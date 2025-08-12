@@ -3,6 +3,7 @@ import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom" // Replace Next.js navigation with React Router
 import dayjs from "dayjs"
 import { motion, AnimatePresence } from "framer-motion"
+import AdComponent from "./ad_component"
 
 // YouTube video ID extractor
 const getYouTubeVideoId = (url) => {
@@ -27,6 +28,57 @@ export default function PostDetailBody() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+
+  // New state for source images
+  const [sourceImages, setSourceImages] = useState([]);
+  const [nonImageLinks, setNonImageLinks] = useState([]);
+
+  // Function to extract images from HTML content
+  const extractImagesFromHTML = (html) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    return Array.from(doc.images).map(img => img.src);
+  };
+
+  // Process source links and fetch images
+  const processSourceLinks = async () => {
+    if (!event.SOURCES) return { imageLinks: [], nonImageLinks: [] };
+
+    const rawUrls = event.SOURCES.split(" || ").map(url => url.trim());
+    const nonImageLinks = [];
+    const foundImages = [];
+
+    for (const url of rawUrls) {
+      if (isLikelyImage(url)) {
+        foundImages.push(url);
+      } else {
+        try {
+          // Fetch page content to find images
+          const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+          const data = await response.json();
+          const htmlContent = data.contents;
+
+          // Extract images from HTML
+          const images = extractImagesFromHTML(htmlContent);
+          foundImages.push(...images);
+        } catch (error) {
+          console.error('Error fetching source content:', error);
+        }
+        nonImageLinks.push(url);
+      }
+    }
+
+    return { imageLinks: foundImages, nonImageLinks };
+  };
+
+  useEffect(() => {
+    if (event) {
+      processSourceLinks().then(({ imageLinks, nonImageLinks }) => {
+        setSourceImages(imageLinks);
+        setNonImageLinks(nonImageLinks);
+      });
+    }
+  }, [event]);
 
   useEffect(() => {
     // Scroll to top when component mounts
@@ -61,6 +113,7 @@ export default function PostDetailBody() {
         }
 
         const data = await response.json();
+        console.log("Fetched post details:", data);
         setEvent(data.fields);
       } catch (error) {
         console.error("Error fetching post details:", error);
@@ -87,6 +140,18 @@ export default function PostDetailBody() {
     setSelectedImageIndex((prevIndex) =>
       prevIndex === event.IMAGE.length - 1 ? 0 : prevIndex + 1
     );
+  };
+
+  const formatNotes = (notes) => {
+    if (!notes) {
+      return <p className="mb-2">No additional details available for this post.</p>;
+    }
+
+    return notes.split('\n\n').map((paragraph, index) => (
+      <p key={index} className="mb-2">
+        {paragraph}
+      </p>
+    ));
   };
 
   // Keyboard navigation for modal
@@ -184,91 +249,83 @@ export default function PostDetailBody() {
     );
   }
 
-  // Process source links for organizing
-  const processSourceLinks = () => {
-    if (!event.SOURCES) return { imageLinks: [], nonImageLinks: [] };
-
-    const rawUrls = event.SOURCES.split(" || ").map((url) => url.trim());
-    const imageLinks = rawUrls.filter((url) => isLikelyImage(url));
-    const nonImageLinks = rawUrls.filter((url) => !isLikelyImage(url) && url);
-
-    return { imageLinks, nonImageLinks };
-  };
-
-  const { imageLinks, nonImageLinks } = processSourceLinks();
-
   // Determine if we have videos from sources or YouTube
   const hasVideos = event.YOUTUBE || false;
 
   return (
     <div className="bg-[#e6edf7] py-8 md:py-12">
       {/* Ad Placement */}
-      <div className="max-w-4xl mx-auto py-4 md:py-8 bg-[#fef2f2] mb-6 text-center text-[#6b7280]">Ad Placement</div>
+      <div className="max-w-4xl mx-auto py-4 md:py-8 bg-[#fef2f2] mb-6 text-center text-[#6b7280]">
+        <AdComponent />
+      </div>
 
       {/* Post Details Text */}
       <div className="w-[90%] md:w-[80vw] mx-auto mb-6 rounded-xl border border-red-500 text-red-400 p-3 md:p-5 overflow-hidden">
         <p className="font-semibold mb-2 ml-4 md:ml-[160px]">Notes 🐣</p>
         <div className="ml-4 md:ml-[160px] mt-4 font-normal text-sm md:text-base">
           <p className="mb-2">
-            {event.NOTES || "No additional details available for this post."}
+            {formatNotes(event.NOTES)}
           </p>
 
           {/* Source links display */}
-          {(nonImageLinks.length > 0) && (
+          {(nonImageLinks.length > 0 || sourceImages.length > 0) && (
             <div className="mt-4 border-t border-red-200 pt-4">
               <p className="font-semibold mb-2">Sources:</p>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {nonImageLinks.map((url, index) => (
+
+              {/* Display the first image from source links (if available) */}
+              {sourceImages.length > 0 && (
+                <div className="mb-4">
                   <a
-                    key={`link-${index}`}
-                    href={url}
+                    href={nonImageLinks[0] || sourceImages[0]} // Link to the original source
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`inline-block bg-white text-red-400 px-3 py-1 rounded-full text-sm border border-red-200 ${url.includes("tumblr.com") ? "border-blue-300" : ""}`}
+                    className="inline-block"
                   >
-                    {url && new URL(url).hostname.replace("www.", "")}
+                    <img
+                      src={sourceImages[0] || sourceImages[5]} // Show first source image
+                      alt="Source"
+                      className="w-full max-w-[600px] rounded-lg cursor-pointer"
+                    />
                   </a>
-                ))}
-              </div>
+                </div>
+              )}
+
+              {/* Display non-image links */}
+              {nonImageLinks.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {nonImageLinks.map((url, index) => (
+                    <a
+                      key={`link-${index}`}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`inline-block bg-white text-red-400 px-3 py-1 rounded-full text-sm border border-red-200 ${url.includes("tumblr.com") ? "border-blue-300" : ""}`}
+                    >
+                      {url && new URL(url).hostname.replace("www.", "")}
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
           )}
+
         </div>
       </div>
 
-      {/* Post Details Images - Combines both IMAGE array and image source links */}
-      {((event.IMAGE && event.IMAGE.length > 0) || imageLinks.length > 0) && (
+      {/* Post Details Images - Now only showing IMAGE array since source images are in notes */}
+      {event.IMAGE && event.IMAGE.length > 0 && (
         <div className="w-[90%] md:w-[80vw] mx-auto mb-6 mt-8 md:mt-16 rounded-xl border border-red-500 text-red-400 p-3 md:p-5 overflow-hidden">
-          <p className="font-semibold mb-2 ml-4 md:ml-[116px] mt-3">Images</p>
-          <div className="flex flex-wrap justify-center md:justify-start gap-4 md:gap-8 ml-0 md:ml-[116px] mt-4">
-            {/* From IMAGE array */}
-            {event.IMAGE && event.IMAGE.map((img, index) => (
-              <img
-                key={`gallery-${index}`}
-                src={img.url}
-                alt={`Post Detail ${index + 1}`}
-                className="w-[150px] h-[150px] sm:w-[200px] sm:h-[200px] md:w-[250px] md:h-[250px] lg:w-[300px] lg:h-[300px] rounded-lg object-cover cursor-pointer"
-                onClick={() => {
-                  setSelectedImageIndex(index);
-                  setIsModalOpen(true);
-                }}
-              />
-            ))}
-
-            {/* From source links */}
-            {imageLinks.map((url, index) => (
-              <img
-                key={`source-${index}`}
-                src={url}
-                alt={`Source Image ${index + 1}`}
-                className="w-[150px] h-[150px] sm:w-[200px] sm:h-[200px] md:w-[250px] md:h-[250px] lg:w-[300px] lg:h-[300px] rounded-lg object-cover cursor-pointer"
-                onClick={() => {
-                  // For source images, we need to handle them separately since they're not in the IMAGE array
-                  const adjustedIndex = event.IMAGE ? event.IMAGE.length + index : index;
-                  setSelectedImageIndex(adjustedIndex);
-                  setIsModalOpen(true);
-                }}
-              />
-            ))}
+          <p className="font-semibold mb-2 ml-4 md:ml-[116px] mt-3">Image</p>
+          <div className="flex justify-center ml-0 md:ml-[116px] mt-4">
+            <img
+              src={event.IMAGE[0].url}
+              alt="Post Detail"
+              className="w-full max-w-[600px] rounded-lg object-cover cursor-pointer"
+              onClick={() => {
+                setSelectedImageIndex(0);
+                setIsModalOpen(true);
+              }}
+            />
           </div>
         </div>
       )}
@@ -343,14 +400,14 @@ export default function PostDetailBody() {
       {event.TWITTER && (
         <div className="w-[90%] md:w-[80vw] mx-auto mb-6 mt-8 md:mt-16 rounded-xl border border-red-500 text-red-400 p-3 md:p-5 overflow-hidden">
           <p className="font-semibold mb-2 ml-4 md:ml-[116px] mt-3">Twitter/X</p>
-          <div className="flex flex-col items-center gap-4 mt-4 w-full overflow-x-auto px-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4 w-full px-2">
             {event.TWITTER.split(/ \|\| |\s+/).map((url, index) => {
               const cleanUrl = url.trim().replace("x.com", "twitter.com");
               const isValid = /^https:\/\/twitter\.com\/[^/]+\/status\/\d+/.test(cleanUrl);
               return isValid ? (
                 <div
                   key={index}
-                  className="twitter-container w-full max-w-[550px] min-w-[300px]"
+                  className="twitter-container w-full"
                 >
                   <blockquote className="twitter-tweet" data-lang="en">
                     <a href={cleanUrl}>{cleanUrl}</a>
@@ -377,8 +434,8 @@ export default function PostDetailBody() {
               onClick={(e) => e.stopPropagation()}
             >
               {(() => {
-                // Determine if we're showing an IMAGE array image or a source image
                 const imageArrayLength = event.IMAGE?.length || 0;
+                const totalImages = imageArrayLength + sourceImages.length;
 
                 if (selectedImageIndex < imageArrayLength) {
                   // Show image from IMAGE array
@@ -389,18 +446,20 @@ export default function PostDetailBody() {
                       className="max-w-full max-h-[80vh] object-contain rounded-lg"
                     />
                   );
-                } else if (imageLinks[selectedImageIndex - imageArrayLength]) {
+                } else if (selectedImageIndex < totalImages) {
                   // Show image from source links
                   return (
                     <img
-                      src={imageLinks[selectedImageIndex - imageArrayLength]}
+                      src={sourceImages[selectedImageIndex - imageArrayLength]}
                       alt="Full view"
                       className="max-w-full max-h-[80vh] object-contain rounded-lg"
                     />
                   );
                 } else {
                   return (
-                    <p className="text-white bg-black bg-opacity-50 p-4 rounded-lg">No image to display.</p>
+                    <p className="text-white bg-black bg-opacity-50 p-4 rounded-lg">
+                      No image to display.
+                    </p>
                   );
                 }
               })()}
@@ -412,19 +471,22 @@ export default function PostDetailBody() {
                 ✕
               </button>
 
-              <button
-                className="absolute left-2 top-1/2 transform -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-red-400 text-white rounded-full opacity-70 hover:opacity-100"
-                onClick={(e) => { e.stopPropagation(); prevImage(); }}
-              >
-                ←
-              </button>
-
-              <button
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-red-400 text-white rounded-full opacity-70 hover:opacity-100"
-                onClick={(e) => { e.stopPropagation(); nextImage(); }}
-              >
-                →
-              </button>
+              {totalImages > 1 && (
+                <>
+                  <button
+                    className="absolute left-2 top-1/2 transform -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-red-400 text-white rounded-full opacity-70 hover:opacity-100"
+                    onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                  >
+                    ←
+                  </button>
+                  <button
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-red-400 text-white rounded-full opacity-70 hover:opacity-100"
+                    onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                  >
+                    →
+                  </button>
+                </>
+              )}
             </motion.div>
           </motion.div>
         )}

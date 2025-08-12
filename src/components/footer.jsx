@@ -1,5 +1,6 @@
 import { Button } from "./ui/Button"
 import { useEffect } from "react"
+import AdComponent from "./ad_component";
 
 export default function Footer() {
 
@@ -45,7 +46,9 @@ export default function Footer() {
                 data-full-width-responsive="true"
               />
             ) : (
-              <div className="text-gray-500 text-sm">Ad Placeholder (Development)</div>
+              <div className="text-gray-500 text-sm">
+                <AdComponent />
+              </div>
             )}
           </div>
         </div>
