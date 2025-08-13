@@ -436,19 +436,7 @@ export default function TimelineBody() {
       <div className="w-full max-w-4xl mx-auto px-4 mb-6">
         <div className="py-8 bg-[#fef2f2] rounded-lg text-center min-h-[100px] flex items-center justify-center">
           {process.env.NODE_ENV === 'production' ? (
-            <ins
-              className="adsbygoogle"
-              style={{
-                display: 'block',
-                width: '100%',
-                maxWidth: '728px',
-                margin: '0 auto'
-              }}
-              data-ad-client="ca-pub-4534610257929133"
-              data-ad-slot="3327797457"
-              data-ad-format="auto"
-              data-full-width-responsive="true"
-            />
+            <AdComponent />
           ) : (
             <div className="text-[#6b7280] text-sm">
               <AdComponent />

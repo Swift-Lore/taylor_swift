@@ -32,19 +32,7 @@ export default function Footer() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-md mx-auto">
           <div className="bg-white/90 p-4 rounded-lg text-center min-h-[100px] flex items-center justify-center">
             {process.env.NODE_ENV === 'production' ? (
-              <ins 
-                className="adsbygoogle"
-                style={{ 
-                  display: 'block',
-                  width: '100%',
-                  maxWidth: '320px',
-                  margin: '0 auto'
-                }}
-                data-ad-client="ca-pub-4534610257929133"
-                data-ad-slot="3327797457"
-                data-ad-format="auto"
-                data-full-width-responsive="true"
-              />
+              <AdComponent/>
             ) : (
               <div className="text-gray-500 text-sm">
                 <AdComponent />

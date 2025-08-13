@@ -276,6 +276,7 @@ export default function Timeline() {
                                     new Date(records[0].fields.DATE).toLocaleDateString('en-US', {
                                         month: 'long',
                                         day: 'numeric',
+                                        timeZone: 'UTC',
                                     })
                                     : "Loading..."}
                             </span>
