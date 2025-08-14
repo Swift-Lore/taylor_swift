@@ -72,12 +72,14 @@ export default function PostDetailBody() {
   };
 
   useEffect(() => {
-    if (event) {
-      processSourceLinks().then(({ imageLinks, nonImageLinks }) => {
-        setSourceImages(imageLinks);
-        setNonImageLinks(nonImageLinks);
-      });
-    }
+    if (!event || !event.SOURCES) return;
+
+    const rawUrls = event.SOURCES.split(" || ").map(url => url.trim());
+    const imageLinks = rawUrls.filter(url => isLikelyImage(url));
+    const nonImageLinks = rawUrls.filter(url => !isLikelyImage(url));
+
+    setSourceImages(imageLinks);
+    setNonImageLinks(nonImageLinks);
   }, [event]);
 
   useEffect(() => {
@@ -263,52 +265,60 @@ export default function PostDetailBody() {
       <div className="w-[90%] md:w-[80vw] mx-auto mb-6 rounded-xl border border-red-500 text-red-400 p-3 md:p-5 overflow-hidden">
         <p className="font-semibold mb-2 ml-4 md:ml-[160px]">Notes 🐣</p>
         <div className="ml-4 md:ml-[160px] mt-4 font-normal text-sm md:text-base">
-          <p className="mb-2">
+          <div className="mb-2">
             {formatNotes(event.NOTES)}
-          </p>
-
-          {/* Source links display */}
+          </div>
+          
+          {/* Source links display - MATCHING EventDetails.jsx BEHAVIOR */}
           {(nonImageLinks.length > 0 || sourceImages.length > 0) && (
             <div className="mt-4 border-t border-red-200 pt-4">
               <p className="font-semibold mb-2">Sources:</p>
 
-              {/* Display the first image from source links (if available) */}
-              {sourceImages.length > 0 && (
-                <div className="mb-4">
+              {/* Combined images and links row */}
+              <div className="flex flex-wrap items-center gap-3">
+                {sourceImages.map((url, index) => (
                   <a
-                    href={nonImageLinks[0] || sourceImages[0]} // Link to the original source
+                    key={`img-${index}`}
+                    href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-block"
+                    className="group relative"
                   >
                     <img
-                      src={sourceImages[0] || sourceImages[5]} // Show first source image
+                      src={url}
                       alt="Source"
-                      className="w-full max-w-[600px] rounded-lg cursor-pointer"
+                      className="h-24 w-auto rounded-lg border border-red-200 object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                      loading="lazy"
                     />
+                    <span className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 opacity-0 group-hover:opacity-100 transition-opacity truncate">
+                      {new URL(url).hostname.replace("www.", "")}
+                    </span>
                   </a>
-                </div>
-              )}
+                ))}
 
-              {/* Display non-image links */}
-              {nonImageLinks.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {nonImageLinks.map((url, index) => (
-                    <a
-                      key={`link-${index}`}
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`inline-block bg-white text-red-400 px-3 py-1 rounded-full text-sm border border-red-200 ${url.includes("tumblr.com") ? "border-blue-300" : ""}`}
-                    >
-                      {url && new URL(url).hostname.replace("www.", "")}
-                    </a>
-                  ))}
-                </div>
-              )}
+                {nonImageLinks.map((url, index) => (
+                  <a
+                    key={`link-${index}`}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`inline-flex items-center h-8 px-3 rounded-full text-sm border ${url.includes("tumblr.com")
+                        ? "border-blue-300 bg-blue-50 text-blue-600"
+                        : "border-red-200 bg-white text-red-400"
+                      } hover:bg-[#fef2f2] transition-colors`}
+                  >
+                    {(() => {
+                      try {
+                        return new URL(url).hostname.replace("www.", "");
+                      } catch {
+                        return url.length > 30 ? `${url.substring(0, 30)}...` : url;
+                      }
+                    })()}
+                  </a>
+                ))}
+              </div>
             </div>
           )}
-
         </div>
       </div>
 
