@@ -78,6 +78,8 @@ export default function TimelineBody() {
   // Add this state near your other state declarations
   const [isSearchMode, setIsSearchMode] = useState(false)
   const [searchResults, setSearchResults] = useState([])
+
+  const [isFilterMode, setIsFilterMode] = useState(false)
   /* NEW */
 
   // Get search query from URL params
@@ -173,7 +175,6 @@ export default function TimelineBody() {
           }
         }
 
-        // Updated keyword filter with "has any" vs "has all" logic
         if (filterKeywords.length > 0) {
           const keywordFilters = filterKeywords.map(keyword => {
             return `FIND('${keyword}', ARRAYJOIN({KEYWORDS}, ',')) > 0`;
@@ -188,73 +189,114 @@ export default function TimelineBody() {
             : keywordFormula;
         }
 
-        // Capitalize first letter for search query
         if (searchQuery.trim()) {
-          // Capitalize the first letter of the search query
           const capitalizedQuery = searchQuery.trim().charAt(0).toUpperCase() + searchQuery.trim().slice(1);
-
           const searchFilter = `OR(
-            FIND('${capitalizedQuery}', {EVENT}) > 0,
-            FIND('${capitalizedQuery}', {LOCATION}) > 0,
-            FIND('${capitalizedQuery}', {CATEGORY}) > 0,
-            FIND('${capitalizedQuery}', ARRAYJOIN({KEYWORDS}, ',')) > 0
-          )`;
-
+        FIND('${capitalizedQuery}', {EVENT}) > 0,
+        FIND('${capitalizedQuery}', {LOCATION}) > 0,
+        FIND('${capitalizedQuery}', {CATEGORY}) > 0,
+        FIND('${capitalizedQuery}', ARRAYJOIN({KEYWORDS}, ',')) > 0
+      )`;
           filterFormula = filterFormula
             ? `AND(${filterFormula}, ${searchFilter})`
             : searchFilter;
         }
 
-        const currentOffset = offsetHistory[currentOffsetIndex]
+        // Check if we're in filter mode (any filter is active)
+        const isFilterActive = filterKeywords.length > 0 || startDate || endDate || monthDay || searchQuery.trim();
+        setIsFilterMode(isFilterActive);
 
-        const response = await axios.get(
-          "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-            },
-            params: {
-              pageSize: recordsPerPage,
-              offset: currentOffset,
-              filterByFormula: filterFormula || undefined,
-              sort: [{ field: "DATE", direction: sortOrder }],
-              view: "Grid view",
-            },
-          }
-        )
-
-        const hasMoreRecords = !!response.data.offset
-        setHasMore(hasMoreRecords)
-
-        if (hasMoreRecords) {
-          if (currentOffsetIndex === offsetHistory.length - 1) {
-            setOffsetHistory(prev => [...prev, response.data.offset])
-          }
-        }
-
-        const formattedPosts = response.data.records.map(record => ({
-          id: record.id,
-          date: record.fields.DATE ? (() => {
-            const date = new Date(record.fields.DATE);
-            const options = {
-              month: 'short',
-              day: '2-digit',
-              year: 'numeric',
-              timeZone: 'UTC'
+        // For filter mode, fetch all records at once (like search)
+        if (isFilterActive) {
+          const response = await axios.get(
+            "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+            {
+              headers: {
+                Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+              },
+              params: {
+                maxRecords: 100,
+                filterByFormula: filterFormula || undefined,
+                sort: [{ field: "DATE", direction: sortOrder }],
+              },
             }
-            return date.toLocaleDateString('en-US', options);
-          })() : 'No date',
-          category: record.fields.CATEGORY || 'Uncategorized',
-          title: record.fields.EVENT || 'Untitled Event',
-          location: record.fields.LOCATION || 'Location unknown',
-          image: record.fields.IMAGE?.[0]?.url || null,
-          year: record.fields.DATE ? new Date(record.fields.DATE).getFullYear() : '',
-          keywords: record.fields.KEYWORDS || [],
-          notes: record.fields.NOTES || null
-        }))
+          )
 
-        setPosts(formattedPosts)
+          const formattedPosts = response.data.records.map(record => ({
+            id: record.id,
+            date: record.fields.DATE ? (() => {
+              const date = new Date(record.fields.DATE);
+              const options = {
+                month: 'short',
+                day: '2-digit',
+                year: 'numeric',
+                timeZone: 'UTC'
+              }
+              return date.toLocaleDateString('en-US', options);
+            })() : 'No date',
+            category: record.fields.CATEGORY || 'Uncategorized',
+            title: record.fields.EVENT || 'Untitled Event',
+            location: record.fields.LOCATION || 'Location unknown',
+            image: record.fields.IMAGE?.[0]?.url || null,
+            year: record.fields.DATE ? new Date(record.fields.DATE).getFullYear() : '',
+            keywords: record.fields.KEYWORDS || [],
+            notes: record.fields.NOTES || null
+          }))
 
+          setPosts(formattedPosts)
+          setHasMore(false) // No pagination in filter mode
+        }
+        // Normal paginated mode when no filters are active
+        else {
+          const currentOffset = offsetHistory[currentOffsetIndex]
+          const response = await axios.get(
+            "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+            {
+              headers: {
+                Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+              },
+              params: {
+                pageSize: recordsPerPage,
+                offset: currentOffset,
+                filterByFormula: filterFormula || undefined,
+                sort: [{ field: "DATE", direction: sortOrder }],
+                view: "Grid view",
+              },
+            }
+          )
+
+          const hasMoreRecords = !!response.data.offset
+          setHasMore(hasMoreRecords)
+
+          if (hasMoreRecords) {
+            if (currentOffsetIndex === offsetHistory.length - 1) {
+              setOffsetHistory(prev => [...prev, response.data.offset])
+            }
+          }
+
+          const formattedPosts = response.data.records.map(record => ({
+            id: record.id,
+            date: record.fields.DATE ? (() => {
+              const date = new Date(record.fields.DATE);
+              const options = {
+                month: 'short',
+                day: '2-digit',
+                year: 'numeric',
+                timeZone: 'UTC'
+              }
+              return date.toLocaleDateString('en-US', options);
+            })() : 'No date',
+            category: record.fields.CATEGORY || 'Uncategorized',
+            title: record.fields.EVENT || 'Untitled Event',
+            location: record.fields.LOCATION || 'Location unknown',
+            image: record.fields.IMAGE?.[0]?.url || null,
+            year: record.fields.DATE ? new Date(record.fields.DATE).getFullYear() : '',
+            keywords: record.fields.KEYWORDS || [],
+            notes: record.fields.NOTES || null
+          }))
+
+          setPosts(formattedPosts)
+        }
       } catch (error) {
         console.error("Error fetching records:", error)
       } finally {
@@ -824,38 +866,41 @@ export default function TimelineBody() {
       )}
 
       {/* Pagination */}
-      <div className="max-w-6xl mx-auto px-4 my-8 flex justify-center items-center gap-2">
-        <span
-          className={`text-sm ${page > 1 ? 'text-[#bb6d6d] cursor-pointer' : 'text-[#bb6d6d]/50'}`}
-          onClick={page > 1 ? handlePreviousPage : undefined}
-        >
-          Previous Page
-        </span>
-        <button
-          className={`w-8 h-8 flex items-center justify-center rounded-full border border-[#bb6d6d] ${page > 1 ? 'bg-[#e6edf7] text-[#bb6d6d]' : 'bg-[#e6edf7]/50 text-[#bb6d6d]/50'}`}
-          onClick={page > 1 ? handlePreviousPage : undefined}
-          disabled={page <= 1}
-        >
-          &lt;
-        </button>
-        <div className="mx-2 text-[#bb6d6d]">Page {page}</div>
-        <button
-          className={`w-8 h-8 flex items-center justify-center rounded-full border border-[#bb6d6d] ${hasMore ? 'bg-[#e6edf7] text-[#bb6d6d]' : 'bg-[#e6edf7]/50 text-[#bb6d6d]/50'}`}
-          onClick={hasMore ? handleNextPage : undefined}
-          disabled={!hasMore}
-        >
-          &gt;
-        </button>
-        <span
-          className={`text-sm ${hasMore ? 'text-[#bb6d6d] cursor-pointer' : 'text-[#bb6d6d]/50'}`}
-          onClick={hasMore ? handleNextPage : undefined}
-        >
-          Next Page
-        </span>
-      </div>
+      {(!loading && !isFilterMode && !isSearchMode &&
+        (posts.length > recordsPerPage || hasMore)) && (
+          <div className="max-w-6xl mx-auto px-4 my-8 flex justify-center items-center gap-2">
+            <span
+              className={`text-sm ${page > 1 ? 'text-[#bb6d6d] cursor-pointer' : 'text-[#bb6d6d]/50'}`}
+              onClick={page > 1 ? handlePreviousPage : undefined}
+            >
+              Previous Page
+            </span>
+            <button
+              className={`w-8 h-8 flex items-center justify-center rounded-full border border-[#bb6d6d] ${page > 1 ? 'bg-[#e6edf7] text-[#bb6d6d]' : 'bg-[#e6edf7]/50 text-[#bb6d6d]/50'}`}
+              onClick={page > 1 ? handlePreviousPage : undefined}
+              disabled={page <= 1}
+            >
+              &lt;
+            </button>
+            <div className="mx-2 text-[#bb6d6d]">Page {page}</div>
+            <button
+              className={`w-8 h-8 flex items-center justify-center rounded-full border border-[#bb6d6d] ${hasMore ? 'bg-[#e6edf7] text-[#bb6d6d]' : 'bg-[#e6edf7]/50 text-[#bb6d6d]/50'}`}
+              onClick={hasMore ? handleNextPage : undefined}
+              disabled={!hasMore}
+            >
+              &gt;
+            </button>
+            <span
+              className={`text-sm ${hasMore ? 'text-[#bb6d6d] cursor-pointer' : 'text-[#bb6d6d]/50'}`}
+              onClick={hasMore ? handleNextPage : undefined}
+            >
+              Next Page
+            </span>
+          </div>
+        )}
 
       {/* View On This Day Button */}
-      <div className="max-w-6xl mx-auto px-4 mb-0">
+      <div className="max-w-6xl mx-auto px-4 mt-16">
         <button
           className="w-full bg-[#c25e5e] text-white py-3 rounded-full font-medium"
           onClick={() => {
