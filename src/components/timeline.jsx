@@ -81,17 +81,17 @@ export default function Timeline() {
     }, []);
 
     const handleNextDay = () => {
-        const currentDate = new Date(2020, currentMonth - 1, currentDay);
-        currentDate.setDate(currentDate.getDate() + 1);
-        setCurrentMonth(currentDate.getMonth() + 1);
-        setCurrentDay(currentDate.getDate());
+        const currentDate = new Date(Date.UTC(2020, currentMonth - 1, currentDay));
+        currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+        setCurrentMonth(currentDate.getUTCMonth() + 1);
+        setCurrentDay(currentDate.getUTCDate());
     };
 
     const handlePreviousDay = () => {
-        const currentDate = new Date(2020, currentMonth - 1, currentDay);
-        currentDate.setDate(currentDate.getDate() - 1);
-        setCurrentMonth(currentDate.getMonth() + 1);
-        setCurrentDay(currentDate.getDate());
+        const currentDate = new Date(Date.UTC(2020, currentMonth - 1, currentDay));
+        currentDate.setUTCDate(currentDate.getUTCDate() - 1);
+        setCurrentMonth(currentDate.getUTCMonth() + 1);
+        setCurrentDay(currentDate.getUTCDate());
     };
 
     const handleCardClick = (postId) => {
@@ -173,10 +173,10 @@ export default function Timeline() {
                                 {record?.fields?.DATE
                                     ? (() => {
                                         const date = new Date(record.fields.DATE);
-                                        const options = { month: "long" };
+                                        const options = { month: "long", timeZone: "UTC" };
                                         const month = date.toLocaleString("en-US", options);
-                                        const day = String(date.getDate()).padStart(2, "0");
-                                        const year = date.getFullYear();
+                                        const day = String(date.getUTCDate()).padStart(2, "0");
+                                        const year = date.getUTCFullYear();
                                         return `${month}-${day}-${year}`;
                                     })()
                                     : "Loading..."}
@@ -387,7 +387,7 @@ export default function Timeline() {
                         className="rounded-full px-5 py-1.5 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg"
                         onClick={() => {
                             navigate("/posts");
-                            window.scrollTo(0,0);
+                            window.scrollTo(0, 0);
                         }}
                     >
                         View Full Timeline
