@@ -263,7 +263,7 @@ export default function PostDetailBody() {
 
       {/* Post Details Text */}
       <div className="w-[90%] md:w-[80vw] mx-auto mb-6 rounded-xl border border-red-500 text-red-400 p-3 md:p-5 overflow-hidden">
-        <p className="font-semibold mb-2 ml-4 md:ml-[160px]">Notes 🐣</p>
+        <p className="font-semibold mb-2 ml-4 md:ml-[160px]">Notes </p>
         <div className="ml-4 md:ml-[160px] mt-4 font-normal text-sm md:text-base">
           <div className="mb-2">
             {formatNotes(event.NOTES)}
