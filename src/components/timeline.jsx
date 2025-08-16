@@ -173,11 +173,13 @@ export default function Timeline() {
                                 {record?.fields?.DATE
                                     ? (() => {
                                         const date = new Date(record.fields.DATE);
-                                        const options = { month: "long", timeZone: "UTC" };
-                                        const month = date.toLocaleString("en-US", options);
-                                        const day = String(date.getUTCDate()).padStart(2, "0");
-                                        const year = date.getUTCFullYear();
-                                        return `${month}-${day}-${year}`;
+                                        const options = {
+                                            month: "short",
+                                            day: "2-digit",
+                                            year: "numeric",
+                                            timeZone: "UTC"  // Add UTC timezone
+                                        };
+                                        return date.toLocaleDateString("en-US", options);
                                     })()
                                     : "Loading..."}
                             </div>
@@ -276,7 +278,7 @@ export default function Timeline() {
                                     new Date(records[0].fields.DATE).toLocaleDateString('en-US', {
                                         month: 'long',
                                         day: 'numeric',
-                                        timeZone: 'UTC',
+                                        timeZone: 'UTC',  // Add this line to use UTC
                                     })
                                     : "Loading..."}
                             </span>
