@@ -1,0 +1,217 @@
+.microlink-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.microlink-card iframe {
+    border: none;
+    width: 100%;
+    min-height: 140px;
+}
+
+.fallback-card {
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background-color: white;
+}
+
+.fallback-card img {
+    width: 2rem;
+    height: 2rem;
+    margin-right: 0.75rem;
+}
+
+.fallback-card div {
+    flex: 1;
+    min-width: 0;
+}
+
+.fallback-card p:first-child {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #dc3545;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.fallback-card p:last-child {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Improved image grid styling */
+.image-only-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 300px;
+    margin-bottom: 1rem;
+}
+
+.image-only-grid a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    overflow: hidden;
+    transition: all 0.2s ease;
+    width: 500px;
+    /* Changed from 380px */
+    height: 400px;
+    /* Changed from 310px */
+    position: relative;
+    flex-shrink: 0;
+}
+
+.image-only-grid a:hover {
+    border-color: #dc3545;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+}
+
+.image-only-grid img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+.image-only-grid span {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 0.75rem;
+    padding: 0.35rem;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.image-only-grid a:hover span {
+    opacity: 1;
+}
+
+/* For specific domains that need special handling */
+.image-only-grid a[href*="hips.hearstapps.com"] img,
+.image-only-grid a[href*="preview.redd.it"] img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Microlink grid styling */
+.microlink-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Override any parent constraints that might be limiting size */
+.w-\[90\%\],
+.md\:w-\[80vw\] {
+    max-width: none !important;
+}
+
+.ml-4,
+.md\:ml-\[160px\] {
+    max-width: none !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1280px) {
+    .image-only-grid a {
+        width: 450px;
+        /* Changed from 340px */
+        height: 360px;
+        /* Changed from 280px */
+    }
+}
+
+@media (max-width: 1024px) {
+    .image-only-grid a {
+        width: 400px;
+        /* Changed from 300px */
+        height: 320px;
+        /* Changed from 250px */
+    }
+}
+
+@media (max-width: 900px) {
+    .image-only-grid {
+        justify-content: center;
+    }
+
+    .image-only-grid a {
+        width: 350px;
+        /* Changed from 280px */
+        height: 280px;
+        /* Changed from 230px */
+    }
+}
+
+@media (max-width: 768px) {
+    .image-only-grid a {
+        width: 320px;
+        /* Changed from 250px */
+        height: 260px;
+        /* Changed from 210px */
+    }
+
+    .microlink-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .image-only-grid a {
+        width: 100%;
+        max-width: 500px;
+        /* Changed from 380px */
+        height: 350px;
+        /* Changed from 280px */
+    }
+}
+
+@media (max-width: 480px) {
+    .image-only-grid a {
+        height: 300px;
+        /* Changed from 240px */
+    }
+
+    .image-only-grid {
+        gap: 16px;
+    }
+}
+
+/* Debug styles - add class="debug" to parent elements to see constraints */
+.debug * {
+    box-shadow: 0 0 0 1px rgba(255, 0, 0, 0.2) !important;
+}
+
+.debug .image-only-grid,
+.debug .image-only-grid a,
+.debug .image-only-grid img {
+    box-shadow: 0 0 0 2px blue !important;
+}

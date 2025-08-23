@@ -4,6 +4,8 @@ import { useNavigate, useLocation } from "react-router-dom" // Replace Next.js n
 import dayjs from "dayjs"
 import { motion, AnimatePresence } from "framer-motion"
 import AdComponent from "./ad_component"
+import Microlink from '@microlink/react';
+import "./post_detail_body.css";
 
 // YouTube video ID extractor
 const getYouTubeVideoId = (url) => {
@@ -257,8 +259,16 @@ export default function PostDetailBody() {
   return (
     <div className="bg-[#e6edf7] py-8 md:py-12">
       {/* Ad Placement */}
-      <div className="max-w-4xl mx-auto py-4 md:py-8 bg-[#fef2f2] mb-6 text-center text-[#6b7280]">
-        <AdComponent />
+      <div className="w-full max-w-4xl mx-auto px-4 mb-6">
+        <div className="py-8 bg-[#fef2f2] rounded-lg text-center min-h-[100px] flex items-center justify-center">
+          {process.env.NODE_ENV === 'production' ? (
+            <AdComponent />
+          ) : (
+            <div className="text-[#6b7280] text-sm">
+              <AdComponent />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Post Details Text */}
@@ -268,57 +278,94 @@ export default function PostDetailBody() {
           <div className="mb-2">
             {formatNotes(event.NOTES)}
           </div>
-          
-          {/* Source links display - MATCHING EventDetails.jsx BEHAVIOR */}
+
+          {/* Source links display - UPDATED WITH MICROLINK */}
           {(nonImageLinks.length > 0 || sourceImages.length > 0) && (
             <div className="mt-4 border-t border-red-200 pt-4">
               <p className="font-semibold mb-2">Sources:</p>
 
-              {/* Combined images and links row */}
-              <div className="flex flex-wrap items-center gap-3">
-                {sourceImages.map((url, index) => (
-                  <a
-                    key={`img-${index}`}
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group relative"
-                  >
-                    <img
-                      src={url}
-                      alt="Source"
-                      className="h-24 w-auto rounded-lg border border-red-200 object-cover cursor-pointer hover:opacity-90 transition-opacity"
-                      loading="lazy"
-                    />
-                    <span className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 opacity-0 group-hover:opacity-100 transition-opacity truncate">
-                      {new URL(url).hostname.replace("www.", "")}
-                    </span>
-                  </a>
-                ))}
+              {/* Direct image links */}
+              {sourceImages.length > 0 && (
+                <div className="image-only-grid flex flex-wrap gap-4 mb-4" style={{gap: '174px'}}>
+                  {sourceImages.map((url, index) => (
+                    <a
+                      key={`img-${index}`}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group relative flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden border border-red-200 hover:shadow-md transition-all"
+                      style={{ width: '500px', height: '450px',}}
+                    >
+                      <img
+                        src={url}
+                        alt="Source"
+                        className="max-w-full max-h-full object-contain cursor-pointer"
+                        loading="lazy"
+                        style={{ width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '100%' }}
+                      />
+                      <span className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs p-1 opacity-0 group-hover:opacity-100 transition-opacity truncate text-center">
+                        {(() => {
+                          try {
+                            return new URL(url).hostname.replace("www.", "");
+                          } catch {
+                            return "Source";
+                          }
+                        })()}
+                      </span>
+                    </a>
+                  ))}
+                </div>
+              )}
 
-                {nonImageLinks.map((url, index) => (
-                  <a
-                    key={`link-${index}`}
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`inline-flex items-center h-8 px-3 rounded-full text-sm border ${url.includes("tumblr.com")
-                        ? "border-blue-300 bg-blue-50 text-blue-600"
-                        : "border-red-200 bg-white text-red-400"
-                      } hover:bg-[#fef2f2] transition-colors`}
-                  >
-                    {(() => {
-                      try {
-                        return new URL(url).hostname.replace("www.", "");
-                      } catch {
-                        return url.length > 30 ? `${url.substring(0, 30)}...` : url;
-                      }
-                    })()}
-                  </a>
-                ))}
-              </div>
+              {/* Microlink previews for non-image links */}
+              {nonImageLinks.length > 0 && (
+                <div className="microlink-grid grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {nonImageLinks.map((url, index) => (
+                    <div key={`link-${index}`} className="microlink-card">
+                      <div id={`microlink-wrapper-${index}`}>
+                        <Microlink
+                          url={url}
+                          size="large"
+                          media="image"
+                          onError={() => {
+                            const fallback = document.getElementById(`fallback-${index}`);
+                            if (fallback) fallback.style.display = "flex";
+                          }}
+                          fallback={{
+                            image: `https://logo.clearbit.com/${new URL(url).hostname}`,
+                            title: url.split("/").slice(-1)[0].replace(/[-_]/g, " "),
+                            description: new URL(url).hostname.replace("www.", "")
+                          }}
+                        />
+                      </div>
+
+                      {/* Fallback card */}
+                      <div
+                        id={`fallback-${index}`}
+                        style={{ display: "none" }}
+                        className="fallback-card flex items-center p-3 border border-red-200 rounded-lg bg-white"
+                      >
+                        <img
+                          src={`https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(url)}`}
+                          alt=""
+                          className="w-8 h-8 mr-3"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-red-400 truncate">
+                            {url.split("/").slice(-1)[0].replace(/[-_]/g, " ")}
+                          </p>
+                          <p className="text-xs text-gray-500 truncate">
+                            {new URL(url).hostname.replace("www.", "")}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
+
         </div>
       </div>
 

@@ -10,4 +10,9 @@ export default defineConfig({
       "@": resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      external: ["@babel/runtime"],
+    },
+  },
 })
