@@ -61,7 +61,7 @@ export default function TimelineBody() {
 
   // view mode: "grid" or "compact"
   const [viewMode, setViewMode] = useState("grid")
-
+  const TIMELINE_FILTERS_KEY = "swiftLoreTimelineFilters"
   // Tag click = add filter, don’t navigate
   const handleTagClick = (e, keyword) => {
     e.preventDefault()
