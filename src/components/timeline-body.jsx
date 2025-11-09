@@ -747,14 +747,7 @@ export default function TimelineBody() {
             </button>
 
             {showKeywordDropdown && (
-  <div
-    className="
-      absolute top-full left-0 mt-1
-      w-64 max-w-[calc(100vw-2rem)]
-      bg-white border border-[#6b7db3] rounded-lg shadow-lg
-      z-50 max-h-[70vh] overflow-hidden
-    "
-  >
+  <div className="absolute top-full left-0 mt-1 w-64 max-w-[90vw] bg-white border border-[#6b7db3] rounded-lg shadow-lg z-50">
     <div className="p-2">
                   {keywordsLoading && allKeywords.length === 0 ? (
                     <div className="px-3 py-4 text-sm text-gray-500">
