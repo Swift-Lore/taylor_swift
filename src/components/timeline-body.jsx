@@ -693,7 +693,7 @@ export default function TimelineBody() {
   }, [])
 
   return (
-    <div className="bg-[#e6edf7] py-8 overflow-hidden">
+  <div className="bg-[#e6edf7] py-8 overflow-x-hidden">
       {/* Ad Placement */}
       <div className="w-full max-w-4xl mx-auto px-4 mb-6">
   <div className="relative rounded-2xl border border-[#f8dada] bg-gradient-to-b from-[#fff8f8] to-[#fdeeee] shadow-sm px-4 py-6 min-h-[110px] flex items-center justify-center">
@@ -746,8 +746,15 @@ export default function TimelineBody() {
             </button>
 
             {showKeywordDropdown && (
-              <div className="absolute top-full left-0 mt-1 w-64 bg-white border border-[#6b7db3] rounded-lg shadow-lg z-50 max-h-80 overflow-hidden">
-                <div className="p-2">
+  <div
+    className="
+      absolute top-full left-0 mt-1
+      w-64 max-w-[calc(100vw-2rem)]
+      bg-white border border-[#6b7db3] rounded-lg shadow-lg
+      z-50 max-h-[70vh] overflow-hidden
+    "
+  >
+    <div className="p-2">
                   {keywordsLoading && allKeywords.length === 0 ? (
                     <div className="px-3 py-4 text-sm text-gray-500">
                       Loading keywords…
@@ -815,7 +822,7 @@ export default function TimelineBody() {
                         Clear All Filters
                       </button>
 
-                      <div className="max-h-48 overflow-y-auto">
+                      <div className="max-h-[50vh] overflow-y-auto">
                         {getFilteredKeywords().map((keyword, index) => (
                           <div
                             key={index}
