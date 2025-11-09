@@ -42,9 +42,15 @@ const formatEventDate = (isoDate) => {
   if (Number.isNaN(d.getTime())) return "";
 
   // Force UTC interpretation
-  const month = d.toLocaleString("en-US", { month: "short", timeZone: "UTC" }); // "Nov"
-  const day = String(d.getUTCDate()).padStart(2, "0");                          // "07"
-  const year = d.getUTCFullYear(
+  const month = d.toLocaleString("en-US", {
+    month: "short",
+    timeZone: "UTC",
+  }); // "Nov"
+  const day = String(d.getUTCDate()).padStart(2, "0"); // "07"
+  const year = d.getUTCFullYear();                     // 2025
+
+  return `${month}-${day}-${year}`;
+};
 
 export default function PostDetailBody() {
   const navigate = useNavigate();
