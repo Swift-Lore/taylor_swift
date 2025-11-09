@@ -26,7 +26,7 @@ export default function TimelineBody() {
   const updateURLParams = () => {
   const params = new URLSearchParams()
 
-  if (sortOrder && sortOrder !== "asc") params.set("sort", sortOrder)
+  if (sortOrder && sortOrder !== "desc") params.set("sort", sortOrder)
   if (viewMode && viewMode !== "grid") params.set("view", viewMode)
   if (filterKeywords.length > 0) params.set("keywords", filterKeywords.join(","))
   if (startDateInput) params.set("start", startDateInput)
@@ -49,7 +49,7 @@ export default function TimelineBody() {
   const recordsPerPage = 12
 
   // Filter states
-  const [sortOrder, setSortOrder] = useState("asc")
+  const [sortOrder, setSortOrder] = useState("desc")
   const [filterKeywords, setFilterKeywords] = useState([])
 
   // these are what the user types, in MM/DD/YYYY
@@ -582,19 +582,27 @@ export default function TimelineBody() {
 
   // Reset ALL filters
   const resetAllFilters = () => {
-    setSortOrder("asc")
-    setFilterKeywords([])
-    setKeywordMatchType("all")
-    setKeywordSearchQuery("")
-    setStartDateInput("")
-    setEndDateInput("")
-    setMonthDay("")
-    setSearchQuery("")
-    setIsSearchMode(false)
-    setSearchResults([])
-    setShowKeywordDropdown(false)
-    resetPagination()
+  setSortOrder("desc")
+  setFilterKeywords([])
+  setKeywordMatchType("all")
+  setKeywordSearchQuery("")
+  setStartDateInput("")
+  setEndDateInput("")
+  setMonthDay("")
+  setSearchQuery("")
+  setIsSearchMode(false)
+  setSearchResults([])
+  setShowKeywordDropdown(false)
+  resetPagination()
+
+  // also clear saved filters + clean URL
+  if (typeof window !== "undefined") {
+    window.sessionStorage.removeItem(TIMELINE_FILTERS_KEY)
+    const basePath = window.location.pathname
+    window.history.replaceState({}, "", basePath)
   }
+}
+
   // Persist filters + view mode to sessionStorage whenever they change
     useEffect(() => {
     if (typeof window === "undefined") return
@@ -819,7 +827,9 @@ export default function TimelineBody() {
                 handleSortChange(sortOrder === "asc" ? "desc" : "asc")
               }
             >
-              <span>Sort by {sortOrder === "asc" ? "oldest" : "newest"}</span>
+              <span>
+  {sortOrder === "asc" ? "Oldest → Newest" : "Newest → Oldest"}
+</span>
               <span className="ml-2">▼</span>
             </button>
           </div>
