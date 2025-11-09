@@ -24,20 +24,23 @@ export default function TimelineBody() {
  
   // Helper: Update URL params when filters change
   const updateURLParams = () => {
-    const params = new URLSearchParams()
+  const params = new URLSearchParams()
 
-    if (sortOrder && sortOrder !== "asc") params.set("sort", sortOrder)
-    if (viewMode && viewMode !== "grid") params.set("view", viewMode)
-    if (filterKeywords.length > 0) params.set("keywords", filterKeywords.join(","))
-    if (startDateInput) params.set("start", startDateInput)
-    if (endDateInput) params.set("end", endDateInput)
-    if (monthDay) params.set("monthday", monthDay)
-    if (searchQuery) params.set("q", searchQuery)
-    if (keywordMatchType !== "all") params.set("match", keywordMatchType)
+  if (sortOrder && sortOrder !== "asc") params.set("sort", sortOrder)
+  if (viewMode && viewMode !== "grid") params.set("view", viewMode)
+  if (filterKeywords.length > 0) params.set("keywords", filterKeywords.join(","))
+  if (startDateInput) params.set("start", startDateInput)
+  if (endDateInput) params.set("end", endDateInput)
+  if (monthDay) params.set("monthday", monthDay)
+  if (searchQuery) params.set("q", searchQuery)
+  if (keywordMatchType !== "all") params.set("match", keywordMatchType)
 
-    const newUrl = `${window.location.pathname}?${params.toString()}`
-    window.history.replaceState({}, "", newUrl)
-  }
+  const queryString = params.toString()
+  const basePath = window.location.pathname
+  const newUrl = queryString ? `${basePath}?${queryString}` : basePath
+
+  window.history.replaceState({}, "", newUrl)
+}
 
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
