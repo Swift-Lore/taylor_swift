@@ -746,120 +746,129 @@ export default function TimelineBody() {
               <span className="ml-2">▼</span>
             </button>
 
-                        {showKeywordDropdown && (
-              <div className="fixed inset-0 z-50 sm:static sm:inset-auto">
-                {/* Mobile backdrop */}
-                <div
-                  className="absolute inset-0 bg-black/20 sm:hidden"
-                  onClick={() => setShowKeywordDropdown(false)}
-                />
+                                 {/* Filter Keywords dropdown */}
+          <div className="relative">
+            <button
+              className="flex items-center justify-between bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-1.5 text-sm min-w-[150px]"
+              onClick={() => {
+                const next = !showKeywordDropdown
+                setShowKeywordDropdown(next)
+                if (next) loadKeywordsIfNeeded()
+              }}
+            >
+              <span>
+                {filterKeywords.length > 0
+                  ? `${filterKeywords.length} selected`
+                  : "Filter by keyword"}
+              </span>
+              <span className="ml-2">▼</span>
+            </button>
 
-                {/* Dropdown panel */}
-                <div className="absolute left-1/2 top-[20%] w-[90vw] max-w-sm -translate-x-1/2 bg-white border border-[#6b7db3] rounded-lg shadow-lg max-h-[60vh] overflow-y-auto
-                                sm:static sm:left-0 sm:top-full sm:mt-1 sm:translate-x-0 sm:w-64 sm:max-w-[90vw] sm:max-h-[50vh]">
-                  <div className="p-2">
-                    {keywordsLoading && allKeywords.length === 0 ? (
-                      <div className="px-3 py-4 text-sm text-gray-500">
-                        Loading keywords…
+            {showKeywordDropdown && (
+              <div className="fixed inset-x-4 top-24 sm:absolute sm:inset-auto sm:top-full sm:left-0 sm:mt-1 w-auto sm:w-64 max-w-[90vw] bg-white border border-[#6b7db3] rounded-lg shadow-lg z-[9999] max-h-[60vh] overflow-y-auto">
+                <div className="p-2">
+                  {keywordsLoading && allKeywords.length === 0 ? (
+                    <div className="px-3 py-4 text-sm text-gray-500">
+                      Loading keywords…
+                    </div>
+                  ) : (
+                    <>
+                      {/* Keyword search input */}
+                      <div className="relative mb-2">
+                        <input
+                          type="text"
+                          placeholder="Search keywords..."
+                          className="w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-3 py-1.5 text-sm"
+                          value={keywordSearchQuery}
+                          onChange={(e) =>
+                            setKeywordSearchQuery(e.target.value)
+                          }
+                        />
                       </div>
-                    ) : (
-                      <>
-                        {/* Keyword search input */}
-                        <div className="relative mb-2">
-                          <input
-                            type="text"
-                            placeholder="Search keywords..."
-                            className="w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-3 py-1.5 text-sm"
-                            value={keywordSearchQuery}
-                            onChange={(e) =>
-                              setKeywordSearchQuery(e.target.value)
-                            }
-                          />
-                        </div>
 
-                        {/* Any / All toggle */}
-                        {filterKeywords.length > 0 && (
-                          <div className="mb-2 p-2 bg-[#e6edf7] rounded">
-                            <div className="flex items-center gap-4">
-                              <label className="flex items-center text-sm">
-                                <input
-                                  type="radio"
-                                  name="matchType"
-                                  value="any"
-                                  checked={keywordMatchType === "any"}
-                                  onChange={(e) => {
-                                    setKeywordMatchType(e.target.value)
-                                    resetPagination()
-                                  }}
-                                  className="mr-1"
-                                />
-                                Has Any
-                              </label>
-                              <label className="flex items-center text-sm">
-                                <input
-                                  type="radio"
-                                  name="matchType"
-                                  value="all"
-                                  checked={keywordMatchType === "all"}
-                                  onChange={(e) => {
-                                    setKeywordMatchType(e.target.value)
-                                    resetPagination()
-                                  }}
-                                  className="mr-1"
-                                />
-                                Has All
-                              </label>
-                            </div>
-                          </div>
-                        )}
-
-                        <button
-                          className="w-full text-left px-3 py-2 text-sm hover:bg-[#e6edf7] rounded mb-1"
-                          onClick={() => {
-                            setFilterKeywords([])
-                            setShowKeywordDropdown(false)
-                            setKeywordSearchQuery("")
-                            resetPagination()
-                          }}
-                        >
-                          Clear All Filters
-                        </button>
-
-                        <div className="max-h-[50vh] overflow-y-auto">
-                          {getFilteredKeywords().map((keyword, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center px-3 py-2"
-                            >
+                      {/* Any / All toggle */}
+                      {filterKeywords.length > 0 && (
+                        <div className="mb-2 p-2 bg-[#e6edf7] rounded">
+                          <div className="flex items-center gap-4">
+                            <label className="flex items-center text-sm">
                               <input
-                                type="checkbox"
-                                id={`keyword-${index}`}
-                                checked={filterKeywords.includes(keyword)}
-                                onChange={() => handleKeywordFilter(keyword)}
-                                className="mr-2"
+                                type="radio"
+                                name="matchType"
+                                value="any"
+                                checked={keywordMatchType === "any"}
+                                onChange={(e) => {
+                                  setKeywordMatchType(e.target.value)
+                                  resetPagination()
+                                }}
+                                className="mr-1"
                               />
-                              <label
-                                htmlFor={`keyword-${index}`}
-                                className="text-sm cursor-pointer"
-                              >
-                                {keyword}
-                              </label>
-                            </div>
-                          ))}
-
-                          {getFilteredKeywords().length === 0 &&
-                            keywordSearchQuery && (
-                              <div className="px-3 py-2 text-sm text-gray-500">
-                                No keywords found matching "{keywordSearchQuery}"
-                              </div>
-                            )}
+                              Has Any
+                            </label>
+                            <label className="flex items-center text-sm">
+                              <input
+                                type="radio"
+                                name="matchType"
+                                value="all"
+                                checked={keywordMatchType === "all"}
+                                onChange={(e) => {
+                                  setKeywordMatchType(e.target.value)
+                                  resetPagination()
+                                }}
+                                className="mr-1"
+                              />
+                              Has All
+                            </label>
+                          </div>
                         </div>
-                      </>
-                    )}
-                  </div>
+                      )}
+
+                      <button
+                        className="w-full text-left px-3 py-2 text-sm hover:bg-[#e6edf7] rounded mb-1"
+                        onClick={() => {
+                          setFilterKeywords([])
+                          setShowKeywordDropdown(false)
+                          setKeywordSearchQuery("")
+                          resetPagination()
+                        }}
+                      >
+                        Clear All Filters
+                      </button>
+
+                      <div className="max-h-[50vh] overflow-y-auto">
+                        {getFilteredKeywords().map((keyword, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center px-3 py-2"
+                          >
+                            <input
+                              type="checkbox"
+                              id={`keyword-${index}`}
+                              checked={filterKeywords.includes(keyword)}
+                              onChange={() => handleKeywordFilter(keyword)}
+                              className="mr-2"
+                            />
+                            <label
+                              htmlFor={`keyword-${index}`}
+                              className="text-sm cursor-pointer"
+                            >
+                              {keyword}
+                            </label>
+                          </div>
+                        ))}
+
+                        {getFilteredKeywords().length === 0 &&
+                          keywordSearchQuery && (
+                            <div className="px-3 py-2 text-sm text-gray-500">
+                              No keywords found matching "{keywordSearchQuery}"
+                            </div>
+                          )}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             )}
+          </div>
 
           {/* Start Date */}
           <div className="relative">
