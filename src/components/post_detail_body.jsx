@@ -35,16 +35,16 @@ const isLikelyImage = (url) => {
   );
 };
 
-// Format DATE field as "Nov-07-2025"
+// Format DATE field as "Nov-07-2025" (force UTC so it doesn’t shift by timezone)
 const formatEventDate = (isoDate) => {
   if (!isoDate) return "";
   const d = new Date(isoDate);
   if (Number.isNaN(d.getTime())) return "";
-  const month = d.toLocaleString("en-US", { month: "short" }); // "Nov"
-  const day = String(d.getDate()).padStart(2, "0");            // "07"
-  const year = d.getFullYear();                                // "2025"
-  return `${month}-${day}-${year}`;
-};
+
+  // Force UTC interpretation
+  const month = d.toLocaleString("en-US", { month: "short", timeZone: "UTC" }); // "Nov"
+  const day = String(d.getUTCDate()).padStart(2, "0");                          // "07"
+  const year = d.getUTCFullYear(
 
 export default function PostDetailBody() {
   const navigate = useNavigate();
