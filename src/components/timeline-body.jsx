@@ -114,6 +114,30 @@ export default function TimelineBody() {
       console.error("Error parsing saved timeline filters:", e)
     }
   }, [])
+  // On first mount, if the URL has filters (shared link), apply them
+  useEffect(() => {
+    if (typeof window === "undefined") return
+
+    const urlParams = new URLSearchParams(window.location.search)
+
+    const urlSort = urlParams.get("sort")
+    const urlView = urlParams.get("view")
+    const urlKeywords = urlParams.get("keywords")
+    const urlStart = urlParams.get("start")
+    const urlEnd = urlParams.get("end")
+    const urlMonthDay = urlParams.get("monthday")
+    const urlQ = urlParams.get("q")
+    const urlMatch = urlParams.get("match")
+
+    if (urlSort) setSortOrder(urlSort)
+    if (urlView) setViewMode(urlView)
+    if (urlKeywords) setFilterKeywords(urlKeywords.split(","))
+    if (urlStart) setStartDateInput(urlStart)
+    if (urlEnd) setEndDateInput(urlEnd)
+    if (urlMonthDay) setMonthDay(urlMonthDay)
+    if (urlQ) setSearchQuery(urlQ)
+    if (urlMatch) setKeywordMatchType(urlMatch)
+  }, [])
 
   // Read query params (?q=, ?keyword=)
   useEffect(() => {
