@@ -21,6 +21,26 @@ const parseMMDDYYYYToISO = (value) => {
 export default function TimelineBody() {
   const navigate = useNavigate()
   const location = useLocation()
+ 
+  // Helper: Update URL params when filters change
+  const updateURLParams = () => {
+  const params = new URLSearchParams()
+
+  if (sortOrder && sortOrder !== "desc") params.set("sort", sortOrder)
+  if (viewMode && viewMode !== "grid") params.set("view", viewMode)
+  if (filterKeywords.length > 0) params.set("keywords", filterKeywords.join(","))
+  if (startDateInput) params.set("start", startDateInput)
+  if (endDateInput) params.set("end", endDateInput)
+  if (monthDay) params.set("monthday", monthDay)
+  if (searchQuery) params.set("q", searchQuery)
+  if (keywordMatchType !== "all") params.set("match", keywordMatchType)
+
+  const queryString = params.toString()
+  const basePath = window.location.pathname
+  const newUrl = queryString ? `${basePath}?${queryString}` : basePath
+
+  window.history.replaceState({}, "", newUrl)
+}
 
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
@@ -29,7 +49,7 @@ export default function TimelineBody() {
   const recordsPerPage = 12
 
   // Filter states
-  const [sortOrder, setSortOrder] = useState("asc")
+  const [sortOrder, setSortOrder] = useState("desc")
   const [filterKeywords, setFilterKeywords] = useState([])
 
   // these are what the user types, in MM/DD/YYYY
@@ -61,7 +81,7 @@ export default function TimelineBody() {
 
   // view mode: "grid" or "compact"
   const [viewMode, setViewMode] = useState("grid")
-
+  const TIMELINE_FILTERS_KEY = "swiftLoreTimelineFilters"
   // Tag click = add filter, don’t navigate
   const handleTagClick = (e, keyword) => {
     e.preventDefault()
@@ -72,6 +92,52 @@ export default function TimelineBody() {
     }
     resetPagination()
   }
+  // On first mount, restore filters from sessionStorage (per user / per tab)
+  useEffect(() => {
+    if (typeof window === "undefined") return
+
+    const saved = window.sessionStorage.getItem(TIMELINE_FILTERS_KEY)
+    if (!saved) return
+
+    try {
+      const parsed = JSON.parse(saved)
+
+      if (parsed.sortOrder) setSortOrder(parsed.sortOrder)
+      if (Array.isArray(parsed.filterKeywords)) setFilterKeywords(parsed.filterKeywords)
+      if (typeof parsed.startDateInput === "string") setStartDateInput(parsed.startDateInput)
+      if (typeof parsed.endDateInput === "string") setEndDateInput(parsed.endDateInput)
+      if (typeof parsed.monthDay === "string") setMonthDay(parsed.monthDay)
+      if (typeof parsed.searchQuery === "string") setSearchQuery(parsed.searchQuery)
+      if (parsed.keywordMatchType) setKeywordMatchType(parsed.keywordMatchType)
+      if (parsed.viewMode) setViewMode(parsed.viewMode)
+    } catch (e) {
+      console.error("Error parsing saved timeline filters:", e)
+    }
+  }, [])
+  // On first mount, if the URL has filters (shared link), apply them
+  useEffect(() => {
+    if (typeof window === "undefined") return
+
+    const urlParams = new URLSearchParams(window.location.search)
+
+    const urlSort = urlParams.get("sort")
+    const urlView = urlParams.get("view")
+    const urlKeywords = urlParams.get("keywords")
+    const urlStart = urlParams.get("start")
+    const urlEnd = urlParams.get("end")
+    const urlMonthDay = urlParams.get("monthday")
+    const urlQ = urlParams.get("q")
+    const urlMatch = urlParams.get("match")
+
+    if (urlSort) setSortOrder(urlSort)
+    if (urlView) setViewMode(urlView)
+    if (urlKeywords) setFilterKeywords(urlKeywords.split(","))
+    if (urlStart) setStartDateInput(urlStart)
+    if (urlEnd) setEndDateInput(urlEnd)
+    if (urlMonthDay) setMonthDay(urlMonthDay)
+    if (urlQ) setSearchQuery(urlQ)
+    if (urlMatch) setKeywordMatchType(urlMatch)
+  }, [])
 
   // Read query params (?q=, ?keyword=)
   useEffect(() => {
@@ -516,19 +582,58 @@ export default function TimelineBody() {
 
   // Reset ALL filters
   const resetAllFilters = () => {
-    setSortOrder("asc")
-    setFilterKeywords([])
-    setKeywordMatchType("all")
-    setKeywordSearchQuery("")
-    setStartDateInput("")
-    setEndDateInput("")
-    setMonthDay("")
-    setSearchQuery("")
-    setIsSearchMode(false)
-    setSearchResults([])
-    setShowKeywordDropdown(false)
-    resetPagination()
+  setSortOrder("desc")
+  setFilterKeywords([])
+  setKeywordMatchType("all")
+  setKeywordSearchQuery("")
+  setStartDateInput("")
+  setEndDateInput("")
+  setMonthDay("")
+  setSearchQuery("")
+  setIsSearchMode(false)
+  setSearchResults([])
+  setShowKeywordDropdown(false)
+  resetPagination()
+
+  // also clear saved filters + clean URL
+  if (typeof window !== "undefined") {
+    window.sessionStorage.removeItem(TIMELINE_FILTERS_KEY)
+    const basePath = window.location.pathname
+    window.history.replaceState({}, "", basePath)
   }
+}
+
+  // Persist filters + view mode to sessionStorage whenever they change
+    useEffect(() => {
+    if (typeof window === "undefined") return
+
+    const payload = {
+      sortOrder,
+      filterKeywords,
+      startDateInput,
+      endDateInput,
+      monthDay,
+      searchQuery,
+      keywordMatchType,
+      viewMode,
+    }
+
+    try {
+      window.sessionStorage.setItem(TIMELINE_FILTERS_KEY, JSON.stringify(payload))
+      updateURLParams()
+    } catch (e) {
+      console.error("Error saving timeline filters:", e)
+    }
+  }, [
+    sortOrder,
+    filterKeywords,
+    startDateInput,
+    endDateInput,
+    monthDay,
+    searchQuery,
+    keywordMatchType,
+    viewMode,
+  ])
 
   // group posts by year in original order
   const groupPostsByYear = (list) => {
@@ -722,7 +827,9 @@ export default function TimelineBody() {
                 handleSortChange(sortOrder === "asc" ? "desc" : "asc")
               }
             >
-              <span>Sort by {sortOrder === "asc" ? "oldest" : "newest"}</span>
+              <span>
+  {sortOrder === "asc" ? "Oldest → Newest" : "Newest → Oldest"}
+</span>
               <span className="ml-2">▼</span>
             </button>
           </div>
