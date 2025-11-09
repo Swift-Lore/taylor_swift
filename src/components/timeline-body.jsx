@@ -1,5 +1,4 @@
 "use client"
-// TEST: dropdown/mobile fix
 
 import { useState, useEffect } from "react"
 import axios from "axios"
@@ -694,31 +693,31 @@ export default function TimelineBody() {
   }, [])
 
   return (
-  <div className="bg-[#e6edf7] py-8 overflow-x-hidden">
+    <div className="bg-[#e6edf7] py-8 overflow-x-hidden">
       {/* Ad Placement */}
       <div className="w-full max-w-4xl mx-auto px-4 mb-6">
-  <div className="relative rounded-2xl border border-[#f8dada] bg-gradient-to-b from-[#fff8f8] to-[#fdeeee] shadow-sm px-4 py-6 min-h-[110px] flex items-center justify-center">
-    <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.12em] text-[#9ca3af]">
-      Sponsored
-    </span>
+        <div className="relative rounded-2xl border border-[#f8dada] bg-gradient-to-b from-[#fff8f8] to-[#fdeeee] shadow-sm px-4 py-6 min-h-[110px] flex items-center justify-center">
+          <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.12em] text-[#9ca3af]">
+            Sponsored
+          </span>
 
-    {process.env.NODE_ENV === "production" ? (
-      <AdComponent />
-    ) : (
-      <div className="text-[#9ca3af] text-sm italic">
-        Advertisement space — supporting Swift Lore 💫
+          {process.env.NODE_ENV === "production" ? (
+            <AdComponent />
+          ) : (
+            <div className="text-[#9ca3af] text-sm italic">
+              Advertisement space — supporting Swift Lore 💫
+            </div>
+          )}
+        </div>
       </div>
-    )}
-  </div>
-</div>
 
       {/* Filters */}
-            <div className="max-w-6xl mx-auto px-4 mb-6">
+      <div className="max-w-6xl mx-auto px-4 mb-6">
         <div className="relative flex flex-wrap gap-2 py-4 items-center overflow-visible">
           {/* Sort By */}
           <div className="relative">
             <button
-              className="flex items-center justify-between bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-1.5 text-sm min-w-[120px]"
+              className="flex items-center justify-between bg.white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-1.5 text-sm min-w-[120px] bg-white"
               onClick={() =>
                 handleSortChange(sortOrder === "asc" ? "desc" : "asc")
               }
@@ -729,24 +728,6 @@ export default function TimelineBody() {
           </div>
 
           {/* Filter Keywords dropdown */}
-          <div className="relative">
-            <button
-              className="flex items-center justify-between bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-1.5 text-sm min-w-[150px]"
-              onClick={() => {
-                const next = !showKeywordDropdown
-                setShowKeywordDropdown(next)
-                if (next) loadKeywordsIfNeeded()
-              }}
-            >
-              <span>
-                {filterKeywords.length > 0
-                  ? `${filterKeywords.length} selected`
-                  : "Filter by keyword"}
-              </span>
-              <span className="ml-2">▼</span>
-            </button>
-
-                                 {/* Filter Keywords dropdown */}
           <div className="relative">
             <button
               className="flex items-center justify-between bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-1.5 text-sm min-w-[150px]"
@@ -945,7 +926,7 @@ export default function TimelineBody() {
               className={`px-3 py-1 text-xs rounded-full border ${
                 viewMode === "compact"
                   ? "bg-[#c25e5e] text-white border-[#c25e5e]"
-                  : "bg-white text-[#6b7db3] border-[#6b7db3]"
+                  : "bg.white text-[#6b7db3] border-[#6b7db3] bg-white"
               }`}
               onClick={() => setViewMode("compact")}
             >
@@ -1100,7 +1081,7 @@ export default function TimelineBody() {
       {/* View On This Day Button */}
       <div className="max-w-6xl mx-auto px-4 mt-16">
         <button
-          className="w-full bg-[#c25e5e] text-white py-3 rounded-full font-medium"
+          className="w-full bg-[#c25e5e] text.white py-3 rounded-full font-medium text-white"
           onClick={() => {
             navigate("/timeline")
             window.scrollTo(0, 0)
@@ -1113,6 +1094,3 @@ export default function TimelineBody() {
     </div>
   )
 }
-
-
-
