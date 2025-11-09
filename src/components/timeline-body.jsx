@@ -21,6 +21,23 @@ const parseMMDDYYYYToISO = (value) => {
 export default function TimelineBody() {
   const navigate = useNavigate()
   const location = useLocation()
+ 
+  // Helper: Update URL params when filters change
+  const updateURLParams = () => {
+    const params = new URLSearchParams()
+
+    if (sortOrder && sortOrder !== "asc") params.set("sort", sortOrder)
+    if (viewMode && viewMode !== "grid") params.set("view", viewMode)
+    if (filterKeywords.length > 0) params.set("keywords", filterKeywords.join(","))
+    if (startDateInput) params.set("start", startDateInput)
+    if (endDateInput) params.set("end", endDateInput)
+    if (monthDay) params.set("monthday", monthDay)
+    if (searchQuery) params.set("q", searchQuery)
+    if (keywordMatchType !== "all") params.set("match", keywordMatchType)
+
+    const newUrl = `${window.location.pathname}?${params.toString()}`
+    window.history.replaceState({}, "", newUrl)
+  }
 
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
@@ -72,6 +89,28 @@ export default function TimelineBody() {
     }
     resetPagination()
   }
+  // On first mount, restore filters from sessionStorage (per user / per tab)
+  useEffect(() => {
+    if (typeof window === "undefined") return
+
+    const saved = window.sessionStorage.getItem(TIMELINE_FILTERS_KEY)
+    if (!saved) return
+
+    try {
+      const parsed = JSON.parse(saved)
+
+      if (parsed.sortOrder) setSortOrder(parsed.sortOrder)
+      if (Array.isArray(parsed.filterKeywords)) setFilterKeywords(parsed.filterKeywords)
+      if (typeof parsed.startDateInput === "string") setStartDateInput(parsed.startDateInput)
+      if (typeof parsed.endDateInput === "string") setEndDateInput(parsed.endDateInput)
+      if (typeof parsed.monthDay === "string") setMonthDay(parsed.monthDay)
+      if (typeof parsed.searchQuery === "string") setSearchQuery(parsed.searchQuery)
+      if (parsed.keywordMatchType) setKeywordMatchType(parsed.keywordMatchType)
+      if (parsed.viewMode) setViewMode(parsed.viewMode)
+    } catch (e) {
+      console.error("Error parsing saved timeline filters:", e)
+    }
+  }, [])
 
   // Read query params (?q=, ?keyword=)
   useEffect(() => {
@@ -529,6 +568,37 @@ export default function TimelineBody() {
     setShowKeywordDropdown(false)
     resetPagination()
   }
+  // Persist filters + view mode to sessionStorage whenever they change
+    useEffect(() => {
+    if (typeof window === "undefined") return
+
+    const payload = {
+      sortOrder,
+      filterKeywords,
+      startDateInput,
+      endDateInput,
+      monthDay,
+      searchQuery,
+      keywordMatchType,
+      viewMode,
+    }
+
+    try {
+      window.sessionStorage.setItem(TIMELINE_FILTERS_KEY, JSON.stringify(payload))
+      updateURLParams()
+    } catch (e) {
+      console.error("Error saving timeline filters:", e)
+    }
+  }, [
+    sortOrder,
+    filterKeywords,
+    startDateInput,
+    endDateInput,
+    monthDay,
+    searchQuery,
+    keywordMatchType,
+    viewMode,
+  ])
 
   // group posts by year in original order
   const groupPostsByYear = (list) => {
