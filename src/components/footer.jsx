@@ -29,17 +29,21 @@ export default function Footer() {
         </div>
 
         {/* Ad Placement - Fixed for mobile */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-md mx-auto">
-          <div className="bg-white/90 p-4 rounded-lg text-center min-h-[100px] flex items-center justify-center">
-            {process.env.NODE_ENV === 'production' ? (
-              <AdComponent/>
-            ) : (
-              <div className="text-gray-500 text-sm">
-                <AdComponent />
-              </div>
-            )}
-          </div>
-        </div>
+<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-md mx-auto">
+  <div className="relative bg-white/90 rounded-2xl border border-[#f8dada] shadow-sm px-4 py-6 min-h-[110px] flex items-center justify-center">
+    <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.12em] text-[#9ca3af]">
+      Sponsored
+    </span>
+
+    {process.env.NODE_ENV === "production" ? (
+      <AdComponent />
+    ) : (
+      <div className="text-[#9ca3af] text-sm italic">
+        Advertisement space — supporting Swift Lore 💫
+      </div>
+    )}
+  </div>
+</div>
       </div>
 
       {/* Support Buttons */}

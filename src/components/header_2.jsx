@@ -28,7 +28,7 @@ export default function Header() {
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center text-center">
         <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white font-medium mb-6">
-          Taylor Swift <br/>
+          Taylor Swift's <br/>
           Career Timeline
         </h1>
         <button

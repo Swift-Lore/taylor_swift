@@ -1,10 +1,10 @@
-// Remove Next.js client directive as it's not needed in Vite
-import { useState, useEffect } from "react"
-import { useNavigate, useLocation } from "react-router-dom" // Replace Next.js navigation with React Router
-import dayjs from "dayjs"
-import { motion, AnimatePresence } from "framer-motion"
-import AdComponent from "./ad_component"
-import Microlink from '@microlink/react';
+// post_detail_body.jsx
+
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import AdComponent from "./ad_component";
+import Microlink from "@microlink/react";
 import "./post_detail_body.css";
 
 // YouTube video ID extractor
@@ -18,9 +18,27 @@ const getYouTubeVideoId = (url) => {
   return null;
 };
 
+// Image URL helper
+const isLikelyImage = (url) => {
+  if (!url) return false;
+  const lower = url.toLowerCase();
+  return (
+    /\.(jpg|jpeg|png|webp|gif)$/i.test(lower) ||
+    lower.includes("preview.redd.it") ||
+    lower.includes("hips.hearstapps.com") ||
+    lower.includes("resize=") ||
+    lower.includes("crop=smart") ||
+    lower.includes("imgur.com/") ||
+    lower.includes("media.tumblr.com") ||
+    lower.includes("imageproxy") ||
+    lower.includes("twimg.com/media/")
+  );
+};
+
 export default function PostDetailBody() {
-  const navigate = useNavigate(); // Use React Router's navigate
+  const navigate = useNavigate();
   const location = useLocation();
+
   // Parse query params manually using URLSearchParams
   const searchParams = new URLSearchParams(location.search);
   const postId = searchParams.get("id");
@@ -31,68 +49,17 @@ export default function PostDetailBody() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  // New state for source images
+  // Source link state
   const [sourceImages, setSourceImages] = useState([]);
   const [nonImageLinks, setNonImageLinks] = useState([]);
 
-  // Function to extract images from HTML content
-  const extractImagesFromHTML = (html) => {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    return Array.from(doc.images).map(img => img.src);
-  };
-
-  // Process source links and fetch images
-  const processSourceLinks = async () => {
-    if (!event.SOURCES) return { imageLinks: [], nonImageLinks: [] };
-
-    const rawUrls = event.SOURCES.split(" || ").map(url => url.trim());
-    const nonImageLinks = [];
-    const foundImages = [];
-
-    for (const url of rawUrls) {
-      if (isLikelyImage(url)) {
-        foundImages.push(url);
-      } else {
-        try {
-          // Fetch page content to find images
-          const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
-          const data = await response.json();
-          const htmlContent = data.contents;
-
-          // Extract images from HTML
-          const images = extractImagesFromHTML(htmlContent);
-          foundImages.push(...images);
-        } catch (error) {
-          console.error('Error fetching source content:', error);
-        }
-        nonImageLinks.push(url);
-      }
-    }
-
-    return { imageLinks: foundImages, nonImageLinks };
-  };
-
+  // Scroll to top on mount / id change
   useEffect(() => {
-    if (!event || !event.SOURCES) return;
-
-    const rawUrls = event.SOURCES.split(" || ").map(url => url.trim());
-    const imageLinks = rawUrls.filter(url => isLikelyImage(url));
-    const nonImageLinks = rawUrls.filter(url => !isLikelyImage(url));
-
-    setSourceImages(imageLinks);
-    setNonImageLinks(nonImageLinks);
-  }, [event]);
-
-  useEffect(() => {
-    // Scroll to top when component mounts
     window.scrollTo(0, 0);
-
-    // Also scroll to top when postId changes (in case of direct navigation)
   }, [postId]);
 
+  // Fetch post data using the postId
   useEffect(() => {
-    // Fetch post data using the postId
     const fetchPostDetails = async () => {
       setLoading(true);
       try {
@@ -102,12 +69,11 @@ export default function PostDetailBody() {
           return;
         }
 
-        // Example API call - replace with your actual API endpoint
         const response = await fetch(
           `https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker/${postId}`,
           {
             headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`, // Use Vite env variable format
+              Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
             },
           }
         );
@@ -117,7 +83,6 @@ export default function PostDetailBody() {
         }
 
         const data = await response.json();
-        console.log("Fetched post details:", data);
         setEvent(data.fields);
       } catch (error) {
         console.error("Error fetching post details:", error);
@@ -129,7 +94,19 @@ export default function PostDetailBody() {
     fetchPostDetails();
   }, [postId]);
 
-  // Modal functions
+  // Populate sourceImages / nonImageLinks from event.SOURCES
+  useEffect(() => {
+    if (!event || !event.SOURCES) return;
+
+    const rawUrls = event.SOURCES.split(" || ").map((url) => url.trim());
+    const imageLinks = rawUrls.filter((url) => isLikelyImage(url));
+    const otherLinks = rawUrls.filter((url) => !isLikelyImage(url));
+
+    setSourceImages(imageLinks);
+    setNonImageLinks(otherLinks);
+  }, [event]);
+
+  // Modal helpers
   const closeModal = () => setIsModalOpen(false);
 
   const prevImage = () => {
@@ -146,12 +123,13 @@ export default function PostDetailBody() {
     );
   };
 
-  const formatNotes = (notes) => {
-    if (!notes) {
-      return <p className="mb-2">No additional details available for this post.</p>;
-    }
+  const handleBackToTimeline = () => {
+    navigate("/timeline");
+  };
 
-    return notes.split('\n\n').map((paragraph, index) => (
+  const formatNotes = (notes) => {
+    if (!notes) return null;
+    return notes.split("\n\n").map((paragraph, index) => (
       <p key={index} className="mb-2">
         {paragraph}
       </p>
@@ -202,11 +180,9 @@ export default function PostDetailBody() {
       }
     };
 
-    // Load scripts based on available content
     if (event.INSTAGRAM) loadInstagramScript();
     if (event.TWITTER) loadTwitterScript();
 
-    // Load Getty Images script if needed
     if (event["GETTY EMBED"] && !document.getElementById("getty-embed-script")) {
       const script = document.createElement("script");
       script.id = "getty-embed-script";
@@ -216,23 +192,7 @@ export default function PostDetailBody() {
     }
   }, [event]);
 
-  // Image URL helper
-  const isLikelyImage = (url) => {
-    if (!url) return false;
-    const lower = url.toLowerCase();
-    return (
-      /\.(jpg|jpeg|png|webp|gif)$/i.test(lower) ||
-      lower.includes("preview.redd.it") ||
-      lower.includes("hips.hearstapps.com") ||
-      lower.includes("resize=") ||
-      lower.includes("crop=smart") ||
-      lower.includes("imgur.com/") ||
-      lower.includes("media.tumblr.com") ||
-      lower.includes("imageproxy") ||
-      lower.includes("twimg.com/media/")
-    );
-  };
-
+  // Loading / missing state
   if (loading) {
     return (
       <div className="bg-[#e6edf7] py-8 md:py-12">
@@ -247,61 +207,74 @@ export default function PostDetailBody() {
     return (
       <div className="bg-[#e6edf7] py-8 md:py-12">
         <div className="max-w-4xl mx-auto py-8 bg-[#fef2f2] mb-6 text-center text-[#6b7280]">
-          No post details available. <button onClick={handleBackToTimeline} className="ml-2 text-red-400 underline">Back to Timeline</button>
+          No post details available.
+          <button
+            onClick={handleBackToTimeline}
+            className="ml-2 text-red-400 underline"
+          >
+            Back to Timeline
+          </button>
         </div>
       </div>
     );
   }
 
-  // Determine if we have videos from sources or YouTube
-  const hasVideos = event.YOUTUBE || false;
+  // Derived flags
+  const hasVideos = !!event.YOUTUBE;
+  const hasNotes = !!event.NOTES && event.NOTES.trim() !== "";
+  const hasSources = nonImageLinks.length > 0 || sourceImages.length > 0;
 
   return (
     <div className="bg-[#e6edf7] py-8 md:py-12">
       {/* Ad Placement */}
-      <div className="w-full max-w-4xl mx-auto px-4 mb-6">
-        <div className="py-8 bg-[#fef2f2] rounded-lg text-center min-h-[100px] flex items-center justify-center">
-          {process.env.NODE_ENV === 'production' ? (
-            <AdComponent />
-          ) : (
-            <div className="text-[#6b7280] text-sm">
-              <AdComponent />
+      {/* Sponsored ad block above Notes */}
+<div className="w-full max-w-4xl mx-auto px-4 mb-10 mt-8">
+  <div className="relative rounded-2xl border border-[#f8dada] bg-gradient-to-b from-[#fff8f8] to-[#fdeeee] shadow-sm px-4 py-6 min-h-[110px] flex items-center justify-center">
+    <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.12em] text-[#9ca3af]">
+      Sponsored
+    </span>
+
+    {process.env.NODE_ENV === "production" ? (
+      <AdComponent />
+    ) : (
+      <div className="text-[#9ca3af] text-sm italic">
+        Advertisement space — supporting Swift Lore 💫
+      </div>
+    )}
+  </div>
+</div>
+
+      {/* NOTES + SOURCES */}
+      {(hasNotes || hasSources) && (
+        <section className="max-w-4xl mx-auto px-4 mb-10">
+          {/* Notes inline, like your old layout */}
+          {hasNotes && (
+            <div className="text-sm md:text-base text-[#111827] leading-relaxed mb-6">
+              <span className="font-semibold">Notes: </span>
+              {formatNotes(event.NOTES)}
             </div>
           )}
-        </div>
-      </div>
 
-      {/* Post Details Text */}
-      <div className="w-[90%] md:w-[80vw] mx-auto mb-6 rounded-xl border border-red-500 text-red-400 p-3 md:p-5 overflow-hidden">
-        <p className="font-semibold mb-2 ml-4 md:ml-[160px]">Notes </p>
-        <div className="ml-4 md:ml-[160px] mt-4 font-normal text-sm md:text-base">
-          <div className="mb-2">
-            {formatNotes(event.NOTES)}
-          </div>
-
-          {/* Source links display - UPDATED WITH MICROLINK */}
-          {(nonImageLinks.length > 0 || sourceImages.length > 0) && (
-            <div className="mt-4 border-t border-red-200 pt-4">
-              <p className="font-semibold mb-2">Sources:</p>
-
+          {/* Sources, but without big labels/frames */}
+          {hasSources && (
+            <div className="space-y-6">
               {/* Direct image links */}
               {sourceImages.length > 0 && (
-                <div className="image-only-grid flex flex-wrap gap-4 mb-4" style={{gap: '174px'}}>
+                <div className="image-only-grid flex flex-wrap gap-6 justify-start">
                   {sourceImages.map((url, index) => (
                     <a
                       key={`img-${index}`}
                       href={url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group relative flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden border border-red-200 hover:shadow-md transition-all"
-                      style={{ width: '500px', height: '450px',}}
+                      className="group relative flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-all"
+                      style={{ width: "500px", height: "400px" }}
                     >
                       <img
                         src={url}
                         alt="Source"
                         className="max-w-full max-h-full object-contain cursor-pointer"
                         loading="lazy"
-                        style={{ width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '100%' }}
                       />
                       <span className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs p-1 opacity-0 group-hover:opacity-100 transition-opacity truncate text-center">
                         {(() => {
@@ -317,9 +290,9 @@ export default function PostDetailBody() {
                 </div>
               )}
 
-              {/* Microlink previews for non-image links */}
+              {/* Non-image links (Microlink) */}
               {nonImageLinks.length > 0 && (
-                <div className="microlink-grid grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="microlink-grid">
                   {nonImageLinks.map((url, index) => (
                     <div key={`link-${index}`} className="microlink-card">
                       <div id={`microlink-wrapper-${index}`}>
@@ -328,13 +301,21 @@ export default function PostDetailBody() {
                           size="large"
                           media="image"
                           onError={() => {
-                            const fallback = document.getElementById(`fallback-${index}`);
+                            const fallback = document.getElementById(
+                              `fallback-${index}`
+                            );
                             if (fallback) fallback.style.display = "flex";
                           }}
                           fallback={{
-                            image: `https://logo.clearbit.com/${new URL(url).hostname}`,
-                            title: url.split("/").slice(-1)[0].replace(/[-_]/g, " "),
-                            description: new URL(url).hostname.replace("www.", "")
+                            image: `https://logo.clearbit.com/${
+                              new URL(url).hostname
+                            }`,
+                            title: url
+                              .split("/")
+                              .slice(-1)[0]
+                              .replace(/[-_]/g, " "),
+                            description: new URL(url)
+                              .hostname.replace("www.", ""),
                           }}
                         />
                       </div>
@@ -343,16 +324,21 @@ export default function PostDetailBody() {
                       <div
                         id={`fallback-${index}`}
                         style={{ display: "none" }}
-                        className="fallback-card flex items-center p-3 border border-red-200 rounded-lg bg-white"
+                        className="fallback-card flex items-center p-3 border border-gray-200 rounded-lg bg-white"
                       >
                         <img
-                          src={`https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(url)}`}
+                          src={`https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(
+                            url
+                          )}`}
                           alt=""
                           className="w-8 h-8 mr-3"
                         />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-red-400 truncate">
-                            {url.split("/").slice(-1)[0].replace(/[-_]/g, " ")}
+                            {url
+                              .split("/")
+                              .slice(-1)[0]
+                              .replace(/[-_]/g, " ")}
                           </p>
                           <p className="text-xs text-gray-500 truncate">
                             {new URL(url).hostname.replace("www.", "")}
@@ -365,46 +351,38 @@ export default function PostDetailBody() {
               )}
             </div>
           )}
+        </section>
+      )}
 
-        </div>
-      </div>
-
-      {/* Post Details Images - Now only showing IMAGE array since source images are in notes */}
+      {/* Main image */}
       {event.IMAGE && event.IMAGE.length > 0 && (
-        <div className="w-[90%] md:w-[80vw] mx-auto mb-6 mt-8 md:mt-16 rounded-xl border border-red-500 text-red-400 p-3 md:p-5 overflow-hidden">
-          <p className="font-semibold mb-2 ml-4 md:ml-[116px] mt-3">Image</p>
-          <div className="flex justify-center ml-0 md:ml-[116px] mt-4">
-            <img
-              src={event.IMAGE[0].url}
-              alt="Post Detail"
-              className="w-full max-w-[600px] rounded-lg object-cover cursor-pointer"
-              onClick={() => {
-                setSelectedImageIndex(0);
-                setIsModalOpen(true);
-              }}
-            />
-          </div>
-        </div>
+        <section className="max-w-4xl mx-auto px-4 mb-10">
+          <img
+            src={event.IMAGE[0].url}
+            alt="Post Detail"
+            className="w-full max-w-[600px] rounded-lg object-cover cursor-pointer shadow-sm"
+            onClick={() => {
+              setSelectedImageIndex(0);
+              setIsModalOpen(true);
+            }}
+          />
+        </section>
       )}
 
-      {/* Getty Embed section */}
+      {/* Getty */}
       {event["GETTY EMBED"] && (
-        <div className="w-[90%] md:w-[80vw] mx-auto mb-6 mt-8 md:mt-16 rounded-xl border border-red-500 text-red-400 p-3 md:p-5 overflow-hidden">
-          <p className="font-semibold mb-2 ml-4 md:ml-[116px] mt-3">Getty Images</p>
-          <div className="flex justify-center w-full mt-4">
-            <div
-              className="getty-embed w-full max-w-4xl"
-              dangerouslySetInnerHTML={{ __html: event["GETTY EMBED"] }}
-            />
-          </div>
-        </div>
+        <section className="max-w-4xl mx-auto px-4 mb-10">
+          <div
+            className="getty-embed w-full max-w-4xl"
+            dangerouslySetInnerHTML={{ __html: event["GETTY EMBED"] }}
+          />
+        </section>
       )}
 
-      {/* YouTube Videos Section */}
+      {/* YouTube */}
       {hasVideos && (
-        <div className="w-[90%] md:w-[80vw] mx-auto mb-6 mt-8 md:mt-16 rounded-xl border border-red-500 text-red-400 p-3 md:p-5 overflow-hidden">
-          <p className="font-semibold mb-2 ml-4 md:ml-[116px] mt-3">Videos</p>
-          <div className="flex flex-col items-center gap-6 mt-4">
+        <section className="max-w-4xl mx-auto px-4 mb-10">
+          <div className="flex flex-col items-center gap-6 mt-2">
             {event.YOUTUBE?.split(",").map((url, index) => {
               const videoId = getYouTubeVideoId(url.trim());
               return videoId ? (
@@ -420,14 +398,13 @@ export default function PostDetailBody() {
               ) : null;
             })}
           </div>
-        </div>
+        </section>
       )}
 
-      {/* Instagram Embeds */}
+      {/* Instagram */}
       {event.INSTAGRAM && (
-        <div className="w-[90%] md:w-[80vw] mx-auto mb-6 mt-8 md:mt-16 rounded-xl border border-red-500 text-red-400 p-3 md:p-5 overflow-hidden">
-          <p className="font-semibold mb-2 ml-4 md:ml-[116px] mt-3">Instagram</p>
-          <div className="flex flex-wrap justify-center gap-4 mt-4">
+        <section className="max-w-4xl mx-auto px-4 mb-10">
+          <div className="flex flex-wrap justify-center gap-4 mt-2">
             {event.INSTAGRAM.split(" || ").map((rawUrl, index) => {
               const url = rawUrl.trim().split("?")[0];
               return url ? (
@@ -450,22 +427,20 @@ export default function PostDetailBody() {
               ) : null;
             })}
           </div>
-        </div>
+        </section>
       )}
 
-      {/* Twitter Embeds */}
+      {/* Twitter / X */}
       {event.TWITTER && (
-        <div className="w-[90%] md:w-[80vw] mx-auto mb-6 mt-8 md:mt-16 rounded-xl border border-red-500 text-red-400 p-3 md:p-5 overflow-hidden">
-          <p className="font-semibold mb-2 ml-4 md:ml-[116px] mt-3">Twitter/X</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4 w-full px-2">
+        <section className="max-w-4xl mx-auto px-4 mb-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2 w-full">
             {event.TWITTER.split(/ \|\| |\s+/).map((url, index) => {
               const cleanUrl = url.trim().replace("x.com", "twitter.com");
-              const isValid = /^https:\/\/twitter\.com\/[^/]+\/status\/\d+/.test(cleanUrl);
+              const isValid = /^https:\/\/twitter\.com\/[^/]+\/status\/\d+/.test(
+                cleanUrl
+              );
               return isValid ? (
-                <div
-                  key={index}
-                  className="twitter-container w-full"
-                >
+                <div key={index} className="twitter-container w-full">
                   <blockquote className="twitter-tweet" data-lang="en">
                     <a href={cleanUrl}>{cleanUrl}</a>
                   </blockquote>
@@ -473,10 +448,10 @@ export default function PostDetailBody() {
               ) : null;
             })}
           </div>
-        </div>
+        </section>
       )}
 
-      {/* Image Modal - Handles both IMAGE array and source image links */}
+      {/* Image Modal */}
       <AnimatePresence>
         {isModalOpen && (
           <motion.div
@@ -495,7 +470,6 @@ export default function PostDetailBody() {
                 const totalImages = imageArrayLength + sourceImages.length;
 
                 if (selectedImageIndex < imageArrayLength) {
-                  // Show image from IMAGE array
                   return (
                     <img
                       src={event.IMAGE[selectedImageIndex].url}
@@ -504,10 +478,11 @@ export default function PostDetailBody() {
                     />
                   );
                 } else if (selectedImageIndex < totalImages) {
-                  // Show image from source links
                   return (
                     <img
-                      src={sourceImages[selectedImageIndex - imageArrayLength]}
+                      src={
+                        sourceImages[selectedImageIndex - imageArrayLength]
+                      }
                       alt="Full view"
                       className="max-w-full max-h-[80vh] object-contain rounded-lg"
                     />
@@ -528,17 +503,27 @@ export default function PostDetailBody() {
                 ✕
               </button>
 
-              {totalImages > 1 && (
+              {(() => {
+                const imageArrayLength = event.IMAGE?.length || 0;
+                const totalImages = imageArrayLength + sourceImages.length;
+                return totalImages > 1;
+              })() && (
                 <>
                   <button
                     className="absolute left-2 top-1/2 transform -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-red-400 text-white rounded-full opacity-70 hover:opacity-100"
-                    onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      prevImage();
+                    }}
                   >
                     ←
                   </button>
                   <button
                     className="absolute right-2 top-1/2 transform -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-red-400 text-white rounded-full opacity-70 hover:opacity-100"
-                    onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      nextImage();
+                    }}
                   >
                     →
                   </button>
@@ -549,5 +534,5 @@ export default function PostDetailBody() {
         )}
       </AnimatePresence>
     </div>
-  )
+  );
 }
