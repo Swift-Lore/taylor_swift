@@ -35,6 +35,17 @@ const isLikelyImage = (url) => {
   );
 };
 
+// Format DATE field as "Nov-07-2025"
+const formatEventDate = (isoDate) => {
+  if (!isoDate) return "";
+  const d = new Date(isoDate);
+  if (Number.isNaN(d.getTime())) return "";
+  const month = d.toLocaleString("en-US", { month: "short" }); // "Nov"
+  const day = String(d.getDate()).padStart(2, "0");            // "07"
+  const year = d.getFullYear();                                // "2025"
+  return `${month}-${day}-${year}`;
+};
+
 export default function PostDetailBody() {
   const navigate = useNavigate();
   const location = useLocation();
