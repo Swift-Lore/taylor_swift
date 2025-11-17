@@ -5,7 +5,6 @@ import { Button } from "./ui/Button"
 import { useNavigate, Link } from "react-router-dom"
 import { useEffect, useState } from "react"
 import axios from "axios"
-
 import "./timeline.css"
 
 export default function Timeline() {
@@ -91,7 +90,6 @@ export default function Timeline() {
     setCurrentDay(currentDate.getDate())
   }
 
-  // ===== Airtable fetch =====
   // ===== Airtable fetch =====
 useEffect(() => {
   const fetchRecordsByDate = async (month, day) => {
