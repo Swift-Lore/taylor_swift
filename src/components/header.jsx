@@ -79,23 +79,48 @@ export default function Header() {
           </button>
         </div>
 
-        {/* Timeline title + Return button (non-home pages) */}
-        {!showHero && (
-          <div className="w-full flex flex-col items-center gap-2 mt-2 mb-2 px-4">
-            {/* Larger, more elegant title */}
-            <h2 className="text-white text-2xl md:text-3xl font-serif drop-shadow-lg tracking-wide text-center">
-              Taylor Swift's Career Timeline
-            </h2>
+        {/* Event page header - shows event title and date */}
+{isEventPage && (
+  <div className="w-full flex flex-col items-center gap-2 mt-2 mb-2 px-4">
+    {/* Event title */}
+    <h2 className="text-white text-xl md:text-2xl font-serif drop-shadow-lg tracking-wide text-center leading-tight">
+      {event?.EVENT || "Event Details"}
+    </h2>
+    
+    {/* Event date */}
+    {event?.DATE && (
+      <p className="text-white/90 text-sm md:text-base font-medium drop-shadow-md">
+        {formatEventDate(event.DATE)}
+      </p>
+    )}
 
-            {/* Return to Home button */}
-            <button
-              onClick={() => navigate("/")}
-              className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all"
-            >
-              Return to Home
-            </button>
-          </div>
-        )}
+    {/* Return to Home button */}
+    <button
+      onClick={() => navigate("/")}
+      className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all mt-2"
+    >
+      Return to Home
+    </button>
+  </div>
+)}
+
+{/* Full timeline page header */}
+{isFullTimelinePage && !isEventPage && (
+  <div className="w-full flex flex-col items-center gap-2 mt-2 mb-2 px-4">
+    {/* Larger, more elegant title */}
+    <h2 className="text-white text-2xl md:text-3xl font-serif drop-shadow-lg tracking-wide text-center">
+      Taylor Swift's Career Timeline
+    </h2>
+
+    {/* Return to Home button */}
+    <button
+      onClick={() => navigate("/")}
+      className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all"
+    >
+      Return to Home
+    </button>
+  </div>
+)}
 
         {/* Blurb + search + CTA — only show on home */}
         {showHero && (
