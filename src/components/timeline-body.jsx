@@ -367,7 +367,6 @@ export default function TimelineBody() {
                 offset: currentOffset,
                 filterByFormula: filterFormula || undefined,
                 sort: [{ field: "DATE", direction: sortOrder }],
-                view: "Grid view",
               },
             }
           )
