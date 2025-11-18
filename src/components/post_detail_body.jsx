@@ -406,24 +406,26 @@ export default function PostDetailBody() {
         </section>
       )}
 
-                  {/* YouTube */}
+                        {/* YouTube */}
       {hasVideos && (
         <section className="max-w-4xl mx-auto px-4 mb-10">
-          <div className={`mt-2 ${event.YOUTUBE?.split(/,\s*|\s*\|\|\s*/).length > 1 ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : 'flex flex-col items-center gap-6'}`}>
+          <div className={`mt-2 ${event.YOUTUBE?.split(/,\s*|\s*\|\|\s*/).length > 1 ? 'grid grid-cols-1 gap-6' : 'flex flex-col items-center gap-6'}`}>
             {event.YOUTUBE?.split(/,\s*|\s*\|\|\s*/).map((url, index) => {
               const trimmedUrl = url.trim();
               const videoId = getYouTubeVideoId(trimmedUrl);
               
               return videoId ? (
-                <div key={index} className={`${event.YOUTUBE?.split(/,\s*|\s*\|\|\s*/).length > 1 ? 'w-full' : 'w-full max-w-4xl'}`}>
-                  <iframe
-                    src={`https://www.youtube.com/embed/${videoId}`}
-                    title={`YouTube Video ${index + 1}`}
-                    className="w-full aspect-video rounded-xl"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  ></iframe>
+                <div key={index} className="w-full">
+                  <div className="relative" style={{ paddingBottom: '56.25%' }}> {/* 16:9 aspect ratio */}
+                    <iframe
+                      src={`https://www.youtube.com/embed/${videoId}`}
+                      title={`YouTube Video ${index + 1}`}
+                      className="absolute top-0 left-0 w-full h-full rounded-xl"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
                 </div>
               ) : null;
             })}
