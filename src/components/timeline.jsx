@@ -223,7 +223,7 @@ export default function Timeline() {
 
   // ===== JSX =====
   return (
-        <section className="w-full bg-[#e8ecf7] pt-3 pb-4 md:pt-5 md:pb-5 px-2 md:px-10 flex-grow">
+        <section className="w-full bg-[#e8ecf7] pt-3 pb-1 md:pt-5 md:pb-2 px-2 md:px-10 flex-grow">
       <div className="container mx-auto h-full flex flex-col">
         {/* On This Day Section */}
         <div className="text-center mb-1 md:mb-3 transform translate-x-0 md:translate-x-[-19px]">
@@ -304,7 +304,7 @@ export default function Timeline() {
         </div>
 
                 {/* Timeline Section */}
-        <div className="relative mt-4 md:mt-8 mb-2 md:mb-4 flex-grow">
+        <div className="relative mt-3 md:mt-5 mb-1 md:mb-2 flex-grow">
           {/* Mobile Timeline (Single Column) */}
           <div className="md:hidden h-[60vh] overflow-y-auto relative mobile-timeline-container">
             <div className="relative flex justify-center">
