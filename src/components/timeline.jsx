@@ -193,9 +193,6 @@ export default function Timeline() {
                   </p>
                 )}
 
-                {/* Divider line */}
-                <div className="w-full h-[1px] bg-[#8e3e3e] rounded-full opacity-60"></div>
-
                 {/* Keywords section with clickable tags */}
                 {record?.fields?.KEYWORDS && record.fields.KEYWORDS.length > 0 && (
                   <div className="flex flex-wrap gap-1 md:gap-1.5 justify-center">
