@@ -5,13 +5,13 @@ import { Button } from "./ui/Button"
 import { useNavigate, Link } from "react-router-dom"
 import { useEffect, useState } from "react"
 import axios from "axios"
+
 import "./timeline.css"
 
 export default function Timeline() {
   const navigate = useNavigate()
   const [showScrollHint, setShowScrollHint] = useState(true)
   const [records, setRecords] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
   const [screenScale, setScreenScale] = useState(1)
 
   // Use the visitor's *local* date for "today"
@@ -91,41 +91,38 @@ export default function Timeline() {
   }
 
   // ===== Airtable fetch =====
-useEffect(() => {
-  const fetchRecordsByDate = async (month, day) => {
-    const fetchByDate = async () => {
-      const response = await axios.get(
-        "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
-        {
-          headers: {
-            Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-          },
-          params: {
-            filterByFormula: `AND(MONTH(DATE) = ${month}, DAY(DATE) = ${day})`,
-            sort: [{ field: "DATE", direction: "desc" }],
-          },
-        }
-      )
-      return response.data.records || []
+  useEffect(() => {
+    const fetchRecordsByDate = async (month, day) => {
+      const fetchByDate = async () => {
+        const response = await axios.get(
+          "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+          {
+            headers: {
+              Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+            },
+            params: {
+              filterByFormula: `AND(MONTH(DATE) = ${month}, DAY(DATE) = ${day})`,
+              sort: [{ field: "DATE", direction: "desc" }],
+            },
+          }
+        )
+        return response.data.records || []
+      }
+
+      try {
+        const fetched = await fetchByDate()
+        setRecords(fetched)
+        console.log("Fetched records:", fetched)
+      } catch (error) {
+        console.error("Error fetching records:", error)
+      }
     }
 
-    try {
-      setIsLoading(true) // 👈 start loading
-      const fetched = await fetchByDate()
-      setRecords(fetched)
-      console.log("Fetched records:", fetched)
-    } catch (error) {
-      console.error("Error fetching records:", error)
-    } finally {
-      setIsLoading(false) // 👈 done loading (success or error)
+    console.log("Fetching Airtable for:", currentMonth, currentDay)
+    if (currentMonth && currentDay) {
+      fetchRecordsByDate(currentMonth, currentDay)
     }
-  }
-
-  console.log("Fetching Airtable for:", currentMonth, currentDay)
-  if (currentMonth && currentDay) {
-    fetchRecordsByDate(currentMonth, currentDay)
-  }
-}, [currentMonth, currentDay])
+  }, [currentMonth, currentDay])
 
   // ===== scroll hint =====
   useEffect(() => {
@@ -241,18 +238,18 @@ useEffect(() => {
 
               <div className="absolute left-1 sm:left-2 md:left-3 lg:left-7 top-1/2 transform -translate-y-1/2">
                 <img
-  src="/images/star.png"
-  alt="Star"
-  className="w-[26px] h-[26px] sm:w-[34px] sm:h-[34px] md:w-[56px] md:h-[56px] lg:w-[85px] lg:h-[85px]"
-/>
+                  src="/images/star.png"
+                  alt="Star"
+                  className="w-[26px] h-[26px] sm:w-[34px] sm:h-[34px] md:w-[56px] md:h-[56px] lg:w-[85px] lg:h-[85px]"
+                />
               </div>
 
               <div className="absolute right-1 sm:right-2 md:right-3 lg:right-7 top-1/2 transform -translate-y-1/2">
                 <img
-  src="/images/star.png"
-  alt="Star"
-  className="w-[26px] h-[26px] sm:w-[34px] sm:h-[34px] md:w-[56px] md:h-[56px] lg:w-[85px] lg:h-[85px]"
-/>
+                  src="/images/star.png"
+                  alt="Star"
+                  className="w-[26px] h-[26px] sm:w-[34px] sm:h-[34px] md:w-[56px] md:h-[56px] lg:w-[85px] lg:h-[85px]"
+                />
               </div>
             </div>
           </div>
@@ -295,10 +292,8 @@ useEffect(() => {
             <div className="flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
               <span className="text-[#8e3e3e] text-xs md:text-sm font-medium">
-  {isLoading
-    ? "Loading events..."
-    : `${records.length} ${records.length === 1 ? "Event" : "Events"} Found`}
-</span>
+                {records.length} {records.length === 1 ? "Event" : "Events"} Found
+              </span>
               <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
             </div>
           </div>
