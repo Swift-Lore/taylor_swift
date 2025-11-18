@@ -22,10 +22,10 @@ export default function Footer() {
   return (
     <footer className="w-full bg-gradient-to-b from-[#E8ECF7] via-[#d8def7] to-[#b6c0f0]">
       {/* Main footer content */}
-      <div className="max-w-5xl mx-auto px-4 pt-10 pb-6">
-        <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start md:items-stretch">
+      <div className="max-w-5xl mx-auto px-4 pt-6 pb-4">
+        <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-stretch">
           {/* About / description card */}
-          <div className="flex-1 fade-in-up card-soft glass-soft rounded-3xl bg-white/10 p-4 md:p-6">
+          <div className="flex-1 fade-in-up card-soft glass-soft rounded-3xl bg-white/10 p-4 md:p-5 text-left">
             <h2 className="text-sm md:text-base font-semibold text-[#5a2b60] tracking-wide mb-2 logo-glow">
               About Swift Lore
             </h2>
@@ -37,7 +37,7 @@ export default function Footer() {
             </p>
 
             {/* Support buttons */}
-            <div className="mt-4 flex flex-wrap gap-3">
+            <div className="mt-4 flex flex-wrap gap-3 justify-start">
               <a
                 href="https://buymeacoffee.com/swiftlore"
                 target="_blank"
@@ -60,8 +60,8 @@ export default function Footer() {
           </div>
 
           {/* Ad card */}
-          <div className="w-full md:w-[380px] fade-in-up">
-  <div className="relative bg-white/80 rounded-2xl border border-[#f8dada] px-5 py-7 min-h-[140px] ...">
+          <div className="flex-1 fade-in-up">
+            <div className="relative h-full bg-white/80 rounded-2xl border border-[#f8dada] px-4 py-4 md:px-5 md:py-5 flex items-center justify-center card-soft glass-soft">
               <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.16em] text-[#9ca3af]">
                 Sponsored
               </span>
@@ -79,8 +79,8 @@ export default function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="bg-[#8a9ad4] py-3 px-4 text-center text-white">
-        <div className="max-w-5xl mx-auto flex flex-wrap justify-center items-center gap-4 text-xs md:text-sm">
+      <div className="bg-[#8a9ad4] py-2 px-4 text-center text-white">
+        <div className="max-w-5xl mx-auto flex flex-wrap justify-center items-center gap-3 text-xs md:text-sm">
           <a
             href="/cookie_policy"
             target="_blank"
