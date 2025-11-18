@@ -127,12 +127,12 @@ export default function Timeline() {
                   {record?.fields?.EVENT || "Event description unavailable"}
                 </h3>
 
-                {/* Notes */}
-                {record?.fields?.NOTES && (
-                  <p className="text-xs md:text-sm text-center font-medium text-gray-700 leading-relaxed">
-                    {record.fields.NOTES}
-                  </p>
-                )}
+                {/* Notes with line breaks */}
+{record?.fields?.NOTES && (
+  <div className="text-xs md:text-sm text-center font-medium text-gray-700 leading-relaxed whitespace-pre-line">
+    {record.fields.NOTES}
+  </div>
+)}
 
                 {/* Keywords section with clickable tags */}
                 {record?.fields?.KEYWORDS && record.fields.KEYWORDS.length > 0 && (
