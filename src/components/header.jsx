@@ -72,10 +72,10 @@ const showHero = !isFullTimelinePage && !isEventPage
             </span>
 
             <img
-              src="/images/swift_lore.png"
-              alt="Swift Lore"
-              className="w-full h-auto object-contain min-h-[270px] max-h-[270px] md:min-h-[290px] md:max-h-[290px] logo-glow"
-            />
+  src="/images/swift_lore.png"
+  alt="Swift Lore"
+  className="w-full h-auto object-contain max-h-[160px] md:max-h-[180px] logo-glow"
+/>
           </button>
         </div>
 {/* Timeline title + Return button (non-home pages) */}
