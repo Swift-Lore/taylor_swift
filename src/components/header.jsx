@@ -79,50 +79,49 @@ const showHero = !isFullTimelinePage && !isEventPage
           </button>
         </div>
 
-        {/* Blurb + search + CTA */}
-        {showHero && (
-        <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-3 md:gap-3 md:mt-1 text-center md:text-left relative z-20">
-          <div className="w-full max-w-xs md:max-w-sm bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 px-4 py-3 md:px-5 md:py-3 shadow-[0_14px_45px_rgba(15,23,42,0.35)]">
-            <p className="text-white text-[11px] md:text-[13px] leading-snug md:leading-relaxed">
-              A fan-crafted, interactive timeline chronicling the epic life and
-              career of Taylor Swift. Explore everything from album releases and
-              Easter Eggs to dating history and iconic moments.
-              <span className="font-semibold"> Dive into the lore!</span>
-            </p>
-                  </div>
-        )}
+        {/* Blurb + search + CTA — only show on home */}
+{showHero && (
+  <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-3 md:gap-3 md:mt-1 text-center md:text-left relative z-20">
+    <div className="w-full max-w-xs md:max-w-sm bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 px-4 py-3 md:px-5 md:py-3 shadow-[0_14px_45px_rgba(15,23,42,0.35)]">
+      <p className="text-white text-[11px] md:text-[13px] leading-snug md:leading-relaxed">
+        A fan-crafted, interactive timeline chronicling the epic life and
+        career of Taylor Swift. Explore everything from album releases and
+        Easter Eggs to dating history and iconic moments.
+        <span className="font-semibold"> Dive into the lore!</span>
+      </p>
+    </div>
 
+    {/* Search */}
+    <div className="w-full max-w-xs md:max-w-sm">
+      <form onSubmit={handleSearch} className="relative">
+        <input
+          type="text"
+          placeholder="Search events, locations, categories..."
+          value={searchQuery}
+          onChange={handleInputChange}
+          onKeyPress={handleKeyPress}
+          className="w-full rounded-full py-1.5 md:py-2 pl-7 md:pl-8 pr-6 text-[11px] md:text-[13px] bg-white/90 text-gray-800 shadow-[0_10px_30px_rgba(15,23,42,0.25)] focus:outline-none focus:ring-2 focus:ring-[#fbb1c3] focus:ring-offset-2 focus:ring-offset-[#8a9ad4]"
+          inputMode="search"
+          enterKeyHint="search"
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck="false"
+        />
+      </form>
+    </div>
 
-          {/* Search */}
-          <div className="w-full max-w-xs md:max-w-sm">
-            <form onSubmit={handleSearch} className="relative">
-              <input
-                type="text"
-                placeholder="Search events, locations, categories..."
-                value={searchQuery}
-                onChange={handleInputChange}
-                onKeyPress={handleKeyPress}
-                className="w-full rounded-full py-1.5 md:py-2 pl-7 md:pl-8 pr-6 text-[11px] md:text-[13px] bg-white/90 text-gray-800 shadow-[0_10px_30px_rgba(15,23,42,0.25)] focus:outline-none focus:ring-2 focus:ring-[#fbb1c3] focus:ring-offset-2 focus:ring-offset-[#8a9ad4]"
-                inputMode="search"
-                enterKeyHint="search"
-                autoCapitalize="none"
-                autoCorrect="off"
-                spellCheck="false"
-              />
-            </form>
-          </div>
-
-          {/* CTA */}
-          <button
-            className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-4 md:px-5 py-1.5 md:py-2 font-semibold text-[11px] md:text-[13px] w-40 md:w-auto shadow-[0_10px_30px_rgba(88,28,135,0.45)] transition-transform hover:-translate-y-0.5"
-            onClick={() => {
-              if (isFullTimelinePage) navigate("/")
-              else navigate("/posts")
-            }}
-          >
-            {isFullTimelinePage ? "Return to Home" : "View Full Timeline"}
-          </button>
-        </div>
+    {/* CTA */}
+    <button
+      className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-4 md:px-5 py-1.5 md:py-2 font-semibold text-[11px] md:text-[13px] w-40 md:w-auto shadow-[0_10px_30px_rgba(88,28,135,0.45)] transition-transform hover:-translate-y-0.5"
+      onClick={() => {
+        if (isFullTimelinePage) navigate("/")
+        else navigate("/posts")
+      }}
+    >
+      {isFullTimelinePage ? "Return to Home" : "View Full Timeline"}
+    </button>
+  </div>
+)}
       </div>
     </header>
   )
