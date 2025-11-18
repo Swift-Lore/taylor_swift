@@ -69,11 +69,11 @@ export default function Header() {
               ✨
             </span>
 
-            <img
-              src="/images/swift_lore.png"
-              alt="Swift Lore"
-              className="w-full h-auto object-contain min-h-[250px] max-h-[250px] md:min-h-[260px] md:max-h-[260px] logo-glow fade-in"
-            />
+            <img 
+  src="/images/swift_lore.png" 
+  alt="Swift Lore" 
+  className="w-full h-auto object-contain min-h-[250px] max-h-[250px] md:min-h-[260px] md:max-h-[260px] logo-glow"
+/>
           </button>
         </div>
 
