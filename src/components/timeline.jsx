@@ -241,168 +241,171 @@ useEffect(() => {
   setTimeout(checkHeights, 100);
 }, [records]);
   // ===== JSX =====
-  return (
-    <section className="w-full bg-[#e8ecf7] py-3 md:py-5 px-2 md:px-10 min-h-0">
-      <div className="container mx-auto h-full flex flex-col min-h-0">
-        {/* On This Day Section - FIXED: removed translations and adjusted spacing */}
-        <div className="text-center mb-1 md:mb-3">
-          <div className="relative w-full mb-2 md:mb-3 px-2 md:px-5">
-            <div className="relative w-full px-2 md:px-3 py-2.5 md:py-5 bg-[#e8eef9]">
-              <div className="max-w-4xl mx-auto text-center">
-                <h2 className="text-lg sm:text-xl md:text-2xl lg:text-5xl font-serif text-[#8e3e3e] text-center">
-                  <span className="block">ON THIS DAY</span>
-                  <span className="text-base sm:text-sm md:text-xl lg:text-2xl block mt-1">
-                    in Taylor Swift's History
-                  </span>
-                </h2>
-              </div>
-
-              <div className="absolute left-1 sm:left-2 md:left-3 lg:left-7 top-1/2 transform -translate-y-1/2">
-                <img
-                  src="/images/star.png"
-                  alt="Star"
-                  className="w-[26px] h-[26px] sm:w-[34px] sm:h-[34px] md:w-[56px] md:h-[56px] lg:w-[85px] lg:h-[85px]"
-                />
-              </div>
-
-              <div className="absolute right-1 sm:right-2 md:right-3 lg:right-7 top-1/2 transform -translate-y-1/2">
-                <img
-                  src="/images/star.png"
-                  alt="Star"
-                  className="w-[26px] h-[26px] sm:w-[34px] sm:h-[34px] md:w-[56px] md:h-[56px] lg:w-[85px] lg:h-[85px]"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-center gap-1 sm:gap-2 md:gap-3 my-2 md:my-3">
-            <Button
-              variant="secondary"
-              className="rounded-full px-2 sm:px-3 md:px-5 text-xs sm:text-sm flex items-center gap-1 md:gap-2 mr-2.5"
-              onClick={handlePreviousDay}
-            >
-              <ChevronLeft size={10} className="md:size-14" />
-              <span className="hidden sm:inline">Previous Day</span>
-              <span className="sm:hidden mr-1.5">Prev</span>
-            </Button>
-
-            <div className="bg-white rounded-full px-3 sm:px-5 md:px-7 py-1 md:py-1.5 min-w-[102px] sm:min-w-[136px] md:min-w-[170px] border border-[#b66b6b]">
-              <span className="text-[#8e3e3e] text-sm md:text-base font-medium">
-                {displayDate.toLocaleDateString("en-US", {
-                  month: "long",
-                  day: "numeric",
-                })}
-              </span>
+return (
+  <section className="w-full bg-[#e8ecf7] py-2 px-2 md:px-10 flex flex-col min-h-0">
+    <div className="container mx-auto flex flex-col min-h-0 flex-1">
+      
+      {/* On This Day Section - simplified */}
+      <div className="text-center mb-2 flex-shrink-0">
+        <div className="relative w-full mb-2 md:mb-3 px-2 md:px-5">
+          <div className="relative w-full px-2 md:px-3 py-2.5 md:py-5 bg-[#e8eef9]">
+            <div className="max-w-4xl mx-auto text-center">
+              <h2 className="text-lg sm:text-xl md:text-2xl lg:text-5xl font-serif text-[#8e3e3e] text-center">
+                <span className="block">ON THIS DAY</span>
+                <span className="text-base sm:text-sm md:text-xl lg:text-2xl block mt-1">
+                  in Taylor Swift's History
+                </span>
+              </h2>
             </div>
 
-            <Button
-              variant="secondary"
-              className="rounded-full px-2 sm:px-3 md:px-5 text-xs sm:text-sm flex items-center gap-1 md:gap-2 ml-2.5"
-              onClick={handleNextDay}
-            >
-              <span className="hidden sm:inline">Next Day</span>
-              <span className="sm:hidden ml-1.5">Next</span>
-              <ChevronRight size={10} className="md:size-14" />
-            </Button>
-          </div>
-        </div>
+            <div className="absolute left-1 sm:left-2 md:left-3 lg:left-7 top-1/2 transform -translate-y-1/2">
+              <img
+                src="/images/star.png"
+                alt="Star"
+                className="w-[26px] h-[26px] sm:w-[34px] sm:h-[34px] md:w-[56px] md:h-[56px] lg:w-[85px] lg:h-[85px]"
+              />
+            </div>
 
-        {/* Event Counter - FIXED: removed translation */}
-        <div className="flex justify-center">
-          <div className="bg-white rounded-full px-2 sm:px-3 md:px-4 py-1 border border-[#b66b6b] shadow-sm">
-            <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
-              <span className="text-[#8e3e3e] text-xs md:text-sm font-medium">
-                {isLoading
-                  ? "Loading events..."
-                  : `${records.length} ${records.length === 1 ? "Event" : "Events"} Found`}
-              </span>
-              <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
+            <div className="absolute right-1 sm:right-2 md:right-3 lg:right-7 top-1/2 transform -translate-y-1/2">
+              <img
+                src="/images/star.png"
+                alt="Star"
+                className="w-[26px] h-[26px] sm:w-[34px] sm:h-[34px] md:w-[56px] md:h-[56px] lg:w-[85px] lg:h-[85px]"
+              />
             </div>
           </div>
         </div>
 
-        {/* Timeline Section - FIXED: removed fixed heights and adjusted spacing */}
-        <div className="relative mt-1 md:mt-2 mb-1 md:mb-1 flex-grow min-h-0">
-          {/* Mobile Timeline - FIXED: removed fixed height */}
-          <div className="md:hidden overflow-y-auto relative mobile-timeline-container min-h-0">
-            <div className="relative flex justify-center py-2">
-              {/* Center line */}
-              <div className="relative w-[2px] flex flex-col items-center bg-[#e8ecf7]">
-                <div className="h-full w-[3px] bg-[#8a9ad4] min-h-[200px]"></div>
-
-                <div className="absolute left-1/2 -translate-x-1/2 top-[0px] w-4 h-4 rounded-full bg-[#6B78B4]"></div>
-                {records.slice(1, 5).map((_, index) => (
-                  <div
-                    key={`mobile-circle-${index}`}
-                    className="absolute left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#FEE6E3] border-2 border-[#6B78B4]"
-                    style={{ top: `${120 + index * 120}px` }}
-                  ></div>
-                ))}
-                <div className="absolute left-1/2 -translate-x-1/2 bottom-4 w-4 h-4 rounded-full bg-[#6B78B4]"></div>
-              </div>
-
-              {/* Mobile Timeline Items */}
-              <div className="absolute left-[17px] w-[calc(100%-26px)] space-y-6 pb-3">
-                {records.map((record, index) => (
-                  <TimelineCard key={`mobile-${record.id}`} record={record} index={index} />
-                ))}
-              </div>
-            </div>
-
-            {/* Scroll hint */}
-            {showScrollHint && records.length > 2 && (
-              <div className="scroll-hint bottom-0">
-                <div className="scroll-blur"></div>
-                <span className="scroll-text">Scroll down</span>
-              </div>
-            )}
-          </div>
-
-          {/* Desktop Timeline */}
-          <div className="hidden md:block min-h-0">
-            <div className="relative flex justify-center">
-              {/* Center line - spans full height */}
-              <div className="absolute w-[2px] flex flex-col items-center h-full">
-                <div className="w-[5px] bg-[#8a9ad4] h-full"></div>
-                <div className="absolute left-1/2 -translate-x-1/2 top-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
-                <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
-              </div>
-
-              {/* Desktop Timeline Items */}
-              <div className="relative left-[37.5%] -translate-x-1/4 w-3/4">
-                {records.map((record, index) => (
-                  <div
-                    key={`desktop-${record.id}`}
-                    className="relative transition-all duration-300"
-                    style={{
-                      marginTop: index === 0 ? "0" : "50px",
-                    }}
-                  >
-                    <div className="transform scale-[0.90] origin-top -translate-x-1/4">
-                      <TimelineCard record={record} index={index} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* View Full Timeline Button */}
-        <div className="flex justify-center mt-0 md:mt-2 mb-2 md:mb-3">
+        <div className="flex items-center justify-center gap-1 sm:gap-2 md:gap-3 my-2 md:my-3">
           <Button
             variant="secondary"
-            className="rounded-full px-5 py-1.5 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg"
-            onClick={() => {
-              navigate("/posts")
-              window.scrollTo(0, 0)
-            }}
+            className="rounded-full px-2 sm:px-3 md:px-5 text-xs sm:text-sm flex items-center gap-1 md:gap-2 mr-2.5"
+            onClick={handlePreviousDay}
           >
-            View Full Timeline
+            <ChevronLeft size={10} className="md:size-14" />
+            <span className="hidden sm:inline">Previous Day</span>
+            <span className="sm:hidden mr-1.5">Prev</span>
+          </Button>
+
+          <div className="bg-white rounded-full px-3 sm:px-5 md:px-7 py-1 md:py-1.5 min-w-[102px] sm:min-w-[136px] md:min-w-[170px] border border-[#b66b6b]">
+            <span className="text-[#8e3e3e] text-sm md:text-base font-medium">
+              {displayDate.toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+              })}
+            </span>
+          </div>
+
+          <Button
+            variant="secondary"
+            className="rounded-full px-2 sm:px-3 md:px-5 text-xs sm:text-sm flex items-center gap-1 md:gap-2 ml-2.5"
+            onClick={handleNextDay}
+          >
+            <span className="hidden sm:inline">Next Day</span>
+            <span className="sm:hidden ml-1.5">Next</span>
+            <ChevronRight size={10} className="md:size-14" />
           </Button>
         </div>
       </div>
-    </section>
-  )
+
+      {/* Event Counter - simplified */}
+      <div className="flex justify-center mb-2 flex-shrink-0">
+        <div className="bg-white rounded-full px-2 sm:px-3 md:px-4 py-1 border border-[#b66b6b] shadow-sm">
+          <div className="flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
+            <span className="text-[#8e3e3e] text-xs md:text-sm font-medium">
+              {isLoading
+                ? "Loading events..."
+                : `${records.length} ${records.length === 1 ? "Event" : "Events"} Found`}
+            </span>
+            <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Timeline Section - THIS IS THE KEY PART */}
+      <div className="flex-1 min-h-0 relative">
+        
+        {/* Mobile Timeline - NO FIXED HEIGHT */}
+        <div className="md:hidden h-auto min-h-0 overflow-y-auto mobile-timeline-container">
+          <div className="relative flex justify-center py-2">
+            {/* Center line */}
+            <div className="relative w-[2px] flex flex-col items-center bg-[#e8ecf7]">
+              <div className="h-full w-[3px] bg-[#8a9ad4] min-h-[200px]"></div>
+
+              <div className="absolute left-1/2 -translate-x-1/2 top-[0px] w-4 h-4 rounded-full bg-[#6B78B4]"></div>
+              {records.slice(1, 5).map((_, index) => (
+                <div
+                  key={`mobile-circle-${index}`}
+                  className="absolute left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#FEE6E3] border-2 border-[#6B78B4]"
+                  style={{ top: `${120 + index * 120}px` }}
+                ></div>
+              ))}
+              <div className="absolute left-1/2 -translate-x-1/2 bottom-4 w-4 h-4 rounded-full bg-[#6B78B4]"></div>
+            </div>
+
+            {/* Mobile Timeline Items */}
+            <div className="absolute left-[17px] w-[calc(100%-26px)] space-y-6 pb-3">
+              {records.map((record, index) => (
+                <TimelineCard key={`mobile-${record.id}`} record={record} index={index} />
+              ))}
+            </div>
+          </div>
+
+          {/* Scroll hint */}
+          {showScrollHint && records.length > 2 && (
+            <div className="scroll-hint bottom-0">
+              <div className="scroll-blur"></div>
+              <span className="scroll-text">Scroll down</span>
+            </div>
+          )}
+        </div>
+
+        {/* Desktop Timeline */}
+        <div className="hidden md:block min-h-0">
+          <div className="relative flex justify-center">
+            {/* Center line - spans full height */}
+            <div className="absolute w-[2px] flex flex-col items-center h-full">
+              <div className="w-[5px] bg-[#8a9ad4] h-full"></div>
+              <div className="absolute left-1/2 -translate-x-1/2 top-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
+              <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
+            </div>
+
+            {/* Desktop Timeline Items */}
+            <div className="relative left-[37.5%] -translate-x-1/4 w-3/4">
+              {records.map((record, index) => (
+                <div
+                  key={`desktop-${record.id}`}
+                  className="relative transition-all duration-300"
+                  style={{
+                    marginTop: index === 0 ? "0" : "50px",
+                  }}
+                >
+                  <div className="transform scale-[0.90] origin-top -translate-x-1/4">
+                    <TimelineCard record={record} index={index} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* View Full Timeline Button */}
+      <div className="flex justify-center mt-2 mb-2 flex-shrink-0">
+        <Button
+          variant="secondary"
+          className="rounded-full px-5 py-1.5 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg"
+          onClick={() => {
+            navigate("/posts")
+            window.scrollTo(0, 0)
+          }}
+        >
+          View Full Timeline
+        </Button>
+      </div>
+      
+    </div>
+  </section>
+)
 }
