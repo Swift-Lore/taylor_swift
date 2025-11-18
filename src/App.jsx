@@ -13,18 +13,18 @@ import CookieConsent from "react-cookie-consent";
 
 function Layout({ children }) {
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       <Header />
-
-      <main className="relative z-0">
+      
+      <main className="flex-1 min-h-0 relative z-0">
         {children}
-
-        {/* Soft, subtle fade between content and footer */}
-        <div className="pointer-events-none w-full h-10 md:h-14 bg-gradient-to-b from-transparent via-[#e8ecf7] to-[#E8ECF7]" />
+        
+        {/* Reduced height gradient - only show if needed */}
+        <div className="pointer-events-none w-full h-4 bg-gradient-to-b from-transparent to-[#e8ecf7]" />
       </main>
 
       <Footer />
-    </>
+    </div>
   );
 }
 
