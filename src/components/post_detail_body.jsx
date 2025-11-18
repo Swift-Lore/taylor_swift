@@ -243,9 +243,9 @@ export default function PostDetailBody() {
   // ---- MAIN RENDER ----
   return (
     <div className="bg-[#e6edf7] py-8 md:py-12">
-      {/* Event hero */}
-      <section className="max-w-5xl mx-auto px-4 mb-8">
-        <div className="relative overflow-hidden rounded-3xl bg-[#8a9ad4] text-white px-6 py-7 md:px-10 md:py-9 shadow-lg">
+      {/* Event hero (no buttons, just vibe) */}
+      <section className="max-w-5xl mx-auto px-4 mb-6">
+        <div className="relative overflow-hidden rounded-3xl bg-[#8a9ad4] text-white px-6 py-6 md:px-10 md:py-7 shadow-lg">
           <div className="pointer-events-none absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.7),_rgba(138,154,212,0))]" />
           <div className="relative z-10 text-center md:text-left">
             {event.EVENT && (
@@ -258,26 +258,12 @@ export default function PostDetailBody() {
                 {formatEventDate(event.DATE)}
               </p>
             )}
-            <div className="mt-5 flex flex-wrap justify-center md:justify-start gap-3">
-              <button
-                onClick={handleBackToTimeline}
-                className="rounded-full border border-white/70 bg-white/10 px-5 py-2 text-xs md:text-sm font-medium text-white hover:bg-white/15 transition-colors"
-              >
-                Back to Timeline
-              </button>
-              <button
-                onClick={() => navigate("/")}
-                className="rounded-full border border-white/70 bg-white/10 px-5 py-2 text-xs md:text-sm font-medium text-white hover:bg-white/15 transition-colors"
-              >
-                Return to Home
-              </button>
-            </div>
           </div>
         </div>
       </section>
 
       {/* Sponsored ad block */}
-      <div className="w-full max-w-4xl mx-auto px-4 mb-6">
+      <div className="w-full max-w-4xl mx-auto px-4 mb-4">
         <div className="relative rounded-2xl border border-[#f8dada] bg-gradient-to-b from-[#fff8f8] to-[#fdeeee] shadow-sm px-4 py-6 min-h-[110px] flex items-center justify-center">
           <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.12em] text-[#9ca3af]">
             Sponsored
@@ -292,6 +278,20 @@ export default function PostDetailBody() {
           )}
         </div>
       </div>
+
+      {/* Compact title/date block for screenshots */}
+      <section className="max-w-4xl mx-auto px-4 mt-2 mb-8 text-center">
+        {event.EVENT && (
+          <h2 className="text-xl md:text-2xl font-serif text-[#8e3e3e] leading-snug">
+            {event.EVENT}
+          </h2>
+        )}
+        {event.DATE && (
+          <p className="mt-1 text-sm md:text-base text-[#6b7db3]">
+            {formatEventDate(event.DATE)}
+          </p>
+        )}
+      </section>
 
       {/* NOTES + SOURCES */}
       {(hasNotes || hasSources) && (
@@ -365,6 +365,7 @@ export default function PostDetailBody() {
                         />
                       </div>
 
+                      {/* Fallback card */}
                       <div
                         id={`fallback-${index}`}
                         style={{ display: "none" }}
