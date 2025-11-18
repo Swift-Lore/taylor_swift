@@ -20,15 +20,12 @@ export default function Footer() {
   }, []);
 
   return (
-    // 1️⃣ Give the footer band a bit more vertical space
-    <footer className="bg-gradient-to-b from-[#e8ecf7] to-[#b6c1e3] pt-1 md:pt-2 pb-4 -mt-3 md:-mt-4">
+    <footer className="bg-gradient-to-b from-[#e8ecf7] to-[#b6c1e3] pt-0 md:pt-1 pb-2 md:pb-3">
       {/* Main footer content */}
-      {/* 2️⃣ Remove the negative margin + use padding instead for nicer centering */}
-      <div className="max-w-5xl mx-auto px-4 py-3">
-        {/* 3️⃣ Spread the cards out and stretch to same height */}
-        <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-stretch justify-between">
+      <div className="max-w-5xl mx-auto px-4 py-2">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-stretch justify-between">
           {/* About / description card */}
-          <div className="bg-white/70 rounded-3xl shadow-sm px-4 py-3 md:px-5 md:py-4 w-full md:w-1/2">
+          <div className="bg-white/70 rounded-3xl shadow-sm px-4 py-2 md:px-5 md:py-3 w-full md:w-1/2">
             <h2 className="text-sm md:text-base font-semibold text-[#5a2b60] tracking-wide mb-1 logo-glow">
               About Swift Lore
             </h2>
@@ -69,9 +66,8 @@ export default function Footer() {
           </div>
 
           {/* Ad card */}
-          {/* 4️⃣ Match width to About card so they feel like a paired set */}
           <div className="w-full md:w-1/2">
-            <div className="relative h-full bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-3 md:px-5 md:py-4 flex items-center justify-center card-soft glass-soft">
+            <div className="relative h-full bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-2 md:px-5 md:py-3 flex items-center justify-center card-soft glass-soft">
               <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.16em] text-[#9ca3af]">
                 Sponsored
               </span>
@@ -89,7 +85,7 @@ export default function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="bg-[#8a9ad4] py-2 px-4 text-center text-white">
+      <div className="bg-[#8a9ad4] py-1 px-4 text-center text-white">
         <div className="max-w-5xl mx-auto flex flex-wrap justify-center items-center gap-2 md:gap-3 text-[11px] md:text-sm">
           <a
             href="/cookie_policy"
