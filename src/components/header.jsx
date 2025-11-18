@@ -7,11 +7,11 @@ export default function Header() {
   const navigate = useNavigate()
   const location = useLocation()
   const [searchQuery, setSearchQuery] = useState("")
-  
+
   // Sync search query with URL params
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search)
-    const queryFromUrl = urlParams.get('q')
+    const queryFromUrl = urlParams.get("q")
     if (queryFromUrl) {
       setSearchQuery(queryFromUrl)
     }
@@ -20,16 +20,15 @@ export default function Header() {
   const handleSearch = (e) => {
     e.preventDefault()
     const trimmedQuery = searchQuery.trim()
-    
+
     if (!trimmedQuery) {
-      navigate('/')
+      navigate("/")
       return
     }
 
-    // Force first letter uppercase (e.g., "travis" → "Travis")
-    const formattedQuery = 
+    const formattedQuery =
       trimmedQuery.charAt(0).toUpperCase() + trimmedQuery.slice(1)
-    
+
     navigate(`/?q=${encodeURIComponent(formattedQuery)}`)
   }
 
@@ -38,47 +37,55 @@ export default function Header() {
   }
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleSearch(e)
     }
   }
 
   const handleLogoClick = () => {
     setSearchQuery("")
-    navigate('/')
+    navigate("/")
   }
 
   return (
-   <header className="w-full bg-[#8a9ad4] py-0 md:py-0.5 px-1 sm:px-3 md:px-5 relative overflow-visible z-10">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-0 md:gap-4">
-          
-          {/* Logo section - Bigger mobile logo */}
-          <div className="w-full flex justify-center md:justify-start md:w-[55%] relative z-20 overflow-visible">
-            <div
-              className="w-full max-w-[600px] md:max-w-[900px] cursor-pointer mb-0 md:mb-0 -mt-4 md:-mt-10 transform tranlate-y-0 md:translate-y-5" 
-              onClick={handleLogoClick}
-            >
-              <img 
-                src="/images/swift_lore.png" 
-                alt="Swift Lore" 
-                className="w-full h-auto object-contain min-h-[250px] max-h-[250px] md:min-h-[260px] md:max-h-[260px]"
-              />
-            </div>
-          </div>
- 
-        {/* Content section - Better mobile layout */}
-        <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-2 md:gap-3.5 md:mt-1 text-center md:text-left transform -translate-y-5 md:translate-y-0"> 
-          <div className="w-64 md:w-full md:max-w-xs">
-            <p className="text-white text-[10px] md:text-xs leading-tight md:leading-relaxed text-justfiy 
-              -translate-y-3.5 md:translate-y-0">
-              A fan-crafted, interactive timeline chronicling the epic life and career of Taylor Swift.
-              Explore everything from album releases and Easter Eggs to dating history and iconic moments. 
-              Dive into the lore!
+    <header className="relative w-full bg-gradient-to-b from-[#9fa8f5] via-[#8a9ad4] to-[#e8ecf7] pb-6 md:pb-10 shadow-[0_10px_40px_rgba(75,85,160,0.4)] fade-in-up overflow-visible z-10">
+      <div className="max-w-5xl mx-auto px-3 sm:px-4 md:px-6 pt-4 md:pt-6 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-4 relative">
+        {/* Decorative background glow behind logo */}
+        <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 md:left-16 md:translate-x-0 w-64 h-64 blur-3xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
+
+        {/* Logo section */}
+        <div className="w-full md:w-[55%] flex justify-center md:justify-start relative z-20 overflow-visible">
+          <button
+            type="button"
+            onClick={handleLogoClick}
+            className="w-full max-w-[520px] md:max-w-[640px] cursor-pointer -mt-6 md:-mt-10 relative"
+          >
+            {/* Tiny sparkle */}
+            <span className="absolute right-10 md:right-16 top-6 md:top-10 text-white/80 text-xl md:text-2xl twinkle">
+              ✨
+            </span>
+
+            <img
+              src="/images/swift_lore.png"
+              alt="Swift Lore"
+              className="w-full h-auto object-contain min-h-[220px] max-h-[240px] md:min-h-[250px] md:max-h-[260px] drop-shadow-[0_12px_40px_rgba(88,28,135,0.45)]"
+            />
+          </button>
+        </div>
+
+        {/* Right side: blurb + search + CTA */}
+        <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-3 md:gap-4 md:mt-2 text-center md:text-left relative z-20">
+          <div className="w-full max-w-xs md:max-w-sm bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 px-4 py-3 md:px-5 md:py-4 shadow-[0_14px_45px_rgba(15,23,42,0.35)]">
+            <p className="text-white text-[11px] md:text-[13px] leading-snug md:leading-relaxed">
+              A fan-crafted, interactive timeline chronicling the epic life and
+              career of Taylor Swift. Explore everything from album releases and
+              Easter Eggs to dating history and iconic moments.
+              <span className="font-semibold"> Dive into the lore!</span>
             </p>
           </div>
 
-          {/* Search Bar - Longer on mobile */}
-          <div className="w-64 md:w-full md:max-w-xs -translate-y-2 md:translate-y-0">
+          {/* Search Bar */}
+          <div className="w-full max-w-xs md:max-w-sm">
             <form onSubmit={handleSearch} className="relative">
               <input
                 type="text"
@@ -86,19 +93,19 @@ export default function Header() {
                 value={searchQuery}
                 onChange={handleInputChange}
                 onKeyPress={handleKeyPress}
-                className="w-full rounded-full py-1 md:py-1.5 pl-5 md:pl-6 pr-2 md:pr-2.5 text-[10px] md:text-xs bg-white/80 text-gray-800 focus:outline-none focus:ring-2 focus:ring-white"
+                className="w-full rounded-full py-1.5 md:py-2 pl-7 md:pl-8 pr-6 text-[11px] md:text-[13px] bg-white/90 text-gray-800 shadow-[0_10px_30px_rgba(15,23,42,0.25)] focus:outline-none focus:ring-2 focus:ring-[#fbb1c3] focus:ring-offset-2 focus:ring-offset-[#8a9ad4]"
                 inputMode="search"
                 enterKeyHint="search"
                 autoCapitalize="none"
                 autoCorrect="off"
                 spellCheck="false"
               />
-              <button 
+              <button
                 type="submit"
-                className="absolute inset-y-0 left-1 md:left-1.5 flex items-center pointer-events-auto hover:text-gray-600 transition-colors"
+                className="absolute inset-y-0 left-2.5 md:left-3 flex items-center pointer-events-auto text-gray-400 hover:text-gray-600 transition-colors"
               >
                 <svg
-                  className="h-2.5 w-2.5 md:h-3 md:w-3 text-gray-400"
+                  className="h-3 w-3 md:h-4 md:w-4"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="none"
@@ -114,14 +121,14 @@ export default function Header() {
               {searchQuery && (
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-1.5 flex items-center"
+                  className="absolute inset-y-0 right-2.5 flex items-center"
                   onClick={() => {
                     setSearchQuery("")
-                    navigate('/')
+                    navigate("/")
                   }}
                 >
                   <svg
-                    className="h-2.5 w-2.5 md:h-3 md:w-3 text-gray-500"
+                    className="h-3 w-3 md:h-4 md:w-4 text-gray-500"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
                     fill="none"
@@ -137,7 +144,7 @@ export default function Header() {
           </div>
 
           <button
-            className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-2.5 md:px-4 py-1 md:py-1.5 font-semibold text-[10px] md:text-xs w-32 md:w-auto mb-1 -translate-y-1 md:translate-y-0"
+            className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-4 md:px-5 py-1.5 md:py-2 font-semibold text-[11px] md:text-[13px] w-40 md:w-auto shadow-[0_10px_30px_rgba(88,28,135,0.45)] transition-transform hover:-translate-y-0.5"
             onClick={() => navigate("/posts")}
           >
             View Full Timeline
