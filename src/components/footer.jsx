@@ -24,9 +24,9 @@ export default function Footer() {
       {/* Main footer content */}
       <div className="max-w-5xl mx-auto px-4 pt-10 pb-6">
         <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start md:items-stretch">
-          {/* About / description */}
-          <div className="flex-1">
-            <h2 className="text-sm md:text-base font-semibold text-[#5a3260] tracking-wide mb-2">
+          {/* About / description card */}
+          <div className="flex-1 fade-in-up card-soft glass-soft rounded-3xl bg-white/10 p-4 md:p-6">
+            <h2 className="text-sm md:text-base font-semibold text-[#5a2b60] tracking-wide mb-2 logo-glow">
               About Swift Lore
             </h2>
             <p className="text-xs md:text-sm text-[#4b4b63] leading-relaxed">
@@ -60,8 +60,8 @@ export default function Footer() {
           </div>
 
           {/* Ad card */}
-          <div className="w-full md:w-[320px]">
-            <div className="relative bg-white/90 rounded-2xl border border-[#f8dada] shadow-sm px-4 py-6 min-h-[110px] flex items-center justify-center">
+          <div className="w-full md:w-[320px] fade-in-up">
+            <div className="relative bg-white/80 rounded-2xl border border-[#f8dada] px-4 py-6 min-h-[110px] flex items-center justify-center card-soft glass-soft">
               <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.16em] text-[#9ca3af]">
                 Sponsored
               </span>
@@ -90,7 +90,10 @@ export default function Footer() {
             Cookie Policy
           </a>
 
-          <p>Copyright © 2025 Swift Lore · Fan-made, not affiliated with Taylor Swift.</p>
+          <p>
+            Copyright © 2025 Swift Lore · Fan-made, not affiliated with Taylor
+            Swift.
+          </p>
 
           <a
             href="/privacy_policy"
@@ -105,4 +108,3 @@ export default function Footer() {
     </footer>
   );
 }
-
