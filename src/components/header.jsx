@@ -104,76 +104,78 @@ export default function Header() {
 
   return (
     <header className="relative w-full bg-gradient-to-b from-[#9fa8f5] via-[#8a9ad4] to-[#e6edf7] pb-3 md:pb-5 shadow-[0_10px_40px_rgba(75,85,160,0.4)] fade-in-up overflow-visible z-10">
-      <div className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 pt-4 md:pt-5 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-4 relative">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 pt-4 md:pt-5 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 relative">
         {/* Decorative glow */}
         <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 md:left-12 md:translate-x-0 w-52 h-52 blur-3xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
 
-        {/* Logo section - adjusted for full timeline page */}
-        <div className={`w-full ${showHero ? 'md:w-[60%]' : 'md:w-full'} flex justify-center md:justify-start relative z-20 overflow-visible`}>
+        {/* Logo section - larger and centered */}
+        <div className="w-full md:w-[70%] flex flex-col items-center md:items-start relative z-20 overflow-visible">
           <button
             type="button"
             onClick={handleLogoClick}
-            className={`w-full max-w-[640px] md:max-w-[720px] cursor-pointer relative ${showHero ? '-mt-4 md:-mt-8' : 'mt-0'}`}
+            className="w-full max-w-[800px] cursor-pointer relative -mt-2 md:-mt-4"
           >
             {/* sparkles around the logo */}
-            <span className="absolute left-6 md:left-10 top-6 md:top-8 text-white/80 text-lg md:text-2xl twinkle">
+            <span className="absolute left-8 md:left-12 top-8 md:top-10 text-white/80 text-xl md:text-3xl twinkle">
               ✨
             </span>
-            <span className="absolute right-8 md:right-14 top-4 md:top-6 text-white/80 text-xl md:text-3xl twinkle">
+            <span className="absolute right-10 md:right-16 top-6 md:top-8 text-white/80 text-2xl md:text-4xl twinkle">
               ✨
             </span>
-            <span className="absolute right-16 md:right-24 bottom-6 md:bottom-10 text-white/80 text-base md:text-xl twinkle">
+            <span className="absolute right-20 md:right-28 bottom-8 md:bottom-12 text-white/80 text-lg md:text-2xl twinkle">
               ✨
             </span>
 
             <img
               src="/images/swift_lore.png"
               alt="Swift Lore"
-              className="w-full h-auto object-contain max-h-[160px] md:max-h-[180px] logo-glow"
+              className="w-full h-auto object-contain max-h-[200px] md:max-h-[240px] logo-glow"
             />
           </button>
+
+          {/* Navigation buttons - under logo */}
+          {!showHero && (
+            <div className="flex flex-wrap justify-center gap-3 mt-3 md:mt-4">
+              <button
+                onClick={() => navigate("/")}
+                className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all"
+              >
+                Return to Home
+              </button>
+              <button
+                onClick={() => navigate("/posts")}
+                className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all"
+              >
+                View Full Timeline
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Event page header - shows event title and date */}
         {isEventPage && (
-          <div className="w-full flex flex-col items-center gap-2 mt-2 mb-2 px-4">
+          <div className="w-full md:w-[30%] flex flex-col items-center md:items-end gap-2 mt-2 mb-2 px-4">
             {/* Event title */}
-            <h2 className="text-white text-xl md:text-2xl font-serif drop-shadow-lg tracking-wide text-center leading-tight">
+            <h2 className="text-white text-xl md:text-2xl font-serif drop-shadow-lg tracking-wide text-center md:text-right leading-tight">
               {eventData?.EVENT || "Loading event..."}
             </h2>
             
             {/* Event date */}
             {eventData?.DATE && (
-              <p className="text-white/90 text-sm md:text-base font-medium drop-shadow-md">
+              <p className="text-white/90 text-sm md:text-base font-medium drop-shadow-md text-center md:text-right">
                 {formatEventDate(eventData.DATE)}
               </p>
             )}
-
-            {/* Return to Home button */}
-            <button
-              onClick={() => navigate("/")}
-              className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all mt-2"
-            >
-              Return to Home
-            </button>
           </div>
         )}
 
         {/* Full timeline page header */}
         {isFullTimelinePage && !isEventPage && (
-          <div className="w-full flex flex-col items-center gap-2 mt-2 mb-2 px-4">
+          <div className="w-full md:w-[30%] flex flex-col items-center md:items-end gap-2 mt-2 mb-2 px-4">
             {/* Larger, more elegant title */}
-            <h2 className="text-white text-2xl md:text-3xl font-serif drop-shadow-lg tracking-wide text-center">
+            <h2 className="text-white text-2xl md:text-3xl font-serif drop-shadow-lg tracking-wide text-center md:text-right">
               Taylor Swift's Career Timeline
             </h2>
-
-            {/* Return to Home button */}
-            <button
-              onClick={() => navigate("/")}
-              className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all"
-            >
-              Return to Home
-            </button>
           </div>
         )}
 
@@ -211,12 +213,9 @@ export default function Header() {
             {/* CTA */}
             <button
               className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-4 md:px-5 py-1.5 md:py-2 font-semibold text-[11px] md:text-[13px] w-40 md:w-auto shadow-[0_10px_30px_rgba(88,28,135,0.45)] transition-transform hover:-translate-y-0.5"
-              onClick={() => {
-                if (isFullTimelinePage) navigate("/")
-                else navigate("/posts")
-              }}
+              onClick={() => navigate("/posts")}
             >
-              {isFullTimelinePage ? "Return to Home" : "View Full Timeline"}
+              View Full Timeline
             </button>
           </div>
         )}
