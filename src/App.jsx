@@ -16,12 +16,11 @@ function Layout({ children }) {
     <>
       <Header />
 
-      {/* Main page content */}
       <main className="relative z-0">
         {children}
 
-        {/* Soft fade spacer before footer */}
-        <div className="h-16 md:h-24 bg-gradient-to-b from-transparent via-[#e8ecf7] to-[#d7ddf4]" />
+        {/* Seamless fade-out between content and footer */}
+        <div className="pointer-events-none w-full h-20 md:h-28 bg-[radial-gradient(ellipse_at_top,_rgba(255,255,255,0.9),_rgba(231,236,247,0)_70%)]" />
       </main>
 
       <Footer />
