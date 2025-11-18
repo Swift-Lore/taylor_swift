@@ -223,7 +223,7 @@ export default function Timeline() {
 
   // ===== JSX =====
   return (
-        <section className="w-full bg-[#e8ecf7] pt-3 pb-0 md:pt-5 md:pb-0 px-2 md:px-10">
+        <section className="w-full bg-[#e8ecf7] pt-3 pb-3 md:pt-5 md:pb-5 px-2 md:px-10">
       <div className="container mx-auto h-full flex flex-col">
         {/* On This Day Section */}
         <div className="text-center mb-1 md:mb-3 transform translate-x-0 md:translate-x-[-19px]">
@@ -371,7 +371,7 @@ export default function Timeline() {
         </div>
 
         {/* View Full Timeline Button */}
-        <div className="flex justify-center mt-0 md:mt-2">
+        <div className="flex justify-center mt-0 md:mt-2 mb-2 md:mb-3">
           <Button
             variant="secondary"
             className="rounded-full px-5 py-1.5 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg"
