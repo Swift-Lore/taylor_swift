@@ -406,19 +406,16 @@ export default function PostDetailBody() {
         </section>
       )}
 
-            {/* YouTube */}
+                  {/* YouTube */}
       {hasVideos && (
         <section className="max-w-4xl mx-auto px-4 mb-10">
-          <div className="flex flex-col items-center gap-6 mt-2">
+          <div className={`mt-2 ${event.YOUTUBE?.split(/,\s*|\s*\|\|\s*/).length > 1 ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : 'flex flex-col items-center gap-6'}`}>
             {event.YOUTUBE?.split(/,\s*|\s*\|\|\s*/).map((url, index) => {
               const trimmedUrl = url.trim();
               const videoId = getYouTubeVideoId(trimmedUrl);
               
-              console.log(`YouTube URL ${index}:`, trimmedUrl); // Debug log
-              console.log(`YouTube Video ID ${index}:`, videoId); // Debug log
-              
               return videoId ? (
-                <div key={index} className="w-full max-w-4xl">
+                <div key={index} className={`${event.YOUTUBE?.split(/,\s*|\s*\|\|\s*/).length > 1 ? 'w-full' : 'w-full max-w-4xl'}`}>
                   <iframe
                     src={`https://www.youtube.com/embed/${videoId}`}
                     title={`YouTube Video ${index + 1}`}
@@ -428,26 +425,20 @@ export default function PostDetailBody() {
                     allowFullScreen
                   ></iframe>
                 </div>
-              ) : (
-                // Show debug info for URLs that aren't working
-                <div key={index} className="w-full max-w-4xl p-4 bg-yellow-100 border border-yellow-400 rounded">
-                  <p className="text-yellow-800">Could not load YouTube video:</p>
-                  <p className="text-yellow-600 text-sm">{trimmedUrl}</p>
-                </div>
-              );
+              ) : null;
             })}
           </div>
         </section>
       )}
 
-      {/* Instagram */}
+            {/* Instagram */}
       {event.INSTAGRAM && (
         <section className="max-w-4xl mx-auto px-4 mb-10">
-          <div className="flex flex-wrap justify-center gap-4 mt-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2 justify-center">
             {event.INSTAGRAM.split(" || ").map((rawUrl, index) => {
               const url = rawUrl.trim().split("?")[0];
               return url ? (
-                <div key={index} className="instagram-container max-w-sm">
+                <div key={index} className="instagram-container flex justify-center">
                   <blockquote
                     className="instagram-media"
                     data-instgrm-permalink={url}
@@ -458,7 +449,8 @@ export default function PostDetailBody() {
                       border: "1px solid #dbdbdb",
                       boxShadow: "none",
                       margin: "0",
-                      minWidth: "326px",
+                      minWidth: "280px",
+                      maxWidth: "320px",
                       padding: "0",
                     }}
                   ></blockquote>
