@@ -19,11 +19,14 @@ export default function Footer() {
     }
   }, []);
 
-    return (
-    <footer className="bg-gradient-to-b from-[#e8ecf7] to-[#b6c1e3] pt-2 pb-3">
+  return (
+    // 1️⃣ Give the footer band a bit more vertical space
+    <footer className="bg-gradient-to-b from-[#e8ecf7] to-[#b6c1e3] pt-4 pb-4">
       {/* Main footer content */}
-      <div className="max-w-5xl mx-auto px-4 pb-3 mt-[-8px]">
-        <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-center md:items-start justify-center">
+      {/* 2️⃣ Remove the negative margin + use padding instead for nicer centering */}
+      <div className="max-w-5xl mx-auto px-4 py-3">
+        {/* 3️⃣ Spread the cards out and stretch to same height */}
+        <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-stretch justify-between">
           {/* About / description card */}
           <div className="bg-white/70 rounded-3xl shadow-sm px-4 py-3 md:px-5 md:py-4 w-full md:w-1/2">
             <h2 className="text-sm md:text-base font-semibold text-[#5a2b60] tracking-wide mb-1 logo-glow">
@@ -43,7 +46,10 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Button variant="secondary" className="rounded-full px-4 py-1.5 text-xs md:text-sm">
+                <Button
+                  variant="secondary"
+                  className="rounded-full px-4 py-1.5 text-xs md:text-sm"
+                >
                   Support the Site
                 </Button>
               </a>
@@ -52,7 +58,10 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Button variant="secondary" className="rounded-full px-4 py-1.5 text-xs md:text-sm">
+                <Button
+                  variant="secondary"
+                  className="rounded-full px-4 py-1.5 text-xs md:text-sm"
+                >
                   Submit a Suggestion
                 </Button>
               </a>
@@ -60,7 +69,8 @@ export default function Footer() {
           </div>
 
           {/* Ad card */}
-          <div className="flex-1">
+          {/* 4️⃣ Match width to About card so they feel like a paired set */}
+          <div className="w-full md:w-1/2">
             <div className="relative h-full bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-3 md:px-5 md:py-4 flex items-center justify-center card-soft glass-soft">
               <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.16em] text-[#9ca3af]">
                 Sponsored
@@ -91,7 +101,8 @@ export default function Footer() {
           </a>
 
           <p className="mx-1">
-            Copyright © 2025 Swift Lore · Fan-made, not affiliated with Taylor Swift.
+            Copyright © 2025 Swift Lore · Fan-made, not affiliated with Taylor
+            Swift.
           </p>
 
           <a
