@@ -109,7 +109,7 @@ export default function Header() {
         <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 md:left-12 md:translate-x-0 w-52 h-52 blur-3xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
 
         {/* Logo section - larger and centered */}
-        <div className="w-full md:w-[70%] flex flex-col items-center md:items-start relative z-20 overflow-visible">
+        <div className="w-full md:w-[70%] flex flex-col items-center relative z-20 overflow-visible">
           <button
             type="button"
             onClick={handleLogoClick}
@@ -133,21 +133,28 @@ export default function Header() {
             />
           </button>
 
-          {/* Navigation buttons - under logo */}
+          {/* Navigation buttons - centered under logo */}
           {!showHero && (
-            <div className="flex flex-wrap justify-center gap-3 mt-3 md:mt-4">
-              <button
-                onClick={() => navigate("/")}
-                className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all"
-              >
-                Return to Home
-              </button>
-              <button
-                onClick={() => navigate("/posts")}
-                className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all"
-              >
-                View Full Timeline
-              </button>
+            <div className="flex flex-wrap justify-center gap-3 mt-3 md:mt-4 w-full">
+              {/* Show "Return to Home" on full timeline page */}
+              {isFullTimelinePage && (
+                <button
+                  onClick={() => navigate("/")}
+                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all"
+                >
+                  Return to Home
+                </button>
+              )}
+              
+              {/* Show "View Full Timeline" on event pages */}
+              {isEventPage && (
+                <button
+                  onClick={() => navigate("/posts")}
+                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all"
+                >
+                  View Full Timeline
+                </button>
+              )}
             </div>
           )}
         </div>
