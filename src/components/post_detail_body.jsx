@@ -41,13 +41,12 @@ const formatEventDate = (isoDate) => {
   const d = new Date(isoDate);
   if (Number.isNaN(d.getTime())) return "";
 
-  // Force UTC interpretation
   const month = d.toLocaleString("en-US", {
     month: "short",
     timeZone: "UTC",
-  }); // "Nov"
-  const day = String(d.getUTCDate()).padStart(2, "0"); // "07"
-  const year = d.getUTCFullYear();                     // 2025
+  });
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  const year = d.getUTCFullYear();
 
   return `${month}-${day}-${year}`;
 };
@@ -241,44 +240,62 @@ export default function PostDetailBody() {
   const hasNotes = !!event.NOTES && event.NOTES.trim() !== "";
   const hasSources = nonImageLinks.length > 0 || sourceImages.length > 0;
 
+  // ---- MAIN RENDER ----
   return (
-  <div className="bg-[#e6edf7] py-8 md:py-12">
-    {/* Ad Placement */}
-    {/* Sponsored ad block above Notes */}
-    <div className="w-full max-w-4xl mx-auto px-4 mb-6 mt-8">
-      <div className="relative rounded-2xl border border-[#f8dada] bg-gradient-to-b from-[#fff8f8] to-[#fdeeee] shadow-sm px-4 py-6 min-h-[110px] flex items-center justify-center">
-        <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.12em] text-[#9ca3af]">
-          Sponsored
-        </span>
-
-        {process.env.NODE_ENV === "production" ? (
-          <AdComponent />
-        ) : (
-          <div className="text-[#9ca3af] text-sm italic">
-            Advertisement space — supporting Swift Lore 💫
+    <div className="bg-[#e6edf7] py-8 md:py-12">
+      {/* Event hero */}
+      <section className="max-w-5xl mx-auto px-4 mb-8">
+        <div className="relative overflow-hidden rounded-3xl bg-[#8a9ad4] text-white px-6 py-7 md:px-10 md:py-9 shadow-lg">
+          <div className="pointer-events-none absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.7),_rgba(138,154,212,0))]" />
+          <div className="relative z-10 text-center md:text-left">
+            {event.EVENT && (
+              <h1 className="font-serif text-2xl md:text-3xl lg:text-4xl leading-tight">
+                {event.EVENT}
+              </h1>
+            )}
+            {event.DATE && (
+              <p className="mt-2 text-sm md:text-base text-indigo-50/90">
+                {formatEventDate(event.DATE)}
+              </p>
+            )}
+            <div className="mt-5 flex flex-wrap justify-center md:justify-start gap-3">
+              <button
+                onClick={handleBackToTimeline}
+                className="rounded-full border border-white/70 bg-white/10 px-5 py-2 text-xs md:text-sm font-medium text-white hover:bg-white/15 transition-colors"
+              >
+                Back to Timeline
+              </button>
+              <button
+                onClick={() => navigate("/")}
+                className="rounded-full border border-white/70 bg-white/10 px-5 py-2 text-xs md:text-sm font-medium text-white hover:bg-white/15 transition-colors"
+              >
+                Return to Home
+              </button>
+            </div>
           </div>
-        )}
-      </div>
-    </div>
+        </div>
+      </section>
 
-    {/* Compact repeat of title + date for clean screenshots */}
-    <section className="max-w-4xl mx-auto px-4 mt-2 mb-8 text-center">
-      {event.EVENT && (
-        <h2 className="text-xl md:text-2xl font-serif text-[#8e3e3e] leading-snug">
-          {event.EVENT}
-        </h2>
-      )}
-      {event.DATE && (
-        <p className="mt-1 text-sm md:text-base text-[#6b7db3]">
-          {formatEventDate(event.DATE)}
-        </p>
-      )}
-    </section>
+      {/* Sponsored ad block */}
+      <div className="w-full max-w-4xl mx-auto px-4 mb-6">
+        <div className="relative rounded-2xl border border-[#f8dada] bg-gradient-to-b from-[#fff8f8] to-[#fdeeee] shadow-sm px-4 py-6 min-h-[110px] flex items-center justify-center">
+          <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.12em] text-[#9ca3af]">
+            Sponsored
+          </span>
+
+          {process.env.NODE_ENV === "production" ? (
+            <AdComponent />
+          ) : (
+            <div className="text-[#9ca3af] text-sm italic">
+              Advertisement space — supporting Swift Lore 💫
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* NOTES + SOURCES */}
       {(hasNotes || hasSources) && (
         <section className="max-w-4xl mx-auto px-4 mb-10">
-          {/* Notes inline, like your old layout */}
           {hasNotes && (
             <div className="text-sm md:text-base text-[#111827] leading-relaxed mb-6">
               <span className="font-semibold">Notes: </span>
@@ -286,10 +303,8 @@ export default function PostDetailBody() {
             </div>
           )}
 
-          {/* Sources, but without big labels/frames */}
           {hasSources && (
             <div className="space-y-6">
-              {/* Direct image links */}
               {sourceImages.length > 0 && (
                 <div className="image-only-grid flex flex-wrap gap-6 justify-start">
                   {sourceImages.map((url, index) => (
@@ -321,7 +336,6 @@ export default function PostDetailBody() {
                 </div>
               )}
 
-              {/* Non-image links (Microlink) */}
               {nonImageLinks.length > 0 && (
                 <div className="microlink-grid">
                   {nonImageLinks.map((url, index) => (
@@ -351,7 +365,6 @@ export default function PostDetailBody() {
                         />
                       </div>
 
-                      {/* Fallback card */}
                       <div
                         id={`fallback-${index}`}
                         style={{ display: "none" }}
