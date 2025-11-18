@@ -14,6 +14,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Timeline scrollbar */
 .timeline-scroll {
   scrollbar-width: thin;
   scrollbar-color: #b66b6b #e8ecf7;
@@ -34,7 +35,7 @@ body {
 
 /* -------------------------
    Hero fade-in + twinkle
-------------------------- */
+   ------------------------- */
 
 .fade-in-up {
   opacity: 0;
@@ -65,7 +66,7 @@ body {
     opacity: 1;
     transform: translateY(-3px);
   }
-} 
+}
 
 /* ---- GLOBAL DEPTH POLISH ---- */
 .card-soft {
@@ -88,9 +89,18 @@ body {
 }
 
 @keyframes sparkleFade {
-  0% { opacity: 0; transform: scale(0.8); }
-  50% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(0.8); }
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
 }
 
 /* ---- FADE IN ON SCROLL ---- */
@@ -104,4 +114,3 @@ body {
   opacity: 1;
   transform: translateY(0);
 }
-
