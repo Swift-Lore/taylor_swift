@@ -19,8 +19,8 @@ function Layout({ children }) {
       <main className="relative z-0">
         {children}
 
-        {/* Seamless fade-out between content and footer */}
-        <div className="pointer-events-none w-full h-20 md:h-28 bg-[radial-gradient(ellipse_at_top,_rgba(255,255,255,0.9),_rgba(231,236,247,0)_70%)]" />
+        {/* Soft, subtle fade between content and footer */}
+        <div className="pointer-events-none w-full h-10 md:h-14 bg-gradient-to-b from-transparent via-[#e8ecf7] to-[#E8ECF7]" />
       </main>
 
       <Footer />
