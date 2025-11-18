@@ -6,6 +6,7 @@ import { useNavigate, Link } from "react-router-dom"
 import { useEffect, useState } from "react"
 import axios from "axios"
 import "./timeline.css"
+import starImage from "./images/star.png"
 
 export default function Timeline() {
   const navigate = useNavigate()
@@ -241,18 +242,19 @@ useEffect(() => {
 
               <div className="absolute left-1 sm:left-2 md:left-3 lg:left-7 top-1/2 transform -translate-y-1/2">
                 <img
-                  src="/images/star.png"
-                  alt="Star"
-                  className="w-[26px] h-[26px] sm:w-[34px] sm:h-[34px] md:w-[56px] md:h-[56px] lg:w-[85px] lg:h-[85px]"
+  src={starImage}
+  alt="Star"
+  className="w-[26px] h-[26px] sm:w-[34px] sm:h-[34px] md:w-[56px] md:h-[56px] lg:w-[85px] lg:h-[85px]"
+/>
                 />
               </div>
 
               <div className="absolute right-1 sm:right-2 md:right-3 lg:right-7 top-1/2 transform -translate-y-1/2">
                 <img
-                  src="/images/star.png"
-                  alt="Star"
-                  className="w-[26px] h-[26px] sm:w-[34px] sm:h-[34px] md:w-[56px] md:h-[56px] lg:w-[85px] lg:h-[85px]"
-                />
+  src={starImage}
+  alt="Star"
+  className="w-[26px] h-[26px] sm:w-[34px] sm:h-[34px] md:w-[56px] md:h-[56px] lg:w-[85px] lg:h-[85px]"
+/>
               </div>
             </div>
           </div>
