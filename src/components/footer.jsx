@@ -84,32 +84,32 @@ export default function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="bg-[#8a9ad4] py-1 px-4 text-center text-white">
-        <div className="max-w-5xl mx-auto flex flex-wrap justify-center items-center gap-1.5 md:gap-2 text-[11px] md:text-xs">
-          <a
-            href="/cookie_policy"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-white hover:text-gray-200 underline"
-          >
-            Cookie Policy
-          </a>
+<div className="bg-[#8a9ad4] py-1.5 md:py-2 px-4 text-center text-white">
+  <div className="max-w-5xl mx-auto flex flex-wrap justify-center items-center gap-2 md:gap-3 text-[11px] md:text-sm">
+    <a
+      href="/cookie_policy"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-white hover:text-gray-200 underline"
+    >
+      Cookie Policy
+    </a>
 
-          <p className="mx-1">
-            Copyright © 2025 Swift Lore · Fan-made, not affiliated with Taylor
-            Swift.
-          </p>
+    <p className="mx-1">
+      Copyright © 2025 Swift Lore · Fan-made, not affiliated with Taylor Swift.
+    </p>
 
-          <a
-            href="/privacy_policy"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-white hover:text-gray-200 underline"
-          >
-            Privacy Policy
-          </a>
-        </div>
-      </div>
+    <a
+      href="/privacy_policy"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-white hover:text-gray-200 underline"
+    >
+      Privacy Policy
+    </a>
+  </div>
+</div>
+
     </footer>
   );
 }
