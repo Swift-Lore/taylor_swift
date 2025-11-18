@@ -243,24 +243,6 @@ export default function PostDetailBody() {
   // ---- MAIN RENDER ----
   return (
     <div className="bg-[#e6edf7] py-8 md:py-12">
-      {/* Event hero (no buttons, just vibe) */}
-      <section className="max-w-5xl mx-auto px-4 mb-6">
-        <div className="relative overflow-hidden rounded-3xl bg-[#8a9ad4] text-white px-6 py-6 md:px-10 md:py-7 shadow-lg">
-          <div className="pointer-events-none absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.7),_rgba(138,154,212,0))]" />
-          <div className="relative z-10 text-center md:text-left">
-            {event.EVENT && (
-              <h1 className="font-serif text-2xl md:text-3xl lg:text-4xl leading-tight">
-                {event.EVENT}
-              </h1>
-            )}
-            {event.DATE && (
-              <p className="mt-2 text-sm md:text-base text-indigo-50/90">
-                {formatEventDate(event.DATE)}
-              </p>
-            )}
-          </div>
-        </div>
-      </section>
 
       {/* Sponsored ad block */}
       <div className="w-full max-w-4xl mx-auto px-4 mb-4">
