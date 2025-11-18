@@ -406,12 +406,17 @@ export default function PostDetailBody() {
         </section>
       )}
 
-      {/* YouTube */}
+            {/* YouTube */}
       {hasVideos && (
         <section className="max-w-4xl mx-auto px-4 mb-10">
           <div className="flex flex-col items-center gap-6 mt-2">
-            {event.YOUTUBE?.split(",").map((url, index) => {
-              const videoId = getYouTubeVideoId(url.trim());
+            {event.YOUTUBE?.split(/,\s*|\s*\|\|\s*/).map((url, index) => {
+              const trimmedUrl = url.trim();
+              const videoId = getYouTubeVideoId(trimmedUrl);
+              
+              console.log(`YouTube URL ${index}:`, trimmedUrl); // Debug log
+              console.log(`YouTube Video ID ${index}:`, videoId); // Debug log
+              
               return videoId ? (
                 <div key={index} className="w-full max-w-4xl">
                   <iframe
@@ -419,10 +424,17 @@ export default function PostDetailBody() {
                     title={`YouTube Video ${index + 1}`}
                     className="w-full aspect-video rounded-xl"
                     frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   ></iframe>
                 </div>
-              ) : null;
+              ) : (
+                // Show debug info for URLs that aren't working
+                <div key={index} className="w-full max-w-4xl p-4 bg-yellow-100 border border-yellow-400 rounded">
+                  <p className="text-yellow-800">Could not load YouTube video:</p>
+                  <p className="text-yellow-600 text-sm">{trimmedUrl}</p>
+                </div>
+              );
             })}
           </div>
         </section>
