@@ -1,9 +1,8 @@
-import { useEffect } from "react";
-import { Button } from "./ui/Button";
-import AdComponent from "./ad_component";
+import { useEffect } from "react"
+import { Button } from "./ui/Button"
+import AdComponent from "./ad_component"
 
 export default function Footer() {
-  // AdSense init
   useEffect(() => {
     if (
       typeof window !== "undefined" &&
@@ -12,21 +11,21 @@ export default function Footer() {
     ) {
       try {
         // eslint-disable-next-line no-undef
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        ;(window.adsbygoogle = window.adsbygoogle || []).push({})
       } catch (e) {
-        console.error("AdSense error:", e);
+        console.error("AdSense error:", e)
       }
     }
-  }, []);
+  }, [])
 
   return (
-    <footer className="bg-[#d6dff1] bg-gradient-to-b from-[#d6dff1] to-[#b6c1e3] pt-4 pb-2">
+    <footer className="bg-gradient-to-b from-[#e6edf7] via-[#d6dff1] to-[#b6c1e3] pt-4 pb-3 mt-4">
       {/* Main footer content */}
-      <div className="max-w-5xl mx-auto px-4 pt-6 pb-4">
-        <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-stretch">
+      <div className="max-w-5xl mx-auto px-4 pt-3 pb-3">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-stretch">
           {/* About / description card */}
           <div className="bg-white/70 rounded-3xl shadow-sm p-3 md:p-4 w-full md:w-1/2">
-            <h2 className="text-sm md:text-base font-semibold text-[#5a2b60] tracking-wide mb-2 logo-glow">
+            <h2 className="text-sm md:text-base font-semibold text-[#5a2b60] tracking-wide mb-1 logo-glow">
               About Swift Lore
             </h2>
             <p className="text-xs md:text-sm text-[#4b4b63] leading-relaxed">
@@ -36,8 +35,7 @@ export default function Footer() {
               <span className="font-semibold">No era left behind.</span>
             </p>
 
-            {/* Support buttons */}
-            <div className="mt-4 flex flex-wrap gap-3 justify-start">
+            <div className="mt-3 flex flex-wrap gap-2.5 justify-start">
               <a
                 href="https://buymeacoffee.com/swiftlore"
                 target="_blank"
@@ -61,7 +59,7 @@ export default function Footer() {
 
           {/* Ad card */}
           <div className="flex-1 fade-in-up">
-            <div className="relative h-full bg-white/80 rounded-2xl border border-[#f8dada] px-3 py-3 md:px-4 md:py-4 flex items-center justify-center card-soft glass-soft">
+            <div className="relative h-full bg-white/80 rounded-3xl border border-[#f8dada] px-3 py-3 md:px-4 md:py-4 flex items-center justify-center card-soft glass-soft">
               <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.16em] text-[#9ca3af]">
                 Sponsored
               </span>
@@ -88,23 +86,3 @@ export default function Footer() {
             className="text-white hover:text-gray-200 underline"
           >
             Cookie Policy
-          </a>
-
-          <p>
-            Copyright © 2025 Swift Lore · Fan-made, not affiliated with Taylor
-            Swift.
-          </p>
-
-          <a
-            href="/privacy_policy"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-white hover:text-gray-200 underline"
-          >
-            Privacy Policy
-          </a>
-        </div>
-      </div>
-    </footer>
-  );
-}
