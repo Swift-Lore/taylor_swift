@@ -15,7 +15,15 @@ function Layout({ children }) {
   return (
     <>
       <Header />
-      {children}
+
+      {/* Main page content */}
+      <main className="relative z-0">
+        {children}
+
+        {/* Soft fade spacer before footer */}
+        <div className="h-16 md:h-24 bg-gradient-to-b from-transparent via-[#e8ecf7] to-[#d7ddf4]" />
+      </main>
+
       <Footer />
     </>
   );
