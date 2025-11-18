@@ -22,10 +22,10 @@ export default function Footer() {
     return (
     <footer className="bg-gradient-to-b from-[#e8ecf7] to-[#b6c1e3] pt-2 pb-3">
       {/* Main footer content */}
-      <div className="max-w-5xl mx-auto px-4 pb-3">
+      <div className="max-w-5xl mx-auto px-4 pb-3 mt-[-8px]">
         <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-stretch">
           {/* About / description card */}
-          <div className="bg-white/70 rounded-3xl shadow-sm px-4 py-4 md:px-5 md:py-5 w-full md:w-1/2">
+          <div className="bg-white/70 rounded-3xl shadow-sm px-4 py-3 md:px-5 md:py-4 w-full md:w-1/2">
             <h2 className="text-sm md:text-base font-semibold text-[#5a2b60] tracking-wide mb-1 logo-glow">
               About Swift Lore
             </h2>
@@ -61,7 +61,7 @@ export default function Footer() {
 
           {/* Ad card */}
           <div className="flex-1">
-            <div className="relative h-full bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-4 md:px-5 md:py-5 flex items-center justify-center card-soft glass-soft">
+            <div className="relative h-full bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-3 md:px-5 md:py-4 flex items-center justify-center card-soft glass-soft">
               <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.16em] text-[#9ca3af]">
                 Sponsored
               </span>
