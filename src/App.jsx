@@ -11,12 +11,16 @@ import CookieConsent from "react-cookie-consent";
 
 /* ------------ Shared layout ------------ */
 
-function Layout({ children }) {
+function Layout({ children, showHero = true }) {
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <Header showHero={showHero} />
       
-      <main className="flex-1 min-h-0 relative z-0">
+      <main
+  className={`flex-1 min-h-0 relative z-0 ${
+    showHero ? "mt-0" : "mt-[-40px]"
+  }`}
+>
         {children}
         
         {/* Reduced height gradient - only show if needed */}
@@ -35,7 +39,7 @@ function HomePage() {
   const query = searchParams.get("q") || "";
 
   return (
-    <Layout>
+    <Layout showHero={true}>
       {query ? <SearchResults /> : <Timeline />}
     </Layout>
   );
@@ -43,7 +47,7 @@ function HomePage() {
 
 function PostsPage() {
   return (
-    <Layout>
+    <Layout showHero={false}>
       <Posts />
     </Layout>
   );
@@ -51,7 +55,7 @@ function PostsPage() {
 
 function PostDetailPage() {
   return (
-    <Layout>
+    <Layout showHero={false}>
       <Post_detail />
     </Layout>
   );
@@ -59,7 +63,7 @@ function PostDetailPage() {
 
 function CookiePolicyPage() {
   return (
-    <Layout>
+    <Layout showHero={false}>
       <CookiePolicy />
     </Layout>
   );
@@ -67,7 +71,7 @@ function CookiePolicyPage() {
 
 function PrivacyPolicyPage() {
   return (
-    <Layout>
+    <Layout showHero={false}>
       <PrivacyPolicy />
     </Layout>
   );
