@@ -1,97 +1,50 @@
-import { Button } from "./ui/Button"
-import { useEffect } from "react"
-import AdComponent from "./ad_component"
+import { useEffect } from "react";
+import { Button } from "./ui/Button";
+import AdComponent from "./ad_component";
 
 export default function Footer() {
+  // AdSense init
   useEffect(() => {
     if (
       typeof window !== "undefined" &&
-      (window as any).adsbygoogle &&
+      window.adsbygoogle &&
       process.env.NODE_ENV === "production"
     ) {
       try {
-        ;(window as any).adsbygoogle = (window as any).adsbygoogle || []
-        ;(window as any).adsbygoogle.push({})
+        // eslint-disable-next-line no-undef
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
       } catch (e) {
-        console.error("AdSense error:", e)
+        console.error("AdSense error:", e);
       }
     }
-  }, [])
-
-  const isProd = process.env.NODE_ENV === "production"
+  }, []);
 
   return (
-    <footer className="mt-10 bg-gradient-to-b from-[#e8ecf7] via-[#edf1fb] to-white border-t border-[#d7dff5]">
-      <div className="max-w-5xl mx-auto px-4 md:px-6 pt-8 md:pt-10 pb-6 md:pb-8">
-        {/* Top area: About + Links + Ad / Support */}
-        <div className="grid gap-8 md:grid-cols-[minmax(0,2.1fr)_minmax(0,1.1fr)_minmax(0,1.4fr)] items-start">
-          {/* About */}
-          <div>
-            <h3 className="text-[#4b3a63] font-semibold text-sm md:text-base mb-2">
+    <footer className="w-full bg-gradient-to-b from-[#E8ECF7] via-[#d8def7] to-[#b6c0f0] mt-10">
+      {/* Main footer content */}
+      <div className="max-w-5xl mx-auto px-4 pt-10 pb-6">
+        <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start md:items-stretch">
+          {/* About / description */}
+          <div className="flex-1">
+            <h2 className="text-sm md:text-base font-semibold text-[#5a3260] tracking-wide mb-2">
               About Swift Lore
-            </h3>
-            <p className="text-[12px] md:text-[13px] text-[#4b3a63]/80 leading-relaxed">
-              Swift Lore is a fan-made project archiving Taylor Swift’s
-              timeline, releases, Easter Eggs, and iconic moments. Built by
-              Swifties, for Swifties — no era left behind. 💗
+            </h2>
+            <p className="text-xs md:text-sm text-[#4b4b63] leading-relaxed">
+              Swift Lore is a fan-crafted, interactive timeline chronicling the
+              epic life and career of Taylor Swift — from album releases and
+              Easter Eggs to dating history and iconic moments.{" "}
+              <span className="font-semibold">No era left behind.</span>
             </p>
-          </div>
-
-          {/* Quick Links */}
-          <div className="space-y-2">
-            <h3 className="text-[#4b3a63] font-semibold text-sm md:text-base">
-              Quick links
-            </h3>
-            <nav className="flex flex-col gap-1 text-[12px] md:text-[13px] text-[#4b3a63]/80">
-              <button
-                className="text-left hover:text-[#b66b6b] transition-colors"
-                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              >
-                Back to top
-              </button>
-              <a
-                href="/posts"
-                className="hover:text-[#b66b6b] transition-colors"
-              >
-                View full timeline
-              </a>
-              <a
-                href="https://www.buymeacoffee.com/swiftlore"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-[#b66b6b] transition-colors"
-              >
-                Support the project
-              </a>
-            </nav>
-          </div>
-
-          {/* Ad + Support */}
-          <div className="space-y-3">
-            {/* Ad card */}
-            <div className="bg-white/90 rounded-2xl border border-[#f8dada] shadow-[0_10px_28px_rgba(15,23,42,0.12)] px-4 py-5 min-h-[110px] flex items-center justify-center relative">
-              <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.14em] text-[#9ca3af]">
-                Sponsored
-              </span>
-
-              {isProd ? (
-                <AdComponent />
-              ) : (
-                <div className="text-[#9ca3af] text-[12px] md:text-[13px] italic text-center px-2">
-                  Advertisement space — helping keep Swift Lore online ✨
-                </div>
-              )}
-            </div>
 
             {/* Support buttons */}
-            <div className="flex justify-start md:justify-end gap-2 flex-wrap">
+            <div className="mt-4 flex flex-wrap gap-3">
               <a
                 href="https://buymeacoffee.com/swiftlore"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Button variant="secondary" className="rounded-full px-4 py-1.5">
-                  Support Us
+                <Button variant="secondary" className="rounded-full px-5 py-1.5">
+                  Support the Site
                 </Button>
               </a>
               <a
@@ -99,42 +52,57 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Button variant="secondary" className="rounded-full px-4 py-1.5">
-                  Submit Suggestion
+                <Button variant="secondary" className="rounded-full px-5 py-1.5">
+                  Submit a Suggestion
                 </Button>
               </a>
             </div>
           </div>
-        </div>
 
-        {/* Bottom row: disclaimer + legal */}
-        <div className="mt-7 pt-4 border-t border-[#d7dff5] flex flex-col md:flex-row items-center justify-between gap-3 text-[11px] md:text-[12px] text-[#4b3a63]/80">
-          <p className="text-center md:text-left">
-            Swift Lore is a fan project and is not affiliated with Taylor Swift,
-            her team, or any official entities.
-          </p>
+          {/* Ad card */}
+          <div className="w-full md:w-[320px]">
+            <div className="relative bg-white/90 rounded-2xl border border-[#f8dada] shadow-sm px-4 py-6 min-h-[110px] flex items-center justify-center">
+              <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.16em] text-[#9ca3af]">
+                Sponsored
+              </span>
 
-          <div className="flex flex-wrap justify-center md:justify-end items-center gap-4">
-            <a
-              href="/cookie_policy"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-[#b66b6b] underline"
-            >
-              Cookie Policy
-            </a>
-            <span>Copyright © 2025 Swift Lore</span>
-            <a
-              href="/privacy_policy"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-[#b66b6b] underline"
-            >
-              Privacy Policy
-            </a>
+              {process.env.NODE_ENV === "production" ? (
+                <AdComponent />
+              ) : (
+                <div className="text-[#9ca3af] text-xs md:text-sm italic text-center px-2">
+                  Advertisement space — helping keep Swift Lore online 💫
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Bottom bar */}
+      <div className="bg-[#8a9ad4] py-3 px-4 text-center text-white">
+        <div className="max-w-5xl mx-auto flex flex-wrap justify-center items-center gap-4 text-xs md:text-sm">
+          <a
+            href="/cookie_policy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white hover:text-gray-200 underline"
+          >
+            Cookie Policy
+          </a>
+
+          <p>Copyright © 2025 Swift Lore · Fan-made, not affiliated with Taylor Swift.</p>
+
+          <a
+            href="/privacy_policy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white hover:text-gray-200 underline"
+          >
+            Privacy Policy
+          </a>
+        </div>
+      </div>
     </footer>
-  )
+  );
 }
+
