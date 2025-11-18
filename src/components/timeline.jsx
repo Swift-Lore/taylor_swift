@@ -216,30 +216,6 @@ export default function Timeline() {
       </Link>
     )
   }
-// ===== DEBUG: Check what's creating space =====
-useEffect(() => {
-  const checkHeights = () => {
-    console.log('=== HEIGHT DEBUG ===');
-    const timelineSection = document.querySelector('section');
-    const mainContent = document.querySelector('.container');
-    const mobileTimeline = document.querySelector('.mobile-timeline-container');
-    
-    if (timelineSection) console.log('Section height:', timelineSection.offsetHeight);
-    if (mainContent) console.log('Container height:', mainContent.offsetHeight);
-    if (mobileTimeline) console.log('Mobile timeline height:', mobileTimeline.offsetHeight);
-    
-    // Check all direct children
-    const container = document.querySelector('.container');
-    if (container) {
-      Array.from(container.children).forEach((child, index) => {
-        console.log(`Child ${index} (${child.className}):`, child.offsetHeight);
-      });
-    }
-  };
-  
-  // Check after a short delay to ensure rendering is complete
-  setTimeout(checkHeights, 100);
-}, [records]);
   // ===== JSX =====
 return (
   <section className="w-full bg-[#e8ecf7] py-2 px-2 md:px-10 flex flex-col min-h-0">
