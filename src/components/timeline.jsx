@@ -371,7 +371,7 @@ export default function Timeline() {
         </div>
 
         {/* View Full Timeline Button */}
-        <div className="flex justify-center mt-1 md:mt-3">
+        <div className="flex justify-center mt-0 md:mt-2">
           <Button
             variant="secondary"
             className="rounded-full px-5 py-1.5 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg"
