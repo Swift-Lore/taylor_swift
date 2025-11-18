@@ -23,7 +23,7 @@ export default function Footer() {
     <footer className="bg-gradient-to-b from-[#e8ecf7] to-[#b6c1e3] pt-2 pb-3">
       {/* Main footer content */}
       <div className="max-w-5xl mx-auto px-4 pb-3 mt-[-8px]">
-        <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-stretch">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-center md:items-start justify-center">
           {/* About / description card */}
           <div className="bg-white/70 rounded-3xl shadow-sm px-4 py-3 md:px-5 md:py-4 w-full md:w-1/2">
             <h2 className="text-sm md:text-base font-semibold text-[#5a2b60] tracking-wide mb-1 logo-glow">
