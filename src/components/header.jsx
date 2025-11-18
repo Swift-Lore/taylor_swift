@@ -8,7 +8,7 @@ export default function Header() {
   const location = useLocation()
   const [searchQuery, setSearchQuery] = useState("")
 
-  // 👇 determine if we’re on the full timeline page
+  // are we on the full timeline page?
   const isFullTimelinePage = location.pathname === "/posts"
 
   useEffect(() => {
@@ -17,7 +17,6 @@ export default function Header() {
     if (queryFromUrl) {
       setSearchQuery(queryFromUrl)
     } else {
-      // if no q param, clear out the search box
       setSearchQuery("")
     }
   }, [location.search])
@@ -53,34 +52,35 @@ export default function Header() {
   }
 
   return (
-    <header className="relative w-full bg-gradient-to-b from-[#9fa8f5] via-[#8a9ad4] to-[#e8ecf7] pb-6 md:pb-10 shadow-[0_10px_40px_rgba(75,85,160,0.4)] fade-in-up overflow-visible z-10">
-      <div className="max-w-5xl mx-auto px-3 sm:px-4 md:px-6 pt-4 md:pt-6 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-4 relative">
-        {/* Decorative background glow behind logo */}
-        <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 md:left-16 md:translate-x-0 w-64 h-64 blur-3xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
+    <header className="relative w-full bg-gradient-to-b from-[#9fa8f5] via-[#8a9ad4] to-[#e6edf7] pb-4 md:pb-6 shadow-[0_10px_35px_rgba(75,85,160,0.35)] fade-in-up overflow-visible z-10">
+      <div className="max-w-4xl mx-auto px-4 pt-4 md:pt-5 flex flex-col md:flex-row items-center justify-between gap-5 md:gap-4 relative">
+        {/* Glow behind logo */}
+        <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 md:left-10 md:translate-x-0 w-56 h-56 blur-3xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
 
-        {/* Logo section */}
-        <div className="w-full md:w-[55%] flex justify-center md:justify-start relative z-20 overflow-visible">
+        {/* Logo */}
+        <div className="w-full md:w-[58%] flex justify-center md:justify-start relative z-20 overflow-visible">
           <button
             type="button"
             onClick={handleLogoClick}
-            className="w-full max-w-[520px] md:max-w-[640px] cursor-pointer -mt-6 md:-mt-10 relative"
+            className="w-full max-w-[560px] md:max-w-[680px] cursor-pointer -mt-4 md:-mt-6 relative"
           >
-            <span className="absolute right-10 md:right-16 top-6 md:top-10 text-white/80 text-xl md:text-2xl twinkle">
+            <span className="absolute right-8 md:right-14 top-5 md:top-8 text-white/80 text-xl md:text-2xl twinkle">
               ✨
             </span>
 
-            <img 
-  src="/images/swift_lore.png" 
-  alt="Swift Lore" 
-  className="w-full h-auto object-contain min-h-[250px] max-h-[250px] md:min-h-[260px] md:max-h-[260px] logo-glow"
-/>
+            <img
+              src="/images/swift_lore.png"
+              alt="Swift Lore"
+              className="w-full h-auto object-contain min-h-[220px] max-h-[220px] md:min-h-[230px] md:max-h-[230px] logo-glow"
+            />
           </button>
         </div>
 
         {/* Right side: blurb + search + CTA */}
-        <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-3 md:gap-4 md:mt-2 text-center md:text-left relative z-20">
-          <div className="w-full max-w-xs md:max-w-sm bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 px-4 py-3 md:px-5 md:py-4 shadow-[0_14px_45px_rgba(15,23,42,0.35)]">
-            <p className="text-white text-[11px] md:text-[13px] leading-snug md:leading-relaxed">
+        <div className="w-full md:w-[42%] flex flex-col items-center md:items-start gap-3 md:gap-4 md:mt-1 text-center md:text-left relative z-20">
+          {/* Blurb card */}
+          <div className="w-full max-w-sm md:max-w-md bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 px-4 py-3 md:px-5 md:py-4 shadow-[0_14px_45px_rgba(15,23,42,0.35)]">
+            <p className="text-white text-[12px] md:text-[14px] leading-snug md:leading-relaxed">
               A fan-crafted, interactive timeline chronicling the epic life and
               career of Taylor Swift. Explore everything from album releases and
               Easter Eggs to dating history and iconic moments.
@@ -88,8 +88,8 @@ export default function Header() {
             </p>
           </div>
 
-          {/* Search Bar */}
-          <div className="w-full max-w-xs md:max-w-sm">
+          {/* Search */}
+          <div className="w-full max-w-sm md:max-w-md">
             <form onSubmit={handleSearch} className="relative">
               <input
                 type="text"
@@ -104,13 +104,12 @@ export default function Header() {
                 autoCorrect="off"
                 spellCheck="false"
               />
-              {/* ... search icons/buttons unchanged ... */}
             </form>
           </div>
 
-          {/* CTA button: changes per page */}
+          {/* CTA button */}
           <button
-            className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-4 md:px-5 py-1.5 md:py-2 font-semibold text-[11px] md:text-[13px] w-40 md:w-auto shadow-[0_10px_30px_rgba(88,28,135,0.45)] transition-transform hover:-translate-y-0.5"
+            className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-1.5 md:py-2 font-semibold text-[11px] md:text-[13px] w-44 md:w-auto shadow-[0_10px_30px_rgba(88,28,135,0.45)] transition-transform hover:-translate-y-0.5"
             onClick={() => {
               if (isFullTimelinePage) {
                 navigate("/")      // on full timeline → go home
