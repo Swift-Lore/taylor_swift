@@ -20,7 +20,7 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer className="w-full bg-gradient-to-b from-[#E8ECF7] via-[#d8def7] to-[#b6c0f0] mt-10">
+    <footer className="w-full bg-gradient-to-b from-[#E8ECF7] via-[#d8def7] to-[#b6c0f0]">
       {/* Main footer content */}
       <div className="max-w-5xl mx-auto px-4 pt-10 pb-6">
         <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start md:items-stretch">
