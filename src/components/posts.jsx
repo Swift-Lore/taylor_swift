@@ -1,6 +1,8 @@
-// src/components/post_details.jsx
-import Post_detail_body from "./post_detail_body.jsx";
+// src/components/Posts.jsx
+import TimelineBody from "./timeline-body";
 
-export default function Post_detail() {
-  return <Post_detail_body />;
+export default function Posts() {
+  // Just render the full timeline body.
+  // The global Layout in App.jsx will wrap this with Header + Footer.
+  return <TimelineBody />;
 }
