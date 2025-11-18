@@ -7,6 +7,7 @@ export default function Header() {
   const navigate = useNavigate()
   const location = useLocation()
   const [searchQuery, setSearchQuery] = useState("")
+  const [eventData, setEventData] = useState(null) // ADDED: Store event data
 
   const isFullTimelinePage = location.pathname === "/posts"
   const isEventPage = location.pathname === "/post_details"
@@ -21,6 +22,54 @@ export default function Header() {
       setSearchQuery("")
     }
   }, [location.search])
+
+  // ADDED: Fetch event data when on event page
+  useEffect(() => {
+    if (isEventPage) {
+      const searchParams = new URLSearchParams(location.search)
+      const postId = searchParams.get("id")
+      
+      if (postId) {
+        const fetchEventData = async () => {
+          try {
+            const response = await fetch(
+              `https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker/${postId}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+                },
+              }
+            )
+            
+            if (response.ok) {
+              const data = await response.json()
+              setEventData(data.fields)
+            }
+          } catch (error) {
+            console.error("Error fetching event data for header:", error)
+          }
+        }
+        
+        fetchEventData()
+      }
+    }
+  }, [isEventPage, location.search])
+
+  // ADDED: Date formatting function
+  const formatEventDate = (isoDate) => {
+    if (!isoDate) return ""
+    const d = new Date(isoDate)
+    if (Number.isNaN(d.getTime())) return ""
+
+    const month = d.toLocaleString("en-US", {
+      month: "short",
+      timeZone: "UTC",
+    })
+    const day = String(d.getUTCDate()).padStart(2, "0")
+    const year = d.getUTCFullYear()
+
+    return `${month}-${day}-${year}`
+  }
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -80,47 +129,47 @@ export default function Header() {
         </div>
 
         {/* Event page header - shows event title and date */}
-{isEventPage && (
-  <div className="w-full flex flex-col items-center gap-2 mt-2 mb-2 px-4">
-    {/* Event title */}
-    <h2 className="text-white text-xl md:text-2xl font-serif drop-shadow-lg tracking-wide text-center leading-tight">
-      {event?.EVENT || "Event Details"}
-    </h2>
-    
-    {/* Event date */}
-    {event?.DATE && (
-      <p className="text-white/90 text-sm md:text-base font-medium drop-shadow-md">
-        {formatEventDate(event.DATE)}
-      </p>
-    )}
+        {isEventPage && (
+          <div className="w-full flex flex-col items-center gap-2 mt-2 mb-2 px-4">
+            {/* Event title */}
+            <h2 className="text-white text-xl md:text-2xl font-serif drop-shadow-lg tracking-wide text-center leading-tight">
+              {eventData?.EVENT || "Loading event..."} {/* CHANGED: eventData instead of event */}
+            </h2>
+            
+            {/* Event date */}
+            {eventData?.DATE && ( {/* CHANGED: eventData instead of event */}
+              <p className="text-white/90 text-sm md:text-base font-medium drop-shadow-md">
+                {formatEventDate(eventData.DATE)} {/* CHANGED: eventData instead of event */}
+              </p>
+            )}
 
-    {/* Return to Home button */}
-    <button
-      onClick={() => navigate("/")}
-      className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all mt-2"
-    >
-      Return to Home
-    </button>
-  </div>
-)}
+            {/* Return to Home button */}
+            <button
+              onClick={() => navigate("/")}
+              className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all mt-2"
+            >
+              Return to Home
+            </button>
+          </div>
+        )}
 
-{/* Full timeline page header */}
-{isFullTimelinePage && !isEventPage && (
-  <div className="w-full flex flex-col items-center gap-2 mt-2 mb-2 px-4">
-    {/* Larger, more elegant title */}
-    <h2 className="text-white text-2xl md:text-3xl font-serif drop-shadow-lg tracking-wide text-center">
-      Taylor Swift's Career Timeline
-    </h2>
+        {/* Full timeline page header */}
+        {isFullTimelinePage && !isEventPage && (
+          <div className="w-full flex flex-col items-center gap-2 mt-2 mb-2 px-4">
+            {/* Larger, more elegant title */}
+            <h2 className="text-white text-2xl md:text-3xl font-serif drop-shadow-lg tracking-wide text-center">
+              Taylor Swift's Career Timeline
+            </h2>
 
-    {/* Return to Home button */}
-    <button
-      onClick={() => navigate("/")}
-      className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all"
-    >
-      Return to Home
-    </button>
-  </div>
-)}
+            {/* Return to Home button */}
+            <button
+              onClick={() => navigate("/")}
+              className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all"
+            >
+              Return to Home
+            </button>
+          </div>
+        )}
 
         {/* Blurb + search + CTA — only show on home */}
         {showHero && (
