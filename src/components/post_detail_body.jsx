@@ -165,7 +165,7 @@ export default function PostDetailBody() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isModalOpen, selectedImageIndex, event?.IMAGE]);
 
-  // Social media embeds script loading
+    // Social media embeds script loading
   useEffect(() => {
     if (!event) return;
 
@@ -176,8 +176,16 @@ export default function PostDetailBody() {
         script.src = "//www.instagram.com/embed.js";
         script.async = true;
         document.body.appendChild(script);
-      } else if (window.instgrm) {
-        window.instgrm.Embeds.process();
+      } else {
+        // Force reload Instagram embeds
+        if (window.instgrm) {
+          window.instgrm.Embeds.process();
+        } else {
+          // If instgrm isn't available yet, wait a bit and try again
+          setTimeout(() => {
+            if (window.instgrm) window.instgrm.Embeds.process();
+          }, 1000);
+        }
       }
     };
 
@@ -196,7 +204,11 @@ export default function PostDetailBody() {
       }
     };
 
-    if (event.INSTAGRAM) loadInstagramScript();
+    if (event.INSTAGRAM) {
+      loadInstagramScript();
+      // Also reload after a short delay to ensure DOM is ready
+      setTimeout(loadInstagramScript, 500);
+    }
     if (event.TWITTER) loadTwitterScript();
 
     if (event["GETTY EMBED"] && !document.getElementById("getty-embed-script")) {
