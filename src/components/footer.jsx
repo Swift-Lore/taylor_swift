@@ -1,8 +1,9 @@
-import { useEffect } from "react"
-import { Button } from "./ui/Button"
-import AdComponent from "./ad_component"
+import { useEffect } from "react";
+import { Button } from "./ui/Button";
+import AdComponent from "./ad_component";
 
 export default function Footer() {
+  // same AdSense hook you already had
   useEffect(() => {
     if (
       typeof window !== "undefined" &&
@@ -11,12 +12,12 @@ export default function Footer() {
     ) {
       try {
         // eslint-disable-next-line no-undef
-        ;(window.adsbygoogle = window.adsbygoogle || []).push({})
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
       } catch (e) {
-        console.error("AdSense error:", e)
+        console.error("AdSense error:", e);
       }
     }
-  }, [])
+  }, []);
 
   return (
     <footer className="bg-gradient-to-b from-[#e6edf7] via-[#d6dff1] to-[#b6c1e3] pt-4 pb-3 mt-4">
@@ -35,13 +36,17 @@ export default function Footer() {
               <span className="font-semibold">No era left behind.</span>
             </p>
 
+            {/* Support buttons */}
             <div className="mt-3 flex flex-wrap gap-2.5 justify-start">
               <a
                 href="https://buymeacoffee.com/swiftlore"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Button variant="secondary" className="rounded-full px-5 py-1.5">
+                <Button
+                  variant="secondary"
+                  className="rounded-full px-5 py-1.5"
+                >
                   Support the Site
                 </Button>
               </a>
@@ -50,7 +55,10 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Button variant="secondary" className="rounded-full px-5 py-1.5">
+                <Button
+                  variant="secondary"
+                  className="rounded-full px-5 py-1.5"
+                >
                   Submit a Suggestion
                 </Button>
               </a>
@@ -86,3 +94,23 @@ export default function Footer() {
             className="text-white hover:text-gray-200 underline"
           >
             Cookie Policy
+          </a>
+
+          <p>
+            Copyright © 2025 Swift Lore · Fan-made, not affiliated with Taylor
+            Swift.
+          </p>
+
+          <a
+            href="/privacy_policy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white hover:text-gray-200 underline"
+          >
+            Privacy Policy
+          </a>
+        </div>
+      </div>
+    </footer>
+  );
+}
