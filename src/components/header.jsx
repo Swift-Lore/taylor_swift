@@ -9,6 +9,8 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState("")
 
   const isFullTimelinePage = location.pathname === "/posts"
+const isEventPage = location.pathname === "/post_details"
+const showHero = !isFullTimelinePage && !isEventPage
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search)
@@ -78,6 +80,7 @@ export default function Header() {
         </div>
 
         {/* Blurb + search + CTA */}
+        {showHero && (
         <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-3 md:gap-3 md:mt-1 text-center md:text-left relative z-20">
           <div className="w-full max-w-xs md:max-w-sm bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 px-4 py-3 md:px-5 md:py-3 shadow-[0_14px_45px_rgba(15,23,42,0.35)]">
             <p className="text-white text-[11px] md:text-[13px] leading-snug md:leading-relaxed">
@@ -86,7 +89,9 @@ export default function Header() {
               Easter Eggs to dating history and iconic moments.
               <span className="font-semibold"> Dive into the lore!</span>
             </p>
-          </div>
+                  </div>
+        )}
+
 
           {/* Search */}
           <div className="w-full max-w-xs md:max-w-sm">
