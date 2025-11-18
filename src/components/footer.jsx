@@ -22,7 +22,7 @@ export default function Footer() {
   return (
     <footer className="bg-gradient-to-b from-[#e8ecf7] to-[#b6c1e3] pt-0 pb-2">
       {/* Main footer content band */}
-      <div className="max-w-5xl mx-auto px-4 pt-0 pb-2 -mt-3 md:-mt-4">
+      <div className="max-w-5xl mx-auto px-4 pt-2 pb-3">
         <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-start justify-between">
           {/* About / description card */}
           <div className="bg-white/70 rounded-3xl shadow-sm px-4 py-2 md:px-5 md:py-3 w-full md:w-1/2">
