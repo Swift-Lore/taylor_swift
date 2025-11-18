@@ -51,21 +51,28 @@ export default function Header() {
         {/* Decorative glow */}
         <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 md:left-12 md:translate-x-0 w-52 h-52 blur-3xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
 
-        {/* Logo */}
-        <div className="w-full md:w-[55%] flex justify-center md:justify-start relative z-20 overflow-visible">
+        {/* Logo section */}
+        <div className="w-full md:w-[60%] flex justify-center md:justify-start relative z-20 overflow-visible">
           <button
             type="button"
             onClick={handleLogoClick}
-            className="w-full max-w-[520px] md:max-w-[560px] cursor-pointer -mt-4 md:-mt-8 relative"
+            className="w-full max-w-[640px] md:max-w-[720px] cursor-pointer -mt-4 md:-mt-8 relative"
           >
-            <span className="absolute right-10 md:right-14 top-4 md:top-7 text-white/80 text-xl md:text-2xl twinkle">
+            {/* sparkles around the logo */}
+            <span className="absolute left-6 md:left-10 top-6 md:top-8 text-white/80 text-lg md:text-2xl twinkle">
+              ✨
+            </span>
+            <span className="absolute right-8 md:right-14 top-4 md:top-6 text-white/80 text-xl md:text-3xl twinkle">
+              ✨
+            </span>
+            <span className="absolute right-16 md:right-24 bottom-6 md:bottom-10 text-white/80 text-base md:text-xl twinkle">
               ✨
             </span>
 
             <img
               src="/images/swift_lore.png"
               alt="Swift Lore"
-              className="w-full h-auto object-contain min-h-[220px] max-h-[220px] md:min-h-[230px] md:max-h-[230px] logo-glow"
+              className="w-full h-auto object-contain min-h-[270px] max-h-[270px] md:min-h-[290px] md:max-h-[290px] logo-glow"
             />
           </button>
         </div>
