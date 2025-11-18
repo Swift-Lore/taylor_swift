@@ -221,19 +221,6 @@ export default function Timeline() {
 
   // ===== JSX =====
   return (
-    <div>
-    {/* Test Image */}
-    <div style={{ background: 'yellow', padding: '10px', margin: '10px' }}>
-      <h3>Image Test:</h3>
-      <img 
-        src="/images/star.png" 
-        alt="Test" 
-        style={{ width: '50px', border: '2px solid red' }}
-        onLoad={() => console.log('✅ Image loaded!')}
-        onError={(e) => console.log('❌ Image failed:', e.target.src)}
-      />
-    </div>
-
     <section className="w-full bg-[#e8ecf7] py-3 md:py-7 px-2 md:px-10 flex-grow">
       <div className="container mx-auto h-full flex flex-col">
         {/* On This Day Section */}
