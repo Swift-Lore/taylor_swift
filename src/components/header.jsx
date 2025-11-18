@@ -78,7 +78,24 @@ const showHero = !isFullTimelinePage && !isEventPage
             />
           </button>
         </div>
+{/* Timeline title + Return button (only on non-home pages) */}
+{(!showHero) && (
+  <div className="w-full flex flex-col items-center md:items-start mt-[-20px] md:mt-[-10px] mb-4 px-4">
 
+    {/* Pretty title text */}
+    <h2 className="text-[#f8f9ff] text-lg md:text-xl font-serif drop-shadow-md tracking-wide">
+      Taylor Swift’s Career Timeline
+    </h2>
+
+    {/* Return to Home button */}
+    <button
+      onClick={() => navigate("/")}
+      className="mt-3 bg-white/80 text-[#8e3e3e] hover:bg-white rounded-full px-4 py-1.5 text-sm shadow-md border border-white/60 transition-all"
+    >
+      Return to Home
+    </button>
+  </div>
+)}
         {/* Blurb + search + CTA — only show on home */}
 {showHero && (
   <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-3 md:gap-3 md:mt-1 text-center md:text-left relative z-20">
