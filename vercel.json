@@ -5,7 +5,7 @@
       "destination": "/index.html"
     },
     {
-      "source": "/cookie_policy",
+      "source": "/cookie_policy", 
       "destination": "/index.html"
     }
   ],
