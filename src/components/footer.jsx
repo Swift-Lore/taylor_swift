@@ -3,7 +3,7 @@ import { Button } from "./ui/Button";
 import AdComponent from "./ad_component";
 
 export default function Footer() {
-  // same AdSense hook you already had
+  // AdSense init
   useEffect(() => {
     if (
       typeof window !== "undefined" &&
@@ -20,12 +20,12 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer className="bg-gradient-to-b from-[#e6edf7] via-[#d6dff1] to-[#b6c1e3] pt-4 pb-3 mt-4">
+    <footer className="bg-gradient-to-b from-[#e6edf7] via-[#d6dff1] to-[#b6c1e3] pt-4 pb-3">
       {/* Main footer content */}
-      <div className="max-w-5xl mx-auto px-4 pt-3 pb-3">
+      <div className="max-w-5xl mx-auto px-4 pb-3">
         <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-stretch">
           {/* About / description card */}
-          <div className="bg-white/70 rounded-3xl shadow-sm p-3 md:p-4 w-full md:w-1/2">
+          <div className="bg-white/70 rounded-3xl shadow-sm px-4 py-4 md:px-5 md:py-5 w-full md:w-1/2">
             <h2 className="text-sm md:text-base font-semibold text-[#5a2b60] tracking-wide mb-1 logo-glow">
               About Swift Lore
             </h2>
@@ -37,16 +37,13 @@ export default function Footer() {
             </p>
 
             {/* Support buttons */}
-            <div className="mt-3 flex flex-wrap gap-2.5 justify-start">
+            <div className="mt-3 flex flex-wrap gap-2 justify-start">
               <a
                 href="https://buymeacoffee.com/swiftlore"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Button
-                  variant="secondary"
-                  className="rounded-full px-5 py-1.5"
-                >
+                <Button variant="secondary" className="rounded-full px-4 py-1.5 text-xs md:text-sm">
                   Support the Site
                 </Button>
               </a>
@@ -55,10 +52,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Button
-                  variant="secondary"
-                  className="rounded-full px-5 py-1.5"
-                >
+                <Button variant="secondary" className="rounded-full px-4 py-1.5 text-xs md:text-sm">
                   Submit a Suggestion
                 </Button>
               </a>
@@ -66,8 +60,8 @@ export default function Footer() {
           </div>
 
           {/* Ad card */}
-          <div className="flex-1 fade-in-up">
-            <div className="relative h-full bg-white/80 rounded-3xl border border-[#f8dada] px-3 py-3 md:px-4 md:py-4 flex items-center justify-center card-soft glass-soft">
+          <div className="flex-1">
+            <div className="relative h-full bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-4 md:px-5 md:py-5 flex items-center justify-center card-soft glass-soft">
               <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.16em] text-[#9ca3af]">
                 Sponsored
               </span>
@@ -86,7 +80,7 @@ export default function Footer() {
 
       {/* Bottom bar */}
       <div className="bg-[#8a9ad4] py-2 px-4 text-center text-white">
-        <div className="max-w-5xl mx-auto flex flex-wrap justify-center items-center gap-3 text-xs md:text-sm">
+        <div className="max-w-5xl mx-auto flex flex-wrap justify-center items-center gap-2 md:gap-3 text-[11px] md:text-sm">
           <a
             href="/cookie_policy"
             target="_blank"
@@ -96,9 +90,8 @@ export default function Footer() {
             Cookie Policy
           </a>
 
-          <p>
-            Copyright © 2025 Swift Lore · Fan-made, not affiliated with Taylor
-            Swift.
+          <p className="mx-1">
+            Copyright © 2025 Swift Lore · Fan-made, not affiliated with Taylor Swift.
           </p>
 
           <a
