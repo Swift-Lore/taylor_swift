@@ -60,8 +60,8 @@ export default function Footer() {
           </div>
 
           {/* Ad card */}
-          <div className="w-full md:w-[320px] fade-in-up">
-            <div className="relative bg-white/80 rounded-2xl border border-[#f8dada] px-4 py-6 min-h-[110px] flex items-center justify-center card-soft glass-soft">
+          <div className="w-full md:w-[380px] fade-in-up">
+  <div className="relative bg-white/80 rounded-2xl border border-[#f8dada] px-5 py-7 min-h-[140px] ...">
               <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.16em] text-[#9ca3af]">
                 Sponsored
               </span>
