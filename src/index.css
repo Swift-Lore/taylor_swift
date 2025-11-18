@@ -10,7 +10,8 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: white;
+  background: radial-gradient(circle at top, #fdf4ff 0%, #e8ecf7 35%, #f9fafb 100%);
+  -webkit-font-smoothing: antialiased;
 }
 
 .timeline-scroll {
@@ -29,4 +30,38 @@ body {
 .timeline-scroll::-webkit-scrollbar-thumb {
   background-color: #b66b6b;
   border-radius: 20px;
+}
+/* -------------------------
+   Hero fade-in + twinkle
+   ------------------------- */
+
+.fade-in-up {
+  opacity: 0;
+  animation: fadeInUp 600ms ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.twinkle {
+  animation: twinkle 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+  0% {
+    opacity: 0.4;
+    transform: translateY(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
 }
