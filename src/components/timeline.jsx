@@ -233,7 +233,6 @@ export default function Timeline() {
   </div>
   
   <section className="w-full bg-[#e8ecf7] py-3 md:py-7 px-2 md:px-10 flex-grow">
-    <section className="w-full bg-[#e8ecf7] py-3 md:py-7 px-2 md:px-10 flex-grow">
       <div className="container mx-auto h-full flex flex-col">
         {/* On This Day Section */}
         <div className="text-center mb-1 md:mb-3 transform translate-x-0 md:translate-x-[-19px]">
