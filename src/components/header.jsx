@@ -136,8 +136,8 @@ export default function Header() {
           {/* Navigation buttons - centered under logo */}
           {!showHero && (
             <div className="flex flex-wrap justify-center gap-3 mt-3 md:mt-4 w-full">
-              {/* Show "Return to Home" on full timeline page */}
-              {isFullTimelinePage && (
+              {/* Show "Return to Home" on full timeline page AND event pages */}
+              {(isFullTimelinePage || isEventPage) && (
                 <button
                   onClick={() => navigate("/")}
                   className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all"
