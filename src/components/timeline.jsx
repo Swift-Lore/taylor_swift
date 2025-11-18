@@ -13,14 +13,12 @@ export default function Timeline() {
   const [showScrollHint, setShowScrollHint] = useState(true)
   const [records, setRecords] = useState([])
   const [screenScale, setScreenScale] = useState(1)
-  const [isLoading, setIsLoading] = useState(true)   // 👈 NEW
+  const [isLoading, setIsLoading] = useState(true)
 
-  // Use the visitor's *local* date for "today"
   const today = new Date()
   const [currentMonth, setCurrentMonth] = useState(today.getMonth() + 1)
   const [currentDay, setCurrentDay] = useState(today.getDate())
 
-  // Dummy year just for pretty label between Prev/Next
   const displayDate = new Date(2020, currentMonth - 1, currentDay)
 
   // ===== dynamic scale =====
@@ -111,15 +109,15 @@ export default function Timeline() {
       }
 
       try {
-        setIsLoading(true)                    // 👈 start loading
+        setIsLoading(true)
         const fetched = await fetchByDate()
         setRecords(fetched)
         console.log("Fetched records:", fetched)
       } catch (error) {
         console.error("Error fetching records:", error)
-        setRecords([])                        // optional: clear on error
+        setRecords([])
       } finally {
-        setIsLoading(false)                   // 👈 done loading
+        setIsLoading(false)
       }
     }
 
@@ -143,23 +141,21 @@ export default function Timeline() {
     return () => timelineElement?.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // ===== Card component (used for mobile & desktop) =====
+  // ===== Card component =====
   const TimelineCard = ({ record, index }) => {
     const navigate = useNavigate()
 
-    // click on a tag = go to /posts?keyword=...
     const handleTagClick = (e, keyword) => {
-      e.preventDefault() // don’t follow the card link
+      e.preventDefault()
       e.stopPropagation()
       navigate(`/posts?keyword=${encodeURIComponent(keyword)}`)
     }
 
-    // the whole card is now a <Link>, so right-click / cmd-click works
     return (
       <Link
         to={`/post_details?id=${record.id}`}
-        className="block relative mt-[43px] cursor-pointer hover:opacity-95 transition-opacity"
-        style={{ marginTop: index === 0 ? "17px" : "" }}
+        className="block relative cursor-pointer hover:opacity-95 transition-opacity"
+        style={{ marginTop: index === 0 ? "17px" : "43px" }}
       >
         <div className="relative">
           <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
@@ -223,10 +219,10 @@ export default function Timeline() {
 
   // ===== JSX =====
   return (
-        <section className="w-full bg-[#e8ecf7] pt-3 pb-3 md:pt-5 md:pb-5 px-2 md:px-10">
-      <div className="container mx-auto h-full flex flex-col">
-        {/* On This Day Section */}
-        <div className="text-center mb-1 md:mb-3 transform translate-x-0 md:translate-x-[-19px]">
+    <section className="w-full bg-[#e8ecf7] py-3 md:py-5 px-2 md:px-10 min-h-0">
+      <div className="container mx-auto h-full flex flex-col min-h-0">
+        {/* On This Day Section - FIXED: removed translations and adjusted spacing */}
+        <div className="text-center mb-1 md:mb-3">
           <div className="relative w-full mb-2 md:mb-3 px-2 md:px-5">
             <div className="relative w-full px-2 md:px-3 py-2.5 md:py-5 bg-[#e8eef9]">
               <div className="max-w-4xl mx-auto text-center">
@@ -288,8 +284,8 @@ export default function Timeline() {
           </div>
         </div>
 
-        {/* Event Counter */}
-        <div className="flex justify-center transform translate-x-0 md:translate-x-[-9px]">
+        {/* Event Counter - FIXED: removed translation */}
+        <div className="flex justify-center">
           <div className="bg-white rounded-full px-2 sm:px-3 md:px-4 py-1 border border-[#b66b6b] shadow-sm">
             <div className="flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
@@ -303,14 +299,14 @@ export default function Timeline() {
           </div>
         </div>
 
-                {/* Timeline Section */}
-        <div className="relative mt-1 md:mt-2 mb-1 md:mb-1 flex-grow">
-          {/* Mobile Timeline (Single Column) */}
-          <div className="md:hidden h-[60vh] overflow-y-auto relative mobile-timeline-container">
-            <div className="relative flex justify-center">
+        {/* Timeline Section - FIXED: removed fixed heights and adjusted spacing */}
+        <div className="relative mt-1 md:mt-2 mb-1 md:mb-1 flex-grow min-h-0">
+          {/* Mobile Timeline - FIXED: removed fixed height */}
+          <div className="md:hidden overflow-y-auto relative mobile-timeline-container min-h-0">
+            <div className="relative flex justify-center py-2">
               {/* Center line */}
               <div className="relative w-[2px] flex flex-col items-center bg-[#e8ecf7]">
-                <div className="h-[1200px] w-[3px] bg-[#8a9ad4]"></div>
+                <div className="h-full w-[3px] bg-[#8a9ad4] min-h-[200px]"></div>
 
                 <div className="absolute left-1/2 -translate-x-1/2 top-[0px] w-4 h-4 rounded-full bg-[#6B78B4]"></div>
                 {records.slice(1, 5).map((_, index) => (
@@ -320,11 +316,11 @@ export default function Timeline() {
                     style={{ top: `${120 + index * 120}px` }}
                   ></div>
                 ))}
-                <div className="absolute left-1/2 -translate-x-1/2 top-[720px] w-4 h-4 rounded-full bg-[#6B78B4]"></div>
+                <div className="absolute left-1/2 -translate-x-1/2 bottom-4 w-4 h-4 rounded-full bg-[#6B78B4]"></div>
               </div>
 
               {/* Mobile Timeline Items */}
-              <div className="absolute left-[17px] w-[calc(100%-26px)] space-y-[43px] pb-3">
+              <div className="absolute left-[17px] w-[calc(100%-26px)] space-y-6 pb-3">
                 {records.map((record, index) => (
                   <TimelineCard key={`mobile-${record.id}`} record={record} index={index} />
                 ))}
@@ -332,7 +328,7 @@ export default function Timeline() {
             </div>
 
             {/* Scroll hint */}
-            {showScrollHint && (
+            {showScrollHint && records.length > 2 && (
               <div className="scroll-hint bottom-0">
                 <div className="scroll-blur"></div>
                 <span className="scroll-text">Scroll down</span>
@@ -341,7 +337,7 @@ export default function Timeline() {
           </div>
 
           {/* Desktop Timeline */}
-          <div className="hidden md:block">
+          <div className="hidden md:block min-h-0">
             <div className="relative flex justify-center">
               {/* Center line - spans full height */}
               <div className="absolute w-[2px] flex flex-col items-center h-full">
@@ -387,4 +383,3 @@ export default function Timeline() {
     </section>
   )
 }
-
