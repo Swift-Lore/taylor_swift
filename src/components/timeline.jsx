@@ -304,7 +304,7 @@ export default function Timeline() {
         </div>
 
                 {/* Timeline Section */}
-        <div className="relative mt-3 md:mt-5 mb-1 md:mb-2 flex-grow">
+        <div className="relative mt-1 md:mt-2 mb-1 md:mb-1 flex-grow">
           {/* Mobile Timeline (Single Column) */}
           <div className="md:hidden h-[60vh] overflow-y-auto relative mobile-timeline-container">
             <div className="relative flex justify-center">
