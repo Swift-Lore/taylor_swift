@@ -13,6 +13,7 @@ export default function Timeline() {
   const [showScrollHint, setShowScrollHint] = useState(true)
   const [records, setRecords] = useState([])
   const [screenScale, setScreenScale] = useState(1)
+  const [isLoading, setIsLoading] = useState(true)   // 👈 NEW
 
   // Use the visitor's *local* date for "today"
   const today = new Date()
@@ -110,11 +111,15 @@ export default function Timeline() {
       }
 
       try {
+        setIsLoading(true)                    // 👈 start loading
         const fetched = await fetchByDate()
         setRecords(fetched)
         console.log("Fetched records:", fetched)
       } catch (error) {
         console.error("Error fetching records:", error)
+        setRecords([])                        // optional: clear on error
+      } finally {
+        setIsLoading(false)                   // 👈 done loading
       }
     }
 
@@ -292,7 +297,9 @@ export default function Timeline() {
             <div className="flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
               <span className="text-[#8e3e3e] text-xs md:text-sm font-medium">
-                {records.length} {records.length === 1 ? "Event" : "Events"} Found
+                {isLoading
+                  ? "Loading events..."
+                  : `${records.length} ${records.length === 1 ? "Event" : "Events"} Found`}
               </span>
               <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
             </div>
@@ -383,3 +390,4 @@ export default function Timeline() {
     </section>
   )
 }
+
