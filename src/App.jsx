@@ -1,58 +1,72 @@
-import { Routes, Route, useSearchParams } from 'react-router-dom';
-import Header from './components/header';
-import Timeline from './components/timeline';
-import Footer from './components/footer';
-import Posts from './components/posts';
-import Post_detail from './components/post_details';
-import SearchResults from './components/search_results';
-import CookiePolicy from './components/cookie_policy';
-import PrivacyPolicy from './components/privacy_policy';
+import { Routes, Route, useSearchParams } from "react-router-dom";
+import Header from "./components/header";
+import Timeline from "./components/timeline";
+import Footer from "./components/footer";
+import Posts from "./components/posts";
+import Post_detail from "./components/post_details";
+import SearchResults from "./components/search_results";
+import CookiePolicy from "./components/cookie_policy";
+import PrivacyPolicy from "./components/privacy_policy";
 import CookieConsent from "react-cookie-consent";
 
-function HomePage() {
-  const [searchParams] = useSearchParams();
-  const query = searchParams.get('q') || '';
+/* ------------ Shared layout ------------ */
 
+function Layout({ children }) {
   return (
     <>
       <Header />
-      {query ? <SearchResults /> : <Timeline />}
+      {children}
       <Footer />
     </>
   );
 }
 
+/* ------------ Pages ------------ */
+
+function HomePage() {
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get("q") || "";
+
+  return (
+    <Layout>
+      {query ? <SearchResults /> : <Timeline />}
+    </Layout>
+  );
+}
+
 function PostsPage() {
   return (
-    <>
+    <Layout>
       <Posts />
-    </>
-  )
-};
+    </Layout>
+  );
+}
 
 function PostDetailPage() {
   return (
-    <>
+    <Layout>
       <Post_detail />
-    </>
-  )
+    </Layout>
+  );
 }
 
 function CookiePolicyPage() {
   return (
-    <>
+    <Layout>
       <CookiePolicy />
-    </>
-  )
+    </Layout>
+  );
 }
 
 function PrivacyPolicyPage() {
   return (
-    <>
+    <Layout>
       <PrivacyPolicy />
-    </>
-  )
+    </Layout>
+  );
 }
+
+/* ------------ App root ------------ */
 
 function App() {
   return (
@@ -62,9 +76,11 @@ function App() {
         <Route path="/posts" element={<PostsPage />} />
         <Route path="/post_details" element={<PostDetailPage />} />
         <Route path="/timeline" element={<HomePage />} />
-        <Route path="/cookie_policy" element={<CookiePolicy />} />
-        <Route path="/privacy_policy" element={<PrivacyPolicy />} />
+        <Route path="/cookie_policy" element={<CookiePolicyPage />} />
+        <Route path="/privacy_policy" element={<PrivacyPolicyPage />} />
       </Routes>
+
+      {/* Cookie banner stays once at the very bottom */}
       <CookieConsent
         buttonText="Accept All Cookies"
         declineButtonText="Reject Non-Essential"
@@ -74,10 +90,10 @@ function App() {
           position: "fixed",
           left: "50%",
           transform: "translateX(-50%)",
-          bottom: "40px", // space from bottom
-          background: "rgba(255, 255, 255, 0.7)", // translucent background for blur
+          bottom: "40px",
+          background: "rgba(255, 255, 255, 0.7)",
           backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)", // Safari support
+          WebkitBackdropFilter: "blur(12px)",
           color: "#6b7db3",
           fontSize: "14px",
           padding: "20px",
@@ -96,7 +112,7 @@ function App() {
           padding: "10px 20px",
           border: "none",
           cursor: "pointer",
-          fontWeight: "600"
+          fontWeight: "600",
         }}
         declineButtonStyle={{
           background: "#8a9ac7",
@@ -107,23 +123,32 @@ function App() {
           border: "none",
           cursor: "pointer",
           marginRight: "10px",
-          fontWeight: "600"
+          fontWeight: "600",
         }}
         expires={365}
-        onAccept={() => {
-          console.log("Cookies accepted");
-        }}
-        onDecline={() => {
-          console.log("Non-essential cookies declined");
-        }}
       >
-        🍪 We use cookies to improve your experience on our site. By continuing to browse, you agree to our use of cookies.
+        🍪 We use cookies to improve your experience on our site. By continuing
+        to browse, you agree to our use of cookies.
         <span style={{ fontSize: "12px", display: "block", marginTop: "8px" }}>
-          <a href="/privacy_policy" style={{ color: "#b91c1c", textDecoration: "underline", fontWeight: "500" }}>
+          <a
+            href="/privacy_policy"
+            style={{
+              color: "#b91c1c",
+              textDecoration: "underline",
+              fontWeight: "500",
+            }}
+          >
             Privacy Policy
           </a>
           {" | "}
-          <a href="/cookie_policy" style={{ color: "#b91c1c", textDecoration: "underline", fontWeight: "500" }}>
+          <a
+            href="/cookie_policy"
+            style={{
+              color: "#b91c1c",
+              textDecoration: "underline",
+              fontWeight: "500",
+            }}
+          >
             Cookie Policy
           </a>
         </span>
