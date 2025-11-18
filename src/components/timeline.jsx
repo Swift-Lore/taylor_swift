@@ -89,7 +89,6 @@ export default function Timeline() {
 
   // ===== Card component =====
   const TimelineCard = ({ record, index }) => {
-    const navigate = useNavigate()
 
     const handleTagClick = (e, keyword) => {
       e.preventDefault()
