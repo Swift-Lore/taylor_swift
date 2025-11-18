@@ -12,7 +12,6 @@ export default function Timeline() {
   const navigate = useNavigate()
   const [showScrollHint, setShowScrollHint] = useState(true)
   const [records, setRecords] = useState([])
-  const [screenScale, setScreenScale] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
 
   const today = new Date()
@@ -20,59 +19,6 @@ export default function Timeline() {
   const [currentDay, setCurrentDay] = useState(today.getDate())
 
   const displayDate = new Date(2020, currentMonth - 1, currentDay)
-
-  // ===== dynamic scale =====
-  useEffect(() => {
-    const calculateScale = () => {
-      const screenWidth = window.screen.width
-      const screenHeight = window.screen.height
-      const pixelDensity = window.devicePixelRatio || 1
-
-      const effectiveWidth = screenWidth * pixelDensity
-      const effectiveHeight = screenHeight * pixelDensity
-
-      console.log(
-        `Screen: ${screenWidth}x${screenHeight}, Pixel Density: ${pixelDensity}, Effective: ${effectiveWidth}x${effectiveHeight}`
-      )
-
-      let scale = 1
-
-      if (effectiveWidth >= 5120) {
-        scale = 0.51
-      } else if (effectiveWidth >= 3840) {
-        scale = 0.55
-      } else if (effectiveWidth >= 2560) {
-        scale = 0.6
-      } else if (effectiveWidth >= 1920) {
-        scale = 0.72
-      } else if (effectiveWidth >= 1440) {
-        scale = 0.77
-      } else {
-        scale = 0.85
-      }
-
-      const viewportWidth = window.innerWidth
-      if (viewportWidth >= 1536) {
-        scale *= 0.81
-      } else if (viewportWidth >= 1280) {
-        scale *= 0.85
-      } else if (viewportWidth >= 1024) {
-        scale *= 0.89
-      }
-
-      console.log(`Applied scale: ${scale}`)
-      setScreenScale(scale)
-    }
-
-    calculateScale()
-
-    const handleResize = () => {
-      setTimeout(calculateScale, 100)
-    }
-
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
 
   // ===== prev / next day =====
   const handleNextDay = () => {
