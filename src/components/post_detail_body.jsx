@@ -418,10 +418,10 @@ export default function PostDetailBody() {
         </section>
       )}
 
-                        {/* YouTube */}
+                              {/* YouTube */}
       {hasVideos && (
         <section className="max-w-4xl mx-auto px-4 mb-10">
-          <div className={`mt-2 ${event.YOUTUBE?.split(/,\s*|\s*\|\|\s*/).length > 1 ? 'grid grid-cols-1 gap-6' : 'flex flex-col items-center gap-6'}`}>
+          <div className={`mt-2 ${event.YOUTUBE?.split(/,\s*|\s*\|\|\s*/).length > 1 ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : 'flex flex-col items-center gap-6'}`}>
             {event.YOUTUBE?.split(/,\s*|\s*\|\|\s*/).map((url, index) => {
               const trimmedUrl = url.trim();
               const videoId = getYouTubeVideoId(trimmedUrl);
