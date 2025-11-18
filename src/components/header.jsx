@@ -7,7 +7,7 @@ export default function Header() {
   const navigate = useNavigate()
   const location = useLocation()
   const [searchQuery, setSearchQuery] = useState("")
-  const [eventData, setEventData] = useState(null) // ADDED: Store event data
+  const [eventData, setEventData] = useState(null)
 
   const isFullTimelinePage = location.pathname === "/posts"
   const isEventPage = location.pathname === "/post_details"
@@ -23,7 +23,7 @@ export default function Header() {
     }
   }, [location.search])
 
-  // ADDED: Fetch event data when on event page
+  // Fetch event data when on event page
   useEffect(() => {
     if (isEventPage) {
       const searchParams = new URLSearchParams(location.search)
@@ -55,20 +55,26 @@ export default function Header() {
     }
   }, [isEventPage, location.search])
 
-  // ADDED: Date formatting function
+  // Safe date formatting function
   const formatEventDate = (isoDate) => {
     if (!isoDate) return ""
-    const d = new Date(isoDate)
-    if (Number.isNaN(d.getTime())) return ""
+    
+    try {
+      const d = new Date(isoDate)
+      if (Number.isNaN(d.getTime())) return ""
 
-    const month = d.toLocaleString("en-US", {
-      month: "short",
-      timeZone: "UTC",
-    })
-    const day = String(d.getUTCDate()).padStart(2, "0")
-    const year = d.getUTCFullYear()
+      const month = d.toLocaleString("en-US", {
+        month: "short",
+        timeZone: "UTC",
+      })
+      const day = String(d.getUTCDate()).padStart(2, "0")
+      const year = d.getUTCFullYear()
 
-    return `${month}-${day}-${year}`
+      return `${month}-${day}-${year}`
+    } catch (error) {
+      console.error("Error formatting date:", error)
+      return ""
+    }
   }
 
   const handleSearch = (e) => {
@@ -133,13 +139,13 @@ export default function Header() {
           <div className="w-full flex flex-col items-center gap-2 mt-2 mb-2 px-4">
             {/* Event title */}
             <h2 className="text-white text-xl md:text-2xl font-serif drop-shadow-lg tracking-wide text-center leading-tight">
-              {eventData?.EVENT || "Loading event..."} {/* CHANGED: eventData instead of event */}
+              {eventData?.EVENT || "Loading event..."}
             </h2>
             
             {/* Event date */}
-            {eventData?.DATE && ( {/* CHANGED: eventData instead of event */}
+            {eventData?.DATE && (
               <p className="text-white/90 text-sm md:text-base font-medium drop-shadow-md">
-                {formatEventDate(eventData.DATE)} {/* CHANGED: eventData instead of event */}
+                {formatEventDate(eventData.DATE)}
               </p>
             )}
 
