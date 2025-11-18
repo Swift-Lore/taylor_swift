@@ -431,14 +431,14 @@ export default function PostDetailBody() {
         </section>
       )}
 
-                  {/* Instagram */}
+                       {/* Instagram */}
       {event.INSTAGRAM && (
-        <section className="max-w-6xl mx-auto px-4 mb-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 mt-2 justify-items-center">
+        <section className="max-w-7xl mx-auto px-4 mb-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-2 justify-items-center">
             {event.INSTAGRAM.split(" || ").map((rawUrl, index) => {
               const url = rawUrl.trim().split("?")[0];
               return url ? (
-                <div key={index} className="instagram-container w-full max-w-[320px]">
+                <div key={index} className="instagram-container w-full max-w-[280px]">
                   <blockquote
                     className="instagram-media w-full"
                     data-instgrm-permalink={url}
@@ -450,7 +450,8 @@ export default function PostDetailBody() {
                       boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                       margin: "0 auto",
                       width: "100%",
-                      maxWidth: "320px",
+                      minWidth: "250px",
+                      maxWidth: "280px",
                       padding: "0",
                     }}
                   ></blockquote>
