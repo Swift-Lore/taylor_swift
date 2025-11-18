@@ -21,7 +21,7 @@ export default function Footer() {
 
   return (
     // 1️⃣ Give the footer band a bit more vertical space
-    <footer className="bg-gradient-to-b from-[#e8ecf7] to-[#b6c1e3] pt-4 pb-4">
+    <footer className="bg-gradient-to-b from-[#e8ecf7] to-[#b6c1e3] pt-1 pb-4">
       {/* Main footer content */}
       {/* 2️⃣ Remove the negative margin + use padding instead for nicer centering */}
       <div className="max-w-5xl mx-auto px-4 py-3">
