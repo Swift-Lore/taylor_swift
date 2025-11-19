@@ -102,7 +102,7 @@ export default function Header() {
     navigate("/")
   }
 
-          return (
+  return (
     <header className="relative w-full bg-gradient-to-b from-[#9fa8f5] via-[#8a9ad4] to-[#e6edf7] pb-3 md:pb-5 shadow-[0_10px_40px_rgba(75,85,160,0.4)] fade-in-up overflow-visible z-10">
       {/* Compact decorative glow */}
       <div className="pointer-events-none absolute -top-4 left-1/2 -translate-x-1/2 md:left-12 md:translate-x-0 w-40 h-40 blur-2xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
@@ -111,8 +111,8 @@ export default function Header() {
         
         {/* LEFT SIDE: Timeline text (only on full timeline page) */}
         {isFullTimelinePage && !isEventPage && (
-          <div className="w-full md:w-[40%] flex flex-col items-start"> {/* Increased width */}
-            <h2 className="text-white text-3xl md:text-4xl font-serif drop-shadow-lg tracking-wide text-left"> {/* Much larger text */}
+          <div className="w-full md:w-[40%] flex flex-col items-start">
+            <h2 className="text-white text-3xl md:text-4xl font-serif drop-shadow-lg tracking-wide text-left">
               Taylor Swift's Career Timeline
             </h2>
           </div>
@@ -184,26 +184,26 @@ export default function Header() {
           </div>
         )}
 
-        {/* RIGHT SIDE: Logo and button (only on full timeline page) - FIXED ALIGNMENT */}
+        {/* RIGHT SIDE: Logo and button (only on full timeline page) */}
         {isFullTimelinePage && !isEventPage && (
-          <div className="w-full md:w-[30%] flex flex-col items-end"> {/* Removed extra styling */}
+          <div className="w-full md:w-[30%] flex flex-col items-end">
             {/* Logo container with proper right alignment */}
-            <div className="flex justify-end w-full"> {/* Force right alignment */}
+            <div className="flex justify-end w-full">
               <button
                 type="button"
                 onClick={handleLogoClick}
-                className="max-w-[300px] cursor-pointer" {/* Smaller, controlled width */}
+                className="max-w-[300px] cursor-pointer"
               >
                 <img
                   src="/images/swift_lore.png"
                   alt="Swift Lore"
-                  className="w-full h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow" {/* Even smaller logo */}
+                  className="w-full h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow"
                 />
               </button>
             </div>
 
             {/* Button container with same right alignment */}
-            <div className="flex justify-end w-full mt-2"> {/* Same right alignment */}
+            <div className="flex justify-end w-full mt-2">
               <button
                 onClick={() => navigate("/")}
                 className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all"
@@ -252,3 +252,4 @@ export default function Header() {
       </div>
     </header>
   );
+}
