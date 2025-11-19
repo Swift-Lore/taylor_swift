@@ -103,41 +103,42 @@ export default function Header() {
   }
 
   return (
-    <header className="relative w-full bg-gradient-to-b from-[#9fa8f5] via-[#8a9ad4] to-[#e6edf7] pb-2 md:pb-3 shadow-[0_10px_40px_rgba(75,85,160,0.4)] fade-in-up overflow-visible z-10">
-  {/* Reduced from pb-3 md:pb-5 */}
-  <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 pt-3 md:pt-4 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4 relative">
-  {/* Reduced from pt-4 md:pt-5 and gap-4 md:gap-6 */}
-        {/* Decorative glow */}
-        <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 md:left-12 md:translate-x-0 w-52 h-52 blur-3xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
+    <header className="relative w-full bg-gradient-to-b from-[#9fa8f5] via-[#8a9ad4] to-[#e6edf7] pb-1 md:pb-2 shadow-[0_10px_40px_rgba(75,85,160,0.4)] fade-in-up overflow-visible z-10">
+  {/* Drastically reduced from pb-3 md:pb-5 */}
+  <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 pt-2 md:pt-3 flex flex-col md:flex-row items-center justify-between gap-2 md:gap-3 relative">
+  {/* Drastically reduced from pt-4 md:pt-5 and gap-4 md:gap-6 */}
+        {/* Smaller decorative glow */}
+<div className="pointer-events-none absolute -top-4 left-1/2 -translate-x-1/2 md:left-12 md:translate-x-0 w-40 h-40 blur-2xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
+{/* Reduced from -top-8, w-52 h-52 blur-3xl */}
 
-        {/* Logo section - reduced spacing */}
+        {/* Logo section - large logo but tight spacing */}
 <div className="w-full flex flex-col items-center relative z-20 overflow-visible">
   <button
     type="button"
     onClick={handleLogoClick}
-    className="w-full max-w-[500px] cursor-pointer relative -mt-0 md:-mt-1" // Reduced from -mt-2 md:-mt-4
+    className="w-full max-w-[600px] cursor-pointer relative -mt-1 md:-mt-0" // Remove most negative margin
   >
-    {/* Keep all sparkles, just adjust positioning */}
-    <span className="absolute left-6 md:left-8 top-4 md:top-5 text-white/80 text-xl md:text-2xl twinkle">
+    {/* Sparkles positioned closer to logo */}
+    <span className="absolute left-4 md:left-6 top-2 md:top-3 text-white/80 text-xl md:text-2xl twinkle">
       ✨
     </span>
-    <span className="absolute right-8 md:right-10 top-4 md:top-5 text-white/80 text-2xl md:text-3xl twinkle">
+    <span className="absolute right-6 md:right-8 top-2 md:top-3 text-white/80 text-2xl md:text-3xl twinkle">
       ✨
     </span>
-    <span className="absolute right-16 md:right-20 bottom-4 md:bottom-6 text-white/80 text-lg md:text-2xl twinkle">
+    <span className="absolute right-14 md:right-16 bottom-2 md:bottom-3 text-white/80 text-lg md:text-xl twinkle">
       ✨
     </span>
 
     <img
       src="/images/swift_lore.png"
       alt="Swift Lore"
-      className="w-full h-auto object-contain max-h-[140px] md:max-h-[160px] logo-glow" // Slightly reduced but still prominent
+      className="w-full h-auto object-contain max-h-[160px] md:max-h-[180px] logo-glow" // Larger logo
     />
   </button>
 
-  {/* Navigation buttons - tighter spacing */}
+  {/* Navigation buttons - minimal spacing */}
   {!showHero && (
-    <div className="flex flex-wrap justify-center gap-2 mt-1 md:mt-2 w-full"> {/* Reduced from mt-3 md:mt-4 */}
+    <div className="flex flex-wrap justify-center gap-2 mt-0 md:mt-1 w-full"> {/* Almost no margin */}
       {(isFullTimelinePage || isEventPage) && (
         <button
           onClick={() => navigate("/")}
