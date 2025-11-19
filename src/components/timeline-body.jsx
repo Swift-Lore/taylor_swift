@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
 import { useNavigate, useLocation, Link } from "react-router-dom"
-import AdComponent from "./ad_component"
+// import AdComponent from "./ad_component" // COMMENT OUT FOR NOW
 
 // helper: convert "MM/DD/YYYY" -> "YYYY-MM-DD" for Airtable
 const parseMMDDYYYYToISO = (value) => {
@@ -781,20 +781,20 @@ export default function TimelineBody() {
     )
   }
 
-  // AdSense init
-  useEffect(() => {
-    if (
-      typeof window !== "undefined" &&
-      window.adsbygoogle &&
-      process.env.NODE_ENV === "production"
-    ) {
-      try {
-        ;(window.adsbygoogle = window.adsbygoogle || []).push({})
-      } catch (e) {
-        console.error("AdSense error:", e)
-      }
-    }
-  }, [])
+    // AdSense init - COMMENT OUT FOR NOW
+  // useEffect(() => {
+  //   if (
+  //     typeof window !== "undefined" &&
+  //     window.adsbygoogle &&
+  //     process.env.NODE_ENV === "production"
+  //   ) {
+  //     try {
+  //       ;(window.adsbygoogle = window.adsbygoogle || []).push({})
+  //     } catch (e) {
+  //       console.error("AdSense error:", e)
+  //     }
+  //   }
+  // }, [])
 
   return (
        <div className="bg-[#e6edf7] py-8 overflow-x-hidden">
