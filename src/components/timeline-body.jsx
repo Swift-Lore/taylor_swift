@@ -1064,8 +1064,8 @@ export default function TimelineBody() {
           )}
         </div>
       </div>
-      {/* Ad block - ONLY SHOW IN PRODUCTION AFTER APPROVAL */}
-      {process.env.NODE_ENV === "production" && (
+            {/* Ad block - COMMENT OUT FOR NOW (ONLY SHOW IN PRODUCTION AFTER APPROVAL) */}
+      {/* {process.env.NODE_ENV === "production" && (
         <div className="w-full max-w-4xl mx-auto px-4 mb-6">
           <div className="relative rounded-2xl border border-[#f8dada] bg-gradient-to-b from-[#fff8f8] to-[#fdeeee] shadow-sm px-4 py-6 min-h-[110px] flex items-center justify-center">
             <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.12em] text-[#9ca3af]">
@@ -1074,7 +1074,7 @@ export default function TimelineBody() {
             <AdComponent />
           </div>
         </div>
-      )}
+      )} */}
       {/* Selected keywords chips */}
       {filterKeywords.length > 0 && (
         <div className="max-w-6xl mx-auto px-4 mb-4">
