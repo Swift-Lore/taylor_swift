@@ -253,119 +253,143 @@ export default function PostDetailBody() {
   const hasSources = nonImageLinks.length > 0 || sourceImages.length > 0;
 
   // ---- MAIN RENDER ----
-  return (
-    <div className="bg-[#e6edf7] py-8 md:py-12">
+return (
+  <div className="bg-[#e6edf7] py-8 md:py-12">
 
-      {/* REMOVED: Compact title/date block - now handled in header */}
-
-      {/* Ad block - ONLY SHOW IN PRODUCTION AFTER APPROVAL */}
-      {process.env.NODE_ENV === "production" && (
-        <div className="w-full max-w-4xl mx-auto px-4 mb-4">
-          <div className="relative rounded-2xl border border-[#f8dada] bg-gradient-to-b from-[#fff8f8] to-[#fdeeee] shadow-sm px-4 py-6 min-h-[110px] flex items-center justify-center">
-            <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.12em] text-[#9ca3af]">
-              Sponsored
-            </span>
-            <AdComponent />
-          </div>
-        </div>
+    {/* KEEP THIS: Compact title/date block for screenshots - ONLY REMOVE THE SECOND ONE */}
+    <section className="max-w-4xl mx-auto px-4 mt-2 mb-8 text-center">
+      {event.EVENT && (
+        <h2 className="text-xl md:text-2xl font-serif text-[#8e3e3e] leading-snug">
+          {event.EVENT}
+        </h2>
       )}
+      {event.DATE && (
+        <p className="mt-1 text-sm md:text-base text-[#6b7db3]">
+          {formatEventDate(event.DATE)}
+        </p>
+      )}
+    </section>
 
-      {/* NOTES + SOURCES */}
-      {(hasNotes || hasSources) && (
-        <section className="max-w-4xl mx-auto px-4 mb-10">
-          {/* REMOVED: Redundant title/date section */}
+    {/* Ad block - ONLY SHOW IN PRODUCTION AFTER APPROVAL */}
+    {process.env.NODE_ENV === "production" && (
+      <div className="w-full max-w-4xl mx-auto px-4 mb-4">
+        <div className="relative rounded-2xl border border-[#f8dada] bg-gradient-to-b from-[#fff8f8] to-[#fdeeee] shadow-sm px-4 py-6 min-h-[110px] flex items-center justify-center">
+          <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.12em] text-[#9ca3af]">
+            Sponsored
+          </span>
+          <AdComponent />
+        </div>
+      </div>
+    )}
 
-          {hasNotes && (
-            <div className="text-sm md:text-base text-[#111827] leading-relaxed mb-6">
-              <span className="font-semibold">Notes: </span>
-              {formatNotes(event.NOTES)}
-            </div>
+    {/* NOTES + SOURCES */}
+    {(hasNotes || hasSources) && (
+      <section className="max-w-4xl mx-auto px-4 mb-10">
+        {/* REMOVED ONLY THIS REDUNDANT TITLE/DATE SECTION - keeping the one above */}
+        {/* <div className="mb-6 border-b border-[#ffcaca] pb-4">
+          {event.EVENT && (
+            <h3 className="text-lg font-serif text-[#8e3e3e] mb-1">
+              {event.EVENT}
+            </h3>
           )}
+          {event.DATE && (
+            <p className="text-sm text-[#6b7db3]">
+              {formatEventDate(event.DATE)}
+            </p>
+          )}
+        </div> */}
 
-          {hasSources && (
-            <div className="space-y-6">
-              {sourceImages.length > 0 && (
-                <div className="image-only-grid flex flex-wrap gap-6 justify-start">
-                  {sourceImages.map((url, index) => (
-                    <a
-                      key={`img-${index}`}
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group relative flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-all"
-                      style={{ width: "500px", height: "400px" }}
+        {hasNotes && (
+          <div className="text-sm md:text-base text-[#111827] leading-relaxed mb-6">
+            <span className="font-semibold">Notes: </span>
+            {formatNotes(event.NOTES)}
+          </div>
+        )}
+
+        {hasSources && (
+          <div className="space-y-6">
+            {sourceImages.length > 0 && (
+              <div className="image-only-grid flex flex-wrap gap-6 justify-start">
+                {sourceImages.map((url, index) => (
+                  <a
+                    key={`img-${index}`}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group relative flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-all"
+                    style={{ width: "500px", height: "400px" }}
+                  >
+                    <img
+                      src={url}
+                      alt="Source"
+                      className="max-w-full max-h-full object-contain cursor-pointer"
+                      loading="lazy"
+                    />
+                    <span className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs p-1 opacity-0 group-hover:opacity-100 transition-opacity truncate text-center">
+                      {(() => {
+                        try {
+                          return new URL(url).hostname.replace("www.", "");
+                        } catch {
+                          return "Source";
+                        }
+                      })()}
+                    </span>
+                  </a>
+                ))}
+              </div>
+            )}
+
+            {nonImageLinks.length > 0 && (
+              <div className="microlink-grid">
+                {nonImageLinks.map((url, index) => (
+                  <div key={`link-${index}`} className="microlink-card">
+                    <div id={`microlink-wrapper-${index}`}>
+                      <Microlink
+                        url={url}
+                        size="large"
+                        media="image"
+                        onError={() => {
+                          const fallback = document.getElementById(
+                            `fallback-${index}`
+                          );
+                          if (fallback) fallback.style.display = "flex";
+                        }}
+                        fallback={{
+                          image: `https://logo.clearbit.com/${new URL(url).hostname}`,
+                          title: url.split("/").slice(-1)[0].replace(/[-_]/g, " "),
+                          description: new URL(url).hostname.replace("www.", ""),
+                        }}
+                      />
+                    </div>
+
+                    {/* Fallback card */}
+                    <div
+                      id={`fallback-${index}`}
+                      style={{ display: "none" }}
+                      className="fallback-card flex items-center p-3 border border-gray-200 rounded-lg bg-white"
                     >
                       <img
-                        src={url}
-                        alt="Source"
-                        className="max-w-full max-h-full object-contain cursor-pointer"
-                        loading="lazy"
+                        src={`https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(url)}`}
+                        alt=""
+                        className="w-8 h-8 mr-3"
                       />
-                      <span className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs p-1 opacity-0 group-hover:opacity-100 transition-opacity truncate text-center">
-                        {(() => {
-                          try {
-                            return new URL(url).hostname.replace("www.", "");
-                          } catch {
-                            return "Source";
-                          }
-                        })()}
-                      </span>
-                    </a>
-                  ))}
-                </div>
-              )}
-
-              {nonImageLinks.length > 0 && (
-                <div className="microlink-grid">
-                  {nonImageLinks.map((url, index) => (
-                    <div key={`link-${index}`} className="microlink-card">
-                      <div id={`microlink-wrapper-${index}`}>
-                        <Microlink
-                          url={url}
-                          size="large"
-                          media="image"
-                          onError={() => {
-                            const fallback = document.getElementById(
-                              `fallback-${index}`
-                            );
-                            if (fallback) fallback.style.display = "flex";
-                          }}
-                          fallback={{
-                            image: `https://logo.clearbit.com/${new URL(url).hostname}`,
-                            title: url.split("/").slice(-1)[0].replace(/[-_]/g, " "),
-                            description: new URL(url).hostname.replace("www.", ""),
-                          }}
-                        />
-                      </div>
-
-                      {/* Fallback card */}
-                      <div
-                        id={`fallback-${index}`}
-                        style={{ display: "none" }}
-                        className="fallback-card flex items-center p-3 border border-gray-200 rounded-lg bg-white"
-                      >
-                        <img
-                          src={`https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(url)}`}
-                          alt=""
-                          className="w-8 h-8 mr-3"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-red-400 truncate">
-                            {url.split("/").slice(-1)[0].replace(/[-_]/g, " ")}
-                          </p>
-                          <p className="text-xs text-gray-500 truncate">
-                            {new URL(url).hostname.replace("www.", "")}
-                          </p>
-                        </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-red-400 truncate">
+                          {url.split("/").slice(-1)[0].replace(/[-_]/g, " ")}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">
+                          {new URL(url).hostname.replace("www.", "")}
+                        </p>
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </section>
-      )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </section>
+    )}
 
       {/* Main image */}
       {event.IMAGE && event.IMAGE.length > 0 && (
