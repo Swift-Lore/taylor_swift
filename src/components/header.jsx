@@ -108,56 +108,54 @@ export default function Header() {
         {/* Decorative glow */}
         <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 md:left-12 md:translate-x-0 w-52 h-52 blur-3xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
 
-        {/* Logo section - larger and centered */}
-        <div className="w-full md:w-[70%] flex flex-col items-center relative z-20 overflow-visible">
-          <button
-            type="button"
-            onClick={handleLogoClick}
-            className="w-full max-w-[800px] cursor-pointer relative -mt-2 md:-mt-4"
-          >
-            {/* sparkles around the logo */}
-            <span className="absolute left-8 md:left-12 top-8 md:top-10 text-white/80 text-xl md:text-3xl twinkle">
-              ✨
-            </span>
-            <span className="absolute right-10 md:right-16 top-6 md:top-8 text-white/80 text-2xl md:text-4xl twinkle">
-              ✨
-            </span>
-            <span className="absolute right-20 md:right-28 bottom-8 md:bottom-12 text-white/80 text-lg md:text-2xl twinkle">
-              ✨
-            </span>
+        {/* Logo section - reduced spacing */}
+<div className="w-full flex flex-col items-center relative z-20 overflow-visible">
+  <button
+    type="button"
+    onClick={handleLogoClick}
+    className="w-full max-w-[500px] cursor-pointer relative -mt-0 md:-mt-1" // Reduced from -mt-2 md:-mt-4
+  >
+    {/* Keep all sparkles, just adjust positioning */}
+    <span className="absolute left-6 md:left-8 top-4 md:top-5 text-white/80 text-xl md:text-2xl twinkle">
+      ✨
+    </span>
+    <span className="absolute right-8 md:right-10 top-4 md:top-5 text-white/80 text-2xl md:text-3xl twinkle">
+      ✨
+    </span>
+    <span className="absolute right-16 md:right-20 bottom-4 md:bottom-6 text-white/80 text-lg md:text-2xl twinkle">
+      ✨
+    </span>
 
-            <img
-              src="/images/swift_lore.png"
-              alt="Swift Lore"
-              className="w-full h-auto object-contain max-h-[200px] md:max-h-[240px] logo-glow"
-            />
-          </button>
+    <img
+      src="/images/swift_lore.png"
+      alt="Swift Lore"
+      className="w-full h-auto object-contain max-h-[140px] md:max-h-[160px] logo-glow" // Slightly reduced but still prominent
+    />
+  </button>
 
-          {/* Navigation buttons - centered under logo */}
-          {!showHero && (
-            <div className="flex flex-wrap justify-center gap-3 mt-3 md:mt-4 w-full">
-              {/* Show "Return to Home" on full timeline page AND event pages */}
-              {(isFullTimelinePage || isEventPage) && (
-                <button
-                  onClick={() => navigate("/")}
-                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all"
-                >
-                  Return to Home
-                </button>
-              )}
-              
-              {/* Show "View Full Timeline" on event pages */}
-              {isEventPage && (
-                <button
-                  onClick={() => navigate("/posts")}
-                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all"
-                >
-                  View Full Timeline
-                </button>
-              )}
-            </div>
-          )}
-        </div>
+  {/* Navigation buttons - tighter spacing */}
+  {!showHero && (
+    <div className="flex flex-wrap justify-center gap-2 mt-1 md:mt-2 w-full"> {/* Reduced from mt-3 md:mt-4 */}
+      {(isFullTimelinePage || isEventPage) && (
+        <button
+          onClick={() => navigate("/")}
+          className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-4 py-1 text-sm font-medium shadow-md border border-white/70 transition-all"
+        >
+          Return to Home
+        </button>
+      )}
+      
+      {isEventPage && (
+        <button
+          onClick={() => navigate("/posts")}
+          className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-4 py-1 text-sm font-medium shadow-md border border-white/70 transition-all"
+        >
+          View Full Timeline
+        </button>
+      )}
+    </div>
+  )}
+</div>
 
         {/* Event page header - shows event title and date */}
         {isEventPage && (
