@@ -65,22 +65,17 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Ad section - fixed to be square and match height */}
-          <div className="w-full md:w-1/2 flex">
-            <div className="relative bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-3 md:px-5 md:py-4 flex items-center justify-center card-soft glass-soft w-full aspect-square md:aspect-auto min-h-[200px]">
-              <span className="absolute top-3 left-4 text-[10px] uppercase tracking-[0.16em] text-[#9ca3af]">
-                Sponsored
-              </span>
-
-              {process.env.NODE_ENV === "production" ? (
+                    {/* Ad section - ONLY SHOW IN PRODUCTION AFTER APPROVAL */}
+          {process.env.NODE_ENV === "production" && (
+            <div className="w-full md:w-1/2 flex">
+              <div className="relative bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-3 md:px-5 md:py-4 flex items-center justify-center card-soft glass-soft w-full aspect-square md:aspect-auto min-h-[200px]">
+                <span className="absolute top-3 left-4 text-[10px] uppercase tracking-[0.16em] text-[#9ca3af]">
+                  Sponsored
+                </span>
                 <AdComponent />
-              ) : (
-                <div className="text-[#9ca3af] text-xs md:text-sm italic text-center px-2">
-                  Advertisement space — helping keep Swift Lore online 💫
-                </div>
-              )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
