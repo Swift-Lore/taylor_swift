@@ -797,26 +797,24 @@ export default function TimelineBody() {
   }, [])
 
   return (
-    <div className="bg-[#e6edf7] py-8 overflow-x-hidden">
-      {/* Ad Placement */}
-      <div className="w-full max-w-4xl mx-auto px-4 mb-6">
-        <div className="relative rounded-2xl border border-[#f8dada] bg-gradient-to-b from-[#fff8f8] to-[#fdeeee] shadow-sm px-4 py-6 min-h-[110px] flex items-center justify-center">
-          <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.12em] text-[#9ca3af]">
-            Sponsored
-          </span>
-
-          {process.env.NODE_ENV === "production" ? (
-            <AdComponent />
-          ) : (
-            <div className="text-[#9ca3af] text-sm italic">
-              Advertisement space — supporting Swift Lore 💫
-            </div>
-          )}
+       <div className="bg-[#e6edf7] py-8 overflow-x-hidden">
+      {/* ADD INTRODUCTORY TEXT HERE - New Section */}
+      <div className="max-w-6xl mx-auto px-4 mb-6">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-serif text-[#8e3e3e] mb-4">
+            Swift Lore
+          </h1>
+          <p className="text-[#6b7db3] text-lg max-w-2xl mx-auto">
+            Welcome to Swift Lore — a fan-made interactive timeline exploring 
+            Taylor Swift's career history, releases, Easter eggs, and more. 
+            Browse events, filter by keywords, or search for specific moments.
+          </p>
         </div>
       </div>
 
       {/* Filters */}
       <div className="max-w-6xl mx-auto px-4 mb-6">
+        {/* ... your existing filters code continues from here ... */}
         <div className="relative flex flex-wrap gap-2 py-4 items-center overflow-visible">
           {/* Sort By */}
           <div className="relative">
