@@ -109,54 +109,54 @@ export default function Header() {
 
       <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 pt-4 md:pt-5 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 relative">
         
-        {/* Logo section - ORIGINAL SIZE */}
-<div className="w-full flex flex-col items-center relative z-20 overflow-visible">
-  <button
-    type="button"
-    onClick={handleLogoClick}
-    className="w-full max-w-[800px] cursor-pointer relative -mt-2 md:-mt-4" // Original negative margins
-  >
-    {/* Original sparkle sizes and positions */}
-    <span className="absolute left-8 md:left-12 top-8 md:top-10 text-white/80 text-xl md:text-3xl twinkle">
-      ✨
-    </span>
-    <span className="absolute right-10 md:right-16 top-6 md:top-8 text-white/80 text-2xl md:text-4xl twinkle">
-      ✨
-    </span>
-    <span className="absolute right-20 md:right-28 bottom-8 md:bottom-12 text-white/80 text-lg md:text-2xl twinkle">
-      ✨
-    </span>
+                {/* Logo section - RIGHT ALIGNED */}
+        <div className="w-full flex flex-col items-end relative z-20 overflow-visible">
+          <button
+            type="button"
+            onClick={handleLogoClick}
+            className="w-full max-w-[600px] cursor-pointer relative -mt-2 md:-mt-4"
+          >
+            {/* Original sparkle sizes and positions */}
+            <span className="absolute left-8 md:left-12 top-8 md:top-10 text-white/80 text-xl md:text-3xl twinkle">
+              ✨
+            </span>
+            <span className="absolute right-10 md:right-16 top-6 md:top-8 text-white/80 text-2xl md:text-4xl twinkle">
+              ✨
+            </span>
+            <span className="absolute right-20 md:right-28 bottom-8 md:bottom-12 text-white/80 text-lg md:text-2xl twinkle">
+              ✨
+            </span>
 
-    <img
-      src="/images/swift_lore.png"
-      alt="Swift Lore"
-      className="w-full h-auto object-contain max-h-[200px] md:max-h-[240px] logo-glow" // ORIGINAL LARGE SIZE
-    />
-  </button>
+            <img
+              src="/images/swift_lore.png"
+              alt="Swift Lore"
+              className="w-full h-auto object-contain max-h-[200px] md:max-h-[240px] logo-glow"
+            />
+          </button>
 
-  {/* Navigation buttons - original spacing */}
-  {!showHero && (
-    <div className="flex flex-wrap justify-center gap-3 mt-3 md:mt-4 w-full"> {/* Original spacing */}
-      {(isFullTimelinePage || isEventPage) && (
-        <button
-          onClick={() => navigate("/")}
-          className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all"
-        >
-          Return to Home
-        </button>
-      )}
-      
-      {isEventPage && (
-        <button
-          onClick={() => navigate("/posts")}
-          className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all"
-        >
-          View Full Timeline
-        </button>
-      )}
-    </div>
-  )}
-</div>
+          {/* Navigation buttons - right aligned */}
+          {!showHero && (
+            <div className="flex flex-wrap justify-end gap-3 mt-3 md:mt-4 w-full">
+              {(isFullTimelinePage || isEventPage) && (
+                <button
+                  onClick={() => navigate("/")}
+                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all"
+                >
+                  Return to Home
+                </button>
+              )}
+              
+              {isEventPage && (
+                <button
+                  onClick={() => navigate("/posts")}
+                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all"
+                >
+                  View Full Timeline
+                </button>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Event page header */}
         {isEventPage && (
@@ -173,10 +173,10 @@ export default function Header() {
           </div>
         )}
 
-        {/* Full timeline page header */}
+                {/* Full timeline page header */}
         {isFullTimelinePage && !isEventPage && (
-          <div className="w-full md:w-[30%] flex flex-col items-center md:items-end gap-1 mt-0 px-2">
-            <h2 className="text-white text-xl md:text-2xl font-serif drop-shadow-lg tracking-wide text-center md:text-right">
+          <div className="w-full md:w-[30%] flex flex-col items-center md:items-start gap-1 mt-0 px-2"> {/* Changed md:items-end to md:items-start */}
+            <h2 className="text-white text-2xl md:text-3xl font-serif drop-shadow-lg tracking-wide text-center md:text-left"> {/* Increased size and changed md:text-right to md:text-left */}
               Taylor Swift's Career Timeline
             </h2>
           </div>
