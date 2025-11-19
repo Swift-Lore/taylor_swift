@@ -290,6 +290,20 @@ export default function PostDetailBody() {
       {/* NOTES + SOURCES */}
       {(hasNotes || hasSources) && (
         <section className="max-w-4xl mx-auto px-4 mb-10">
+          {/* Subtle title/date for screenshots */}
+          <div className="text-center mb-6 border-b border-[#ffcaca] pb-4">
+            {event.EVENT && (
+              <h3 className="text-lg font-serif text-[#8e3e3e] mb-1">
+                {event.EVENT}
+              </h3>
+            )}
+            {event.DATE && (
+              <p className="text-sm text-[#6b7db3]">
+                {formatEventDate(event.DATE)}
+              </p>
+            )}
+          </div>
+
           {hasNotes && (
             <div className="text-sm md:text-base text-[#111827] leading-relaxed mb-6">
               <span className="font-semibold">Notes: </span>
