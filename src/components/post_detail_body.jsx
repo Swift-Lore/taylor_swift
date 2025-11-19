@@ -424,33 +424,52 @@ return (
     )}
  {/* TikTok - ADD THIS RIGHT HERE */}
     {event.TIKTOK && (
-  <section className="max-w-4xl mx-auto px-4 mb-10">
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
-      {event.TIKTOK.split(" || ").map((url, index) => (
-        <div key={index} className="tiktok-embed-container flex justify-center">
-          <blockquote
-            className="tiktok-embed"
-            cite={url.trim()}
-            data-video-id={url.trim().split('/video/')[1]?.split('?')[0] || url.trim().split('/t/')[1]?.split('/')[0]}
-            style={{ maxWidth: '280px', minWidth: '280px' }}
+  <section className="max-w-6xl mx-auto px-4 mb-10">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-2">
+      {event.TIKTOK.split(" || ").map((url, index) => {
+        const cleanUrl = url.trim();
+        const username = cleanUrl.split('@')[1]?.split('/')[0] || 'tiktok';
+        const isTaylor = username.includes('taylorswift');
+        
+        return (
+          <a
+            key={index}
+            href={cleanUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block border border-gray-200 rounded-lg overflow-hidden bg-white hover:shadow-lg transition-all duration-200 group"
           >
-            <section>
-              <a 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                href={url.trim()}
-                className="flex items-center justify-center bg-gradient-to-br from-red-400 to-blue-500 text-white p-4 rounded-lg h-64"
-              >
-                <div className="text-center">
-                  <div className="text-2xl mb-2">🎵</div>
-                  <div className="text-sm font-medium">TikTok Video</div>
-                  <div className="text-xs mt-1">Click to view</div>
+            <div className="aspect-[9/16] bg-gradient-to-br from-red-400 to-blue-500 flex items-center justify-center relative group-hover:from-red-500 group-hover:to-blue-600 transition-colors">
+              <div className="text-center text-white">
+                <div className="text-3xl mb-3">🎵</div>
+                <div className="text-sm font-semibold">TikTok</div>
+                {isTaylor && (
+                  <div className="text-xs mt-2 bg-white/20 px-2 py-1 rounded-full">
+                    @{username}
+                  </div>
+                )}
+              </div>
+              {/* Play button overlay */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="bg-black/50 rounded-full p-3">
+                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
                 </div>
-              </a>
-            </section>
-          </blockquote>
-        </div>
-      ))}
+              </div>
+            </div>
+            <div className="p-3 border-t border-gray-100">
+              <div className="text-xs font-medium text-gray-800 truncate">
+                {isTaylor ? `@${username}` : 'TikTok Video'}
+              </div>
+              <div className="text-[10px] text-gray-500 mt-1 flex items-center">
+                <span>Watch on TikTok</span>
+                <span className="ml-1">→</span>
+              </div>
+            </div>
+          </a>
+        );
+      })}
     </div>
   </section>
 )}
