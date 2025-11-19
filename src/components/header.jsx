@@ -184,7 +184,7 @@ export default function Header() {
           </div>
         )}
 
-                {/* RIGHT SIDE: Logo and button (only on full timeline page) */}
+        {/* RIGHT SIDE: Logo and button (only on full timeline page) - FIXED ALIGNMENT */}
         {isFullTimelinePage && !isEventPage && (
           <div className="w-full md:w-[30%] flex flex-col items-end">
             {/* Logo container with proper right alignment */}
@@ -192,21 +192,22 @@ export default function Header() {
               <button
                 type="button"
                 onClick={handleLogoClick}
-                className="cursor-pointer" {/* Removed max-width constraint */}
+                className="cursor-pointer flex justify-end"
               >
                 <img
                   src="/images/swift_lore.png"
                   alt="Swift Lore"
-                  className="h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow" {/* Removed w-full */}
+                  className="h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow"
+                  style={{ maxWidth: '200px' }} // Control width to prevent overflow
                 />
               </button>
             </div>
 
-            {/* Button container with same right alignment */}
-            <div className="flex justify-end w-full mt-2">
+            {/* Button container with perfect right alignment under logo */}
+            <div className="flex justify-end w-full mt-2 pr-2 md:pr-4"> {/* Added right padding for alignment */}
               <button
                 onClick={() => navigate("/")}
-                className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all"
+                className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
               >
                 Return to Home
               </button>
