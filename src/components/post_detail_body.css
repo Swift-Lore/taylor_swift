@@ -215,3 +215,23 @@
 .debug .image-only-grid img {
     box-shadow: 0 0 0 2px blue !important;
 }
+/* TIKTOK EMBED FIXES */
+.tiktok-embed {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.tiktok-embed iframe {
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  height: 520px !important; /* adjust shorter/taller if needed */
+  border-radius: 12px !important;
+}
+
+/* Wrapper so we can have 3-across on desktop */
+.tiktok-wrapper {
+  width: 100%;
+  max-width: 350px;
+}
