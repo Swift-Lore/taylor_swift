@@ -223,27 +223,39 @@ export default function PostDetailBody() {
 useEffect(() => {
   if (!event?.TIKTOK) return;
 
-  // Load TikTok embed script
-  const loadTikTokScript = () => {
-    if (!document.getElementById('tiktok-embed-script')) {
-      const script = document.createElement('script');
-      script.id = 'tiktok-embed-script';
-      script.src = 'https://www.tiktok.com/embed.js';
-      script.async = true;
-      document.body.appendChild(script);
-    } else {
-      // Refresh embeds if script already loaded
-      if (window.tiktokEmbed && window.tiktokEmbed.parse) {
-        window.tiktokEmbed.parse();
-      }
-    }
-  };
+ // Load TikTok embed script
+const loadTikTokScript = () => {
+  const existing = document.getElementById("tiktok-embed-script");
+
+  if (!existing) {
+    const script = document.createElement("script");
+    script.id = "tiktok-embed-script";
+    script.src = "https://www.tiktok.com/embed.js";
+    script.async = true;
+    script.onload = () => {
+      // Once loaded, force processing
+      window?.TikTok?.embed?.load();
+    };
+    document.body.appendChild(script);
+  } else {
+    // Refresh embeds if script already loaded
+    window?.TikTok?.embed?.load();
+  }
+};
+
+useEffect(() => {
+  if (!event?.TIKTOK) return;
 
   loadTikTokScript();
-  
-  // Also reload after a short delay to ensure DOM is ready
-  setTimeout(loadTikTokScript, 500);
+
+  // Reload once DOM settles
+  const timeout = setTimeout(() => {
+    window?.TikTok?.embed?.load();
+  }, 500);
+
+  return () => clearTimeout(timeout);
 }, [event?.TIKTOK]);
+
 
 // Keyboard navigation for modal - THIS IS WHAT COMES NEXT
 useEffect(() => {
