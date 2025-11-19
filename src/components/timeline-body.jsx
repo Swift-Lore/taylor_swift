@@ -242,7 +242,16 @@ useEffect(() => {
   const timer = setTimeout(checkForUpdates, 30000);
   return () => clearTimeout(timer);
 }, []);
+useEffect(() => {
+  const timer = setTimeout(() => {
+    // Only trigger filter when we have a complete MM/DD (5 characters) or when cleared
+    if (monthDay === "" || monthDay.length === 5) {
+      resetPagination();
+    }
+  }, 500); // 500ms delay
 
+  return () => clearTimeout(timer);
+}, [monthDay]);
 // filter keywords list (using dynamic list from Airtable)
 const getFilteredKeywords = () => {
   const source = allKeywords.length ? allKeywords : []
@@ -474,23 +483,18 @@ const getFilteredKeywords = () => {
   }
 
   const handleMonthDayChange = (value) => {
-    setMonthDay(value)
+  setMonthDay(value);
+};
 
-    // Only reset + trigger a real filter when complete (MM/DD) or cleared
-    if (value === "" || value.length === 5) {
-      resetPagination()
-    }
-  }
+const handleStartDateChange = (value) => {
+  setStartDateInput(value);
+  resetPagination();
+};
 
-  const handleStartDateChange = (value) => {
-    setStartDateInput(value)
-    resetPagination()
-  }
-
-  const handleEndDateChange = (value) => {
-    setEndDateInput(value)
-    resetPagination()
-  }
+const handleEndDateChange = (value) => {
+  setEndDateInput(value);
+  resetPagination();
+};
 
   // Search
   const handleSearch = async (e) => {
