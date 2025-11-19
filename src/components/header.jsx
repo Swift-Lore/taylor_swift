@@ -102,7 +102,7 @@ export default function Header() {
     navigate("/")
   }
 
-        return (
+          return (
     <header className="relative w-full bg-gradient-to-b from-[#9fa8f5] via-[#8a9ad4] to-[#e6edf7] pb-3 md:pb-5 shadow-[0_10px_40px_rgba(75,85,160,0.4)] fade-in-up overflow-visible z-10">
       {/* Compact decorative glow */}
       <div className="pointer-events-none absolute -top-4 left-1/2 -translate-x-1/2 md:left-12 md:translate-x-0 w-40 h-40 blur-2xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
