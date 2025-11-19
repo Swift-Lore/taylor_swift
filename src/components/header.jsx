@@ -102,75 +102,71 @@ export default function Header() {
     navigate("/")
   }
 
-  return (
-    <header className="relative w-full bg-gradient-to-b from-[#9fa8f5] via-[#8a9ad4] to-[#e6edf7] pb-1 md:pb-2 shadow-[0_10px_40px_rgba(75,85,160,0.4)] fade-in-up overflow-visible z-10">
-  {/* Drastically reduced from pb-3 md:pb-5 */}
-  <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 pt-2 md:pt-3 flex flex-col md:flex-row items-center justify-between gap-2 md:gap-3 relative">
-  {/* Drastically reduced from pt-4 md:pt-5 and gap-4 md:gap-6 */}
-        {/* Smaller decorative glow */}
-<div className="pointer-events-none absolute -top-4 left-1/2 -translate-x-1/2 md:left-12 md:translate-x-0 w-40 h-40 blur-2xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
-{/* Reduced from -top-8, w-52 h-52 blur-3xl */}
+    return (
+    <header className="relative w-full bg-gradient-to-b from-[#9fa8f5] via-[#8a9ad4] to-[#e6edf7] pb-1 md:pb-2 shadow-[0_10px_40px_rgba(75,85,160,0.4)] overflow-visible z-10">
+      {/* Compact decorative glow */}
+      <div className="pointer-events-none absolute -top-2 left-1/2 -translate-x-1/2 md:left-12 md:translate-x-0 w-32 h-32 blur-xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
 
-        {/* Logo section - large logo but tight spacing */}
-<div className="w-full flex flex-col items-center relative z-20 overflow-visible">
-  <button
-    type="button"
-    onClick={handleLogoClick}
-    className="w-full max-w-[600px] cursor-pointer relative -mt-1 md:-mt-0" // Remove most negative margin
-  >
-    {/* Sparkles positioned closer to logo */}
-    <span className="absolute left-4 md:left-6 top-2 md:top-3 text-white/80 text-xl md:text-2xl twinkle">
-      ✨
-    </span>
-    <span className="absolute right-6 md:right-8 top-2 md:top-3 text-white/80 text-2xl md:text-3xl twinkle">
-      ✨
-    </span>
-    <span className="absolute right-14 md:right-16 bottom-2 md:bottom-3 text-white/80 text-lg md:text-xl twinkle">
-      ✨
-    </span>
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 pt-2 md:pt-3 flex flex-col md:flex-row items-center justify-between gap-2 md:gap-3 relative">
+        
+        {/* Logo section - compact but large logo */}
+        <div className="w-full flex flex-col items-center relative z-20">
+          <button
+            type="button"
+            onClick={handleLogoClick}
+            className="w-full max-w-[500px] cursor-pointer relative"
+          >
+            {/* Sparkles */}
+            <span className="absolute left-2 top-1 text-white/80 text-lg twinkle">
+              ✨
+            </span>
+            <span className="absolute right-4 top-1 text-white/80 text-xl twinkle">
+              ✨
+            </span>
+            <span className="absolute right-10 bottom-1 text-white/80 text-base twinkle">
+              ✨
+            </span>
 
-    <img
-      src="/images/swift_lore.png"
-      alt="Swift Lore"
-      className="w-full h-auto object-contain max-h-[160px] md:max-h-[180px] logo-glow" // Larger logo
-    />
-  </button>
+            <img
+              src="/images/swift_lore.png"
+              alt="Swift Lore"
+              className="w-full h-auto object-contain max-h-[120px] md:max-h-[140px]"
+            />
+          </button>
 
-  {/* Navigation buttons - minimal spacing */}
-  {!showHero && (
-    <div className="flex flex-wrap justify-center gap-2 mt-0 md:mt-1 w-full"> {/* Almost no margin */}
-      {(isFullTimelinePage || isEventPage) && (
-        <button
-          onClick={() => navigate("/")}
-          className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-4 py-1 text-sm font-medium shadow-md border border-white/70 transition-all"
-        >
-          Return to Home
-        </button>
-      )}
-      
-      {isEventPage && (
-        <button
-          onClick={() => navigate("/posts")}
-          className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-4 py-1 text-sm font-medium shadow-md border border-white/70 transition-all"
-        >
-          View Full Timeline
-        </button>
-      )}
-    </div>
-  )}
-</div>
+          {/* Navigation buttons - minimal spacing */}
+          {!showHero && (
+            <div className="flex flex-wrap justify-center gap-1 mt-0 w-full">
+              {(isFullTimelinePage || isEventPage) && (
+                <button
+                  onClick={() => navigate("/")}
+                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-3 py-0.5 text-xs font-medium shadow border border-white/70 transition-all"
+                >
+                  Return to Home
+                </button>
+              )}
+              
+              {isEventPage && (
+                <button
+                  onClick={() => navigate("/posts")}
+                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-3 py-0.5 text-xs font-medium shadow border border-white/70 transition-all"
+                >
+                  View Full Timeline
+                </button>
+              )}
+            </div>
+          )}
+        </div>
 
-        {/* Event page header - shows event title and date */}
+        {/* Event page header */}
         {isEventPage && (
-          <div className="w-full md:w-[30%] flex flex-col items-center md:items-end gap-2 mt-2 mb-2 px-4">
-            {/* Event title */}
-            <h2 className="text-white text-xl md:text-2xl font-serif drop-shadow-lg tracking-wide text-center md:text-right leading-tight">
+          <div className="w-full md:w-[30%] flex flex-col items-center md:items-end gap-1 mt-0 px-2">
+            <h2 className="text-white text-lg md:text-xl font-serif drop-shadow-lg tracking-wide text-center md:text-right leading-tight">
               {eventData?.EVENT || "Loading event..."}
             </h2>
             
-            {/* Event date */}
             {eventData?.DATE && (
-              <p className="text-white/90 text-sm md:text-base font-medium drop-shadow-md text-center md:text-right">
+              <p className="text-white/90 text-xs md:text-sm font-medium drop-shadow-md text-center md:text-right">
                 {formatEventDate(eventData.DATE)}
               </p>
             )}
@@ -179,19 +175,18 @@ export default function Header() {
 
         {/* Full timeline page header */}
         {isFullTimelinePage && !isEventPage && (
-          <div className="w-full md:w-[30%] flex flex-col items-center md:items-end gap-2 mt-2 mb-2 px-4">
-            {/* Larger, more elegant title */}
-            <h2 className="text-white text-2xl md:text-3xl font-serif drop-shadow-lg tracking-wide text-center md:text-right">
+          <div className="w-full md:w-[30%] flex flex-col items-center md:items-end gap-1 mt-0 px-2">
+            <h2 className="text-white text-xl md:text-2xl font-serif drop-shadow-lg tracking-wide text-center md:text-right">
               Taylor Swift's Career Timeline
             </h2>
           </div>
         )}
 
-        {/* Blurb + search + CTA — only show on home */}
+        {/* Home page content */}
         {showHero && (
-          <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-3 md:gap-3 md:mt-1 text-center md:text-left relative z-20">
-            <div className="w-full max-w-xs md:max-w-sm bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 px-4 py-3 md:px-5 md:py-3 shadow-[0_14px_45px_rgba(15,23,42,0.35)]">
-              <p className="text-white text-[11px] md:text-[13px] leading-snug md:leading-relaxed">
+          <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-2 md:gap-2 text-center md:text-left relative z-20">
+            <div className="w-full max-w-xs bg-white/10 backdrop-blur-md rounded-xl border border-white/20 px-3 py-2 shadow">
+              <p className="text-white text-[10px] md:text-[12px] leading-snug">
                 A fan-crafted, interactive timeline chronicling the epic life and
                 career of Taylor Swift. Explore everything from album releases and
                 Easter Eggs to dating history and iconic moments.
@@ -200,7 +195,7 @@ export default function Header() {
             </div>
 
             {/* Search */}
-            <div className="w-full max-w-xs md:max-w-sm">
+            <div className="w-full max-w-xs">
               <form onSubmit={handleSearch} className="relative">
                 <input
                   type="text"
@@ -208,19 +203,14 @@ export default function Header() {
                   value={searchQuery}
                   onChange={handleInputChange}
                   onKeyPress={handleKeyPress}
-                  className="w-full rounded-full py-1.5 md:py-2 pl-7 md:pl-8 pr-6 text-[11px] md:text-[13px] bg-white/90 text-gray-800 shadow-[0_10px_30px_rgba(15,23,42,0.25)] focus:outline-none focus:ring-2 focus:ring-[#fbb1c3] focus:ring-offset-2 focus:ring-offset-[#8a9ad4]"
-                  inputMode="search"
-                  enterKeyHint="search"
-                  autoCapitalize="none"
-                  autoCorrect="off"
-                  spellCheck="false"
+                  className="w-full rounded-full py-1 pl-6 pr-4 text-[10px] md:text-[12px] bg-white/90 text-gray-800 shadow focus:outline-none focus:ring-1 focus:ring-[#fbb1c3]"
                 />
               </form>
             </div>
 
             {/* CTA */}
             <button
-              className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-4 md:px-5 py-1.5 md:py-2 font-semibold text-[11px] md:text-[13px] w-40 md:w-auto shadow-[0_10px_30px_rgba(88,28,135,0.45)] transition-transform hover:-translate-y-0.5"
+              className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-3 py-1 font-semibold text-[10px] md:text-[12px] w-32 shadow transition-transform hover:-translate-y-0.5"
               onClick={() => navigate("/posts")}
             >
               View Full Timeline
@@ -229,5 +219,4 @@ export default function Header() {
         )}
       </div>
     </header>
-  )
-}
+  );
