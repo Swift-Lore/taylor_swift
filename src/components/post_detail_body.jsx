@@ -422,45 +422,34 @@ return (
         )}
       </section>
     )}
- {/* TikTok - ADD THIS RIGHT HERE */}
-    {event.TIKTOK && (
+    {/* TikTok */}
+{event.TIKTOK && (
   <section className="max-w-6xl mx-auto px-4 mb-10">
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-2">
-      {event.TIKTOK.split(" || ").map((url, index) => {
-        const cleanUrl = url.trim();
-        
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center mt-2">
+
+      {event.TIKTOK.split(" || ").map((raw, index) => {
+        const cleanUrl = raw.trim();
+        const videoId =
+          cleanUrl.split("/video/")[1]?.split("?")[0] ||
+          cleanUrl.split("/t/")[1]?.split("/")[0];
+
         return (
-          <div key={index} className="tiktok-embed-container flex justify-center">
+          <div key={index} className="tiktok-wrapper">
             <blockquote
               className="tiktok-embed"
               cite={cleanUrl}
-              data-video-id={cleanUrl.split('/video/')[1]?.split('?')[0] || cleanUrl.split('/t/')[1]?.split('/')[0]}
-              style={{ 
-                maxWidth: '450px',
-                minWidth: '450px'
-              }}
+              data-video-id={videoId}
             >
-              <section>
-                <a 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  href={cleanUrl}
-                  className="flex items-center justify-center bg-gradient-to-br from-red-400 to-blue-500 text-white p-6 rounded-lg"
-                >
-                  <div className="text-center">
-                    <div className="text-3xl mb-3">🎵</div>
-                    <div className="text-lg font-medium">TikTok Video</div>
-                    <div className="text-sm mt-2">Click to view on TikTok</div>
-                  </div>
-                </a>
-              </section>
+              <a href={cleanUrl}></a>
             </blockquote>
           </div>
         );
       })}
+
     </div>
   </section>
 )}
+
       {/* Main image */}
       {event.IMAGE && event.IMAGE.length > 0 && (
         <section className="max-w-4xl mx-auto px-4 mb-10">
