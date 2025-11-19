@@ -184,7 +184,7 @@ export default function Header() {
           </div>
         )}
 
-        {/* RIGHT SIDE: Logo and button (only on full timeline page) */}
+                {/* RIGHT SIDE: Logo and button (only on full timeline page) */}
         {isFullTimelinePage && !isEventPage && (
           <div className="w-full md:w-[30%] flex flex-col items-end">
             {/* Logo container with proper right alignment */}
@@ -192,12 +192,12 @@ export default function Header() {
               <button
                 type="button"
                 onClick={handleLogoClick}
-                className="max-w-[300px] cursor-pointer"
+                className="cursor-pointer" {/* Removed max-width constraint */}
               >
                 <img
                   src="/images/swift_lore.png"
                   alt="Swift Lore"
-                  className="w-full h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow"
+                  className="h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow" {/* Removed w-full */}
                 />
               </button>
             </div>
