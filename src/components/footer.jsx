@@ -1,23 +1,23 @@
 import { useEffect } from "react";
 import { Button } from "./ui/Button";
-import AdComponent from "./ad_component";
+// import AdComponent from "./ad_component"; // REMOVE THIS LINE
 
 export default function Footer() {
-  // AdSense init
-  useEffect(() => {
-    if (
-      typeof window !== "undefined" &&
-      window.adsbygoogle &&
-      process.env.NODE_ENV === "production"
-    ) {
-      try {
-        // eslint-disable-next-line no-undef
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-      } catch (e) {
-        console.error("AdSense error:", e);
-      }
-    }
-  }, []);
+  // AdSense init - REMOVE OR COMMENT OUT THIS ENTIRE useEffect
+  // useEffect(() => {
+  //   if (
+  //     typeof window !== "undefined" &&
+  //     window.adsbygoogle &&
+  //     process.env.NODE_ENV === "production"
+  //   ) {
+  //     try {
+  //       // eslint-disable-next-line no-undef
+  //       (window.adsbygoogle = window.adsbygoogle || []).push({});
+  //     } catch (e) {
+  //       console.error("AdSense error:", e);
+  //     }
+  //   }
+  // }, []);
 
   return (
     <footer className="bg-gradient-to-b from-[#e8ecf7] to-[#b6c1e3] pt-0 pb-2">
@@ -65,8 +65,8 @@ export default function Footer() {
             </div>
           </div>
 
-                    {/* Ad section - ONLY SHOW IN PRODUCTION AFTER APPROVAL */}
-          {process.env.NODE_ENV === "production" && (
+          {/* REMOVE OR COMMENT OUT THE ENTIRE AD SECTION */}
+          {/* {process.env.NODE_ENV === "production" && (
             <div className="w-full md:w-1/2 flex">
               <div className="relative bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-3 md:px-5 md:py-4 flex items-center justify-center card-soft glass-soft w-full aspect-square md:aspect-auto min-h-[200px]">
                 <span className="absolute top-3 left-4 text-[10px] uppercase tracking-[0.16em] text-[#9ca3af]">
@@ -75,7 +75,7 @@ export default function Footer() {
                 <AdComponent />
               </div>
             </div>
-          )}
+          )} */}
         </div>
       </div>
 
