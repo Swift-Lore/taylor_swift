@@ -396,34 +396,6 @@ export default function PostDetailBody() {
         </section>
       )}
 
-      {/* TikTok */}
-      {event.TIKTOK && (
-        <section className="max-w-6xl mx-auto px-4 mb-10">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center mt-2">
-            {event.TIKTOK.split(" || ").map((raw, index) => {
-              const cleanUrl = raw.trim();
-              if (!cleanUrl) return null;
-
-              const videoId =
-                cleanUrl.split("/video/")[1]?.split("?")[0] ||
-                cleanUrl.split("/t/")[1]?.split("/")[0];
-
-              return (
-                <div key={index} className="tiktok-wrapper">
-                  <blockquote
-                    className="tiktok-embed"
-                    cite={cleanUrl}
-                    data-video-id={videoId || undefined}
-                  >
-                    <a href={cleanUrl}></a>
-                  </blockquote>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
       {/* Main image */}
       {event.IMAGE && event.IMAGE.length > 0 && (
         <section className="max-w-4xl mx-auto px-4 mb-10">
@@ -538,7 +510,33 @@ export default function PostDetailBody() {
           </div>
         </section>
       )}
+{/* TikTok */}
+      {event.TIKTOK && (
+        <section className="max-w-6xl mx-auto px-4 mb-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center mt-2">
+            {event.TIKTOK.split(" || ").map((raw, index) => {
+              const cleanUrl = raw.trim();
+              if (!cleanUrl) return null;
 
+              const videoId =
+                cleanUrl.split("/video/")[1]?.split("?")[0] ||
+                cleanUrl.split("/t/")[1]?.split("/")[0];
+
+              return (
+                <div key={index} className="tiktok-wrapper">
+                  <blockquote
+                    className="tiktok-embed"
+                    cite={cleanUrl}
+                    data-video-id={videoId || undefined}
+                  >
+                    <a href={cleanUrl}></a>
+                  </blockquote>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
       {/* Image Modal */}
       <AnimatePresence>
         {isModalOpen && (
