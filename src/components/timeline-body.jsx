@@ -243,26 +243,22 @@ useEffect(() => {
   return () => clearTimeout(timer);
 }, []);
 
-// filter keywords list (using dynamic list from Airtable) - THIS STAYS THE SAME
+// filter keywords list (using dynamic list from Airtable)
 const getFilteredKeywords = () => {
   const source = allKeywords.length ? allKeywords : []
   if (!keywordSearchQuery.trim()) return source
-  // filter keywords list (using dynamic list from Airtable)
-  const getFilteredKeywords = () => {
-    const source = allKeywords.length ? allKeywords : []
-    if (!keywordSearchQuery.trim()) return source
 
-    const query = keywordSearchQuery.toLowerCase()
-    return source
-      .filter((keyword) => keyword.toLowerCase().includes(query))
-      .sort((a, b) => {
-        const aLower = a.toLowerCase()
-        const bLower = b.toLowerCase()
-        if (aLower.startsWith(query) && !bLower.startsWith(query)) return -1
-        if (!aLower.startsWith(query) && bLower.startsWith(query)) return 1
-        return a.localeCompare(b)
-      })
-  }
+  const query = keywordSearchQuery.toLowerCase()
+  return source
+    .filter((keyword) => keyword.toLowerCase().includes(query))
+    .sort((a, b) => {
+      const aLower = a.toLowerCase()
+      const bLower = b.toLowerCase()
+      if (aLower.startsWith(query) && !bLower.startsWith(query)) return -1
+      if (!aLower.startsWith(query) && bLower.startsWith(query)) return 1
+      return a.localeCompare(b)
+    })
+}
 
   // Fetch posts (filters + pagination)
   useEffect(() => {
