@@ -166,52 +166,87 @@ export default function TimelineBody() {
 
   // lazy-load all unique keywords from Airtable when dropdown first opens
   const loadKeywordsIfNeeded = async () => {
-    if (keywordsLoaded || keywordsLoading) return
-
-    setKeywordsLoading(true)
-    try {
-      const keywordSet = new Set()
-      let offset = undefined
-
-      do {
-        const response = await axios.get(
-          "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-            },
-            params: {
-              pageSize: 100,
-              offset,
-              fields: ["KEYWORDS"],
-            },
-          }
-        )
-
-        response.data.records.forEach((record) => {
-          ;(record.fields.KEYWORDS || []).forEach((kw) => {
-            const cleaned = typeof kw === "string" ? kw.trim() : ""
-            if (cleaned) keywordSet.add(cleaned)
-          })
-        })
-
-        offset = response.data.offset
-      } while (offset)
-
-      setAllKeywords(Array.from(keywordSet).sort((a, b) => a.localeCompare(b)))
-      setKeywordsLoaded(true)
-    } catch (error) {
-      console.error("Error fetching all keywords:", error)
-    } finally {
-      setKeywordsLoading(false)
-    }
+  // Check cache first
+  const cached = localStorage.getItem('swiftlore_keywords');
+  const cacheTime = localStorage.getItem('swiftlore_keywords_time');
+  
+  // Use cache if it's less than 1 hour old
+  if (cached && cacheTime && (Date.now() - parseInt(cacheTime)) < 60 * 60 * 1000) {
+    setAllKeywords(JSON.parse(cached));
+    setKeywordsLoaded(true);
+    return;
   }
+
+  if (keywordsLoaded || keywordsLoading) return;
+
+  setKeywordsLoading(true);
+  try {
+    const keywordSet = new Set();
+    let offset = undefined;
+
+    do {
+      const response = await axios.get(
+        "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+        {
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+          },
+          params: {
+            pageSize: 100,
+            offset,
+            fields: ["KEYWORDS"],
+          },
+        }
+      );
+
+      response.data.records.forEach((record) => {
+        ;(record.fields.KEYWORDS || []).forEach((kw) => {
+          const cleaned = typeof kw === "string" ? kw.trim() : "";
+          if (cleaned) keywordSet.add(cleaned);
+        });
+      });
+
+      offset = response.data.offset;
+    } while (offset);
+
+    const keywords = Array.from(keywordSet).sort((a, b) => a.localeCompare(b));
+    setAllKeywords(keywords);
+    setKeywordsLoaded(true);
+    
+    // Save to cache
+    localStorage.setItem('swiftlore_keywords', JSON.stringify(keywords));
+    localStorage.setItem('swiftlore_keywords_time', Date.now().toString());
+    
+  } catch (error) {
+    console.error("Error fetching all keywords:", error);
+  } finally {
+    setKeywordsLoading(false);
+  }
+};
 
   // preload keywords in the background as soon as the page mounts
   useEffect(() => {
     loadKeywordsIfNeeded()
   }, [])
+// Background sync for keywords
+useEffect(() => {
+  const checkForUpdates = async () => {
+    const cacheTime = localStorage.getItem('swiftlore_keywords_time');
+    // Only check if cache is older than 1 hour
+    if (!cacheTime || (Date.now() - parseInt(cacheTime)) > 60 * 60 * 1000) {
+      await loadKeywordsIfNeeded();
+    }
+  };
+  
+  // Check for updates 30 seconds after page load (non-blocking)
+  const timer = setTimeout(checkForUpdates, 30000);
+  return () => clearTimeout(timer);
+}, []);
 
+// filter keywords list (using dynamic list from Airtable) - THIS STAYS THE SAME
+const getFilteredKeywords = () => {
+  const source = allKeywords.length ? allKeywords : []
+  if (!keywordSearchQuery.trim()) return source
   // filter keywords list (using dynamic list from Airtable)
   const getFilteredKeywords = () => {
     const source = allKeywords.length ? allKeywords : []
