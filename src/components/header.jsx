@@ -201,41 +201,41 @@ export default function Header() {
           </div>
         )}
 
-        {/* Home page content */}
-        {showHero && (
-          <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-3 text-center md:text-left relative z-20">
-            <div className="w-full max-w-xs bg-white/10 backdrop-blur-md rounded-xl border border-white/20 px-4 py-3 shadow">
-              <p className="text-white text-sm leading-relaxed">
-                A fan-crafted, interactive timeline chronicling the epic life and
-                career of Taylor Swift. Explore everything from album releases and
-                Easter Eggs to dating history and iconic moments.
-                <span className="font-semibold"> Dive into the lore!</span>
-              </p>
-            </div>
+        {/* Home page content - LEAVE THIS 100% UNCHANGED */}
+{showHero && (
+  <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-3 text-center md:text-left relative z-20">
+    <div className="w-full max-w-xs bg-white/10 backdrop-blur-md rounded-xl border border-white/20 px-4 py-3 shadow">
+      <p className="text-white text-sm leading-relaxed">
+        A fan-crafted, interactive timeline chronicling the epic life and
+        career of Taylor Swift. Explore everything from album releases and
+        Easter Eggs to dating history and iconic moments.
+        <span className="font-semibold"> Dive into the lore!</span>
+      </p>
+    </div>
 
-            {/* Search */}
-            <div className="w-full max-w-xs">
-              <form onSubmit={handleSearch} className="relative">
-                <input
-                  type="text"
-                  placeholder="Search events, locations, categories..."
-                  value={searchQuery}
-                  onChange={handleInputChange}
-                  onKeyPress={handleKeyPress}
-                  className="w-full rounded-full py-2 pl-7 pr-4 text-sm bg-white/90 text-gray-800 shadow focus:outline-none focus:ring-2 focus:ring-[#fbb1c3]"
-                />
-              </form>
-            </div>
+             {/* Search */}
+    <div className="w-full max-w-xs">
+      <form onSubmit={handleSearch} className="relative">
+        <input
+          type="text"
+          placeholder="Search events, locations, categories..."
+          value={searchQuery}
+          onChange={handleInputChange}
+          onKeyPress={handleKeyPress}
+          className="w-full rounded-full py-2 pl-7 pr-4 text-sm bg-white/90 text-gray-800 shadow focus:outline-none focus:ring-2 focus:ring-[#fbb1c3]"
+        />
+      </form>
+    </div>
 
-            {/* CTA - single line */}
-            <button
-              className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-2 font-semibold text-sm w-auto shadow transition-transform hover:-translate-y-0.5 whitespace-nowrap"
-              onClick={() => navigate("/posts")}
-            >
-              View Full Timeline
-            </button>
-          </div>
-        )}
+    {/* CTA - single line */}
+    <button
+      className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-2 font-semibold text-sm w-auto shadow transition-transform hover:-translate-y-0.5 whitespace-nowrap"
+      onClick={() => navigate("/posts")}
+    >
+      View Full Timeline
+    </button>
+  </div>
+)}
       </div>
     </header>
   );
