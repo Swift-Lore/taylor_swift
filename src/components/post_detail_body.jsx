@@ -390,7 +390,42 @@ return (
         )}
       </section>
     )}
-
+ {/* TikTok - ADD THIS RIGHT HERE */}
+    {event.TIKTOK && (
+      <section className="max-w-4xl mx-auto px-4 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+          {event.TIKTOK.split(" || ").map((url, index) => {
+            const cleanUrl = url.trim();
+            
+            return (
+              <div key={index} className="tiktok-embed-container flex justify-center">
+                <blockquote
+                  className="tiktok-embed"
+                  cite={cleanUrl}
+                  data-video-id={cleanUrl.split('/video/')[1]?.split('?')[0] || cleanUrl.split('/t/')[1]?.split('/')[0]}
+                  style={{ maxWidth: '605px', minWidth: '325px' }}
+                >
+                  <section>
+                    <a 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      href={cleanUrl}
+                      className="flex items-center justify-center bg-gradient-to-br from-red-400 to-blue-500 text-white p-4 rounded-lg"
+                    >
+                      <div className="text-center">
+                        <div className="text-2xl mb-2">🎵</div>
+                        <div className="text-sm font-medium">TikTok Video</div>
+                        <div className="text-xs mt-1">Click to view on TikTok</div>
+                      </div>
+                    </a>
+                  </section>
+                </blockquote>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+    )}
       {/* Main image */}
       {event.IMAGE && event.IMAGE.length > 0 && (
         <section className="max-w-4xl mx-auto px-4 mb-10">
