@@ -109,99 +109,23 @@ export default function Header() {
 
       <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 pt-4 md:pt-5 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 relative">
         
-        {/* LEFT SIDE: Timeline text (only on full timeline page) */}
+        {/* MOBILE-FIRST LAYOUT: Full Timeline Page */}
         {isFullTimelinePage && !isEventPage && (
-          <div className="w-full md:w-[40%] flex flex-col items-start">
-            <h2 className="text-white text-3xl md:text-4xl font-serif drop-shadow-lg tracking-wide text-left">
-              Taylor Swift's Career Timeline
-            </h2>
-          </div>
-        )}
-
-        {/* Event page header - LEFT SIDE */}
-        {isEventPage && (
-          <div className="w-full md:w-[40%] flex flex-col items-start">
-            <h2 className="text-white text-3xl md:text-4xl font-serif drop-shadow-lg tracking-wide text-left">
-              {eventData?.EVENT || "Loading event..."}
-            </h2>
-            
-            {eventData?.DATE && (
-              <p className="text-white/90 text-sm md:text-base font-medium drop-shadow-md text-left mt-1">
-                {formatEventDate(eventData.DATE)}
-              </p>
-            )}
-          </div>
-        )}
-
-        {/* CENTER: Logo section - show for HOME PAGE and EVENT PAGE */}
-        {!isFullTimelinePage && (
-          <div className="w-full flex flex-col items-center relative z-20 overflow-visible">
-            <button
-              type="button"
-              onClick={handleLogoClick}
-              className="w-full max-w-[800px] cursor-pointer relative -mt-2 md:-mt-4"
-            >
-              {/* Sparkles - only show for home page */}
-              {showHero && (
-                <>
-                  <span className="absolute left-8 md:left-12 top-8 md:top-10 text-white/80 text-xl md:text-3xl twinkle">
-                    ✨
-                  </span>
-                  <span className="absolute right-10 md:right-16 top-6 md:top-8 text-white/80 text-2xl md:text-4xl twinkle">
-                    ✨
-                  </span>
-                  <span className="absolute right-20 md:right-28 bottom-8 md:bottom-12 text-white/80 text-lg md:text-2xl twinkle">
-                    ✨
-                  </span>
-                </>
-              )}
-
-              <img
-                src="/images/swift_lore.png"
-                alt="Swift Lore"
-                className="w-full h-auto object-contain max-h-[200px] md:max-h-[240px] logo-glow"
-              />
-            </button>
-
-            {/* Navigation buttons - for EVENT PAGE only */}
-            {isEventPage && (
-              <div className="flex flex-wrap justify-center gap-3 mt-3 md:mt-4 w-full">
-                <button
-                  onClick={() => navigate("/")}
-                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all"
-                >
-                  Return to Home
-                </button>
-                <button
-                  onClick={() => navigate("/posts")}
-                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all"
-                >
-                  View Full Timeline
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* RIGHT SIDE: Logo and button (only on full timeline page) */}
-        {isFullTimelinePage && !isEventPage && (
-          <div className="w-full md:w-[30%] flex flex-col items-end">
-            <div className="flex justify-end w-full">
+          <>
+            {/* Mobile: Centered logo and button on top */}
+            <div className="w-full md:hidden flex flex-col items-center gap-4">
               <button
                 type="button"
                 onClick={handleLogoClick}
-                className="cursor-pointer flex justify-end"
+                className="cursor-pointer"
               >
                 <img
                   src="/images/swift_lore.png"
                   alt="Swift Lore"
-                  className="h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow"
-                  style={{ maxWidth: '200px' }}
+                  className="h-auto object-contain max-h-[100px] logo-glow"
+                  style={{ maxWidth: '180px' }}
                 />
               </button>
-            </div>
-
-            <div className="flex justify-end w-full mt-2 pr-2 md:pr-4">
               <button
                 onClick={() => navigate("/")}
                 className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
@@ -209,17 +133,137 @@ export default function Header() {
                 Return to Home
               </button>
             </div>
-          </div>
+
+            {/* Mobile: Timeline text below */}
+            <div className="w-full md:hidden flex flex-col items-center mt-4">
+              <h2 className="text-white text-2xl font-serif drop-shadow-lg tracking-wide text-center">
+                Taylor Swift's Career Timeline
+              </h2>
+            </div>
+
+            {/* Desktop: Original layout */}
+            <div className="hidden md:flex md:w-[40%] flex-col items-start">
+              <h2 className="text-white text-3xl md:text-4xl font-serif drop-shadow-lg tracking-wide text-left">
+                Taylor Swift's Career Timeline
+              </h2>
+            </div>
+            <div className="hidden md:flex md:w-[30%] flex-col items-end">
+              <div className="flex justify-end w-full">
+                <button
+                  type="button"
+                  onClick={handleLogoClick}
+                  className="cursor-pointer flex justify-end"
+                >
+                  <img
+                    src="/images/swift_lore.png"
+                    alt="Swift Lore"
+                    className="h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow"
+                    style={{ maxWidth: '200px' }}
+                  />
+                </button>
+              </div>
+              <div className="flex justify-end w-full mt-2 pr-2 md:pr-4">
+                <button
+                  onClick={() => navigate("/")}
+                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+                >
+                  Return to Home
+                </button>
+              </div>
+            </div>
+          </>
         )}
 
-        {/* RIGHT SIDE: Empty space for event page to balance layout */}
+        {/* MOBILE-FIRST LAYOUT: Event Page */}
         {isEventPage && (
-          <div className="w-full md:w-[30%] flex flex-col items-end">
-            {/* Empty space to balance the left-aligned event text */}
+          <>
+            {/* Mobile: Logo and buttons on top */}
+            <div className="w-full md:hidden flex flex-col items-center gap-4 mb-4">
+              <button
+                type="button"
+                onClick={handleLogoClick}
+                className="cursor-pointer"
+              >
+                <img
+                  src="/images/swift_lore.png"
+                  alt="Swift Lore"
+                  className="h-auto object-contain max-h-[100px] logo-glow"
+                  style={{ maxWidth: '180px' }}
+                />
+              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => navigate("/")}
+                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+                >
+                  Return to Home
+                </button>
+                <button
+                  onClick={() => navigate("/posts")}
+                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+                >
+                  View Full Timeline
+                </button>
+              </div>
+            </div>
+
+            {/* Mobile: Event info below */}
+            <div className="w-full md:hidden flex flex-col items-center text-center">
+              <h2 className="text-white text-2xl font-serif drop-shadow-lg tracking-wide">
+                {eventData?.EVENT || "Loading event..."}
+              </h2>
+              {eventData?.DATE && (
+                <p className="text-white/90 text-sm font-medium drop-shadow-md mt-1">
+                  {formatEventDate(eventData.DATE)}
+                </p>
+              )}
+            </div>
+
+            {/* Desktop: Original event page layout */}
+            <div className="hidden md:flex md:w-[40%] flex-col items-start">
+              <h2 className="text-white text-3xl md:text-4xl font-serif drop-shadow-lg tracking-wide text-left">
+                {eventData?.EVENT || "Loading event..."}
+              </h2>
+              {eventData?.DATE && (
+                <p className="text-white/90 text-sm md:text-base font-medium drop-shadow-md text-left mt-1">
+                  {formatEventDate(eventData.DATE)}
+                </p>
+              )}
+            </div>
+            <div className="hidden md:flex md:w-[30%] flex-col items-end">
+              {/* Empty space for desktop layout balance */}
+            </div>
+          </>
+        )}
+
+        {/* CENTER: Logo section for Home Page (unchanged) */}
+        {!isFullTimelinePage && !isEventPage && (
+          <div className="w-full flex flex-col items-center relative z-20 overflow-visible">
+            <button
+              type="button"
+              onClick={handleLogoClick}
+              className="w-full max-w-[800px] cursor-pointer relative -mt-2 md:-mt-4"
+            >
+              <span className="absolute left-8 md:left-12 top-8 md:top-10 text-white/80 text-xl md:text-3xl twinkle">
+                ✨
+              </span>
+              <span className="absolute right-10 md:right-16 top-6 md:top-8 text-white/80 text-2xl md:text-4xl twinkle">
+                ✨
+              </span>
+              <span className="absolute right-20 md:right-28 bottom-8 md:bottom-12 text-white/80 text-lg md:text-2xl twinkle">
+                ✨
+              </span>
+
+              <img
+                src="/images/swift_lore.png"
+                alt="Swift Lore"
+                className="w-full h-auto object-contain max-h-[200px] md:max-h-[240px] logo-glow"
+              />
+            </button>
           </div>
         )}
 
-        {/* Home page content - RIGHT SIDE (info box, search, CTA) */}
+        {/* Home page content - RIGHT SIDE (unchanged) */}
         {showHero && (
           <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-3 text-center md:text-left relative z-20">
             <div className="w-full max-w-xs bg-white/10 backdrop-blur-md rounded-xl border border-white/20 px-4 py-3 shadow">
@@ -231,7 +275,6 @@ export default function Header() {
               </p>
             </div>
 
-            {/* Search */}
             <div className="w-full max-w-xs">
               <form onSubmit={handleSearch} className="relative">
                 <input
@@ -245,7 +288,6 @@ export default function Header() {
               </form>
             </div>
 
-            {/* CTA - single line */}
             <button
               className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-2 font-semibold text-sm w-auto shadow transition-transform hover:-translate-y-0.5 whitespace-nowrap"
               onClick={() => navigate("/posts")}
