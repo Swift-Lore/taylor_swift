@@ -102,7 +102,7 @@ export default function Header() {
     navigate("/")
   }
 
-    return (
+  return (
     <header className="relative w-full bg-gradient-to-b from-[#9fa8f5] via-[#8a9ad4] to-[#e6edf7] pb-1 md:pb-2 shadow-[0_10px_40px_rgba(75,85,160,0.4)] overflow-visible z-10">
       {/* Compact decorative glow */}
       <div className="pointer-events-none absolute -top-2 left-1/2 -translate-x-1/2 md:left-12 md:translate-x-0 w-32 h-32 blur-xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
@@ -219,4 +219,5 @@ export default function Header() {
         )}
       </div>
     </header>
-  );
+  )
+}
