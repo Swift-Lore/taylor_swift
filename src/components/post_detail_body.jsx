@@ -1,4 +1,4 @@
-// post_detail_body.jsx
+"use client"
 
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -35,7 +35,7 @@ const isLikelyImage = (url) => {
   );
 };
 
-// Format DATE field as "Nov-07-2025" (force UTC so it doesn’t shift by timezone)
+// Format DATE field as "Nov-07-2025" (force UTC so it doesn't shift by timezone)
 const formatEventDate = (isoDate) => {
   if (!isoDate) return "";
   const d = new Date(isoDate);
@@ -165,7 +165,7 @@ export default function PostDetailBody() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isModalOpen, selectedImageIndex, event?.IMAGE]);
 
-    // Social media embeds script loading
+  // Social media embeds script loading
   useEffect(() => {
     if (!event) return;
 
@@ -252,7 +252,7 @@ export default function PostDetailBody() {
   const hasNotes = !!event.NOTES && event.NOTES.trim() !== "";
   const hasSources = nonImageLinks.length > 0 || sourceImages.length > 0;
 
-    // ---- MAIN RENDER ----
+  // ---- MAIN RENDER ----
   return (
     <div className="bg-[#e6edf7] py-8 md:py-12">
 
@@ -346,15 +346,9 @@ export default function PostDetailBody() {
                             if (fallback) fallback.style.display = "flex";
                           }}
                           fallback={{
-                            image: `https://logo.clearbit.com/${
-                              new URL(url).hostname
-                            }`,
-                            title: url
-                              .split("/")
-                              .slice(-1)[0]
-                              .replace(/[-_]/g, " "),
-                            description: new URL(url)
-                              .hostname.replace("www.", ""),
+                            image: `https://logo.clearbit.com/${new URL(url).hostname}`,
+                            title: url.split("/").slice(-1)[0].replace(/[-_]/g, " "),
+                            description: new URL(url).hostname.replace("www.", ""),
                           }}
                         />
                       </div>
@@ -366,18 +360,13 @@ export default function PostDetailBody() {
                         className="fallback-card flex items-center p-3 border border-gray-200 rounded-lg bg-white"
                       >
                         <img
-                          src={`https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(
-                            url
-                          )}`}
+                          src={`https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(url)}`}
                           alt=""
                           className="w-8 h-8 mr-3"
                         />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-red-400 truncate">
-                            {url
-                              .split("/")
-                              .slice(-1)[0]
-                              .replace(/[-_]/g, " ")}
+                            {url.split("/").slice(-1)[0].replace(/[-_]/g, " ")}
                           </p>
                           <p className="text-xs text-gray-500 truncate">
                             {new URL(url).hostname.replace("www.", "")}
@@ -385,7 +374,7 @@ export default function PostDetailBody() {
                         </div>
                       </div>
                     </div>
-                  )}
+                  ))}
                 </div>
               )}
             </div>
@@ -428,7 +417,7 @@ export default function PostDetailBody() {
               
               return videoId ? (
                 <div key={index} className="w-full">
-                  <div className="relative" style={{ paddingBottom: '56.25%' }}> {/* 16:9 aspect ratio */}
+                  <div className="relative" style={{ paddingBottom: '56.25%' }}>
                     <iframe
                       src={`https://www.youtube.com/embed/${videoId}`}
                       title={`YouTube Video ${index + 1}`}
@@ -481,9 +470,7 @@ export default function PostDetailBody() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2 w-full">
             {event.TWITTER.split(/ \|\| |\s+/).map((url, index) => {
               const cleanUrl = url.trim().replace("x.com", "twitter.com");
-              const isValid = /^https:\/\/twitter\.com\/[^/]+\/status\/\d+/.test(
-                cleanUrl
-              );
+              const isValid = /^https:\/\/twitter\.com\/[^/]+\/status\/\d+/.test(cleanUrl);
               return isValid ? (
                 <div key={index} className="twitter-container w-full">
                   <blockquote className="twitter-tweet" data-lang="en">
@@ -525,9 +512,7 @@ export default function PostDetailBody() {
                 } else if (selectedImageIndex < totalImages) {
                   return (
                     <img
-                      src={
-                        sourceImages[selectedImageIndex - imageArrayLength]
-                      }
+                      src={sourceImages[selectedImageIndex - imageArrayLength]}
                       alt="Full view"
                       className="max-w-full max-h-[80vh] object-contain rounded-lg"
                     />
@@ -580,3 +565,4 @@ export default function PostDetailBody() {
       </AnimatePresence>
     </div>
   );
+}
