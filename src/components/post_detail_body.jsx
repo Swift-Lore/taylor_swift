@@ -256,7 +256,6 @@ useEffect(() => {
   return () => clearTimeout(timeout);
 }, [event?.TIKTOK]);
 
-
 // Keyboard navigation for modal - THIS IS WHAT COMES NEXT
 useEffect(() => {
   const handleKeyDown = (e) => {
