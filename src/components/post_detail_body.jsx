@@ -252,9 +252,9 @@ export default function PostDetailBody() {
   const hasNotes = !!event.NOTES && event.NOTES.trim() !== "";
   const hasSources = nonImageLinks.length > 0 || sourceImages.length > 0;
 
-  // ---- MAIN RENDER ----
+    // ---- MAIN RENDER ----
   return (
-        <div className="bg-[#e6edf7] py-8 md:py-12">
+    <div className="bg-[#e6edf7] py-8 md:py-12">
 
       {/* Compact title/date block for screenshots */}
       <section className="max-w-4xl mx-auto px-4 mt-2 mb-8 text-center">
@@ -286,20 +286,6 @@ export default function PostDetailBody() {
           )}
         </div>
       </div>
-
-      {/* NOTES + SOURCES */}
-      {(hasNotes || hasSources) && (
-        {event.EVENT && (
-          <h2 className="text-xl md:text-2xl font-serif text-[#8e3e3e] leading-snug">
-            {event.EVENT}
-          </h2>
-        )}
-        {event.DATE && (
-          <p className="mt-1 text-sm md:text-base text-[#6b7db3]">
-            {formatEventDate(event.DATE)}
-          </p>
-        )}
-      </section>
 
       {/* NOTES + SOURCES */}
       {(hasNotes || hasSources) && (
@@ -399,7 +385,7 @@ export default function PostDetailBody() {
                         </div>
                       </div>
                     </div>
-                  ))}
+                  )}
                 </div>
               )}
             </div>
@@ -432,7 +418,7 @@ export default function PostDetailBody() {
         </section>
       )}
 
-                              {/* YouTube */}
+      {/* YouTube */}
       {hasVideos && (
         <section className="max-w-4xl mx-auto px-4 mb-10">
           <div className={`mt-2 ${event.YOUTUBE?.split(/,\s*|\s*\|\|\s*/).length > 1 ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : 'flex flex-col items-center gap-6'}`}>
@@ -459,7 +445,7 @@ export default function PostDetailBody() {
         </section>
       )}
 
-                                   {/* Instagram */}
+      {/* Instagram */}
       {event.INSTAGRAM && (
         <section className="w-full px-4 mb-10">
           <div className="flex flex-wrap justify-center gap-6 mt-2">
@@ -594,4 +580,3 @@ export default function PostDetailBody() {
       </AnimatePresence>
     </div>
   );
-}
