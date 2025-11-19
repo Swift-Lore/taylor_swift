@@ -103,8 +103,10 @@ export default function Header() {
   }
 
   return (
-    <header className="relative w-full bg-gradient-to-b from-[#9fa8f5] via-[#8a9ad4] to-[#e6edf7] pb-3 md:pb-5 shadow-[0_10px_40px_rgba(75,85,160,0.4)] fade-in-up overflow-visible z-10">
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 pt-4 md:pt-5 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 relative">
+    <header className="relative w-full bg-gradient-to-b from-[#9fa8f5] via-[#8a9ad4] to-[#e6edf7] pb-2 md:pb-3 shadow-[0_10px_40px_rgba(75,85,160,0.4)] fade-in-up overflow-visible z-10">
+  {/* Reduced from pb-3 md:pb-5 */}
+  <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 pt-3 md:pt-4 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4 relative">
+  {/* Reduced from pt-4 md:pt-5 and gap-4 md:gap-6 */}
         {/* Decorative glow */}
         <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 md:left-12 md:translate-x-0 w-52 h-52 blur-3xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
 
