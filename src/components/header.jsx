@@ -118,71 +118,57 @@ export default function Header() {
           </div>
         )}
 
-        {/* Event page header */}
-        {isEventPage && (
-          <div className="w-full md:w-[30%] flex flex-col items-center md:items-start gap-1 mt-0 px-2">
-            <h2 className="text-white text-lg md:text-xl font-serif drop-shadow-lg tracking-wide text-center md:text-left leading-tight">
-              {eventData?.EVENT || "Loading event..."}
-            </h2>
-            
-            {eventData?.DATE && (
-              <p className="text-white/90 text-xs md:text-sm font-medium drop-shadow-md text-center md:text-left">
-                {formatEventDate(eventData.DATE)}
-              </p>
-            )}
-          </div>
-        )}
+        {/* Event page header - UPDATED FOR LARGER TEXT AND LEFT ALIGNMENT */}
+{isEventPage && (
+  <div className="w-full md:w-[40%] flex flex-col items-start"> {/* Changed from md:w-[30%] and items-center to items-start */}
+    <h2 className="text-white text-3xl md:text-4xl font-serif drop-shadow-lg tracking-wide text-left"> {/* Larger text, left aligned */}
+      {eventData?.EVENT || "Loading event..."}
+    </h2>
+    
+    {eventData?.DATE && (
+      <p className="text-white/90 text-sm md:text-base font-medium drop-shadow-md text-left mt-1"> {/* Larger text, left aligned */}
+        {formatEventDate(eventData.DATE)}
+      </p>
+    )}
+  </div>
+)}
 
-        {/* CENTER: Logo section - only show when not on full timeline page */}
-        {!isFullTimelinePage && (
-          <div className="w-full flex flex-col items-center relative z-20 overflow-visible">
-            <button
-              type="button"
-              onClick={handleLogoClick}
-              className="w-full max-w-[800px] cursor-pointer relative -mt-2 md:-mt-4"
-            >
-              {/* Original sparkle sizes and positions */}
-              <span className="absolute left-8 md:left-12 top-8 md:top-10 text-white/80 text-xl md:text-3xl twinkle">
-                ✨
-              </span>
-              <span className="absolute right-10 md:right-16 top-6 md:top-8 text-white/80 text-2xl md:text-4xl twinkle">
-                ✨
-              </span>
-              <span className="absolute right-20 md:right-28 bottom-8 md:bottom-12 text-white/80 text-lg md:text-2xl twinkle">
-                ✨
-              </span>
+{/* RIGHT SIDE: Logo and buttons (only on event page) - MOVED MORE TO RIGHT */}
+{isEventPage && (
+  <div className="w-full md:w-[30%] flex flex-col items-end"> {/* Using items-end to push content right */}
+    {/* Logo container with proper right alignment */}
+    <div className="flex justify-end w-full">
+      <button
+        type="button"
+        onClick={handleLogoClick}
+        className="cursor-pointer flex justify-end"
+      >
+        <img
+          src="/images/swift_lore.png"
+          alt="Swift Lore"
+          className="h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow"
+          style={{ maxWidth: '200px' }}
+        />
+      </button>
+    </div>
 
-              <img
-                src="/images/swift_lore.png"
-                alt="Swift Lore"
-                className="w-full h-auto object-contain max-h-[200px] md:max-h-[240px] logo-glow"
-              />
-            </button>
-
-            {/* Navigation buttons */}
-            {!showHero && (
-              <div className="flex flex-wrap justify-center gap-3 mt-3 md:mt-4 w-full">
-                {(isFullTimelinePage || isEventPage) && (
-                  <button
-                    onClick={() => navigate("/")}
-                    className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all"
-                  >
-                    Return to Home
-                  </button>
-                )}
-                
-                {isEventPage && (
-                  <button
-                    onClick={() => navigate("/posts")}
-                    className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all"
-                  >
-                    View Full Timeline
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-        )}
+    {/* Button container with both buttons, aligned right */}
+    <div className="flex justify-end w-full mt-2 pr-2 md:pr-4 gap-3"> {/* Added gap-3 for spacing between buttons */}
+      <button
+        onClick={() => navigate("/")}
+        className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+      >
+        Return to Home
+      </button>
+      <button
+        onClick={() => navigate("/posts")}
+        className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+      >
+        View Full Timeline
+      </button>
+    </div>
+  </div>
+)}
 
         {/* RIGHT SIDE: Logo and button (only on full timeline page) - FIXED ALIGNMENT */}
         {isFullTimelinePage && !isEventPage && (
