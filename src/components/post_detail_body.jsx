@@ -254,9 +254,23 @@ export default function PostDetailBody() {
 
   // ---- MAIN RENDER ----
   return (
-    <div className="bg-[#e6edf7] py-8 md:py-12">
+        <div className="bg-[#e6edf7] py-8 md:py-12">
 
-      {/* Sponsored ad block */}
+      {/* Compact title/date block for screenshots */}
+      <section className="max-w-4xl mx-auto px-4 mt-2 mb-8 text-center">
+        {event.EVENT && (
+          <h2 className="text-xl md:text-2xl font-serif text-[#8e3e3e] leading-snug">
+            {event.EVENT}
+          </h2>
+        )}
+        {event.DATE && (
+          <p className="mt-1 text-sm md:text-base text-[#6b7db3]">
+            {formatEventDate(event.DATE)}
+          </p>
+        )}
+      </section>
+
+      {/* Sponsored ad block - MOVED HERE (after title, before content) */}
       <div className="w-full max-w-4xl mx-auto px-4 mb-4">
         <div className="relative rounded-2xl border border-[#f8dada] bg-gradient-to-b from-[#fff8f8] to-[#fdeeee] shadow-sm px-4 py-6 min-h-[110px] flex items-center justify-center">
           <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.12em] text-[#9ca3af]">
@@ -273,8 +287,8 @@ export default function PostDetailBody() {
         </div>
       </div>
 
-      {/* Compact title/date block for screenshots */}
-      <section className="max-w-4xl mx-auto px-4 mt-2 mb-8 text-center">
+      {/* NOTES + SOURCES */}
+      {(hasNotes || hasSources) && (
         {event.EVENT && (
           <h2 className="text-xl md:text-2xl font-serif text-[#8e3e3e] leading-snug">
             {event.EVENT}
