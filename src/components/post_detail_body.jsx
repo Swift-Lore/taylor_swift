@@ -219,7 +219,39 @@ export default function PostDetailBody() {
       document.body.appendChild(script);
     }
   }, [event]);
+// TikTok embed script loading - ADD THIS RIGHT HERE
+useEffect(() => {
+  if (!event?.TIKTOK) return;
 
+  // Load TikTok embed script
+  const loadTikTokScript = () => {
+    if (!document.getElementById('tiktok-embed-script')) {
+      const script = document.createElement('script');
+      script.id = 'tiktok-embed-script';
+      script.src = 'https://www.tiktok.com/embed.js';
+      script.async = true;
+      document.body.appendChild(script);
+    } else {
+      // Refresh embeds if script already loaded
+      if (window.tiktokEmbed && window.tiktokEmbed.parse) {
+        window.tiktokEmbed.parse();
+      }
+    }
+  };
+
+  loadTikTokScript();
+  
+  // Also reload after a short delay to ensure DOM is ready
+  setTimeout(loadTikTokScript, 500);
+}, [event?.TIKTOK]);
+
+// Keyboard navigation for modal - THIS IS WHAT COMES NEXT
+useEffect(() => {
+  const handleKeyDown = (e) => {
+    // ... existing keyboard navigation code
+  };
+  // ...
+}, [isModalOpen, selectedImageIndex, event?.IMAGE]);
   // Loading / missing state
   if (loading) {
     return (
