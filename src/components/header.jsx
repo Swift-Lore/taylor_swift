@@ -219,20 +219,36 @@ export default function Header() {
               )}
             </div>
 
-            {/* Desktop: Original event page layout */}
-            <div className="hidden md:flex md:w-[40%] flex-col items-start">
-              <h2 className="text-white text-3xl md:text-4xl font-serif drop-shadow-lg tracking-wide text-left">
-                {eventData?.EVENT || "Loading event..."}
-              </h2>
-              {eventData?.DATE && (
-                <p className="text-white/90 text-sm md:text-base font-medium drop-shadow-md text-left mt-1">
-                  {formatEventDate(eventData.DATE)}
-                </p>
-              )}
-            </div>
             <div className="hidden md:flex md:w-[30%] flex-col items-end">
-              {/* Empty space for desktop layout balance */}
-            </div>
+  <button
+    type="button"
+    onClick={handleLogoClick}
+    className="cursor-pointer flex justify-end"
+  >
+    <img
+      src="/images/swift_lore.png"
+      alt="Swift Lore"
+      className="h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow"
+      style={{ maxWidth: "200px" }}
+    />
+  </button>
+
+  <div className="flex gap-3 mt-3">
+    <button
+      onClick={() => navigate("/")}
+      className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+    >
+      Return to Home
+    </button>
+
+    <button
+      onClick={() => navigate("/posts")}
+      className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+    >
+      View Full Timeline
+    </button>
+  </div>
+</div>
           </>
         )}
 
