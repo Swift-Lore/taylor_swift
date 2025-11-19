@@ -103,44 +103,44 @@ export default function Header() {
   }
 
   return (
-    <header className="relative w-full bg-gradient-to-b from-[#9fa8f5] via-[#8a9ad4] to-[#e6edf7] pb-1 md:pb-2 shadow-[0_10px_40px_rgba(75,85,160,0.4)] overflow-visible z-10">
+    <header className="relative w-full bg-gradient-to-b from-[#9fa8f5] via-[#8a9ad4] to-[#e6edf7] pb-2 md:pb-3 shadow-[0_10px_40px_rgba(75,85,160,0.4)] overflow-visible z-10">
       {/* Compact decorative glow */}
-      <div className="pointer-events-none absolute -top-2 left-1/2 -translate-x-1/2 md:left-12 md:translate-x-0 w-32 h-32 blur-xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
+      <div className="pointer-events-none absolute -top-4 left-1/2 -translate-x-1/2 md:left-12 md:translate-x-0 w-40 h-40 blur-2xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
 
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 pt-2 md:pt-3 flex flex-col md:flex-row items-center justify-between gap-2 md:gap-3 relative">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 pt-3 md:pt-4 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4 relative">
         
-        {/* Logo section - compact but large logo */}
+        {/* Logo section - larger logo with minimal spacing */}
         <div className="w-full flex flex-col items-center relative z-20">
           <button
             type="button"
             onClick={handleLogoClick}
-            className="w-full max-w-[500px] cursor-pointer relative"
+            className="w-full max-w-[600px] cursor-pointer relative"
           >
             {/* Sparkles */}
-            <span className="absolute left-2 top-1 text-white/80 text-lg twinkle">
+            <span className="absolute left-4 top-2 text-white/80 text-xl twinkle">
               ✨
             </span>
-            <span className="absolute right-4 top-1 text-white/80 text-xl twinkle">
+            <span className="absolute right-6 top-2 text-white/80 text-2xl twinkle">
               ✨
             </span>
-            <span className="absolute right-10 bottom-1 text-white/80 text-base twinkle">
+            <span className="absolute right-12 bottom-2 text-white/80 text-lg twinkle">
               ✨
             </span>
 
             <img
               src="/images/swift_lore.png"
               alt="Swift Lore"
-              className="w-full h-auto object-contain max-h-[120px] md:max-h-[140px]"
+              className="w-full h-auto object-contain max-h-[160px] md:max-h-[180px]" // Much larger logo
             />
           </button>
 
           {/* Navigation buttons - minimal spacing */}
           {!showHero && (
-            <div className="flex flex-wrap justify-center gap-1 mt-0 w-full">
+            <div className="flex flex-wrap justify-center gap-2 mt-1 w-full">
               {(isFullTimelinePage || isEventPage) && (
                 <button
                   onClick={() => navigate("/")}
-                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-3 py-0.5 text-xs font-medium shadow border border-white/70 transition-all"
+                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-4 py-1 text-sm font-medium shadow border border-white/70 transition-all whitespace-nowrap" // Added whitespace-nowrap
                 >
                   Return to Home
                 </button>
@@ -149,7 +149,7 @@ export default function Header() {
               {isEventPage && (
                 <button
                   onClick={() => navigate("/posts")}
-                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-3 py-0.5 text-xs font-medium shadow border border-white/70 transition-all"
+                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-4 py-1 text-sm font-medium shadow border border-white/70 transition-all whitespace-nowrap" // Added whitespace-nowrap
                 >
                   View Full Timeline
                 </button>
@@ -184,9 +184,9 @@ export default function Header() {
 
         {/* Home page content */}
         {showHero && (
-          <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-2 md:gap-2 text-center md:text-left relative z-20">
-            <div className="w-full max-w-xs bg-white/10 backdrop-blur-md rounded-xl border border-white/20 px-3 py-2 shadow">
-              <p className="text-white text-[10px] md:text-[12px] leading-snug">
+          <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-3 text-center md:text-left relative z-20">
+            <div className="w-full max-w-xs bg-white/10 backdrop-blur-md rounded-xl border border-white/20 px-4 py-3 shadow">
+              <p className="text-white text-sm leading-relaxed"> {/* Larger text */}
                 A fan-crafted, interactive timeline chronicling the epic life and
                 career of Taylor Swift. Explore everything from album releases and
                 Easter Eggs to dating history and iconic moments.
@@ -203,14 +203,14 @@ export default function Header() {
                   value={searchQuery}
                   onChange={handleInputChange}
                   onKeyPress={handleKeyPress}
-                  className="w-full rounded-full py-1 pl-6 pr-4 text-[10px] md:text-[12px] bg-white/90 text-gray-800 shadow focus:outline-none focus:ring-1 focus:ring-[#fbb1c3]"
+                  className="w-full rounded-full py-2 pl-7 pr-4 text-sm bg-white/90 text-gray-800 shadow focus:outline-none focus:ring-2 focus:ring-[#fbb1c3]" // Larger input
                 />
               </form>
             </div>
 
-            {/* CTA */}
+            {/* CTA - single line */}
             <button
-              className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-3 py-1 font-semibold text-[10px] md:text-[12px] w-32 shadow transition-transform hover:-translate-y-0.5"
+              className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-2 font-semibold text-sm w-auto shadow transition-transform hover:-translate-y-0.5 whitespace-nowrap" // Added whitespace-nowrap
               onClick={() => navigate("/posts")}
             >
               View Full Timeline
