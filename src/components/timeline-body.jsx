@@ -869,7 +869,6 @@ const getFilteredKeywords = () => {
               onClick={() => {
                 const next = !showKeywordDropdown
                 setShowKeywordDropdown(next)
-                if (next) loadKeywordsIfNeeded()
               }}
             >
               <span>
