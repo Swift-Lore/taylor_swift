@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -163,9 +163,10 @@ export default function PostDetailBody() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isModalOpen, selectedImageIndex, event?.IMAGE]);
 
-  // Social media embeds script loading
+  // Social media embeds script loading (Instagram, Twitter, Getty)
   useEffect(() => {
     if (!event) return;
 
@@ -177,11 +178,9 @@ export default function PostDetailBody() {
         script.async = true;
         document.body.appendChild(script);
       } else {
-        // Force reload Instagram embeds
         if (window.instgrm) {
           window.instgrm.Embeds.process();
         } else {
-          // If instgrm isn't available yet, wait a bit and try again
           setTimeout(() => {
             if (window.instgrm) window.instgrm.Embeds.process();
           }, 1000);
@@ -206,7 +205,6 @@ export default function PostDetailBody() {
 
     if (event.INSTAGRAM) {
       loadInstagramScript();
-      // Also reload after a short delay to ensure DOM is ready
       setTimeout(loadInstagramScript, 500);
     }
     if (event.TWITTER) loadTwitterScript();
@@ -219,50 +217,28 @@ export default function PostDetailBody() {
       document.body.appendChild(script);
     }
   }, [event]);
-// TikTok embed script loading - ADD THIS RIGHT HERE
-useEffect(() => {
-  if (!event?.TIKTOK) return;
 
- // Load TikTok embed script
-const loadTikTokScript = () => {
-  const existing = document.getElementById("tiktok-embed-script");
+  // TikTok embed script loading
+  useEffect(() => {
+    if (!event?.TIKTOK) return;
 
-  if (!existing) {
+    const existing = document.getElementById("tiktok-embed-script");
+    const timestamp = Date.now();
+
     const script = document.createElement("script");
     script.id = "tiktok-embed-script";
-    script.src = "https://www.tiktok.com/embed.js";
+    script.src = `https://www.tiktok.com/embed.js?t=${timestamp}`;
     script.async = true;
-    script.onload = () => {
-      // Once loaded, force processing
-      window?.TikTok?.embed?.load();
-    };
+
+    if (existing && existing.parentNode) {
+      existing.parentNode.removeChild(existing);
+    }
+
     document.body.appendChild(script);
-  } else {
-    // Refresh embeds if script already loaded
-    window?.TikTok?.embed?.load();
-  }
-};
 
-useEffect(() => {
-  if (!event?.TIKTOK) return;
+    // no special cleanup needed
+  }, [event?.TIKTOK]);
 
-  loadTikTokScript();
-
-  // Reload once DOM settles
-  const timeout = setTimeout(() => {
-    window?.TikTok?.embed?.load();
-  }, 500);
-
-  return () => clearTimeout(timeout);
-}, [event?.TIKTOK]);
-
-// Keyboard navigation for modal - THIS IS WHAT COMES NEXT
-useEffect(() => {
-  const handleKeyDown = (e) => {
-    // ... existing keyboard navigation code
-  };
-  // ...
-}, [isModalOpen, selectedImageIndex, event?.IMAGE]);
   // Loading / missing state
   if (loading) {
     return (
@@ -296,170 +272,157 @@ useEffect(() => {
   const hasSources = nonImageLinks.length > 0 || sourceImages.length > 0;
 
   // ---- MAIN RENDER ----
-return (
-  <div className="bg-[#e6edf7] py-8 md:py-12">
-
-    {/* KEEP THIS: Compact title/date block for screenshots - ONLY REMOVE THE SECOND ONE */}
-    <section className="max-w-4xl mx-auto px-4 mt-2 mb-8 text-center">
-      {event.EVENT && (
-        <h2 className="text-xl md:text-2xl font-serif text-[#8e3e3e] leading-snug">
-          {event.EVENT}
-        </h2>
-      )}
-      {event.DATE && (
-        <p className="mt-1 text-sm md:text-base text-[#6b7db3]">
-          {formatEventDate(event.DATE)}
-        </p>
-      )}
-    </section>
-
-        {/* Ad block - COMMENT OUT FOR NOW (ONLY SHOW IN PRODUCTION AFTER APPROVAL) */}
-    {/* {process.env.NODE_ENV === "production" && (
-      <div className="w-full max-w-4xl mx-auto px-4 mb-4">
-        <div className="relative rounded-2xl border border-[#f8dada] bg-gradient-to-b from-[#fff8f8] to-[#fdeeee] shadow-sm px-4 py-6 min-h-[110px] flex items-center justify-center">
-          <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.12em] text-[#9ca3af]">
-            Sponsored
-          </span>
-          <AdComponent />
-        </div>
-      </div>
-    )} */}
-
-    {/* NOTES + SOURCES */}
-    {(hasNotes || hasSources) && (
-      <section className="max-w-4xl mx-auto px-4 mb-10">
-        {/* REMOVED ONLY THIS REDUNDANT TITLE/DATE SECTION - keeping the one above */}
-        {/* <div className="mb-6 border-b border-[#ffcaca] pb-4">
-          {event.EVENT && (
-            <h3 className="text-lg font-serif text-[#8e3e3e] mb-1">
-              {event.EVENT}
-            </h3>
-          )}
-          {event.DATE && (
-            <p className="text-sm text-[#6b7db3]">
-              {formatEventDate(event.DATE)}
-            </p>
-          )}
-        </div> */}
-
-        {hasNotes && (
-          <div className="text-sm md:text-base text-[#111827] leading-relaxed mb-6">
-            <span className="font-semibold">Notes: </span>
-            {formatNotes(event.NOTES)}
-          </div>
+  return (
+    <div className="bg-[#e6edf7] py-8 md:py-12">
+      {/* Compact title/date block */}
+      <section className="max-w-4xl mx-auto px-4 mt-2 mb-8 text-center">
+        {event.EVENT && (
+          <h2 className="text-xl md:text-2xl font-serif text-[#8e3e3e] leading-snug">
+            {event.EVENT}
+          </h2>
         )}
-
-        {hasSources && (
-          <div className="space-y-6">
-            {sourceImages.length > 0 && (
-              <div className="image-only-grid flex flex-wrap gap-6 justify-start">
-                {sourceImages.map((url, index) => (
-                  <a
-                    key={`img-${index}`}
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group relative flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-all"
-                    style={{ width: "500px", height: "400px" }}
-                  >
-                    <img
-                      src={url}
-                      alt="Source"
-                      className="max-w-full max-h-full object-contain cursor-pointer"
-                      loading="lazy"
-                    />
-                    <span className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs p-1 opacity-0 group-hover:opacity-100 transition-opacity truncate text-center">
-                      {(() => {
-                        try {
-                          return new URL(url).hostname.replace("www.", "");
-                        } catch {
-                          return "Source";
-                        }
-                      })()}
-                    </span>
-                  </a>
-                ))}
-              </div>
-            )}
-
-            {nonImageLinks.length > 0 && (
-              <div className="microlink-grid">
-                {nonImageLinks.map((url, index) => (
-                  <div key={`link-${index}`} className="microlink-card">
-                    <div id={`microlink-wrapper-${index}`}>
-                      <Microlink
-                        url={url}
-                        size="large"
-                        media="image"
-                        onError={() => {
-                          const fallback = document.getElementById(
-                            `fallback-${index}`
-                          );
-                          if (fallback) fallback.style.display = "flex";
-                        }}
-                        fallback={{
-                          image: `https://logo.clearbit.com/${new URL(url).hostname}`,
-                          title: url.split("/").slice(-1)[0].replace(/[-_]/g, " "),
-                          description: new URL(url).hostname.replace("www.", ""),
-                        }}
-                      />
-                    </div>
-
-                    {/* Fallback card */}
-                    <div
-                      id={`fallback-${index}`}
-                      style={{ display: "none" }}
-                      className="fallback-card flex items-center p-3 border border-gray-200 rounded-lg bg-white"
-                    >
-                      <img
-                        src={`https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(url)}`}
-                        alt=""
-                        className="w-8 h-8 mr-3"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-red-400 truncate">
-                          {url.split("/").slice(-1)[0].replace(/[-_]/g, " ")}
-                        </p>
-                        <p className="text-xs text-gray-500 truncate">
-                          {new URL(url).hostname.replace("www.", "")}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+        {event.DATE && (
+          <p className="mt-1 text-sm md:text-base text-[#6b7db3]">
+            {formatEventDate(event.DATE)}
+          </p>
         )}
       </section>
-    )}
-    {/* TikTok */}
-{event.TIKTOK && (
-  <section className="max-w-6xl mx-auto px-4 mb-10">
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center mt-2">
 
-      {event.TIKTOK.split(" || ").map((raw, index) => {
-        const cleanUrl = raw.trim();
-        const videoId =
-          cleanUrl.split("/video/")[1]?.split("?")[0] ||
-          cleanUrl.split("/t/")[1]?.split("/")[0];
+      {/* NOTES + SOURCES */}
+      {(hasNotes || hasSources) && (
+        <section className="max-w-4xl mx-auto px-4 mb-10">
+          {hasNotes && (
+            <div className="text-sm md:text-base text-[#111827] leading-relaxed mb-6">
+              <span className="font-semibold">Notes: </span>
+              {formatNotes(event.NOTES)}
+            </div>
+          )}
 
-        return (
-          <div key={index} className="tiktok-wrapper">
-            <blockquote
-              className="tiktok-embed"
-              cite={cleanUrl}
-              data-video-id={videoId}
-            >
-              <a href={cleanUrl}></a>
-            </blockquote>
+          {hasSources && (
+            <div className="space-y-6">
+              {sourceImages.length > 0 && (
+                <div className="image-only-grid flex flex-wrap gap-6 justify-start">
+                  {sourceImages.map((url, index) => (
+                    <a
+                      key={`img-${index}`}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group relative flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-all"
+                      style={{ width: "500px", height: "400px" }}
+                    >
+                      <img
+                        src={url}
+                        alt="Source"
+                        className="max-w-full max-h-full object-contain cursor-pointer"
+                        loading="lazy"
+                      />
+                      <span className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs p-1 opacity-0 group-hover:opacity-100 transition-opacity truncate text-center">
+                        {(() => {
+                          try {
+                            return new URL(url).hostname.replace("www.", "");
+                          } catch {
+                            return "Source";
+                          }
+                        })()}
+                      </span>
+                    </a>
+                  ))}
+                </div>
+              )}
+
+              {nonImageLinks.length > 0 && (
+                <div className="microlink-grid">
+                  {nonImageLinks.map((url, index) => (
+                    <div key={`link-${index}`} className="microlink-card">
+                      <div id={`microlink-wrapper-${index}`}>
+                        <Microlink
+                          url={url}
+                          size="large"
+                          media="image"
+                          onError={() => {
+                            const fallback = document.getElementById(
+                              `fallback-${index}`
+                            );
+                            if (fallback) fallback.style.display = "flex";
+                          }}
+                          fallback={{
+                            image: `https://logo.clearbit.com/${new URL(
+                              url
+                            ).hostname}`,
+                            title: url
+                              .split("/")
+                              .slice(-1)[0]
+                              .replace(/[-_]/g, " "),
+                            description: new URL(url).hostname.replace(
+                              "www.",
+                              ""
+                            ),
+                          }}
+                        />
+                      </div>
+
+                      {/* Fallback card */}
+                      <div
+                        id={`fallback-${index}`}
+                        style={{ display: "none" }}
+                        className="fallback-card flex items-center p-3 border border-gray-200 rounded-lg bg-white"
+                      >
+                        <img
+                          src={`https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(
+                            url
+                          )}`}
+                          alt=""
+                          className="w-8 h-8 mr-3"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-red-400 truncate">
+                            {url
+                              .split("/")
+                              .slice(-1)[0]
+                              .replace(/[-_]/g, " ")}
+                          </p>
+                          <p className="text-xs text-gray-500 truncate">
+                            {new URL(url).hostname.replace("www.", "")}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* TikTok */}
+      {event.TIKTOK && (
+        <section className="max-w-6xl mx-auto px-4 mb-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center mt-2">
+            {event.TIKTOK.split(" || ").map((raw, index) => {
+              const cleanUrl = raw.trim();
+              if (!cleanUrl) return null;
+
+              const videoId =
+                cleanUrl.split("/video/")[1]?.split("?")[0] ||
+                cleanUrl.split("/t/")[1]?.split("/")[0];
+
+              return (
+                <div key={index} className="tiktok-wrapper">
+                  <blockquote
+                    className="tiktok-embed"
+                    cite={cleanUrl}
+                    data-video-id={videoId || undefined}
+                  >
+                    <a href={cleanUrl}></a>
+                  </blockquote>
+                </div>
+              );
+            })}
           </div>
-        );
-      })}
-
-    </div>
-  </section>
-)}
+        </section>
+      )}
 
       {/* Main image */}
       {event.IMAGE && event.IMAGE.length > 0 && (
@@ -489,14 +452,23 @@ return (
       {/* YouTube */}
       {hasVideos && (
         <section className="max-w-4xl mx-auto px-4 mb-10">
-          <div className={`mt-2 ${event.YOUTUBE?.split(/,\s*|\s*\|\|\s*/).length > 1 ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : 'flex flex-col items-center gap-6'}`}>
+          <div
+            className={`mt-2 ${
+              event.YOUTUBE?.split(/,\s*|\s*\|\|\s*/).length > 1
+                ? "grid grid-cols-1 md:grid-cols-2 gap-6"
+                : "flex flex-col items-center gap-6"
+            }`}
+          >
             {event.YOUTUBE?.split(/,\s*|\s*\|\|\s*/).map((url, index) => {
               const trimmedUrl = url.trim();
               const videoId = getYouTubeVideoId(trimmedUrl);
-              
+
               return videoId ? (
                 <div key={index} className="w-full">
-                  <div className="relative" style={{ paddingBottom: '56.25%' }}>
+                  <div
+                    className="relative"
+                    style={{ paddingBottom: "56.25%" }}
+                  >
                     <iframe
                       src={`https://www.youtube.com/embed/${videoId}`}
                       title={`YouTube Video ${index + 1}`}
@@ -520,7 +492,11 @@ return (
             {event.INSTAGRAM.split(" || ").map((rawUrl, index) => {
               const url = rawUrl.trim().split("?")[0];
               return url ? (
-                <div key={index} className="instagram-container flex-shrink-0" style={{ width: "320px" }}>
+                <div
+                  key={index}
+                  className="instagram-container flex-shrink-0"
+                  style={{ width: "320px" }}
+                >
                   <blockquote
                     className="instagram-media"
                     data-instgrm-permalink={url}
@@ -549,7 +525,8 @@ return (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2 w-full">
             {event.TWITTER.split(/ \|\| |\s+/).map((url, index) => {
               const cleanUrl = url.trim().replace("x.com", "twitter.com");
-              const isValid = /^https:\/\/twitter\.com\/[^/]+\/status\/\d+/.test(cleanUrl);
+              const isValid =
+                /^https:\/\/twitter\.com\/[^/]+\/status\/\d+/.test(cleanUrl);
               return isValid ? (
                 <div key={index} className="twitter-container w-full">
                   <blockquote className="twitter-tweet" data-lang="en">
