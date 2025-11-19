@@ -140,7 +140,7 @@ export default function PostDetailBody() {
   };
 
   const handleBackToTimeline = () => {
-    navigate("/timeline");
+    navigate("/posts");
   };
 
   const formatNotes = (notes) => {
@@ -256,21 +256,9 @@ export default function PostDetailBody() {
   return (
     <div className="bg-[#e6edf7] py-8 md:py-12">
 
-      {/* Compact title/date block for screenshots */}
-      <section className="max-w-4xl mx-auto px-4 mt-2 mb-8 text-center">
-        {event.EVENT && (
-          <h2 className="text-xl md:text-2xl font-serif text-[#8e3e3e] leading-snug">
-            {event.EVENT}
-          </h2>
-        )}
-        {event.DATE && (
-          <p className="mt-1 text-sm md:text-base text-[#6b7db3]">
-            {formatEventDate(event.DATE)}
-          </p>
-        )}
-      </section>
+      {/* REMOVED: Compact title/date block - now handled in header */}
 
-            {/* Ad block - ONLY SHOW IN PRODUCTION AFTER APPROVAL */}
+      {/* Ad block - ONLY SHOW IN PRODUCTION AFTER APPROVAL */}
       {process.env.NODE_ENV === "production" && (
         <div className="w-full max-w-4xl mx-auto px-4 mb-4">
           <div className="relative rounded-2xl border border-[#f8dada] bg-gradient-to-b from-[#fff8f8] to-[#fdeeee] shadow-sm px-4 py-6 min-h-[110px] flex items-center justify-center">
@@ -282,22 +270,10 @@ export default function PostDetailBody() {
         </div>
       )}
 
-            {/* NOTES + SOURCES */}
+      {/* NOTES + SOURCES */}
       {(hasNotes || hasSources) && (
         <section className="max-w-4xl mx-auto px-4 mb-10">
-          {/* Subtle title/date for screenshots - LEFT ALIGNED */}
-          <div className="mb-6 border-b border-[#ffcaca] pb-4">
-            {event.EVENT && (
-              <h3 className="text-lg font-serif text-[#8e3e3e] mb-1">
-                {event.EVENT}
-              </h3>
-            )}
-            {event.DATE && (
-              <p className="text-sm text-[#6b7db3]">
-                {formatEventDate(event.DATE)}
-              </p>
-            )}
-          </div>
+          {/* REMOVED: Redundant title/date section */}
 
           {hasNotes && (
             <div className="text-sm md:text-base text-[#111827] leading-relaxed mb-6">
