@@ -219,7 +219,7 @@ export default function Header() {
       )}
     </div>
 
-    {/* Desktop: left = event info, right = logo + buttons */}
+        {/* Desktop: left = event info, right = logo + buttons */}
     <div className="hidden md:flex md:w-[55%] flex-col items-start">
       <h2 className="text-white text-3xl md:text-4xl font-serif drop-shadow-lg tracking-wide text-left">
         {eventData?.EVENT || "Loading event..."}
@@ -232,32 +232,36 @@ export default function Header() {
     </div>
 
     <div className="hidden md:flex md:w-[35%] flex-col items-end">
-      <button
-        type="button"
-        onClick={handleLogoClick}
-        className="cursor-pointer flex justify-end"
-      >
-        <img
-          src="/images/swift_lore.png"
-          alt="Swift Lore"
-          className="h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow"
-          style={{ maxWidth: "200px" }}
-        />
-      </button>
+      {/* Logo container with centered alignment */}
+      <div className="flex flex-col items-center w-full">
+        <button
+          type="button"
+          onClick={handleLogoClick}
+          className="cursor-pointer flex justify-center w-full"
+        >
+          <img
+            src="/images/swift_lore.png"
+            alt="Swift Lore"
+            className="h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow"
+            style={{ maxWidth: "200px" }}
+          />
+        </button>
 
-      <div className="flex gap-3 mt-3">
-        <button
-          onClick={() => navigate("/")}
-          className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
-        >
-          Return to Home
-        </button>
-        <button
-          onClick={() => navigate("/posts")}
-          className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
-        >
-          View Full Timeline
-        </button>
+        {/* Buttons container - centered under logo */}
+        <div className="flex gap-3 mt-3 justify-center w-full">
+          <button
+            onClick={() => navigate("/")}
+            className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+          >
+            Return to Home
+          </button>
+          <button
+            onClick={() => navigate("/posts")}
+            className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+          >
+            View Full Timeline
+          </button>
+        </div>
       </div>
     </div>
   </>
