@@ -263,14 +263,15 @@ useEffect(() => {
 }, []);
 useEffect(() => {
   const timer = setTimeout(() => {
-    // Only trigger filter when we have a complete MM/DD (5 characters) or when cleared
-    if (monthDay === "" || monthDay.length === 5) {
-      resetPagination();
+    // Only trigger filter when cleared or when MM/DD is valid
+    if (monthDay === "" || isCompleteMonthDay(monthDay)) {
+      resetPagination()
     }
-  }, 500); // 500ms delay
+  }, 500)
 
-  return () => clearTimeout(timer);
-}, [monthDay]);
+  return () => clearTimeout(timer)
+}, [monthDay])
+
 // filter keywords list (using dynamic list from Airtable)
 const getFilteredKeywords = () => {
   const source = allKeywords.length ? allKeywords : []
