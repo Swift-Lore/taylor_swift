@@ -178,74 +178,65 @@ return (
   </p>
 </div>
 
-      {/* On This Day Section - simplified */}
-      <div className="text-center mb-2 flex-shrink-0">
-        <div className="relative w-full mb-2 md:mb-3 px-2 md:px-5">
-          <div className="relative w-full px-2 md:px-3 py-2.5 md:py-5 bg-[#e8eef9]">
-            <div className="max-w-4xl mx-auto text-center">
-              <h2 className="text-lg sm:text-xl md:text-2xl lg:text-5xl font-serif text-[#8e3e3e] text-center">
-  <span className="block">ON THIS DAY</span>
-  <span className="text-base sm:text-sm md:text-xl lg:text-2xl block mt-1">
-    across Taylor’s eras
-  </span>
-</h2>
-            </div>
-            <div className="absolute left-1 sm:left-2 md:left-3 lg:left-7 top-1/2 transform -translate-y-1/2">
-              <img
-                src="/images/star.png"
-                alt="Star"
-                className="w-[26px] h-[26px] sm:w-[34px] sm:h-[34px] md:w-[56px] md:h-[56px] lg:w-[85px] lg:h-[85px]"
-              />
-            </div>
+          {/* Homepage Intro for SEO / AdSense */}
+    <div className="max-w-3xl mx-auto mt-4 mb-8 px-4">
+      <div className="bg-white/70 border border-[#e3d5dd] rounded-2xl shadow-sm px-5 py-4 md:px-8 md:py-5 text-center">
+        <h2 className="text-xl md:text-2xl font-semibold text-[#8e3e3e] mb-2">
+          Explore Taylor Swift’s Complete Career Timeline
+        </h2>
+        <p className="text-[#6b7db3] text-sm md:text-base leading-relaxed">
+          A fan-crafted, interactive archive chronicling Taylor Swift’s life,
+          releases, and iconic moments. Dive into albums, performances, easter
+          eggs, and the evolution of her artistry, all in one place.
+        </p>
+      </div>
+    </div>
 
-            <div className="absolute right-1 sm:right-2 md:right-3 lg:right-7 top-1/2 transform -translate-y-1/2">
-              <img
-                src="/images/star.png"
-                alt="Star"
-                className="w-[26px] h-[26px] sm:w-[34px] sm:h-[34px] md:w-[56px] md:h-[56px] lg:w-[85px] lg:h-[85px]"
-              />
-            </div>
-          </div>
-        </div>
-{/* Supporting paragraph below header */}
-<div className="max-w-2xl mx-auto mt-2 mb-3 px-4 text-center">
-  <p className="text-[#6b7db3] text-sm md:text-base leading-relaxed">
-    Each day in Taylor’s career has a story. Explore everything that happened
-    on this day across years: releases, performances, interviews, and more.
-  </p>
-</div>
+    {/* ON THIS DAY Section */}
+    <div className="text-center mb-4 flex-shrink-0">
+      <div className="relative w-full mb-3 md:mb-4 px-2 md:px-5">
+        <div className="relative w-full px-3 md:px-4 py-3 md:py-4 bg-[#e8eef9] rounded-2xl">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif text-[#8e3e3e]">
+              <span className="block tracking-wide">ON THIS DAY</span>
+              <span className="text-sm sm:text-base md:text-lg lg:text-xl block mt-1">
+                across Taylor’s eras
+              </span>
+            </h2>
 
-        <div className="flex items-center justify-center gap-1 sm:gap-2 md:gap-3 my-2 md:my-3">
-          <Button
-            variant="secondary"
-            className="rounded-full px-2 sm:px-3 md:px-5 text-xs sm:text-sm flex items-center gap-1 md:gap-2 mr-2.5"
-            onClick={handlePreviousDay}
-          >
-            <ChevronLeft size={10} className="md:size-14" />
-            <span className="hidden sm:inline">Previous Day</span>
-            <span className="sm:hidden mr-1.5">Prev</span>
-          </Button>
-
-          <div className="bg-white rounded-full px-3 sm:px-5 md:px-7 py-1 md:py-1.5 min-w-[102px] sm:min-w-[136px] md:min-w-[170px] border border-[#b66b6b]">
-            <span className="text-[#8e3e3e] text-sm md:text-base font-medium">
-              {displayDate.toLocaleDateString("en-US", {
-                month: "long",
-                day: "numeric",
-              })}
-            </span>
+            {/* supporting paragraph */}
+            <p className="mt-3 text-[#6b7db3] text-xs sm:text-sm md:text-base leading-relaxed px-2">
+              Each day in Taylor’s career has a story. Explore everything that
+              happened on this day across years: releases, performances,
+              interviews, and more.
+            </p>
           </div>
 
-          <Button
-            variant="secondary"
-            className="rounded-full px-2 sm:px-3 md:px-5 text-xs sm:text-sm flex items-center gap-1 md:gap-2 ml-2.5"
-            onClick={handleNextDay}
-          >
-            <span className="hidden sm:inline">Next Day</span>
-            <span className="sm:hidden ml-1.5">Next</span>
-            <ChevronRight size={10} className="md:size-14" />
-          </Button>
+          {/* Side stars with softer opacity */}
+          <div className="pointer-events-none absolute left-1 sm:left-2 md:left-3 lg:left-7 top-1/2 -translate-y-1/2 opacity-70">
+            <img
+              src="/images/star.png"
+              alt="Star"
+              className="w-[26px] h-[26px] sm:w-[34px] sm:h-[34px] md:w-[56px] md:h-[56px] lg:w-[72px] lg:h-[72px]"
+            />
+          </div>
+
+          <div className="pointer-events-none absolute right-1 sm:right-2 md:right-3 lg:right-7 top-1/2 -translate-y-1/2 opacity-70">
+            <img
+              src="/images/star.png"
+              alt="Star"
+              className="w-[26px] h-[26px] sm:w-[34px] sm:h-[34px] md:w-[56px] md:h-[56px] lg:w-[72px] lg:h-[72px]"
+            />
+          </div>
         </div>
       </div>
+
+      {/* Date navigation */}
+      <div className="flex items-center justify-center gap-1 sm:gap-2 md:gap-3 mt-1 md:mt-2">
+        <Button
+          variant="secondary"
+          className="rounded-full px-2 sm:px-3 md:px-5 text-xs sm:text-sm flex items-center gap-1 md:gap-2 mr-2.5"
+          onClick={handlePreviousDay}
 
       {/* Event Counter - simplified */}
       <div className="flex justify-center mb-2 flex-shrink-0">
