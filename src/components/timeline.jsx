@@ -271,39 +271,15 @@ return (
       {/* Timeline Section - THIS IS THE KEY PART */}
       <div className="flex-1 min-h-0 relative">
         
-        {/* Mobile Timeline - NO FIXED HEIGHT */}
-        <div className="md:hidden h-auto min-h-0 overflow-y-auto mobile-timeline-container">
-          <div className="relative flex justify-center py-2">
-            {/* Center line */}
-            <div className="relative w-[2px] flex flex-col items-center bg-[#e8ecf7]">
-              <div className="h-full w-[3px] bg-[#8a9ad4] min-h-[200px]"></div>
-
-              <div className="absolute left-1/2 -translate-x-1/2 top-[0px] w-4 h-4 rounded-full bg-[#6B78B4]"></div>
-              {records.slice(1, 5).map((_, index) => (
-                <div
-                  key={`mobile-circle-${index}`}
-                  className="absolute left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#FEE6E3] border-2 border-[#6B78B4]"
-                  style={{ top: `${120 + index * 120}px` }}
-                ></div>
-              ))}
-              <div className="absolute left-1/2 -translate-x-1/2 bottom-4 w-4 h-4 rounded-full bg-[#6B78B4]"></div>
-            </div>
-
-            {/* Mobile Timeline Items */}
-            <div className="absolute left-[17px] w-[calc(100%-26px)] space-y-6 pb-3">
-              {records.map((record, index) => (
-                <TimelineCard key={`mobile-${record.id}`} record={record} index={index} />
-              ))}
-            </div>
-          </div>
-
-          {/* Scroll hint */}
-          {showScrollHint && records.length > 2 && (
-            <div className="scroll-hint bottom-0">
-              <div className="scroll-blur"></div>
-              <span className="scroll-text">Scroll down</span>
-            </div>
-          )}
+                {/* Mobile Timeline - simple stacked cards, page scrolls normally */}
+        <div className="md:hidden mt-2 space-y-6">
+          {records.map((record, index) => (
+            <TimelineCard
+              key={`mobile-${record.id}`}
+              record={record}
+              index={index}
+            />
+          ))}
         </div>
 
         {/* Desktop Timeline */}
