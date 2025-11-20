@@ -165,20 +165,31 @@ export default function Timeline() {
 return (
   <section className="w-full bg-[#e8ecf7] py-2 px-2 md:px-10 flex flex-col min-h-0">
     <div className="container mx-auto flex flex-col min-h-0 flex-1">
-      
+      {/* Homepage Intro for SEO / AdSense */}
+<div className="max-w-3xl mx-auto text-center mt-4 mb-6 px-4">
+  <h2 className="text-2xl md:text-3xl font-serif text-[#8e3e3e] mb-3">
+    Swift Lore: Explore Taylor Swift’s Complete Career Timeline
+  </h2>
+
+  <p className="text-[#6b7db3] text-sm md:text-base leading-relaxed">
+    A fan-crafted, interactive archive chronicling Taylor Swift’s life,
+    releases, and iconic moments. Dive into albums, performances, easter eggs,
+    and the evolution of her artistry, all in one place.
+  </p>
+</div>
+
       {/* On This Day Section - simplified */}
       <div className="text-center mb-2 flex-shrink-0">
         <div className="relative w-full mb-2 md:mb-3 px-2 md:px-5">
           <div className="relative w-full px-2 md:px-3 py-2.5 md:py-5 bg-[#e8eef9]">
             <div className="max-w-4xl mx-auto text-center">
               <h2 className="text-lg sm:text-xl md:text-2xl lg:text-5xl font-serif text-[#8e3e3e] text-center">
-                <span className="block">ON THIS DAY</span>
-                <span className="text-base sm:text-sm md:text-xl lg:text-2xl block mt-1">
-                  in Taylor Swift's History
-                </span>
-              </h2>
+  <span className="block">ON THIS DAY</span>
+  <span className="text-base sm:text-sm md:text-xl lg:text-2xl block mt-1">
+    across Taylor’s eras
+  </span>
+</h2>
             </div>
-
             <div className="absolute left-1 sm:left-2 md:left-3 lg:left-7 top-1/2 transform -translate-y-1/2">
               <img
                 src="/images/star.png"
@@ -196,6 +207,13 @@ return (
             </div>
           </div>
         </div>
+{/* Supporting paragraph below header */}
+<div className="max-w-2xl mx-auto mt-2 mb-3 px-4 text-center">
+  <p className="text-[#6b7db3] text-sm md:text-base leading-relaxed">
+    Each day in Taylor’s career has a story. Explore everything that happened
+    on this day across years: releases, performances, interviews, and more.
+  </p>
+</div>
 
         <div className="flex items-center justify-center gap-1 sm:gap-2 md:gap-3 my-2 md:my-3">
           <Button
