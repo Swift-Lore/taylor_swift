@@ -103,7 +103,7 @@ export default function Header() {
   }
 
   return (
-    <header className="relative w-full bg-gradient-to-b from-[#9fa8f5] via-[#8a9ad4] to-[#e6edf7] pb-3 md:pb-5 shadow-[0_10px_40px_rgba(75,85,160,0.4)] fade-in-up overflow-visible z-10">
+    <header className="relative w-full bg-gradient-to-b from-[#9fa8f5] via-[#8a9ad4] to-[#e6edf7] pb-2 md:pb-3 shadow-[0_10px_30px_rgba(75,85,160,0.35)] fade-in-up overflow-visible z-10">
       {/* Compact decorative glow */}
       <div className="pointer-events-none absolute -top-4 left-1/2 -translate-x-1/2 md:left-12 md:translate-x-0 w-40 h-40 blur-2xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
 
@@ -294,18 +294,9 @@ export default function Header() {
           </div>
         )}
 
-        {/* Home page content - RIGHT SIDE (unchanged) */}
+                {/* Home page content - search + CTA only */}
         {showHero && (
           <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-3 text-center md:text-left relative z-20">
-            <div className="w-full max-w-xs bg-white/10 backdrop-blur-md rounded-xl border border-white/20 px-4 py-3 shadow">
-              <p className="text-white text-sm leading-relaxed">
-                A fan-crafted, interactive timeline chronicling the epic life and
-                career of Taylor Swift. Explore everything from album releases and
-                Easter Eggs to dating history and iconic moments.
-                <span className="font-semibold"> Dive into the lore!</span>
-              </p>
-            </div>
-
             <div className="w-full max-w-xs">
               <form onSubmit={handleSearch} className="relative">
                 <input
