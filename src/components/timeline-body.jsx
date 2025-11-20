@@ -17,6 +17,37 @@ const parseMMDDYYYYToISO = (value) => {
   const day = d.padStart(2, "0")
   return `${y}-${month}-${day}`
 }
+// helper: convert "MM/DD/YYYY" -> "YYYY-MM-DD" for Airtable
+const parseMMDDYYYYToISO = (value) => {
+  if (!value) return ""
+  const trimmed = value.trim()
+  const match = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(trimmed)
+  if (!match) return ""
+
+  const [, m, d, y] = match
+  const month = m.padStart(2, "0")
+  const day = d.padStart(2, "0")
+  return `${y}-${month}-${day}`
+}
+
+// helper: is "MM/DD" complete enough to filter?
+const isCompleteMonthDay = (value) => {
+  if (!value) return false
+  const parts = value.split("/")
+  if (parts.length !== 2) return false
+
+  const [m, d] = parts.map((p) => p.trim())
+  if (!m || !d) return false
+
+  const monthNum = parseInt(m, 10)
+  const dayNum = parseInt(d, 10)
+
+  if (Number.isNaN(monthNum) || Number.isNaN(dayNum)) return false
+  if (monthNum < 1 || monthNum > 12) return false
+  if (dayNum < 1 || dayNum > 31) return false
+
+  return true
+}
 
 export default function TimelineBody() {
   const navigate = useNavigate()
@@ -271,7 +302,12 @@ const getFilteredKeywords = () => {
 
   // Fetch posts (filters + pagination)
   useEffect(() => {
-    const fetchPosts = async () => {
+  const fetchPosts = async () => {
+      // If user started typing Month/Day but it's not a complete MM/DD yet, don't fetch yet
+      if (monthDay && !isCompleteMonthDay(monthDay)) {
+        return
+      }
+
       setLoading(true)
 
       try {
