@@ -17,18 +17,6 @@ const parseMMDDYYYYToISO = (value) => {
   const day = d.padStart(2, "0")
   return `${y}-${month}-${day}`
 }
-// helper: convert "MM/DD/YYYY" -> "YYYY-MM-DD" for Airtable
-const parseMMDDYYYYToISO = (value) => {
-  if (!value) return ""
-  const trimmed = value.trim()
-  const match = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(trimmed)
-  if (!match) return ""
-
-  const [, m, d, y] = match
-  const month = m.padStart(2, "0")
-  const day = d.padStart(2, "0")
-  return `${y}-${month}-${day}`
-}
 
 // helper: is "MM/DD" complete enough to filter?
 const isCompleteMonthDay = (value) => {
