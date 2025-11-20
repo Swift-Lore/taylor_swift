@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
 import { useNavigate, useLocation, Link } from "react-router-dom"
-import AdComponent from "./ad_component"
+// import AdComponent from "./ad_component" // COMMENT OUT FOR NOW
 
 // helper: convert "MM/DD/YYYY" -> "YYYY-MM-DD" for Airtable
 const parseMMDDYYYYToISO = (value) => {
@@ -16,6 +16,25 @@ const parseMMDDYYYYToISO = (value) => {
   const month = m.padStart(2, "0")
   const day = d.padStart(2, "0")
   return `${y}-${month}-${day}`
+}
+
+// helper: is "MM/DD" complete enough to filter?
+const isCompleteMonthDay = (value) => {
+  if (!value) return false
+  const parts = value.split("/")
+  if (parts.length !== 2) return false
+
+  const [m, d] = parts.map((p) => p.trim())
+  if (!m || !d) return false
+
+  const monthNum = parseInt(m, 10)
+  const dayNum = parseInt(d, 10)
+
+  if (Number.isNaN(monthNum) || Number.isNaN(dayNum)) return false
+  if (monthNum < 1 || monthNum > 12) return false
+  if (dayNum < 1 || dayNum > 31) return false
+
+  return true
 }
 
 export default function TimelineBody() {
@@ -166,72 +185,118 @@ export default function TimelineBody() {
 
   // lazy-load all unique keywords from Airtable when dropdown first opens
   const loadKeywordsIfNeeded = async () => {
-    if (keywordsLoaded || keywordsLoading) return
-
-    setKeywordsLoading(true)
-    try {
-      const keywordSet = new Set()
-      let offset = undefined
-
-      do {
-        const response = await axios.get(
-          "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-            },
-            params: {
-              pageSize: 100,
-              offset,
-              fields: ["KEYWORDS"],
-            },
-          }
-        )
-
-        response.data.records.forEach((record) => {
-          ;(record.fields.KEYWORDS || []).forEach((kw) => {
-            const cleaned = typeof kw === "string" ? kw.trim() : ""
-            if (cleaned) keywordSet.add(cleaned)
-          })
-        })
-
-        offset = response.data.offset
-      } while (offset)
-
-      setAllKeywords(Array.from(keywordSet).sort((a, b) => a.localeCompare(b)))
-      setKeywordsLoaded(true)
-    } catch (error) {
-      console.error("Error fetching all keywords:", error)
-    } finally {
-      setKeywordsLoading(false)
-    }
+  // Check cache first
+  const cached = localStorage.getItem('swiftlore_keywords');
+  const cacheTime = localStorage.getItem('swiftlore_keywords_time');
+  
+  // Use cache if it's less than 1 hour old
+  if (cached && cacheTime && (Date.now() - parseInt(cacheTime)) < 60 * 60 * 1000) {
+    setAllKeywords(JSON.parse(cached));
+    setKeywordsLoaded(true);
+    return;
   }
+
+  if (keywordsLoaded || keywordsLoading) return;
+
+  setKeywordsLoading(true);
+  try {
+    const keywordSet = new Set();
+    let offset = undefined;
+
+    do {
+      const response = await axios.get(
+        "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+        {
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+          },
+          params: {
+            pageSize: 100,
+            offset,
+            fields: ["KEYWORDS"],
+          },
+        }
+      );
+
+      response.data.records.forEach((record) => {
+        ;(record.fields.KEYWORDS || []).forEach((kw) => {
+          const cleaned = typeof kw === "string" ? kw.trim() : "";
+          if (cleaned) keywordSet.add(cleaned);
+        });
+      });
+
+      offset = response.data.offset;
+    } while (offset);
+
+    const keywords = Array.from(keywordSet).sort((a, b) => a.localeCompare(b));
+    setAllKeywords(keywords);
+    setKeywordsLoaded(true);
+    
+    // Save to cache
+    localStorage.setItem('swiftlore_keywords', JSON.stringify(keywords));
+    localStorage.setItem('swiftlore_keywords_time', Date.now().toString());
+    
+  } catch (error) {
+    console.error("Error fetching all keywords:", error);
+  } finally {
+    setKeywordsLoading(false);
+  }
+};
 
   // preload keywords in the background as soon as the page mounts
   useEffect(() => {
     loadKeywordsIfNeeded()
   }, [])
+// Background sync for keywords
+useEffect(() => {
+  const checkForUpdates = async () => {
+    const cacheTime = localStorage.getItem('swiftlore_keywords_time');
+    // Only check if cache is older than 1 hour
+    if (!cacheTime || (Date.now() - parseInt(cacheTime)) > 60 * 60 * 1000) {
+      await loadKeywordsIfNeeded();
+    }
+  };
+  
+  // Check for updates 30 seconds after page load (non-blocking)
+  const timer = setTimeout(checkForUpdates, 30000);
+  return () => clearTimeout(timer);
+}, []);
+useEffect(() => {
+  const timer = setTimeout(() => {
+    // Only trigger filter when cleared or when MM/DD is valid
+    if (monthDay === "" || isCompleteMonthDay(monthDay)) {
+      resetPagination()
+    }
+  }, 500)
 
-  // filter keywords list (using dynamic list from Airtable)
-  const getFilteredKeywords = () => {
-    const source = allKeywords.length ? allKeywords : []
-    if (!keywordSearchQuery.trim()) return source
+  return () => clearTimeout(timer)
+}, [monthDay])
 
-    const query = keywordSearchQuery.toLowerCase()
-    return source
-      .filter((keyword) => keyword.toLowerCase().includes(query))
-      .sort((a, b) => {
-        const aLower = a.toLowerCase()
-        const bLower = b.toLowerCase()
-        if (aLower.startsWith(query) && !bLower.startsWith(query)) return -1
-        if (!aLower.startsWith(query) && bLower.startsWith(query)) return 1
-        return a.localeCompare(b)
-      })
-  }
+// filter keywords list (using dynamic list from Airtable)
+const getFilteredKeywords = () => {
+  const source = allKeywords.length ? allKeywords : []
+  if (!keywordSearchQuery.trim()) return source
+
+  const query = keywordSearchQuery.toLowerCase()
+  return source
+    .filter((keyword) => keyword.toLowerCase().includes(query))
+    .sort((a, b) => {
+      const aLower = a.toLowerCase()
+      const bLower = b.toLowerCase()
+      if (aLower.startsWith(query) && !bLower.startsWith(query)) return -1
+      if (!aLower.startsWith(query) && bLower.startsWith(query)) return 1
+      return a.localeCompare(b)
+    })
+}
 
   // Fetch posts (filters + pagination)
   useEffect(() => {
-    const fetchPosts = async () => {
+  const fetchPosts = async () => {
+      // If user started typing Month/Day but it's not a complete MM/DD yet, don't fetch yet
+      if (monthDay && !isCompleteMonthDay(monthDay)) {
+        return
+      }
+
       setLoading(true)
 
       try {
@@ -254,18 +319,16 @@ export default function TimelineBody() {
           )
         }
 
-        // month/day MM/DD (any year), only when fully entered
-        if (monthDay && monthDay.length === 5) {
-          const [m, d] = monthDay.split("/")
-          const monthNum = parseInt(m, 10)
-          const dayNum = parseInt(d, 10)
+        // month/day MM/DD (any year), only when valid
+if (isCompleteMonthDay(monthDay)) {
+  const [m, d] = monthDay.split("/")
+  const monthNum = parseInt(m, 10)
+  const dayNum = parseInt(d, 10)
 
-          if (!isNaN(monthNum) && !isNaN(dayNum)) {
-            clauses.push(
-              `AND(MONTH({DATE}) = ${monthNum}, DAY({DATE}) = ${dayNum})`
-            )
-          }
-        }
+  clauses.push(
+    `AND(MONTH({DATE}) = ${monthNum}, DAY({DATE}) = ${dayNum})`
+  )
+}
 
         // keyword filters
         if (filterKeywords.length > 0) {
@@ -443,23 +506,18 @@ export default function TimelineBody() {
   }
 
   const handleMonthDayChange = (value) => {
-    setMonthDay(value)
+  setMonthDay(value);
+};
 
-    // Only reset + trigger a real filter when complete (MM/DD) or cleared
-    if (value === "" || value.length === 5) {
-      resetPagination()
-    }
-  }
+const handleStartDateChange = (value) => {
+  setStartDateInput(value);
+  resetPagination();
+};
 
-  const handleStartDateChange = (value) => {
-    setStartDateInput(value)
-    resetPagination()
-  }
-
-  const handleEndDateChange = (value) => {
-    setEndDateInput(value)
-    resetPagination()
-  }
+const handleEndDateChange = (value) => {
+  setEndDateInput(value);
+  resetPagination();
+};
 
   // Search
   const handleSearch = async (e) => {
@@ -781,42 +839,40 @@ export default function TimelineBody() {
     )
   }
 
-  // AdSense init
-  useEffect(() => {
-    if (
-      typeof window !== "undefined" &&
-      window.adsbygoogle &&
-      process.env.NODE_ENV === "production"
-    ) {
-      try {
-        ;(window.adsbygoogle = window.adsbygoogle || []).push({})
-      } catch (e) {
-        console.error("AdSense error:", e)
-      }
-    }
-  }, [])
+    // AdSense init - COMMENT OUT FOR NOW
+  // useEffect(() => {
+  //   if (
+  //     typeof window !== "undefined" &&
+  //     window.adsbygoogle &&
+  //     process.env.NODE_ENV === "production"
+  //   ) {
+  //     try {
+  //       ;(window.adsbygoogle = window.adsbygoogle || []).push({})
+  //     } catch (e) {
+  //       console.error("AdSense error:", e)
+  //     }
+  //   }
+  // }, [])
 
   return (
-    <div className="bg-[#e6edf7] py-8 overflow-x-hidden">
-      {/* Ad Placement */}
-      <div className="w-full max-w-4xl mx-auto px-4 mb-6">
-        <div className="relative rounded-2xl border border-[#f8dada] bg-gradient-to-b from-[#fff8f8] to-[#fdeeee] shadow-sm px-4 py-6 min-h-[110px] flex items-center justify-center">
-          <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.12em] text-[#9ca3af]">
-            Sponsored
-          </span>
-
-          {process.env.NODE_ENV === "production" ? (
-            <AdComponent />
-          ) : (
-            <div className="text-[#9ca3af] text-sm italic">
-              Advertisement space — supporting Swift Lore 💫
-            </div>
-          )}
+       <div className="bg-[#e6edf7] py-8 overflow-x-hidden">
+      {/* ADD INTRODUCTORY TEXT HERE - New Section */}
+      <div className="max-w-6xl mx-auto px-4 mb-6">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-serif text-[#8e3e3e] mb-4">
+            Swift Lore
+          </h1>
+          <p className="text-[#6b7db3] text-lg max-w-2xl mx-auto">
+            Welcome to Swift Lore — a fan-made interactive timeline exploring 
+            Taylor Swift's career history, releases, Easter eggs, and more. 
+            Browse events, filter by keywords, or search for specific moments.
+          </p>
         </div>
       </div>
 
       {/* Filters */}
       <div className="max-w-6xl mx-auto px-4 mb-6">
+        {/* ... your existing filters code continues from here ... */}
         <div className="relative flex flex-wrap gap-2 py-4 items-center overflow-visible">
           {/* Sort By */}
           <div className="relative">
@@ -840,7 +896,6 @@ export default function TimelineBody() {
               onClick={() => {
                 const next = !showKeywordDropdown
                 setShowKeywordDropdown(next)
-                if (next) loadKeywordsIfNeeded()
               }}
             >
               <span>
@@ -1066,7 +1121,17 @@ export default function TimelineBody() {
           )}
         </div>
       </div>
-
+            {/* Ad block - COMMENT OUT FOR NOW (ONLY SHOW IN PRODUCTION AFTER APPROVAL) */}
+      {/* {process.env.NODE_ENV === "production" && (
+        <div className="w-full max-w-4xl mx-auto px-4 mb-6">
+          <div className="relative rounded-2xl border border-[#f8dada] bg-gradient-to-b from-[#fff8f8] to-[#fdeeee] shadow-sm px-4 py-6 min-h-[110px] flex items-center justify-center">
+            <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.12em] text-[#9ca3af]">
+              Sponsored
+            </span>
+            <AdComponent />
+          </div>
+        </div>
+      )} */}
       {/* Selected keywords chips */}
       {filterKeywords.length > 0 && (
         <div className="max-w-6xl mx-auto px-4 mb-4">

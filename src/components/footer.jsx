@@ -1,78 +1,87 @@
-import { Button } from "./ui/Button"
-import { useEffect } from "react"
-import AdComponent from "./ad_component";
+import { useEffect } from "react";
+import { Button } from "./ui/Button";
+// import AdComponent from "./ad_component"; // REMOVE THIS LINE
 
 export default function Footer() {
-
-  useEffect(() => {
-    // Initialize AdSense ad after component mounts (only in production)
-    if (typeof window !== 'undefined' && window.adsbygoogle && process.env.NODE_ENV === 'production') {
-      try {
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-      } catch (e) {
-        console.error("AdSense error:", e);
-      }
-    }
-  }, []);
+  // AdSense init - REMOVE OR COMMENT OUT THIS ENTIRE useEffect
+  // useEffect(() => {
+  //   if (
+  //     typeof window !== "undefined" &&
+  //     window.adsbygoogle &&
+  //     process.env.NODE_ENV === "production"
+  //   ) {
+  //     try {
+  //       // eslint-disable-next-line no-undef
+  //       (window.adsbygoogle = window.adsbygoogle || []).push({});
+  //     } catch (e) {
+  //       console.error("AdSense error:", e);
+  //     }
+  //   }
+  // }, []);
 
   return (
-    <footer className="w-full overflow-hidden">
-      <div className="relative">
-        {/* Background Image */}
-        <div className="relative w-full h-[410px]">
-          <img
-            src="/images/taylor_swift_background.jpg"
-            alt="Taylor Swift Background"
-            className="absolute inset-0 w-full h-full object-cover object-[center_20%]"
-          />
-          <div className="absolute inset-0 bg-black/30"></div>
+    <footer className="bg-gradient-to-b from-[#e8ecf7] to-[#b6c1e3] pt-0 pb-2">
+      {/* Main footer content - removed top padding and adjusted spacing */}
+      <div className="max-w-5xl mx-auto px-4 py-3">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-stretch justify-between min-h-0">
+          {/* About section - fixed height and spacing */}
+          <div className="bg-white/70 rounded-3xl shadow-sm px-4 py-3 md:px-5 md:py-4 w-full md:w-1/2 flex flex-col">
+            <h2 className="text-sm md:text-base font-semibold text-[#5a2b60] tracking-wide mb-2 logo-glow">
+              About Swift Lore
+            </h2>
+            <p className="text-xs md:text-sm text-[#4b4b63] leading-relaxed flex-1">
+              Swift Lore is a fan-crafted, interactive timeline chronicling the
+              epic life and career of Taylor Swift — from album releases and
+              Easter Eggs to dating history and iconic moments.{" "}
+              <span className="font-semibold">No era left behind.</span>
+            </p>
+
+            {/* Support buttons */}
+            <div className="mt-3 flex flex-wrap gap-2 justify-start">
+              <a
+                href="https://buymeacoffee.com/swiftlore"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button
+                  variant="secondary"
+                  className="rounded-full px-4 py-1.5 text-xs md:text-sm"
+                >
+                  Support the Site
+                </Button>
+              </a>
+              <a
+                href="https://docs.google.com/forms/d/e/1FAIpQLSc0f-asKuKOM81V3sPMusyvSkdcFr9XqrGVT0VgodPKKpkKPg/viewform?usp=header"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button
+                  variant="secondary"
+                  className="rounded-full px-4 py-1.5 text-xs md:text-sm"
+                >
+                  Submit a Suggestion
+                </Button>
+              </a>
+            </div>
+          </div>
+
+          {/* REMOVE OR COMMENT OUT THE ENTIRE AD SECTION */}
+          {/* {process.env.NODE_ENV === "production" && (
+            <div className="w-full md:w-1/2 flex">
+              <div className="relative bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-3 md:px-5 md:py-4 flex items-center justify-center card-soft glass-soft w-full aspect-square md:aspect-auto min-h-[200px]">
+                <span className="absolute top-3 left-4 text-[10px] uppercase tracking-[0.16em] text-[#9ca3af]">
+                  Sponsored
+                </span>
+                <AdComponent />
+              </div>
+            </div>
+          )} */}
         </div>
-
-        {/* Ad Placement - Fixed for mobile */}
-<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-md mx-auto">
-  <div className="relative bg-white/90 rounded-2xl border border-[#f8dada] shadow-sm px-4 py-6 min-h-[110px] flex items-center justify-center">
-    <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.12em] text-[#9ca3af]">
-      Sponsored
-    </span>
-
-    {process.env.NODE_ENV === "production" ? (
-      <AdComponent />
-    ) : (
-      <div className="text-[#9ca3af] text-sm italic">
-        Advertisement space — supporting Swift Lore 💫
-      </div>
-    )}
-  </div>
-</div>
       </div>
 
-      {/* Support Buttons */}
-      <div className="bg-[#e8ecf7] py-5 px-4">
-        <div className="flex justify-center gap-3 flex-wrap">
-          <a
-            href="https://buymeacoffee.com/swiftlore"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Button variant="secondary" className="rounded-full px-7">
-              Support Us
-            </Button>
-          </a>
-          <a
-            href="https://docs.google.com/forms/d/e/1FAIpQLSc0f-asKuKOM81V3sPMusyvSkdcFr9XqrGVT0VgodPKKpkKPg/viewform?usp=header"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Button variant="secondary" className="rounded-full px-7">
-              Submit Suggestion
-            </Button>
-          </a>
-        </div>
-      </div>
-
-      {/* Copyright - Fixed syntax error */}
-      <div className="bg-[#8a9ad4] py-3 px-4 text-center text-white">
-        <div className="flex flex-wrap justify-center items-center gap-4 text-sm">
+      {/* Bottom bar */}
+      <div className="bg-[#8a9ad4] py-2 px-4 text-center text-white mt-0">
+        <div className="max-w-5xl mx-auto flex flex-wrap justify-center items-center gap-2 md:gap-3 text-[11px] md:text-sm">
           <a
             href="/cookie_policy"
             target="_blank"
@@ -82,7 +91,10 @@ export default function Footer() {
             Cookie Policy
           </a>
 
-          <p>Copyright © 2025 Swift Lore</p>
+          <p className="mx-1">
+            Copyright © 2025 Swift Lore · Fan-made, not affiliated with Taylor
+            Swift.
+          </p>
 
           <a
             href="/privacy_policy"
@@ -95,5 +107,5 @@ export default function Footer() {
         </div>
       </div>
     </footer>
-  )
+  );
 }

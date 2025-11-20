@@ -8,11 +8,14 @@
   --background-end-rgb: 255, 255, 255;
 }
 
+/* ===== EXISTING STYLES ===== */
 body {
   color: rgb(var(--foreground-rgb));
-  background: white;
+  background: radial-gradient(circle at top, #fdf4ff 0%, #e8ecf7 35%, #f9fafb 100%);
+  -webkit-font-smoothing: antialiased;
 }
 
+/* Timeline scrollbar */
 .timeline-scroll {
   scrollbar-width: thin;
   scrollbar-color: #b66b6b #e8ecf7;
@@ -29,4 +32,86 @@ body {
 .timeline-scroll::-webkit-scrollbar-thumb {
   background-color: #b66b6b;
   border-radius: 20px;
+}
+
+/* -------------------------
+   Hero fade-in + twinkle
+   ------------------------- */
+
+.fade-in-up {
+  opacity: 0;
+  animation: fadeInUp 600ms ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.twinkle {
+  animation: twinkle 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+  0% {
+    opacity: 0.4;
+    transform: translateY(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+/* ---- GLOBAL DEPTH POLISH ---- */
+.card-soft {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.glass-soft {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(8px);
+}
+
+.logo-glow {
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.35));
+}
+
+/* ---- TWINKLE SPARKLES ---- */
+.sparkle {
+  animation: sparkleFade 3s infinite ease-in-out;
+  opacity: 0.6;
+}
+
+@keyframes sparkleFade {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+/* ---- FADE IN ON SCROLL ---- */
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s ease;
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
 }

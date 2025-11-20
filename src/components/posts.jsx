@@ -1,14 +1,8 @@
 // src/components/Posts.jsx
-import Header_2 from './header_2';
-import TimelineBody from './timeline-body';
-import Footer from './footer';
+import TimelineBody from "./timeline-body";
 
 export default function Posts() {
-    return (
-    <>
-      <Header_2 />
-      <TimelineBody />
-      <Footer />
-    </>
-    );
+  // Just render the full timeline body.
+  // The global Layout in App.jsx will wrap this with Header + Footer.
+  return <TimelineBody />;
 }

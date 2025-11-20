@@ -7,143 +7,318 @@ export default function Header() {
   const navigate = useNavigate()
   const location = useLocation()
   const [searchQuery, setSearchQuery] = useState("")
-  
-  // Sync search query with URL params
+  const [eventData, setEventData] = useState(null)
+
+  const isFullTimelinePage = location.pathname === "/posts"
+  const isEventPage = location.pathname === "/post_details"
+  const showHero = !isFullTimelinePage && !isEventPage
+
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search)
-    const queryFromUrl = urlParams.get('q')
+    const queryFromUrl = urlParams.get("q")
     if (queryFromUrl) {
       setSearchQuery(queryFromUrl)
+    } else {
+      setSearchQuery("")
     }
   }, [location.search])
+
+  // Fetch event data when on event page
+  useEffect(() => {
+    if (isEventPage) {
+      const searchParams = new URLSearchParams(location.search)
+      const postId = searchParams.get("id")
+      
+      if (postId) {
+        const fetchEventData = async () => {
+          try {
+            const response = await fetch(
+              `https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker/${postId}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+                },
+              }
+            )
+            
+            if (response.ok) {
+              const data = await response.json()
+              setEventData(data.fields)
+            }
+          } catch (error) {
+            console.error("Error fetching event data for header:", error)
+          }
+        }
+        
+        fetchEventData()
+      }
+    }
+  }, [isEventPage, location.search])
+
+  // Safe date formatting function
+  const formatEventDate = (isoDate) => {
+    if (!isoDate) return ""
+    
+    try {
+      const d = new Date(isoDate)
+      if (Number.isNaN(d.getTime())) return ""
+
+      const month = d.toLocaleString("en-US", {
+        month: "short",
+        timeZone: "UTC",
+      })
+      const day = String(d.getUTCDate()).padStart(2, "0")
+      const year = d.getUTCFullYear()
+
+      return `${month}-${day}-${year}`
+    } catch (error) {
+      console.error("Error formatting date:", error)
+      return ""
+    }
+  }
 
   const handleSearch = (e) => {
     e.preventDefault()
     const trimmedQuery = searchQuery.trim()
-    
     if (!trimmedQuery) {
-      navigate('/')
+      navigate("/")
       return
     }
 
-    // Force first letter uppercase (e.g., "travis" → "Travis")
-    const formattedQuery = 
+    const formattedQuery =
       trimmedQuery.charAt(0).toUpperCase() + trimmedQuery.slice(1)
-    
+
     navigate(`/?q=${encodeURIComponent(formattedQuery)}`)
   }
 
-  const handleInputChange = (e) => {
-    setSearchQuery(e.target.value)
-  }
+  const handleInputChange = (e) => setSearchQuery(e.target.value)
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch(e)
-    }
+    if (e.key === "Enter") handleSearch(e)
   }
 
   const handleLogoClick = () => {
     setSearchQuery("")
-    navigate('/')
+    navigate("/")
   }
 
   return (
-   <header className="w-full bg-[#8a9ad4] py-0 md:py-0.5 px-1 sm:px-3 md:px-5 relative overflow-visible z-10">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-0 md:gap-4">
-          
-          {/* Logo section - Bigger mobile logo */}
-          <div className="w-full flex justify-center md:justify-start md:w-[55%] relative z-20 overflow-visible">
-            <div
-              className="w-full max-w-[600px] md:max-w-[900px] cursor-pointer mb-0 md:mb-0 -mt-4 md:-mt-10 transform tranlate-y-0 md:translate-y-5" 
-              onClick={handleLogoClick}
-            >
-              <img 
-                src="/images/swift_lore.png" 
-                alt="Swift Lore" 
-                className="w-full h-auto object-contain min-h-[250px] max-h-[250px] md:min-h-[260px] md:max-h-[260px]"
-              />
-            </div>
-          </div>
- 
-        {/* Content section - Better mobile layout */}
-        <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-2 md:gap-3.5 md:mt-1 text-center md:text-left transform -translate-y-5 md:translate-y-0"> 
-          <div className="w-64 md:w-full md:max-w-xs">
-            <p className="text-white text-[10px] md:text-xs leading-tight md:leading-relaxed text-justfiy 
-              -translate-y-3.5 md:translate-y-0">
-              A fan-crafted, interactive timeline chronicling the epic life and career of Taylor Swift.
-              Explore everything from album releases and Easter Eggs to dating history and iconic moments. 
-              Dive into the lore!
-            </p>
-          </div>
+    <header className="relative w-full bg-gradient-to-b from-[#9fa8f5] via-[#8a9ad4] to-[#e6edf7] pb-2 md:pb-3 shadow-[0_10px_30px_rgba(75,85,160,0.35)] fade-in-up overflow-visible z-10">
+      {/* Compact decorative glow */}
+      <div className="pointer-events-none absolute -top-4 left-1/2 -translate-x-1/2 md:left-12 md:translate-x-0 w-40 h-40 blur-2xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
 
-          {/* Search Bar - Longer on mobile */}
-          <div className="w-64 md:w-full md:max-w-xs -translate-y-2 md:translate-y-0">
-            <form onSubmit={handleSearch} className="relative">
-              <input
-                type="text"
-                placeholder="Search events, locations, categories..."
-                value={searchQuery}
-                onChange={handleInputChange}
-                onKeyPress={handleKeyPress}
-                className="w-full rounded-full py-1 md:py-1.5 pl-5 md:pl-6 pr-2 md:pr-2.5 text-[10px] md:text-xs bg-white/80 text-gray-800 focus:outline-none focus:ring-2 focus:ring-white"
-                inputMode="search"
-                enterKeyHint="search"
-                autoCapitalize="none"
-                autoCorrect="off"
-                spellCheck="false"
-              />
-              <button 
-                type="submit"
-                className="absolute inset-y-0 left-1 md:left-1.5 flex items-center pointer-events-auto hover:text-gray-600 transition-colors"
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 pt-4 md:pt-5 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 relative">
+        
+        {/* MOBILE-FIRST LAYOUT: Full Timeline Page */}
+        {isFullTimelinePage && !isEventPage && (
+          <>
+            {/* Mobile: Centered logo and button on top */}
+            <div className="w-full md:hidden flex flex-col items-center gap-4">
+              <button
+                type="button"
+                onClick={handleLogoClick}
+                className="cursor-pointer"
               >
-                <svg
-                  className="h-2.5 w-2.5 md:h-3 md:w-3 text-gray-400"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <path d="m21 21-4.3-4.3"></path>
-                </svg>
+                <img
+                  src="/images/swift_lore.png"
+                  alt="Swift Lore"
+                  className="h-auto object-contain max-h-[100px] logo-glow"
+                  style={{ maxWidth: '180px' }}
+                />
               </button>
-              {searchQuery && (
+              <button
+                onClick={() => navigate("/")}
+                className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+              >
+                Return to Home
+              </button>
+            </div>
+
+            {/* Mobile: Timeline text below */}
+            <div className="w-full md:hidden flex flex-col items-center mt-4">
+              <h2 className="text-white text-2xl font-serif drop-shadow-lg tracking-wide text-center">
+                Taylor Swift's Career Timeline
+              </h2>
+            </div>
+
+            {/* Desktop: Original layout */}
+            <div className="hidden md:flex md:w-[40%] flex-col items-start">
+              <h2 className="text-white text-3xl md:text-4xl font-serif drop-shadow-lg tracking-wide text-left">
+                Taylor Swift's Career Timeline
+              </h2>
+            </div>
+            <div className="hidden md:flex md:w-[30%] flex-col items-end">
+              <div className="flex justify-end w-full">
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-1.5 flex items-center"
-                  onClick={() => {
-                    setSearchQuery("")
-                    navigate('/')
-                  }}
+                  onClick={handleLogoClick}
+                  className="cursor-pointer flex justify-end"
                 >
-                  <svg
-                    className="h-2.5 w-2.5 md:h-3 md:w-3 text-gray-500"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                  </svg>
+                  <img
+                    src="/images/swift_lore.png"
+                    alt="Swift Lore"
+                    className="h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow"
+                    style={{ maxWidth: '200px' }}
+                  />
                 </button>
-              )}
-            </form>
-          </div>
+              </div>
+              <div className="flex justify-end w-full mt-2 pr-2 md:pr-4">
+                <button
+                  onClick={() => navigate("/")}
+                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+                >
+                  Return to Home
+                </button>
+              </div>
+            </div>
+          </>
+        )}
 
+        {/* MOBILE-FIRST LAYOUT: Event Page */}
+{isEventPage && (
+  <>
+    {/* Mobile: Logo + buttons on top */}
+    <div className="w-full md:hidden flex flex-col items-center gap-4 mb-4">
+      <button
+        type="button"
+        onClick={handleLogoClick}
+        className="cursor-pointer"
+      >
+        <img
+          src="/images/swift_lore.png"
+          alt="Swift Lore"
+          className="h-auto object-contain max-h-[100px] logo-glow"
+          style={{ maxWidth: "180px" }}
+        />
+      </button>
+      <div className="flex gap-3">
+        <button
+          onClick={() => navigate("/")}
+          className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+        >
+          Return to Home
+        </button>
+        <button
+          onClick={() => navigate("/posts")}
+          className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+        >
+          View Full Timeline
+        </button>
+      </div>
+    </div>
+
+    {/* Mobile: Event info below */}
+    <div className="w-full md:hidden flex flex-col items-center text-center">
+      <h2 className="text-white text-2xl font-serif drop-shadow-lg tracking-wide">
+        {eventData?.EVENT || "Loading event..."}
+      </h2>
+      {eventData?.DATE && (
+        <p className="text-white/90 text-sm font-medium drop-shadow-md mt-1">
+          {formatEventDate(eventData.DATE)}
+        </p>
+      )}
+    </div>
+
+        {/* Desktop: left = event info, right = logo + buttons */}
+    <div className="hidden md:flex md:w-[55%] flex-col items-start">
+      <h2 className="text-white text-3xl md:text-4xl font-serif drop-shadow-lg tracking-wide text-left">
+        {eventData?.EVENT || "Loading event..."}
+      </h2>
+      {eventData?.DATE && (
+        <p className="text-white/90 text-sm md:text-base font-medium drop-shadow-md text-left mt-1">
+          {formatEventDate(eventData.DATE)}
+        </p>
+      )}
+    </div>
+
+    <div className="hidden md:flex md:w-[35%] flex-col items-end">
+      {/* Logo container with centered alignment */}
+      <div className="flex flex-col items-center w-full">
+        <button
+          type="button"
+          onClick={handleLogoClick}
+          className="cursor-pointer flex justify-center w-full"
+        >
+          <img
+            src="/images/swift_lore.png"
+            alt="Swift Lore"
+            className="h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow"
+            style={{ maxWidth: "200px" }}
+          />
+        </button>
+
+        {/* Buttons container - centered under logo */}
+        <div className="flex gap-3 mt-3 justify-center w-full">
           <button
-            className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-2.5 md:px-4 py-1 md:py-1.5 font-semibold text-[10px] md:text-xs w-32 md:w-auto mb-1 -translate-y-1 md:translate-y-0"
+            onClick={() => navigate("/")}
+            className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+          >
+            Return to Home
+          </button>
+          <button
             onClick={() => navigate("/posts")}
+            className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
           >
             View Full Timeline
           </button>
         </div>
       </div>
+    </div>
+  </>
+)}
+
+        {/* CENTER: Logo section for Home Page (unchanged) */}
+        {!isFullTimelinePage && !isEventPage && (
+          <div className="w-full flex flex-col items-center relative z-20 overflow-visible">
+            <button
+              type="button"
+              onClick={handleLogoClick}
+              className="w-full max-w-[800px] cursor-pointer relative -mt-2 md:-mt-4"
+            >
+              <span className="absolute left-8 md:left-12 top-8 md:top-10 text-white/80 text-xl md:text-3xl twinkle">
+                ✨
+              </span>
+              <span className="absolute right-10 md:right-16 top-6 md:top-8 text-white/80 text-2xl md:text-4xl twinkle">
+                ✨
+              </span>
+              <span className="absolute right-20 md:right-28 bottom-8 md:bottom-12 text-white/80 text-lg md:text-2xl twinkle">
+                ✨
+              </span>
+
+              <img
+                src="/images/swift_lore.png"
+                alt="Swift Lore"
+                className="w-full h-auto object-contain max-h-[200px] md:max-h-[240px] logo-glow"
+              />
+            </button>
+          </div>
+        )}
+
+                {/* Home page content - search + CTA only */}
+        {showHero && (
+          <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-3 text-center md:text-left relative z-20">
+            <div className="w-full max-w-xs">
+              <form onSubmit={handleSearch} className="relative">
+                <input
+                  type="text"
+                  placeholder="Search events, locations, categories..."
+                  value={searchQuery}
+                  onChange={handleInputChange}
+                  onKeyPress={handleKeyPress}
+                  className="w-full rounded-full py-2 pl-7 pr-4 text-sm bg-white/90 text-gray-800 shadow focus:outline-none focus:ring-2 focus:ring-[#fbb1c3]"
+                />
+              </form>
+            </div>
+
+            <button
+              className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-2 font-semibold text-sm w-auto shadow transition-transform hover:-translate-y-0.5 whitespace-nowrap"
+              onClick={() => navigate("/posts")}
+            >
+              View Full Timeline
+            </button>
+          </div>
+        )}
+      </div>
     </header>
-  )
+  );
 }

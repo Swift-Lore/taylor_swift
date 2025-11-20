@@ -1,9 +1,9 @@
-// post_detail_body.jsx
+"use client";
 
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import AdComponent from "./ad_component";
+// import AdComponent from "./ad_component"; // COMMENT OUT FOR NOW
 import Microlink from "@microlink/react";
 import "./post_detail_body.css";
 
@@ -35,19 +35,18 @@ const isLikelyImage = (url) => {
   );
 };
 
-// Format DATE field as "Nov-07-2025" (force UTC so it doesn’t shift by timezone)
+// Format DATE field as "Nov-07-2025" (force UTC so it doesn't shift by timezone)
 const formatEventDate = (isoDate) => {
   if (!isoDate) return "";
   const d = new Date(isoDate);
   if (Number.isNaN(d.getTime())) return "";
 
-  // Force UTC interpretation
   const month = d.toLocaleString("en-US", {
     month: "short",
     timeZone: "UTC",
-  }); // "Nov"
-  const day = String(d.getUTCDate()).padStart(2, "0"); // "07"
-  const year = d.getUTCFullYear();                     // 2025
+  });
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  const year = d.getUTCFullYear();
 
   return `${month}-${day}-${year}`;
 };
@@ -141,7 +140,7 @@ export default function PostDetailBody() {
   };
 
   const handleBackToTimeline = () => {
-    navigate("/timeline");
+    navigate("/posts");
   };
 
   const formatNotes = (notes) => {
@@ -164,9 +163,10 @@ export default function PostDetailBody() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isModalOpen, selectedImageIndex, event?.IMAGE]);
 
-  // Social media embeds script loading
+  // Social media embeds script loading (Instagram, Twitter, Getty)
   useEffect(() => {
     if (!event) return;
 
@@ -177,8 +177,14 @@ export default function PostDetailBody() {
         script.src = "//www.instagram.com/embed.js";
         script.async = true;
         document.body.appendChild(script);
-      } else if (window.instgrm) {
-        window.instgrm.Embeds.process();
+      } else {
+        if (window.instgrm) {
+          window.instgrm.Embeds.process();
+        } else {
+          setTimeout(() => {
+            if (window.instgrm) window.instgrm.Embeds.process();
+          }, 1000);
+        }
       }
     };
 
@@ -197,7 +203,10 @@ export default function PostDetailBody() {
       }
     };
 
-    if (event.INSTAGRAM) loadInstagramScript();
+    if (event.INSTAGRAM) {
+      loadInstagramScript();
+      setTimeout(loadInstagramScript, 500);
+    }
     if (event.TWITTER) loadTwitterScript();
 
     if (event["GETTY EMBED"] && !document.getElementById("getty-embed-script")) {
@@ -208,6 +217,27 @@ export default function PostDetailBody() {
       document.body.appendChild(script);
     }
   }, [event]);
+
+  // TikTok embed script loading
+  useEffect(() => {
+    if (!event?.TIKTOK) return;
+
+    const existing = document.getElementById("tiktok-embed-script");
+    const timestamp = Date.now();
+
+    const script = document.createElement("script");
+    script.id = "tiktok-embed-script";
+    script.src = `https://www.tiktok.com/embed.js?t=${timestamp}`;
+    script.async = true;
+
+    if (existing && existing.parentNode) {
+      existing.parentNode.removeChild(existing);
+    }
+
+    document.body.appendChild(script);
+
+    // no special cleanup needed
+  }, [event?.TIKTOK]);
 
   // Loading / missing state
   if (loading) {
@@ -241,44 +271,34 @@ export default function PostDetailBody() {
   const hasNotes = !!event.NOTES && event.NOTES.trim() !== "";
   const hasSources = nonImageLinks.length > 0 || sourceImages.length > 0;
 
+  // ---- MAIN RENDER ----
   return (
-  <div className="bg-[#e6edf7] py-8 md:py-12">
-    {/* Ad Placement */}
-    {/* Sponsored ad block above Notes */}
-    <div className="w-full max-w-4xl mx-auto px-4 mb-6 mt-8">
-      <div className="relative rounded-2xl border border-[#f8dada] bg-gradient-to-b from-[#fff8f8] to-[#fdeeee] shadow-sm px-4 py-6 min-h-[110px] flex items-center justify-center">
-        <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.12em] text-[#9ca3af]">
-          Sponsored
-        </span>
-
-        {process.env.NODE_ENV === "production" ? (
-          <AdComponent />
-        ) : (
-          <div className="text-[#9ca3af] text-sm italic">
-            Advertisement space — supporting Swift Lore 💫
-          </div>
+    <div className="bg-[#e6edf7] py-8 md:py-12">
+      {/* Compact title/date block */}
+      <section className="max-w-4xl mx-auto px-4 mt-2 mb-8 text-center">
+        {event.EVENT && (
+          <h2 className="text-xl md:text-2xl font-serif text-[#8e3e3e] leading-snug">
+            {event.EVENT}
+          </h2>
         )}
-      </div>
-    </div>
-
-    {/* Compact repeat of title + date for clean screenshots */}
-    <section className="max-w-4xl mx-auto px-4 mt-2 mb-8 text-center">
-      {event.EVENT && (
-        <h2 className="text-xl md:text-2xl font-serif text-[#8e3e3e] leading-snug">
-          {event.EVENT}
-        </h2>
-      )}
-      {event.DATE && (
-        <p className="mt-1 text-sm md:text-base text-[#6b7db3]">
-          {formatEventDate(event.DATE)}
-        </p>
-      )}
-    </section>
+        {event.DATE && (
+          <p className="mt-1 text-sm md:text-base text-[#6b7db3]">
+            {formatEventDate(event.DATE)}
+          </p>
+        )}
+              {/* No Notes Fallback */}
+{!event.NOTES && (
+  <p className="mt-3 text-sm md:text-base text-[#8e3e3e] font-medium italic leading-relaxed px-2">
+    No additional notes are available for this event yet, but more context may be
+    added later as Swift Lore expands its archive of Taylor Swift’s releases,
+    performances, interviews, and cultural milestones.
+  </p>
+)}
+</section>
 
       {/* NOTES + SOURCES */}
       {(hasNotes || hasSources) && (
         <section className="max-w-4xl mx-auto px-4 mb-10">
-          {/* Notes inline, like your old layout */}
           {hasNotes && (
             <div className="text-sm md:text-base text-[#111827] leading-relaxed mb-6">
               <span className="font-semibold">Notes: </span>
@@ -286,10 +306,8 @@ export default function PostDetailBody() {
             </div>
           )}
 
-          {/* Sources, but without big labels/frames */}
           {hasSources && (
             <div className="space-y-6">
-              {/* Direct image links */}
               {sourceImages.length > 0 && (
                 <div className="image-only-grid flex flex-wrap gap-6 justify-start">
                   {sourceImages.map((url, index) => (
@@ -321,7 +339,6 @@ export default function PostDetailBody() {
                 </div>
               )}
 
-              {/* Non-image links (Microlink) */}
               {nonImageLinks.length > 0 && (
                 <div className="microlink-grid">
                   {nonImageLinks.map((url, index) => (
@@ -338,15 +355,17 @@ export default function PostDetailBody() {
                             if (fallback) fallback.style.display = "flex";
                           }}
                           fallback={{
-                            image: `https://logo.clearbit.com/${
-                              new URL(url).hostname
-                            }`,
+                            image: `https://logo.clearbit.com/${new URL(
+                              url
+                            ).hostname}`,
                             title: url
                               .split("/")
                               .slice(-1)[0]
                               .replace(/[-_]/g, " "),
-                            description: new URL(url)
-                              .hostname.replace("www.", ""),
+                            description: new URL(url).hostname.replace(
+                              "www.",
+                              ""
+                            ),
                           }}
                         />
                       </div>
@@ -413,18 +432,32 @@ export default function PostDetailBody() {
       {/* YouTube */}
       {hasVideos && (
         <section className="max-w-4xl mx-auto px-4 mb-10">
-          <div className="flex flex-col items-center gap-6 mt-2">
-            {event.YOUTUBE?.split(",").map((url, index) => {
-              const videoId = getYouTubeVideoId(url.trim());
+          <div
+            className={`mt-2 ${
+              event.YOUTUBE?.split(/,\s*|\s*\|\|\s*/).length > 1
+                ? "grid grid-cols-1 md:grid-cols-2 gap-6"
+                : "flex flex-col items-center gap-6"
+            }`}
+          >
+            {event.YOUTUBE?.split(/,\s*|\s*\|\|\s*/).map((url, index) => {
+              const trimmedUrl = url.trim();
+              const videoId = getYouTubeVideoId(trimmedUrl);
+
               return videoId ? (
-                <div key={index} className="w-full max-w-4xl">
-                  <iframe
-                    src={`https://www.youtube.com/embed/${videoId}`}
-                    title={`YouTube Video ${index + 1}`}
-                    className="w-full aspect-video rounded-xl"
-                    frameBorder="0"
-                    allowFullScreen
-                  ></iframe>
+                <div key={index} className="w-full">
+                  <div
+                    className="relative"
+                    style={{ paddingBottom: "56.25%" }}
+                  >
+                    <iframe
+                      src={`https://www.youtube.com/embed/${videoId}`}
+                      title={`YouTube Video ${index + 1}`}
+                      className="absolute top-0 left-0 w-full h-full rounded-xl"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
                 </div>
               ) : null;
             })}
@@ -434,23 +467,28 @@ export default function PostDetailBody() {
 
       {/* Instagram */}
       {event.INSTAGRAM && (
-        <section className="max-w-4xl mx-auto px-4 mb-10">
-          <div className="flex flex-wrap justify-center gap-4 mt-2">
+        <section className="w-full px-4 mb-10">
+          <div className="flex flex-wrap justify-center gap-6 mt-2">
             {event.INSTAGRAM.split(" || ").map((rawUrl, index) => {
               const url = rawUrl.trim().split("?")[0];
               return url ? (
-                <div key={index} className="instagram-container max-w-sm">
+                <div
+                  key={index}
+                  className="instagram-container flex-shrink-0"
+                  style={{ width: "320px" }}
+                >
                   <blockquote
                     className="instagram-media"
                     data-instgrm-permalink={url}
                     data-instgrm-version="14"
                     style={{
                       background: "#FFF",
-                      borderRadius: "3px",
+                      borderRadius: "8px",
                       border: "1px solid #dbdbdb",
-                      boxShadow: "none",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                       margin: "0",
-                      minWidth: "326px",
+                      width: "320px",
+                      minWidth: "320px",
                       padding: "0",
                     }}
                   ></blockquote>
@@ -467,9 +505,8 @@ export default function PostDetailBody() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2 w-full">
             {event.TWITTER.split(/ \|\| |\s+/).map((url, index) => {
               const cleanUrl = url.trim().replace("x.com", "twitter.com");
-              const isValid = /^https:\/\/twitter\.com\/[^/]+\/status\/\d+/.test(
-                cleanUrl
-              );
+              const isValid =
+                /^https:\/\/twitter\.com\/[^/]+\/status\/\d+/.test(cleanUrl);
               return isValid ? (
                 <div key={index} className="twitter-container w-full">
                   <blockquote className="twitter-tweet" data-lang="en">
@@ -481,7 +518,33 @@ export default function PostDetailBody() {
           </div>
         </section>
       )}
+{/* TikTok */}
+      {event.TIKTOK && (
+        <section className="max-w-6xl mx-auto px-4 mb-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center mt-2">
+            {event.TIKTOK.split(" || ").map((raw, index) => {
+              const cleanUrl = raw.trim();
+              if (!cleanUrl) return null;
 
+              const videoId =
+                cleanUrl.split("/video/")[1]?.split("?")[0] ||
+                cleanUrl.split("/t/")[1]?.split("/")[0];
+
+              return (
+                <div key={index} className="tiktok-wrapper">
+                  <blockquote
+                    className="tiktok-embed"
+                    cite={cleanUrl}
+                    data-video-id={videoId || undefined}
+                  >
+                    <a href={cleanUrl}></a>
+                  </blockquote>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
       {/* Image Modal */}
       <AnimatePresence>
         {isModalOpen && (
@@ -511,9 +574,7 @@ export default function PostDetailBody() {
                 } else if (selectedImageIndex < totalImages) {
                   return (
                     <img
-                      src={
-                        sourceImages[selectedImageIndex - imageArrayLength]
-                      }
+                      src={sourceImages[selectedImageIndex - imageArrayLength]}
                       alt="Full view"
                       className="max-w-full max-h-[80vh] object-contain rounded-lg"
                     />

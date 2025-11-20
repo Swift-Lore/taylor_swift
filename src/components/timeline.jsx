@@ -12,69 +12,13 @@ export default function Timeline() {
   const navigate = useNavigate()
   const [showScrollHint, setShowScrollHint] = useState(true)
   const [records, setRecords] = useState([])
-  const [screenScale, setScreenScale] = useState(1)
-  const [isLoading, setIsLoading] = useState(true)   // 👈 NEW
+  const [isLoading, setIsLoading] = useState(true)
 
-  // Use the visitor's *local* date for "today"
   const today = new Date()
   const [currentMonth, setCurrentMonth] = useState(today.getMonth() + 1)
   const [currentDay, setCurrentDay] = useState(today.getDate())
 
-  // Dummy year just for pretty label between Prev/Next
   const displayDate = new Date(2020, currentMonth - 1, currentDay)
-
-  // ===== dynamic scale =====
-  useEffect(() => {
-    const calculateScale = () => {
-      const screenWidth = window.screen.width
-      const screenHeight = window.screen.height
-      const pixelDensity = window.devicePixelRatio || 1
-
-      const effectiveWidth = screenWidth * pixelDensity
-      const effectiveHeight = screenHeight * pixelDensity
-
-      console.log(
-        `Screen: ${screenWidth}x${screenHeight}, Pixel Density: ${pixelDensity}, Effective: ${effectiveWidth}x${effectiveHeight}`
-      )
-
-      let scale = 1
-
-      if (effectiveWidth >= 5120) {
-        scale = 0.51
-      } else if (effectiveWidth >= 3840) {
-        scale = 0.55
-      } else if (effectiveWidth >= 2560) {
-        scale = 0.6
-      } else if (effectiveWidth >= 1920) {
-        scale = 0.72
-      } else if (effectiveWidth >= 1440) {
-        scale = 0.77
-      } else {
-        scale = 0.85
-      }
-
-      const viewportWidth = window.innerWidth
-      if (viewportWidth >= 1536) {
-        scale *= 0.81
-      } else if (viewportWidth >= 1280) {
-        scale *= 0.85
-      } else if (viewportWidth >= 1024) {
-        scale *= 0.89
-      }
-
-      console.log(`Applied scale: ${scale}`)
-      setScreenScale(scale)
-    }
-
-    calculateScale()
-
-    const handleResize = () => {
-      setTimeout(calculateScale, 100)
-    }
-
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
 
   // ===== prev / next day =====
   const handleNextDay = () => {
@@ -111,15 +55,15 @@ export default function Timeline() {
       }
 
       try {
-        setIsLoading(true)                    // 👈 start loading
+        setIsLoading(true)
         const fetched = await fetchByDate()
         setRecords(fetched)
         console.log("Fetched records:", fetched)
       } catch (error) {
         console.error("Error fetching records:", error)
-        setRecords([])                        // optional: clear on error
+        setRecords([])
       } finally {
-        setIsLoading(false)                   // 👈 done loading
+        setIsLoading(false)
       }
     }
 
@@ -143,23 +87,20 @@ export default function Timeline() {
     return () => timelineElement?.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // ===== Card component (used for mobile & desktop) =====
+  // ===== Card component =====
   const TimelineCard = ({ record, index }) => {
-    const navigate = useNavigate()
 
-    // click on a tag = go to /posts?keyword=...
     const handleTagClick = (e, keyword) => {
-      e.preventDefault() // don’t follow the card link
+      e.preventDefault()
       e.stopPropagation()
       navigate(`/posts?keyword=${encodeURIComponent(keyword)}`)
     }
 
-    // the whole card is now a <Link>, so right-click / cmd-click works
     return (
       <Link
         to={`/post_details?id=${record.id}`}
-        className="block relative mt-[43px] cursor-pointer hover:opacity-95 transition-opacity"
-        style={{ marginTop: index === 0 ? "17px" : "" }}
+        className="block relative cursor-pointer hover:opacity-95 transition-opacity"
+        style={{ marginTop: index === 0 ? "17px" : "43px" }}
       >
         <div className="relative">
           <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
@@ -186,15 +127,12 @@ export default function Timeline() {
                   {record?.fields?.EVENT || "Event description unavailable"}
                 </h3>
 
-                {/* Notes */}
-                {record?.fields?.NOTES && (
-                  <p className="text-xs md:text-sm text-center font-medium text-gray-700 leading-relaxed">
-                    {record.fields.NOTES}
-                  </p>
-                )}
-
-                {/* Divider line */}
-                <div className="w-full h-[1px] bg-[#8e3e3e] rounded-full opacity-60"></div>
+                {/* Notes with line breaks */}
+{record?.fields?.NOTES && (
+  <div className="text-xs md:text-sm text-center font-medium text-gray-700 leading-relaxed whitespace-pre-line">
+    {record.fields.NOTES}
+  </div>
+)}
 
                 {/* Keywords section with clickable tags */}
                 {record?.fields?.KEYWORDS && record.fields.KEYWORDS.length > 0 && (
@@ -223,171 +161,172 @@ export default function Timeline() {
       </Link>
     )
   }
-
   // ===== JSX =====
-  return (
-    <section className="w-full bg-[#e8ecf7] py-3 md:py-7 px-2 md:px-10 flex-grow">
-      <div className="container mx-auto h-full flex flex-col">
-        {/* On This Day Section */}
-        <div className="text-center mb-1 md:mb-3 transform translate-x-0 md:translate-x-[-19px]">
-          <div className="relative w-full mb-2 md:mb-3 px-2 md:px-5">
-            <div className="relative w-full px-2 md:px-3 py-2.5 md:py-5 bg-[#e8eef9]">
-              <div className="max-w-4xl mx-auto text-center">
-                <h2 className="text-lg sm:text-xl md:text-2xl lg:text-5xl font-serif text-[#8e3e3e] text-center">
-                  <span className="block">ON THIS DAY</span>
-                  <span className="text-base sm:text-sm md:text-xl lg:text-2xl block mt-1">
-                    in Taylor Swift's History
-                  </span>
-                </h2>
-              </div>
-
-              <div className="absolute left-1 sm:left-2 md:left-3 lg:left-7 top-1/2 transform -translate-y-1/2">
-                <img
-                  src="/images/star.png"
-                  alt="Star"
-                  className="w-[26px] h-[26px] sm:w-[34px] sm:h-[34px] md:w-[56px] md:h-[56px] lg:w-[85px] lg:h-[85px]"
-                />
-              </div>
-
-              <div className="absolute right-1 sm:right-2 md:right-3 lg:right-7 top-1/2 transform -translate-y-1/2">
-                <img
-                  src="/images/star.png"
-                  alt="Star"
-                  className="w-[26px] h-[26px] sm:w-[34px] sm:h-[34px] md:w-[56px] md:h-[56px] lg:w-[85px] lg:h-[85px]"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-center gap-1 sm:gap-2 md:gap-3 my-2 md:my-3">
-            <Button
-              variant="secondary"
-              className="rounded-full px-2 sm:px-3 md:px-5 text-xs sm:text-sm flex items-center gap-1 md:gap-2 mr-2.5"
-              onClick={handlePreviousDay}
-            >
-              <ChevronLeft size={10} className="md:size-14" />
-              <span className="hidden sm:inline">Previous Day</span>
-              <span className="sm:hidden mr-1.5">Prev</span>
-            </Button>
-
-            <div className="bg-white rounded-full px-3 sm:px-5 md:px-7 py-1 md:py-1.5 min-w-[102px] sm:min-w-[136px] md:min-w-[170px] border border-[#b66b6b]">
-              <span className="text-[#8e3e3e] text-sm md:text-base font-medium">
-                {displayDate.toLocaleDateString("en-US", {
-                  month: "long",
-                  day: "numeric",
-                })}
-              </span>
-            </div>
-
-            <Button
-              variant="secondary"
-              className="rounded-full px-2 sm:px-3 md:px-5 text-xs sm:text-sm flex items-center gap-1 md:gap-2 ml-2.5"
-              onClick={handleNextDay}
-            >
-              <span className="hidden sm:inline">Next Day</span>
-              <span className="sm:hidden ml-1.5">Next</span>
-              <ChevronRight size={10} className="md:size-14" />
-            </Button>
-          </div>
+return (
+  <section className="w-full bg-[#e8ecf7] py-2 px-2 md:px-10 flex flex-col min-h-0">
+    <div className="container mx-auto flex flex-col min-h-0 flex-1">
+           {/* Homepage Intro for SEO / AdSense */}
+      <div className="max-w-3xl mx-auto mt-4 mb-8 px-4">
+        <div className="bg-white/70 border border-[#e3d5dd] rounded-2xl shadow-sm px-5 py-4 md:px-8 md:py-5 text-center">
+          <h2 className="text-xl md:text-2xl font-semibold text-[#8e3e3e] mb-2">
+            Swift Lore: Explore Taylor Swift’s Complete Career Timeline
+          </h2>
+          <p className="text-[#6b7db3] text-sm md:text-base leading-relaxed">
+            A fan-crafted, interactive archive chronicling Taylor Swift’s life,
+            releases, and iconic moments. Dive into albums, performances, easter
+            eggs, and the evolution of her artistry, all in one place.
+          </p>
         </div>
+      </div>
 
-        {/* Event Counter */}
-        <div className="flex justify-center transform translate-x-0 md:translate-x-[-9px]">
-          <div className="bg-white rounded-full px-2 sm:px-3 md:px-4 py-1 border border-[#b66b6b] shadow-sm">
-            <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
-              <span className="text-[#8e3e3e] text-xs md:text-sm font-medium">
-                {isLoading
-                  ? "Loading events..."
-                  : `${records.length} ${records.length === 1 ? "Event" : "Events"} Found`}
-              </span>
-              <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
+      {/* ON THIS DAY Section */}
+      <div className="text-center mb-4 flex-shrink-0">
+        <div className="relative w-full mb-3 md:mb-4 px-2 md:px-5">
+          <div className="relative w-full px-3 md:px-4 py-3 md:py-4 bg-[#e8eef9] rounded-2xl">
+            <div className="max-w-3xl mx-auto text-center">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif text-[#8e3e3e]">
+                <span className="block tracking-wide">ON THIS DAY</span>
+                <span className="text-sm sm:text-base md:text-lg lg:text-xl block mt-1">
+                  across Taylor’s eras
+                </span>
+              </h2>
+
+              {/* supporting paragraph */}
+              <p className="mt-3 text-[#6b7db3] text-xs sm:text-sm md:text-base leading-relaxed px-2">
+                Each day in Taylor’s career has a story. Explore everything that
+                happened on this day across years: releases, performances,
+                interviews, and more.
+              </p>
+            </div>
+
+            {/* Side stars with softer opacity */}
+            <div className="pointer-events-none absolute left-1 sm:left-2 md:left-3 lg:left-7 top-1/2 -translate-y-1/2 opacity-70">
+              <img
+                src="/images/star.png"
+                alt="Star"
+                className="w-[26px] h-[26px] sm:w-[34px] sm:h-[34px] md:w-[56px] md:h-[56px] lg:w-[72px] lg:h-[72px]"
+              />
+            </div>
+
+            <div className="pointer-events-none absolute right-1 sm:right-2 md:right-3 lg:right-7 top-1/2 -translate-y-1/2 opacity-70">
+              <img
+                src="/images/star.png"
+                alt="Star"
+                className="w-[26px] h-[26px] sm:w-[34px] sm:h-[34px] md:w-[56px] md:h-[56px] lg:w-[72px] lg:h-[72px]"
+              />
             </div>
           </div>
         </div>
 
-        {/* Timeline Section */}
-        <div className="relative mt-5 md:mt-10 mb-3 md:mb-7 flex-grow">
-          {/* Mobile Timeline (Single Column) */}
-          <div className="md:hidden h-[60vh] overflow-y-auto relative mobile-timeline-container">
-            <div className="relative flex justify-center">
-              {/* Center line */}
-              <div className="relative w-[2px] flex flex-col items-center bg-[#e8ecf7]">
-                <div className="h-[1200px] w-[3px] bg-[#8a9ad4]"></div>
-
-                <div className="absolute left-1/2 -translate-x-1/2 top-[0px] w-4 h-4 rounded-full bg-[#6B78B4]"></div>
-                {records.slice(1, 5).map((_, index) => (
-                  <div
-                    key={`mobile-circle-${index}`}
-                    className="absolute left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#FEE6E3] border-2 border-[#6B78B4]"
-                    style={{ top: `${120 + index * 120}px` }}
-                  ></div>
-                ))}
-                <div className="absolute left-1/2 -translate-x-1/2 top-[720px] w-4 h-4 rounded-full bg-[#6B78B4]"></div>
-              </div>
-
-              {/* Mobile Timeline Items */}
-              <div className="absolute left-[17px] w-[calc(100%-26px)] space-y-[43px] pb-3">
-                {records.map((record, index) => (
-                  <TimelineCard key={`mobile-${record.id}`} record={record} index={index} />
-                ))}
-              </div>
-            </div>
-
-            {/* Scroll hint */}
-            {showScrollHint && (
-              <div className="scroll-hint bottom-0">
-                <div className="scroll-blur"></div>
-                <span className="scroll-text">Scroll down</span>
-              </div>
-            )}
-          </div>
-
-          {/* Desktop Timeline */}
-          <div className="hidden md:block">
-            <div className="relative flex justify-center">
-              {/* Center line - spans full height */}
-              <div className="absolute w-[2px] flex flex-col items-center h-full">
-                <div className="w-[5px] bg-[#8a9ad4] h-full"></div>
-                <div className="absolute left-1/2 -translate-x-1/2 top-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
-                <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
-              </div>
-
-              {/* Desktop Timeline Items */}
-              <div className="relative left-[37.5%] -translate-x-1/4 w-3/4">
-                {records.map((record, index) => (
-                  <div
-                    key={`desktop-${record.id}`}
-                    className="relative transition-all duration-300"
-                    style={{
-                      marginTop: index === 0 ? "0" : "50px",
-                    }}
-                  >
-                    <div className="transform scale-[0.90] origin-top -translate-x-1/4">
-                      <TimelineCard record={record} index={index} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* View Full Timeline Button */}
-        <div className="flex justify-center mt-1 md:mt-3">
+        {/* Date navigation */}
+        <div className="flex items-center justify-center gap-1 sm:gap-2 md:gap-3 mt-1 md:mt-2">
           <Button
             variant="secondary"
-            className="rounded-full px-5 py-1.5 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg"
-            onClick={() => {
-              navigate("/posts")
-              window.scrollTo(0, 0)
-            }}
+            className="rounded-full px-2 sm:px-3 md:px-5 text-xs sm:text-sm flex items-center gap-1 md:gap-2 mr-2.5"
+            onClick={handlePreviousDay}
           >
-            View Full Timeline
+            <ChevronLeft size={10} className="md:size-14" />
+            <span className="hidden sm:inline">Previous Day</span>
+            <span className="sm:hidden mr-1.5">Prev</span>
+          </Button>
+
+          <div className="bg-white rounded-full px-3 sm:px-5 md:px-7 py-1 md:py-1.5 min-w-[102px] sm:min-w-[136px] md:min-w-[170px] border border-[#b66b6b]">
+            <span className="text-[#8e3e3e] text-sm md:text-base font-medium">
+              {displayDate.toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+              })}
+            </span>
+          </div>
+
+          <Button
+            variant="secondary"
+            className="rounded-full px-2 sm:px-3 md:px-5 text-xs sm:text-sm flex items-center gap-1 md:gap-2 ml-2.5"
+            onClick={handleNextDay}
+          >
+            <span className="hidden sm:inline">Next Day</span>
+            <span className="sm:hidden ml-1.5">Next</span>
+            <ChevronRight size={10} className="md:size-14" />
           </Button>
         </div>
       </div>
-    </section>
-  )
-}
 
+      {/* Event Counter - simplified */}
+      <div className="flex justify-center mb-2 flex-shrink-0">
+        <div className="bg-white rounded-full px-2 sm:px-3 md:px-4 py-1 border border-[#b66b6b] shadow-sm">
+          <div className="flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
+            <span className="text-[#8e3e3e] text-xs md:text-sm font-medium">
+              {isLoading
+                ? "Loading events..."
+                : `${records.length} ${
+                    records.length === 1 ? "Event" : "Events"
+                  } Found`}
+            </span>
+            <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Timeline Section - THIS IS THE KEY PART */}
+      <div className="flex-1 min-h-0 relative">
+        
+                {/* Mobile Timeline - simple stacked cards, page scrolls normally */}
+        <div className="md:hidden mt-2 space-y-6">
+          {records.map((record, index) => (
+            <TimelineCard
+              key={`mobile-${record.id}`}
+              record={record}
+              index={index}
+            />
+          ))}
+        </div>
+
+        {/* Desktop Timeline */}
+        <div className="hidden md:block min-h-0">
+          <div className="relative flex justify-center">
+            {/* Center line - spans full height */}
+            <div className="absolute w-[2px] flex flex-col items-center h-full">
+              <div className="w-[5px] bg-[#8a9ad4] h-full"></div>
+              <div className="absolute left-1/2 -translate-x-1/2 top-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
+              <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
+            </div>
+
+            {/* Desktop Timeline Items */}
+            <div className="relative left-[37.5%] -translate-x-1/4 w-3/4">
+              {records.map((record, index) => (
+                <div
+                  key={`desktop-${record.id}`}
+                  className="relative transition-all duration-300"
+                  style={{
+                    marginTop: index === 0 ? "0" : "50px",
+                  }}
+                >
+                  <div className="transform scale-[0.90] origin-top -translate-x-1/4">
+                    <TimelineCard record={record} index={index} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* View Full Timeline Button */}
+      <div className="flex justify-center mt-2 mb-2 flex-shrink-0">
+        <Button
+          variant="secondary"
+          className="rounded-full px-5 py-1.5 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg"
+          onClick={() => {
+            navigate("/posts")
+            window.scrollTo(0, 0)
+          }}
+        >
+          View Full Timeline
+        </Button>
+      </div>
+      
+    </div>
+  </section>
+)
+}
