@@ -318,17 +318,15 @@ const getFilteredKeywords = () => {
           )
         }
 
-        // month/day MM/DD (any year), only when fully entered
-if (monthDay && monthDay.length === 5) {
+        // month/day MM/DD (any year), only when valid
+if (isCompleteMonthDay(monthDay)) {
   const [m, d] = monthDay.split("/")
   const monthNum = parseInt(m, 10)
   const dayNum = parseInt(d, 10)
 
-  if (!isNaN(monthNum) && !isNaN(dayNum)) {
-    clauses.push(
-      `AND(MONTH({DATE}) = ${monthNum}, DAY({DATE}) = ${dayNum})`
-    )
-  }
+  clauses.push(
+    `AND(MONTH({DATE}) = ${monthNum}, DAY({DATE}) = ${dayNum})`
+  )
 }
 
         // keyword filters
