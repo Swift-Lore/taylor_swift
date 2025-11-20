@@ -286,7 +286,15 @@ export default function PostDetailBody() {
             {formatEventDate(event.DATE)}
           </p>
         )}
-      </section>
+              {/* No Notes Fallback */}
+{!event.NOTES && (
+  <p className="mt-3 text-sm md:text-base text-[#8e3e3e] font-medium italic leading-relaxed px-2">
+    No additional notes are available for this event yet, but more context may be
+    added later as Swift Lore expands its archive of Taylor Swift’s releases,
+    performances, interviews, and cultural milestones.
+  </p>
+)}
+</section>
 
       {/* NOTES + SOURCES */}
       {(hasNotes || hasSources) && (
