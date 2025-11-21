@@ -502,23 +502,23 @@ export default function PostDetailBody() {
 
       {/* Twitter / X */}
       {event.TWITTER && (
-        <section className="max-w-4xl mx-auto px-4 mb-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2 w-full">
-            {event.TWITTER.split(/ \|\| |\s+/).map((url, index) => {
-              const cleanUrl = url.trim().replace("x.com", "twitter.com");
-              const isValid =
-                /^https:\/\/twitter\.com\/[^/]+\/status\/\d+/.test(cleanUrl);
-              return isValid ? (
-                <div key={index} className="twitter-container w-full">
-                  <blockquote className="twitter-tweet" data-lang="en">
-                    <a href={cleanUrl}>{cleanUrl}</a>
-                  </blockquote>
-                </div>
-              ) : null;
-            })}
+  <section className="w-full px-4 mb-10">
+    <div className="flex flex-wrap justify-center gap-6 mt-2">
+      {event.TWITTER.split(/ \|\| |\s+/).map((url, index) => {
+        const cleanUrl = url.trim().replace("x.com", "twitter.com");
+        const isValid =
+          /^https:\/\/twitter\.com\/[^/]+\/status\/\d+/.test(cleanUrl);
+        return isValid ? (
+          <div key={index} className="twitter-container flex-shrink-0" style={{ width: "320px" }}>
+            <blockquote className="twitter-tweet" data-lang="en">
+              <a href={cleanUrl}>{cleanUrl}</a>
+            </blockquote>
           </div>
-        </section>
-      )}
+        ) : null;
+      })}
+    </div>
+  </section>
+)}
 {/* TikTok */}
       {event.TIKTOK && (
         <section className="max-w-6xl mx-auto px-4 mb-10">
