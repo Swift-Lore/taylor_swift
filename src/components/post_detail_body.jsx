@@ -166,83 +166,57 @@ export default function PostDetailBody() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isModalOpen, selectedImageIndex, event?.IMAGE]);
 
-      // Social media embeds script loading (Instagram, Twitter, Getty)
-useEffect(() => {
-  if (!event) return;
+        // Social media embeds script loading (Instagram, Twitter, Getty)
+  useEffect(() => {
+    if (!event) return;
 
-  // Instagram script loading with retry logic
-  const loadInstagramWithRetry = (retryCount = 0) => {
-    // Clean up previous script
-    const existingScript = document.getElementById("instagram-embed-script");
-    if (existingScript) {
-      existingScript.remove();
+    const loadInstagramScript = () => {
+      if (!document.getElementById("instagram-embed-script")) {
+        const script = document.createElement("script");
+        script.id = "instagram-embed-script";
+        script.src = "//www.instagram.com/embed.js";
+        script.async = true;
+        document.body.appendChild(script);
+      } else {
+        if (window.instgrm) {
+          window.instgrm.Embeds.process();
+        } else {
+          setTimeout(() => {
+            if (window.instgrm) window.instgrm.Embeds.process();
+          }, 1000);
+        }
+      }
+    };
+
+    const loadTwitterScript = () => {
+      if (window.twttr && window.twttr.widgets) {
+        window.twttr.widgets.load();
+      } else if (!document.getElementById("twitter-embed-script")) {
+        const script = document.createElement("script");
+        script.id = "twitter-embed-script";
+        script.src = "https://platform.twitter.com/widgets.js";
+        script.async = true;
+        script.onload = () => {
+          if (window.twttr?.widgets) window.twttr.widgets.load();
+        };
+        document.body.appendChild(script);
+      }
+    };
+
+    if (event.INSTAGRAM) {
+      loadInstagramScript();
+      setTimeout(loadInstagramScript, 500);
     }
+    if (event.TWITTER) loadTwitterScript();
 
-    const script = document.createElement("script");
-    script.id = "instagram-embed-script";
-    script.src = "//www.instagram.com/embed.js";
-    script.async = true;
-    
-    script.onload = () => {
-      if (window.instgrm?.Embeds) {
-        window.instgrm.Embeds.process();
-        
-        // Double-check after processing
-        setTimeout(() => {
-          const instagramBlocks = document.querySelectorAll('.instagram-media');
-          instagramBlocks.forEach(block => {
-            if (block.innerHTML.includes('broken') || block.innerHTML.includes('error')) {
-              if (retryCount < 3) {
-                console.log('Instagram embed failed, retrying...');
-                loadInstagramWithRetry(retryCount + 1);
-              }
-            }
-          });
-        }, 1000);
-      }
-    };
-
-    script.onerror = () => {
-      if (retryCount < 3) {
-        console.log('Instagram script failed to load, retrying...');
-        setTimeout(() => loadInstagramWithRetry(retryCount + 1), 1000);
-      }
-    };
-
-    document.body.appendChild(script);
-  };
-
-  const loadTwitterScript = () => {
-    if (window.twttr && window.twttr.widgets) {
-      window.twttr.widgets.load();
-    } else if (!document.getElementById("twitter-embed-script")) {
+    if (event["GETTY EMBED"] && !document.getElementById("getty-embed-script")) {
       const script = document.createElement("script");
-      script.id = "twitter-embed-script";
-      script.src = "https://platform.twitter.com/widgets.js";
+      script.id = "getty-embed-script";
+      script.src = "//www.gettyimages.com/showcase/embed.js";
       script.async = true;
-      script.onload = () => {
-        if (window.twttr?.widgets) window.twttr.widgets.load();
-      };
       document.body.appendChild(script);
     }
-  };
-
-  if (event.INSTAGRAM) {
-    // Delay slightly to ensure DOM is ready
-    setTimeout(() => {
-      loadInstagramWithRetry();
-    }, 300);
-  }
-  if (event.TWITTER) loadTwitterScript();
-
-  if (event["GETTY EMBED"] && !document.getElementById("getty-embed-script")) {
-    const script = document.createElement("script");
-    script.id = "getty-embed-script";
-    script.src = "//www.gettyimages.com/showcase/embed.js";
-    script.async = true;
-    document.body.appendChild(script);
-  }
-}, [event]);
+  }, [event]);
 
   // TikTok embed script loading
   useEffect(() => {
@@ -493,38 +467,38 @@ useEffect(() => {
 
                   {/* Instagram */}
       {event.INSTAGRAM && (
-  <section className="w-full px-4 mb-10">
-    <div className="flex flex-wrap justify-center gap-6 mt-2">
-      {event.INSTAGRAM.split(" || ").map((rawUrl, index) => {
-        const url = rawUrl.trim().split("?")[0];
-        return url ? (
-          <div
-            key={index}
-            className="instagram-container flex-shrink-0"
-            style={{ width: "320px" }}
-          >
-            <blockquote
-              className="instagram-media"
-              data-instgrm-permalink={url}
-              data-instgrm-captioned="true" // Add this line
-              data-instgrm-version="14"
-              style={{
-                background: "#FFF",
-                borderRadius: "8px",
-                border: "1px solid #dbdbdb",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                margin: "0",
-                width: "320px",
-                minWidth: "320px",
-                padding: "0",
-              }}
-            ></blockquote>
+        <section className="w-full px-4 mb-10">
+          <div className="flex flex-wrap justify-center gap-6 mt-2">
+            {event.INSTAGRAM.split(" || ").map((rawUrl, index) => {
+              const url = rawUrl.trim().split("?")[0];
+              return url ? (
+                <div
+                  key={index}
+                  className="instagram-container flex-shrink-0"
+                  style={{ width: "320px" }}
+                >
+                  <blockquote
+                    className="instagram-media"
+                    data-instgrm-permalink={url}
+                    data-instgrm-version="14"
+                    style={{
+                      background: "#FFF",
+                      borderRadius: "8px",
+                      border: "1px solid #dbdbdb",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                      margin: "0",
+                      width: "320px",
+                      minWidth: "320px",
+                      padding: "0",
+                    }}
+                  ></blockquote>
+                </div>
+              ) : null;
+            })}
           </div>
-        ) : null;
-      })}
-    </div>
-  </section>
-)}
+        </section>
+      )}
+
 
       {/* Twitter / X */}
       {event.TWITTER && (
