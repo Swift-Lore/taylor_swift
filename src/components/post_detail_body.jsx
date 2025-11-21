@@ -167,56 +167,82 @@ export default function PostDetailBody() {
   }, [isModalOpen, selectedImageIndex, event?.IMAGE]);
 
       // Social media embeds script loading (Instagram, Twitter, Getty)
-  useEffect(() => {
-    if (!event) return;
+useEffect(() => {
+  if (!event) return;
 
-    const loadInstagramScript = () => {
-      if (!document.getElementById("instagram-embed-script")) {
-        const script = document.createElement("script");
-        script.id = "instagram-embed-script";
-        script.src = "//www.instagram.com/embed.js";
-        script.async = true;
-        document.body.appendChild(script);
-      } else {
-        if (window.instgrm) {
-          window.instgrm.Embeds.process();
-        } else {
-          setTimeout(() => {
-            if (window.instgrm) window.instgrm.Embeds.process();
-          }, 1000);
-        }
-      }
-    };
-
-    const loadTwitterScript = () => {
-      if (window.twttr && window.twttr.widgets) {
-        window.twttr.widgets.load();
-      } else if (!document.getElementById("twitter-embed-script")) {
-        const script = document.createElement("script");
-        script.id = "twitter-embed-script";
-        script.src = "https://platform.twitter.com/widgets.js";
-        script.async = true;
-        script.onload = () => {
-          if (window.twttr?.widgets) window.twttr.widgets.load();
-        };
-        document.body.appendChild(script);
-      }
-    };
-
-    if (event.INSTAGRAM) {
-      loadInstagramScript();
-      setTimeout(loadInstagramScript, 500);
+  // Instagram script loading with retry logic
+  const loadInstagramWithRetry = (retryCount = 0) => {
+    // Clean up previous script
+    const existingScript = document.getElementById("instagram-embed-script");
+    if (existingScript) {
+      existingScript.remove();
     }
-    if (event.TWITTER) loadTwitterScript();
 
-    if (event["GETTY EMBED"] && !document.getElementById("getty-embed-script")) {
+    const script = document.createElement("script");
+    script.id = "instagram-embed-script";
+    script.src = "//www.instagram.com/embed.js";
+    script.async = true;
+    
+    script.onload = () => {
+      if (window.instgrm?.Embeds) {
+        window.instgrm.Embeds.process();
+        
+        // Double-check after processing
+        setTimeout(() => {
+          const instagramBlocks = document.querySelectorAll('.instagram-media');
+          instagramBlocks.forEach(block => {
+            if (block.innerHTML.includes('broken') || block.innerHTML.includes('error')) {
+              if (retryCount < 3) {
+                console.log('Instagram embed failed, retrying...');
+                loadInstagramWithRetry(retryCount + 1);
+              }
+            }
+          });
+        }, 1000);
+      }
+    };
+
+    script.onerror = () => {
+      if (retryCount < 3) {
+        console.log('Instagram script failed to load, retrying...');
+        setTimeout(() => loadInstagramWithRetry(retryCount + 1), 1000);
+      }
+    };
+
+    document.body.appendChild(script);
+  };
+
+  const loadTwitterScript = () => {
+    if (window.twttr && window.twttr.widgets) {
+      window.twttr.widgets.load();
+    } else if (!document.getElementById("twitter-embed-script")) {
       const script = document.createElement("script");
-      script.id = "getty-embed-script";
-      script.src = "//www.gettyimages.com/showcase/embed.js";
+      script.id = "twitter-embed-script";
+      script.src = "https://platform.twitter.com/widgets.js";
       script.async = true;
+      script.onload = () => {
+        if (window.twttr?.widgets) window.twttr.widgets.load();
+      };
       document.body.appendChild(script);
     }
-  }, [event]);
+  };
+
+  if (event.INSTAGRAM) {
+    // Delay slightly to ensure DOM is ready
+    setTimeout(() => {
+      loadInstagramWithRetry();
+    }, 300);
+  }
+  if (event.TWITTER) loadTwitterScript();
+
+  if (event["GETTY EMBED"] && !document.getElementById("getty-embed-script")) {
+    const script = document.createElement("script");
+    script.id = "getty-embed-script";
+    script.src = "//www.gettyimages.com/showcase/embed.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }
+}, [event]);
 
   // TikTok embed script loading
   useEffect(() => {
