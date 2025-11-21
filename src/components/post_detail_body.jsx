@@ -467,38 +467,38 @@ export default function PostDetailBody() {
 
                   {/* Instagram */}
       {event.INSTAGRAM && (
-        <section className="w-full px-4 mb-10">
-          <div className="flex flex-wrap justify-center gap-6 mt-2">
-            {event.INSTAGRAM.split(" || ").map((rawUrl, index) => {
-              const url = rawUrl.trim().split("?")[0];
-              return url ? (
-                <div
-                  key={index}
-                  className="instagram-container flex-shrink-0"
-                  style={{ width: "320px" }}
-                >
-                  <blockquote
-                    className="instagram-media"
-                    data-instgrm-permalink={url}
-                    data-instgrm-version="14"
-                    style={{
-                      background: "#FFF",
-                      borderRadius: "8px",
-                      border: "1px solid #dbdbdb",
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                      margin: "0",
-                      width: "320px",
-                      minWidth: "320px",
-                      padding: "0",
-                    }}
-                  ></blockquote>
-                </div>
-              ) : null;
-            })}
+  <section className="w-full px-4 mb-10">
+    <div className="flex flex-wrap justify-center gap-6 mt-2">
+      {event.INSTAGRAM.split(" || ").map((rawUrl, index) => {
+        const url = rawUrl.trim().split("?")[0];
+        return url ? (
+          <div
+            key={index}
+            className="instagram-container flex-shrink-0"
+            style={{ width: "320px" }}
+          >
+            <blockquote
+              className="instagram-media"
+              data-instgrm-permalink={url}
+              data-instgrm-captioned="true" // Add this line
+              data-instgrm-version="14"
+              style={{
+                background: "#FFF",
+                borderRadius: "8px",
+                border: "1px solid #dbdbdb",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                margin: "0",
+                width: "320px",
+                minWidth: "320px",
+                padding: "0",
+              }}
+            ></blockquote>
           </div>
-        </section>
-      )}
-
+        ) : null;
+      })}
+    </div>
+  </section>
+)}
 
       {/* Twitter / X */}
       {event.TWITTER && (
