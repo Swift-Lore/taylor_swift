@@ -166,29 +166,35 @@ export default function PostDetailBody() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isModalOpen, selectedImageIndex, event?.IMAGE]);
 
-  // Social media embeds script loading (Instagram, Twitter, Getty)
+    // Social media embeds script loading (Instagram, Twitter, Getty)
   useEffect(() => {
     if (!event) return;
 
-    const loadInstagramScript = () => {
-      if (!document.getElementById("instagram-embed-script")) {
-        const script = document.createElement("script");
+    const hasInstagram = !!event.INSTAGRAM;
+    const hasTwitter = !!event.TWITTER;
+    const hasGetty = !!event["GETTY EMBED"];
+
+    // Instagram
+    if (hasInstagram) {
+      let script = document.getElementById("instagram-embed-script");
+
+      if (!script) {
+        script = document.createElement("script");
         script.id = "instagram-embed-script";
-        script.src = "//www.instagram.com/embed.js";
+        script.src = "https://www.instagram.com/embed.js";
         script.async = true;
+        script.onload = () => {
+          window?.instgrm?.Embeds?.process();
+        };
         document.body.appendChild(script);
       } else {
-        if (window.instgrm) {
-          window.instgrm.Embeds.process();
-        } else {
-          setTimeout(() => {
-            if (window.instgrm) window.instgrm.Embeds.process();
-          }, 1000);
-        }
+        // Script already on page – just re-process embeds
+        window?.instgrm?.Embeds?.process();
       }
-    };
+    }
 
-    const loadTwitterScript = () => {
+    // Twitter / X
+    if (hasTwitter) {
       if (window.twttr && window.twttr.widgets) {
         window.twttr.widgets.load();
       } else if (!document.getElementById("twitter-embed-script")) {
@@ -197,26 +203,21 @@ export default function PostDetailBody() {
         script.src = "https://platform.twitter.com/widgets.js";
         script.async = true;
         script.onload = () => {
-          if (window.twttr?.widgets) window.twttr.widgets.load();
+          window?.twttr?.widgets?.load();
         };
         document.body.appendChild(script);
       }
-    };
-
-    if (event.INSTAGRAM) {
-      loadInstagramScript();
-      setTimeout(loadInstagramScript, 500);
     }
-    if (event.TWITTER) loadTwitterScript();
 
-    if (event["GETTY EMBED"] && !document.getElementById("getty-embed-script")) {
+    // Getty
+    if (hasGetty && !document.getElementById("getty-embed-script")) {
       const script = document.createElement("script");
       script.id = "getty-embed-script";
-      script.src = "//www.gettyimages.com/showcase/embed.js";
+      script.src = "https://www.gettyimages.com/showcase/embed.js";
       script.async = true;
       document.body.appendChild(script);
     }
-  }, [event]);
+  }, [event?.INSTAGRAM, event?.TWITTER, event?.["GETTY EMBED"]]);
 
   // TikTok embed script loading
   useEffect(() => {
@@ -465,35 +466,50 @@ export default function PostDetailBody() {
         </section>
       )}
 
-      {/* Instagram */}
+            {/* Instagram */}
       {event.INSTAGRAM && (
         <section className="w-full px-4 mb-10">
           <div className="flex flex-wrap justify-center gap-6 mt-2">
             {event.INSTAGRAM.split(" || ").map((rawUrl, index) => {
-              const url = rawUrl.trim().split("?")[0];
-              return url ? (
+              const raw = rawUrl.trim();
+              if (!raw) return null;
+
+              // Use a clean permalink for the embed, keep full URL for the fallback link
+              const cleanUrl = raw.split("?")[0];
+
+              return (
                 <div
                   key={index}
                   className="instagram-container flex-shrink-0"
-                  style={{ width: "320px" }}
+                  style={{ width: "320px", maxWidth: "100%" }}
                 >
                   <blockquote
                     className="instagram-media"
-                    data-instgrm-permalink={url}
+                    data-instgrm-permalink={cleanUrl}
                     data-instgrm-version="14"
                     style={{
                       background: "#FFF",
                       borderRadius: "8px",
                       border: "1px solid #dbdbdb",
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                      margin: "0",
-                      width: "320px",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                      margin: 0,
+                      width: "100%",
                       minWidth: "320px",
-                      padding: "0",
+                      padding: 0,
                     }}
                   ></blockquote>
+
+                  {/* Always-visible fallback link */}
+                  <a
+                    href={raw}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block mt-2 text-xs text-[#8e3e3e] text-center underline"
+                  >
+                    Open on Instagram
+                  </a>
                 </div>
-              ) : null;
+              );
             })}
           </div>
         </section>
