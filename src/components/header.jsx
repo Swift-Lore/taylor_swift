@@ -137,13 +137,6 @@ export default function Header() {
                   className="h-auto object-contain max-h-[100px] logo-glow"
                   style={{ maxWidth: '180px' }}
                 />
-              </button>
-              <button
-                onClick={() => navigate("/")}
-                className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
-              >
-                Return to Home
-              </button>
             </div>
 
             {/* Mobile: Timeline text below */}
