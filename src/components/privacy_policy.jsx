@@ -137,8 +137,15 @@ export default function PrivacyPolicyPage() {
     technologies to serve ads based on your prior visits to this or other websites. 
     Google’s use of advertising cookies enables it and its partners to serve 
     personalized or non-personalized ads to you based on your browsing activity. 
-    You can opt out of personalized advertising by visiting 
-    Google’s Ads Settings page.
+    You can opt out of personalized advertising by visiting{" "}
+    <a
+      href="https://www.google.com/settings/ads"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-[#b91c1c] underline font-medium"
+    >
+      Google’s Ads Settings page
+    </a>.
   </p>
 </div>
           </div>
