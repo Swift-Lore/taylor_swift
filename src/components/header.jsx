@@ -121,10 +121,10 @@ export default function Header() {
 
       <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 pt-4 md:pt-5 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 relative">
         
-        {/* MOBILE-FIRST LAYOUT: Full Timeline Page */}
+                {/* MOBILE-FIRST LAYOUT: Full Timeline Page */}
         {isFullTimelinePage && !isEventPage && (
           <>
-            {/* Mobile: Centered logo and button on top */}
+            {/* Mobile: Centered logo on top */}
             <div className="w-full md:hidden flex flex-col items-center gap-4">
               <button
                 type="button"
@@ -135,23 +135,25 @@ export default function Header() {
                   src="/images/swift_lore.png"
                   alt="Swift Lore"
                   className="h-auto object-contain max-h-[100px] logo-glow"
-                  style={{ maxWidth: '180px' }}
+                  style={{ maxWidth: "180px" }}
                 />
+              </button>
             </div>
 
             {/* Mobile: Timeline text below */}
             <div className="w-full md:hidden flex flex-col items-center mt-4">
               <h2 className="text-white text-2xl font-serif drop-shadow-lg tracking-wide text-center">
-                Taylor Swift's Career Timeline
+                Taylor Swift&apos;s Career Timeline
               </h2>
             </div>
 
-            {/* Desktop: Original layout */}
+            {/* Desktop: left = title, right = logo */}
             <div className="hidden md:flex md:w-[40%] flex-col items-start">
               <h2 className="text-white text-3xl md:text-4xl font-serif drop-shadow-lg tracking-wide text-left">
-                Taylor Swift's Career Timeline
+                Taylor Swift&apos;s Career Timeline
               </h2>
             </div>
+
             <div className="hidden md:flex md:w-[30%] flex-col items-end">
               <div className="flex justify-end w-full">
                 <button
@@ -163,16 +165,8 @@ export default function Header() {
                     src="/images/swift_lore.png"
                     alt="Swift Lore"
                     className="h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow"
-                    style={{ maxWidth: '200px' }}
+                    style={{ maxWidth: "200px" }}
                   />
-                </button>
-              </div>
-              <div className="flex justify-end w-full mt-2 pr-2 md:pr-4">
-                <button
-                  onClick={() => navigate("/")}
-                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
-                >
-                  Return to Home
                 </button>
               </div>
             </div>
