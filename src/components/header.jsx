@@ -324,31 +324,38 @@ export default function Header() {
           </div>
         )}
 
-        {/* Global nav row – appears on all pages */}
-        <nav className="w-full mt-4 mb-1">
-          <div className="flex flex-wrap justify-center gap-2 md:gap-3 text-sm">
+                {/* Global nav row – appears on all pages */}
+        <nav className="w-full mt-4 mb-2">
+          <div className="flex flex-wrap justify-center gap-2 md:gap-3">
             <button
               onClick={handleLogoClick}
-              className="bg-white/85 text-[#8e3e3e] hover:bg:white rounded-full px-4 py-1.5 font-medium shadow-sm border border-white/70 transition-all whitespace-nowrap"
+              className={`${navBaseClasses} ${
+                isHomeRoute ? navActiveClasses : navInactiveClasses
+              }`}
             >
               Home
             </button>
 
             <button
               onClick={() => navigate("/posts")}
-              className="bg:white/85 text-[#8e3e3e] hover:bg:white rounded-full px-4 py-1.5 font-medium shadow-sm border border:white/70 transition-all whitespace-nowrap"
+              className={`${navBaseClasses} ${
+                isTimelineRoute ? navActiveClasses : navInactiveClasses
+              }`}
             >
               Full Timeline
             </button>
 
             <button
               onClick={() => navigate("/eras-tour-shows")}
-              className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-4 py-1.5 font-semibold shadow-sm transition-transform hover:-translate-y-0.5 whitespace-nowrap"
+              className={`${navBaseClasses} ${
+                isErasRoute ? navActiveClasses : navInactiveClasses
+              }`}
             >
               Eras Tour Shows
             </button>
           </div>
         </nav>
+
       </div>
     </header>
   );
