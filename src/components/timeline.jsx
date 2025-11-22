@@ -95,6 +95,19 @@ const TimelineCard = ({ record, index }) => {
     navigate(`/posts?keyword=${encodeURIComponent(keyword)}`)
   }
 
+  // Format date function moved outside the return
+  const formatDate = (dateString) => {
+    if (!dateString) return "Loading..."
+    const date = new Date(dateString)
+    const options = {
+      month: "short",
+      day: "2-digit", 
+      year: "numeric",
+      timeZone: "UTC",
+    }
+    return date.toLocaleDateString("en-US", options)
+  }
+
   return (
     <Link
       to={`/post_details?id=${record.id}`}
@@ -106,18 +119,7 @@ const TimelineCard = ({ record, index }) => {
           <div className="bg-white/80 backdrop-blur-sm rounded-[10px] p-3 border border-[#f0d0d3]">
             {/* Date Badge */}
             <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 -translate-y-1/4 border border-[#8e3e3e] bg-white rounded-full px-3 py-1 text-sm text-[#8e3e3e] font-semibold shadow-md z-10 min-w-[150px] text-center">
-              {record?.fields?.DATE
-                ? (() => {
-                    const date = new Date(record.fields.DATE)
-                    const options = {
-                      month: "short",
-                      day: "2-digit",
-                      year: "numeric",
-                      timeZone: "UTC",
-                    }
-                    return date.toLocaleDateString("en-US", options)
-                  })()
-                : "Loading..."}
+              {formatDate(record?.fields?.DATE)}
             </div>
 
             <div className="flex flex-col gap-2.5 mt-1.5 timeline-card-text">
@@ -158,30 +160,6 @@ const TimelineCard = ({ record, index }) => {
         </div>
       </div>
     </Link>
-  )
-}
-
-      {/* Keywords section with clickable tags */}
-      {record?.fields?.KEYWORDS && record.fields.KEYWORDS.length > 0 && (
-        <div className="flex flex-wrap gap-1 md:gap-1.5 justify-center mt-3">
-          {record.fields.KEYWORDS.slice(0, 4).map((tag, tagIndex) => (
-            <button
-              key={tagIndex}
-              type="button"
-              className="bg-[#8a9ac7] text-white font-medium text-xs px-2 py-0.5 rounded-full whitespace-nowrap shadow-sm cursor-pointer hover:bg-[#6b7db3] transition-colors select-text"
-              onClick={(e) => handleTagClick(e, tag)}
-            >
-              {tag}
-            </button>
-          ))}
-          {record.fields.KEYWORDS.length > 4 && (
-            <div className="bg-[#b8c5e8] text-[#8e3e3e] font-medium text-xs px-2 py-0.5 rounded-full select-text">
-              +{record.fields.KEYWORDS.length - 4}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
   )
 }
   // ===== JSX =====
