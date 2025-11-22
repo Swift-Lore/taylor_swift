@@ -306,10 +306,10 @@ export default function Header() {
           </div>
         )}
 
-        {/* Home page content - search + CTA only */}
+                {/* Home page content - search only (no duplicate CTA) */}
         {showHero && (
-          <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-3 text-center md:text-left relative z-20">
-            <div className="w-full max-w-xs">
+          <div className="w-full md:w-1/2 flex flex-col items-center md:items-start gap-3 text-center md:text-left relative z-20">
+            <div className="w-full max-w-lg">
               <form onSubmit={handleSearch} className="relative">
                 <input
                   type="text"
@@ -317,17 +317,10 @@ export default function Header() {
                   value={searchQuery}
                   onChange={handleInputChange}
                   onKeyPress={handleKeyPress}
-                  className="w-full rounded-full py-2 pl-7 pr-4 text-sm bg-white/90 text-gray-800 shadow focus:outline-none focus:ring-2 focus:ring-[#fbb1c3]"
+                  className="w-full rounded-full py-2.5 pl-7 pr-4 text-sm bg-white/90 text-gray-800 shadow focus:outline-none focus:ring-2 focus:ring-[#fbb1c3]"
                 />
               </form>
             </div>
-
-            <button
-              className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-2 font-semibold text-sm w-auto shadow transition-transform hover:-translate-y-0.5 whitespace-nowrap"
-              onClick={() => navigate("/posts")}
-            >
-              View Full Timeline
-            </button>
           </div>
         )}
 
