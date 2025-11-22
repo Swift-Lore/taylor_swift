@@ -3,19 +3,20 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-export default function Header({ showHero = true }) {
+export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
-
   const [searchQuery, setSearchQuery] = useState("");
   const [eventData, setEventData] = useState(null);
 
-  // ---- Route helpers ----
-  const path = location.pathname;
-  const isHomeRoute = path === "/" || path === "/timeline";
-  const isTimelineRoute = path === "/posts";
-  const isEventPage = path === "/post_details";
-  const isErasRoute = path === "/eras-tour-shows";
+  const isFullTimelinePage = location.pathname === "/posts";
+  const isEventPage = location.pathname === "/post_details";
+  const currentPath = location.pathname;
+  const isHomeRoute = currentPath === "/" || currentPath === "/timeline";
+  const isTimelineRoute = currentPath === "/posts";
+  const isErasRoute = currentPath === "/eras-tour-shows";
+
+  const showHero = !isFullTimelinePage && !isEventPage;
 
   const navBaseClasses =
     "rounded-full px-4 py-1.5 text-sm font-medium whitespace-nowrap border transition-all";
@@ -24,7 +25,6 @@ export default function Header({ showHero = true }) {
   const navInactiveClasses =
     "bg-white/80 text-[#8e3e3e] border-white/70 hover:bg-white hover:shadow-md";
 
-  // ---- Sync search from ?q ----
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const queryFromUrl = urlParams.get("q");
@@ -35,41 +35,39 @@ export default function Header({ showHero = true }) {
     }
   }, [location.search]);
 
-  // ---- Fetch event data for event detail header ----
+  // Fetch event data when on event page
   useEffect(() => {
-    if (!isEventPage) {
-      setEventData(null);
-      return;
-    }
+    if (isEventPage) {
+      const searchParams = new URLSearchParams(location.search);
+      const postId = searchParams.get("id");
 
-    const searchParams = new URLSearchParams(location.search);
-    const postId = searchParams.get("id");
-    if (!postId) return;
+      if (postId) {
+        const fetchEventData = async () => {
+          try {
+            const response = await fetch(
+              `https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker/${postId}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+                },
+              }
+            );
 
-    const fetchEventData = async () => {
-      try {
-        const response = await fetch(
-          `https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker/${postId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-            },
+            if (response.ok) {
+              const data = await response.json();
+              setEventData(data.fields);
+            }
+          } catch (error) {
+            console.error("Error fetching event data for header:", error);
           }
-        );
+        };
 
-        if (response.ok) {
-          const data = await response.json();
-          setEventData(data.fields);
-        }
-      } catch (error) {
-        console.error("Error fetching event data for header:", error);
+        fetchEventData();
       }
-    };
-
-    fetchEventData();
+    }
   }, [isEventPage, location.search]);
 
-  // ---- Date formatter ----
+  // Safe date formatting function
   const formatEventDate = (isoDate) => {
     if (!isoDate) return "";
 
@@ -91,7 +89,6 @@ export default function Header({ showHero = true }) {
     }
   };
 
-  // ---- Handlers ----
   const handleSearch = (e) => {
     e.preventDefault();
     const trimmedQuery = searchQuery.trim();
@@ -122,42 +119,163 @@ export default function Header({ showHero = true }) {
       {/* Compact decorative glow */}
       <div className="pointer-events-none absolute -top-4 left-1/2 -translate-x-1/2 md:left-12 md:translate-x-0 w-40 h-40 blur-2xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
 
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 pt-4 md:pt-5 flex flex-col items-center md:items-stretch gap-4 md:gap-6 relative">
-        {/* ---------- Global nav row (top) ---------- */}
-        <nav className="w-full flex justify-center md:justify-end gap-2 md:gap-3">
-          {/* Hide Home button on the actual home route */}
-          {!isHomeRoute && (
-            <button
-              onClick={handleLogoClick}
-              className={`${navBaseClasses} ${navInactiveClasses}`}
-            >
-              Home
-            </button>
-          )}
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 pt-4 md:pt-5 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 relative">
+        {/* MOBILE-FIRST LAYOUT: Full Timeline Page */}
+        {isFullTimelinePage && !isEventPage && (
+          <>
+            {/* Mobile: Centered logo on top */}
+            <div className="w-full md:hidden flex flex-col items-center gap-4">
+              <button
+                type="button"
+                onClick={handleLogoClick}
+                className="cursor-pointer"
+              >
+                <img
+                  src="/images/swift_lore.png"
+                  alt="Swift Lore"
+                  className="h-auto object-contain max-h-[100px] logo-glow"
+                  style={{ maxWidth: "180px" }}
+                />
+              </button>
+            </div>
 
-          <button
-            onClick={() => navigate("/posts")}
-            className={`${navBaseClasses} ${
-              isTimelineRoute ? navActiveClasses : navInactiveClasses
-            }`}
-          >
-            Full Timeline
-          </button>
+            {/* Mobile: Timeline text below */}
+            <div className="w-full md:hidden flex flex-col items-center mt-4">
+              <h2 className="text-white text-2xl font-serif drop-shadow-lg tracking-wide text-center">
+                Taylor Swift&apos;s Career Timeline
+              </h2>
+            </div>
 
-          <button
-            onClick={() => navigate("/eras-tour-shows")}
-            className={`${navBaseClasses} ${
-              isErasRoute ? navActiveClasses : navInactiveClasses
-            }`}
-          >
-            Eras Tour Shows
-          </button>
-        </nav>
+            {/* Desktop: left = title, right = logo */}
+            <div className="hidden md:flex md:w-[40%] flex-col items-start">
+              <h2 className="text-white text-3xl md:text-4xl font-serif drop-shadow-lg tracking-wide text-left">
+                Taylor Swift&apos;s Career Timeline
+              </h2>
+            </div>
 
-        {/* ---------- HOME HERO (logo + search) ---------- */}
-        {isHomeRoute && showHero && (
-          <div className="w-full flex flex-col items-center gap-4 relative z-20 overflow-visible">
-            {/* Logo with sparkles */}
+            <div className="hidden md:flex md:w-[30%] flex-col items-end">
+              <div className="flex justify-end w-full">
+                <button
+                  type="button"
+                  onClick={handleLogoClick}
+                  className="cursor-pointer flex justify-end"
+                >
+                  <img
+                    src="/images/swift_lore.png"
+                    alt="Swift Lore"
+                    className="h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow"
+                    style={{ maxWidth: "200px" }}
+                  />
+                </button>
+              </div>
+              <div className="flex justify-end w-full mt-2 pr-2 md:pr-4">
+                <button
+                  onClick={() => navigate("/")}
+                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+                >
+                  Return to Home
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* MOBILE-FIRST LAYOUT: Event Page */}
+        {isEventPage && (
+          <>
+            {/* Mobile: Logo + buttons on top */}
+            <div className="w-full md:hidden flex flex-col items-center gap-4 mb-4">
+              <button
+                type="button"
+                onClick={handleLogoClick}
+                className="cursor-pointer"
+              >
+                <img
+                  src="/images/swift_lore.png"
+                  alt="Swift Lore"
+                  className="h-auto object-contain max-h-[100px] logo-glow"
+                  style={{ maxWidth: "180px" }}
+                />
+              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => navigate("/")}
+                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+                >
+                  Return to Home
+                </button>
+                <button
+                  onClick={() => navigate("/posts")}
+                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+                >
+                  View Full Timeline
+                </button>
+              </div>
+            </div>
+
+            {/* Mobile: Event info below */}
+            <div className="w-full md:hidden flex flex-col items-center text-center">
+              <h2 className="text-white text-2xl font-serif drop-shadow-lg tracking-wide">
+                {eventData?.EVENT || "Loading event..."}
+              </h2>
+              {eventData?.DATE && (
+                <p className="text-white/90 text-sm font-medium drop-shadow-md mt-1">
+                  {formatEventDate(eventData.DATE)}
+                </p>
+              )}
+            </div>
+
+            {/* Desktop: left = event info, right = logo + buttons */}
+            <div className="hidden md:flex md:w-[55%] flex-col items-start">
+              <h2 className="text-white text-3xl md:text-4xl font-serif drop-shadow-lg tracking-wide text-left">
+                {eventData?.EVENT || "Loading event..."}
+              </h2>
+              {eventData?.DATE && (
+                <p className="text-white/90 text-sm md:text-base font-medium drop-shadow-md text-left mt-1">
+                  {formatEventDate(eventData.DATE)}
+                </p>
+              )}
+            </div>
+
+            <div className="hidden md:flex md:w-[35%] flex-col items-end">
+              {/* Logo container with centered alignment */}
+              <div className="flex flex-col items-center w-full">
+                <button
+                  type="button"
+                  onClick={handleLogoClick}
+                  className="cursor-pointer flex justify-center w-full"
+                >
+                  <img
+                    src="/images/swift_lore.png"
+                    alt="Swift Lore"
+                    className="h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow"
+                    style={{ maxWidth: "200px" }}
+                  />
+                </button>
+
+                {/* Buttons container - centered under logo */}
+                <div className="flex gap-3 mt-3 justify-center w-full">
+                  <button
+                    onClick={() => navigate("/")}
+                    className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+                  >
+                    Return to Home
+                  </button>
+                  <button
+                    onClick={() => navigate("/posts")}
+                    className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+                  >
+                    View Full Timeline
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* CENTER: Logo section for Home Page (unchanged) */}
+        {!isFullTimelinePage && !isEventPage && (
+          <div className="w-full flex flex-col items-center relative z-20 overflow-visible">
             <button
               type="button"
               onClick={handleLogoClick}
@@ -179,60 +297,61 @@ export default function Header({ showHero = true }) {
                 className="w-full h-auto object-contain max-h-[200px] md:max-h-[240px] logo-glow"
               />
             </button>
-
-            {/* Search bar */}
-            <div className="w-full md:w-1/2 flex flex-col items-center md:items-start gap-3 text-center md:text-left">
-              <div className="w-full max-w-lg">
-                <form onSubmit={handleSearch} className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search events, locations, categories..."
-                    value={searchQuery}
-                    onChange={handleInputChange}
-                    onKeyPress={handleKeyPress}
-                    className="w-full rounded-full py-2.5 pl-7 pr-4 text-sm bg-white/90 text-gray-800 shadow focus:outline-none focus:ring-2 focus:ring-[#fbb1c3]"
-                  />
-                </form>
-              </div>
-            </div>
           </div>
         )}
 
-        {/* ---------- EVENT PAGE HEADER ---------- */}
-        {isEventPage && (
-          <div className="w-full flex flex-col md:flex-row items-center md:items-end justify-between gap-4 mt-1">
-            {/* Event title/date */}
-            <div className="w-full md:w-2/3 flex flex-col items-center md:items-start text-center md:text-left">
-              <h2 className="text-white text-2xl md:text-3xl font-serif drop-shadow-lg tracking-wide">
-                {eventData?.EVENT || "Loading event..."}
-              </h2>
-              {eventData?.DATE && (
-                <p className="text-white/90 text-sm md:text-base font-medium drop-shadow-md mt-1">
-                  {formatEventDate(eventData.DATE)}
-                </p>
-              )}
-            </div>
-
-            {/* Small logo on the right */}
-            <div className="w-full md:w-1/3 flex justify-center md:justify-end">
-              <button
-                type="button"
-                onClick={handleLogoClick}
-                className="cursor-pointer flex justify-end"
-              >
-                <img
-                  src="/images/swift_lore.png"
-                  alt="Swift Lore"
-                  className="h-auto object-contain max-h-[90px] md:max-h-[110px] logo-glow"
-                  style={{ maxWidth: "200px" }}
+        {/* Home page content - search only (no duplicate CTA) */}
+        {showHero && (
+          <div className="w-full md:w-1/2 flex flex-col items-center md:items-start gap-3 text-center md:text-left relative z-20">
+            <div className="w-full max-w-lg">
+              <form onSubmit={handleSearch} className="relative">
+                <input
+                  type="text"
+                  placeholder="Search events, locations, categories..."
+                  value={searchQuery}
+                  onChange={handleInputChange}
+                  onKeyPress={handleKeyPress}
+                  className="w-full rounded-full py-2.5 pl-7 pr-4 text-sm bg-white/90 text-gray-800 shadow focus:outline-none focus:ring-2 focus:ring-[#fbb1c3]"
                 />
-              </button>
+              </form>
             </div>
           </div>
         )}
 
-        {/* For non-home, non-event pages (Timeline/Eras), we keep the header minimal;
-            their own pages render titles/content below. */}
+        {/* Global nav row – appears on all pages */}
+        <nav className="w-full mt-4 mb-2">
+          <div className="flex flex-wrap justify-center gap-2 md:gap-3">
+            {/* Hide Home button on home page */}
+            {!isHomeRoute && (
+              <button
+                onClick={handleLogoClick}
+                className={`${navBaseClasses} ${
+                  isHomeRoute ? navActiveClasses : navInactiveClasses
+                }`}
+              >
+                Home
+              </button>
+            )}
+
+            <button
+              onClick={() => navigate("/posts")}
+              className={`${navBaseClasses} ${
+                isTimelineRoute ? navActiveClasses : navInactiveClasses
+              }`}
+            >
+              Full Timeline
+            </button>
+
+            <button
+              onClick={() => navigate("/eras-tour-shows")}
+              className={`${navBaseClasses} ${
+                isErasRoute ? navActiveClasses : navInactiveClasses
+              }`}
+            >
+              Eras Tour Shows
+            </button>
+          </div>
+        </nav>
       </div>
     </header>
   );
