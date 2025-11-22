@@ -42,46 +42,40 @@ export default function ErasTourShows() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
+    useEffect(() => {
     async function loadShows() {
       try {
         setLoading(true);
         setError("");
 
-        const res = await fetch(SHOWS_ENDPOINT);
+        // Only pull Eras Tour rows from Airtable
+        const params =
+          "filterByFormula=" +
+          encodeURIComponent('SEARCH("The Eras Tour:", {EVENT})') +
+          "&pageSize=200" +
+          "&sort[0][field]=DATE&sort[0][direction]=asc";
+
+        const res = await fetch(`${AIRTABLE_URL}?${params}`, {
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+          },
+        });
+
         if (!res.ok) {
           throw new Error(`Failed to fetch shows: ${res.status}`);
         }
 
         const data = await res.json();
+        const records = Array.isArray(data.records) ? data.records : [];
 
-        // Handle different possible shapes:
-        // - [{ EVENT, ... }]
-        // - { records: [{ id, fields: { EVENT, ... } }] }
-        const rawArray = Array.isArray(data)
-          ? data
-          : Array.isArray(data.records)
-          ? data.records
-          : [];
-
-        // Flatten to just "fields + id"
-        const flattened = rawArray.map((item) => {
-          if (item.fields) {
-            return { ...item.fields, id: item.id };
-          }
-          return item;
-        });
-
-        // Filter down to Eras Tour shows only
-        const erasOnly = flattened.filter(
-          (item) =>
-            typeof item.EVENT === "string" &&
-            item.EVENT.startsWith("The Eras Tour:")
-        );
-
-        // Normalize shape
-        const normalized = erasOnly
-          .map((item) => normalizeShow(item))
+        // Normalize Airtable records
+        const normalized = records
+          .map((record) => normalizeShow(record))
+          .filter(
+            (show) =>
+              typeof show.event === "string" &&
+              show.event.startsWith("The Eras Tour:")
+          )
           .sort((a, b) => {
             const da = new Date(a.date);
             const db = new Date(b.date);
