@@ -8,9 +8,6 @@ import SearchResults from "./components/search_results";
 import CookiePolicy from "./components/cookie_policy";
 import PrivacyPolicy from "./components/privacy_policy";
 import CookieConsent from "react-cookie-consent";
-
-// 🔹 IMPORTANT: file is `ErasTourShows.jsx` in your components folder,
-// so the import path must match the capitalization exactly:
 import ErasTourShows from "./components/ErasTourShows";
 
 /* ------------ Shared layout ------------ */
