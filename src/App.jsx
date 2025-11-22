@@ -8,7 +8,10 @@ import SearchResults from "./components/search_results";
 import CookiePolicy from "./components/cookie_policy";
 import PrivacyPolicy from "./components/privacy_policy";
 import CookieConsent from "react-cookie-consent";
-import ErasTourShows from "./components/ErasTourShows";
+
+// 🔹 IMPORTANT: file is `erastourshows.jsx` in your screenshot,
+// so the import path should be all lowercase:
+import ErasTourShows from "./components/erastourshows";
 
 /* ------------ Shared layout ------------ */
 
@@ -16,14 +19,11 @@ function Layout({ children, showHero = true }) {
   return (
     <div className="min-h-screen flex flex-col">
       <Header showHero={showHero} />
-      
       <main className="flex-1 min-h-0 relative z-0">
         {children}
-        
         {/* Reduced height gradient - only show if needed */}
         <div className="pointer-events-none w-full h-4 bg-gradient-to-b from-transparent to-[#e8ecf7]" />
       </main>
-
       <Footer />
     </div>
   );
@@ -73,6 +73,8 @@ function PrivacyPolicyPage() {
     </Layout>
   );
 }
+
+// 🔹 NEW: Eras Tour Shows page wrapper
 function ErasTourShowsPage() {
   return (
     <Layout showHero={false}>
@@ -80,6 +82,7 @@ function ErasTourShowsPage() {
     </Layout>
   );
 }
+
 /* ------------ App root ------------ */
 
 function App() {
@@ -87,11 +90,13 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/timeline" element={<HomePage />} />
         <Route path="/posts" element={<PostsPage />} />
         <Route path="/post_details" element={<PostDetailPage />} />
-        <Route path="/timeline" element={<HomePage />} />
         <Route path="/cookie_policy" element={<CookiePolicyPage />} />
         <Route path="/privacy_policy" element={<PrivacyPolicyPage />} />
+
+        {/* 🔹 NEW ROUTE: this is what your header button navigates to */}
         <Route path="/eras-tour-shows" element={<ErasTourShowsPage />} />
       </Routes>
 
@@ -112,7 +117,7 @@ function App() {
           color: "#6b7db3",
           fontSize: "14px",
           padding: "20px",
-          border: "2px solid #ffcaca",
+          border: "2px solid "#ffcaca",
           borderRadius: "12px",
           maxWidth: "600px",
           width: "90%",
