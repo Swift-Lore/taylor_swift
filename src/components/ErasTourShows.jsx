@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 
-// POINT THIS TO THE SAME ENDPOINT YOUR TIMELINE USES
-// Example if your timeline uses axios.get("/.netlify/functions/events"):
-// const SHOWS_ENDPOINT = "/.netlify/functions/events";
-const SHOWS_ENDPOINT =
-  import.meta.env.VITE_EVENTS_ENDPOINT || "/.netlify/functions/events";
+// Direct Airtable endpoint (same base + table as Timeline)
+const AIRTABLE_URL =
+  "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker";
 
 // Normalize any record shape into a flat "show" object
 function normalizeShow(raw) {
