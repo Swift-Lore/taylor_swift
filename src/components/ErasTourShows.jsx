@@ -1,7 +1,4 @@
 import { useEffect, useState } from "react";
-
-// If you have a Netlify function, set VITE_EVENTS_ENDPOINT to it in your env.
-// Example: "/.netlify/functions/events"
 const SERVER_EVENTS_ENDPOINT = import.meta.env.VITE_EVENTS_ENDPOINT || "";
 
 // Direct Airtable fallback (same base/table as Timeline)
@@ -45,6 +42,10 @@ export default function ErasTourShows() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, []);
+ 
   useEffect(() => {
     async function loadShows() {
       try {
