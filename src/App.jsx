@@ -92,6 +92,7 @@ function App() {
         <Route path="/timeline" element={<HomePage />} />
         <Route path="/cookie_policy" element={<CookiePolicyPage />} />
         <Route path="/privacy_policy" element={<PrivacyPolicyPage />} />
+        <Route path="/eras-tour-shows" element={<ErasTourShowsPage />} />
       </Routes>
 
       {/* Cookie banner stays once at the very bottom */}
