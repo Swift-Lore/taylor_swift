@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+
 const SERVER_EVENTS_ENDPOINT = import.meta.env.VITE_EVENTS_ENDPOINT || "";
 
 // Direct Airtable fallback (same base/table as Timeline)
@@ -7,7 +8,6 @@ const AIRTABLE_URL =
 
 // Normalize any record shape into a flat "show" object
 function normalizeShow(raw) {
-  // Support Airtable-style { id, fields: {...} } OR flat objects
   const fields = raw.fields || raw;
 
   return {
@@ -42,10 +42,11 @@ export default function ErasTourShows() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // (Scroll to top is fine but not required for the blank issue)
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    window.scrollTo(0, 0);
   }, []);
- 
+
   useEffect(() => {
     async function loadShows() {
       try {
@@ -55,14 +56,12 @@ export default function ErasTourShows() {
         let data;
 
         if (SERVER_EVENTS_ENDPOINT) {
-          // Use your Netlify/server endpoint if configured
           const res = await fetch(SERVER_EVENTS_ENDPOINT);
           if (!res.ok) {
             throw new Error(`Failed to fetch shows from server: ${res.status}`);
           }
           data = await res.json();
         } else {
-          // Fallback: query Airtable directly for Eras Tour shows
           const filterFormula = encodeURIComponent(
             `FIND("The Eras Tour:", {EVENT})`
           );
@@ -77,24 +76,23 @@ export default function ErasTourShows() {
           );
 
           if (!res.ok) {
-            throw new Error(`Failed to fetch shows from Airtable: ${res.status}`);
+            throw new Error(
+              `Failed to fetch shows from Airtable: ${res.status}`
+            );
           }
           data = await res.json();
         }
 
-        // Handle array or { records: [...] }
         const rawArray = Array.isArray(data)
           ? data
           : Array.isArray(data.records)
           ? data.records
           : [];
 
-        // Flatten { id, fields } → { ...fields, id }
         const flattened = rawArray.map((item) =>
           item.fields ? { ...item.fields, id: item.id } : item
         );
 
-        // Double-check "Eras Tour" filter on the client side
         const erasOnly = flattened.filter(
           (item) =>
             typeof item.EVENT === "string" &&
@@ -106,7 +104,8 @@ export default function ErasTourShows() {
           .sort((a, b) => {
             const da = new Date(a.date);
             const db = new Date(b.date);
-            if (Number.isNaN(da.getTime()) || Number.isNaN(db.getTime())) return 0;
+            if (Number.isNaN(da.getTime()) || Number.isNaN(db.getTime()))
+              return 0;
             return da - db;
           });
 
@@ -139,7 +138,20 @@ export default function ErasTourShows() {
   };
 
   return (
-    <section className="max-w-5xl mx-auto px-4 py-10 fade-in">
+    // 🔹 Removed "fade-in" in case the CSS is hiding it on first mount
+    <section className="max-w-5xl mx-auto px-4 py-10 min-h-[60vh]">
+      {/* Always-visible debug state at top */}
+      {loading && (
+        <div className="mb-4 text-center text-sm text-[#6b7db3] italic">
+          Loading Eras Tour shows…
+        </div>
+      )}
+      {error && (
+        <div className="mb-4 text-center text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
       {/* Page Title */}
       <header className="mb-8 text-center">
         <h1 className="text-2xl md:text-3xl font-serif text-[#8e3e3e] mb-3">
@@ -153,20 +165,8 @@ export default function ErasTourShows() {
       </header>
 
       {/* Dropdown + state */}
-      <div className="mb-8">
-        {loading && (
-          <p className="text-sm text-[#6b7db3] italic">
-            Loading Eras Tour shows…
-          </p>
-        )}
-
-        {error && (
-          <p className="text-sm text-red-700 mb-2">
-            {error}
-          </p>
-        )}
-
-        {!loading && !error && shows.length > 0 && (
+      {!loading && !error && shows.length > 0 && (
+        <div className="mb-8">
           <div className="flex flex-col md:flex-row md:items-center gap-3">
             <label
               htmlFor="eras-show-select"
@@ -187,13 +187,12 @@ export default function ErasTourShows() {
               ))}
             </select>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Detail card */}
-      {selectedShow && (
+      {!loading && selectedShow && (
         <div className="glass-soft card-soft rounded-xl bg-white/70 px-5 py-6 md:px-7 md:py-7 border border-[#f3d6d6] space-y-5">
-          {/* Show title & basics */}
           <div className="border-b border-[#f5e3e3] pb-4">
             <h2 className="text-xl md:text-2xl font-serif text-[#8e3e3e] mb-2 leading-snug">
               {selectedShow.showDisplayName}
@@ -214,7 +213,6 @@ export default function ErasTourShows() {
             </div>
           </div>
 
-          {/* Surprise songs */}
           {(selectedShow.surprise1 || selectedShow.surprise2) && (
             <div className="border-b border-[#f5e3e3] pb-4">
               <h3 className="text-sm font-semibold tracking-wide uppercase text-[#8e3e3e] mb-2">
@@ -237,7 +235,6 @@ export default function ErasTourShows() {
             </div>
           )}
 
-          {/* Notes */}
           {selectedShow.notes && (
             <div className="border-b border-[#f5e3e3] pb-4">
               <h3 className="text-sm font-semibold tracking-wide uppercase text-[#8e3e3e] mb-2">
@@ -249,7 +246,6 @@ export default function ErasTourShows() {
             </div>
           )}
 
-          {/* YouTube link */}
           {selectedShow.youtube && (
             <div>
               <h3 className="text-sm font-semibold tracking-wide uppercase text-[#8e3e3e] mb-2">
