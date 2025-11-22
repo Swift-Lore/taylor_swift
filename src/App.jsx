@@ -117,7 +117,7 @@ function App() {
           color: "#6b7db3",
           fontSize: "14px",
           padding: "20px",
-          border: "2px solid "#ffcaca",
+          border: "2px solid #ffcaca",
           borderRadius: "12px",
           maxWidth: "600px",
           width: "90%",
