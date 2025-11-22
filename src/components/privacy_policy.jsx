@@ -129,6 +129,18 @@ export default function PrivacyPolicyPage() {
                 📋 For more information, refer to our <strong>Cookie Policy</strong>
               </p>
             </div>
+            {/* Google AdSense Disclosure (Required by Google) */}
+<div className="bg-[#fef2f2] border border-[#b91c1c] rounded-lg p-4 mt-6">
+  <h3 className="font-semibold text-[#b91c1c] mb-2">Google AdSense & Advertising Partners</h3>
+  <p className="text-[#6b7db3] text-sm leading-relaxed">
+    Google and its advertising partners may use cookies, web beacons, or similar 
+    technologies to serve ads based on your prior visits to this or other websites. 
+    Google’s use of advertising cookies enables it and its partners to serve 
+    personalized or non-personalized ads to you based on your browsing activity. 
+    You can opt out of personalized advertising by visiting 
+    Google’s Ads Settings page.
+  </p>
+</div>
           </div>
 
           {/* Section 4 */}
