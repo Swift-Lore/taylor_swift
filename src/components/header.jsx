@@ -120,7 +120,8 @@ export default function Header() {
       <div className="pointer-events-none absolute -top-4 left-1/2 -translate-x-1/2 md:left-12 md:translate-x-0 w-40 h-40 blur-2xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
 
       <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 pt-4 md:pt-5 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 relative">
-        /* MOBILE-FIRST LAYOUT: Full Timeline Page */
+       
+        {/* MOBILE-FIRST LAYOUT: Full Timeline Page */}
 {isFullTimelinePage && !isEventPage && (
   <>
     {/* Mobile: Centered logo */}
