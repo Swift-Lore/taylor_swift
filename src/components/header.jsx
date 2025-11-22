@@ -267,7 +267,7 @@ export default function Header() {
   </>
 )}
 
-        {/* CENTER: Logo section for Home Page (unchanged) */}
+               {/* CENTER: Logo section for Home Page (unchanged) */}
         {!isFullTimelinePage && !isEventPage && (
           <div className="w-full flex flex-col items-center relative z-20 overflow-visible">
             <button
