@@ -267,7 +267,7 @@ export default function Header() {
   </>
 )}
 
-               {/* CENTER: Logo section for Home Page (unchanged) */}
+                      {/* CENTER: Logo section for Home Page (unchanged) */}
         {!isFullTimelinePage && !isEventPage && (
           <div className="w-full flex flex-col items-center relative z-20 overflow-visible">
             <button
@@ -294,7 +294,7 @@ export default function Header() {
           </div>
         )}
 
-                {/* Home page content - search + CTA only */}
+        {/* Home page content - search + CTA only */}
         {showHero && (
           <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-3 text-center md:text-left relative z-20">
             <div className="w-full max-w-xs">
@@ -318,6 +318,32 @@ export default function Header() {
             </button>
           </div>
         )}
+
+        {/* Global nav row – appears on all pages */}
+        <nav className="w-full mt-4 mb-1">
+          <div className="flex flex-wrap justify-center gap-2 md:gap-3 text-sm">
+            <button
+              onClick={handleLogoClick}
+              className="bg-white/85 text-[#8e3e3e] hover:bg:white rounded-full px-4 py-1.5 font-medium shadow-sm border border-white/70 transition-all whitespace-nowrap"
+            >
+              Home
+            </button>
+
+            <button
+              onClick={() => navigate("/posts")}
+              className="bg:white/85 text-[#8e3e3e] hover:bg:white rounded-full px-4 py-1.5 font-medium shadow-sm border border:white/70 transition-all whitespace-nowrap"
+            >
+              Full Timeline
+            </button>
+
+            <button
+              onClick={() => navigate("/eras-tour-shows")}
+              className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-4 py-1.5 font-semibold shadow-sm transition-transform hover:-translate-y-0.5 whitespace-nowrap"
+            >
+              Eras Tour Shows
+            </button>
+          </div>
+        </nav>
       </div>
     </header>
   );
