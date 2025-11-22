@@ -109,46 +109,89 @@ export default function Header() {
       <div className="pointer-events-none absolute -top-4 left-1/2 -translate-x-1/2 md:left-12 md:translate-x-0 w-40 h-40 blur-2xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
 
       <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 pt-4 md:pt-5 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 relative">
-                {/* =============== FULL TIMELINE PAGE HEADER =============== */}
+        {/* =============== FULL TIMELINE PAGE HEADER =============== */}
         {isFullTimelinePage && !isEventPage && (
-          <div className="w-full flex flex-col items-center gap-4">
-            {/* Centered logo */}
-            <button
-              type="button"
-              onClick={handleLogoClick}
-              className="cursor-pointer"
-            >
-              <img
-                src="/images/swift_lore.png"
-                alt="Swift Lore"
-                className="h-auto object-contain max-h-[120px] md:max-h-[140px] logo-glow"
-                style={{ maxWidth: "260px" }}
-              />
-            </button>
+          <>
+            {/* Mobile layout: what you have now, kept as-is */}
+            <div className="w-full md:hidden flex flex-col items-center gap-4">
+              {/* Centered logo */}
+              <button
+                type="button"
+                onClick={handleLogoClick}
+                className="cursor-pointer"
+              >
+                <img
+                  src="/images/swift_lore.png"
+                  alt="Swift Lore"
+                  className="h-auto object-contain max-h-[120px] md:max-h-[140px] logo-glow"
+                  style={{ maxWidth: "260px" }}
+                />
+              </button>
 
-            {/* Buttons row */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <button
-                onClick={() => navigate("/")}
-                className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
-              >
-                Return to Home
-              </button>
-              <button
-                onClick={() => navigate("/eras-tour-shows")}
-                className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
-              >
-                Eras Tour Shows
-              </button>
+              {/* Buttons row */}
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <button
+                  onClick={() => navigate("/")}
+                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+                >
+                  Return to Home
+                </button>
+                <button
+                  onClick={() => navigate("/eras-tour-shows")}
+                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+                >
+                  Eras Tour Shows
+                </button>
+              </div>
+
+              {/* Timeline subtitle under buttons */}
+              <h2 className="text-white text-2xl md:text-3xl font-serif drop-shadow-lg tracking-wide text-center mt-2">
+                Taylor Swift&apos;s Career Timeline
+              </h2>
             </div>
 
-            {/* Timeline subtitle under buttons */}
-            <h2 className="text-white text-2xl md:text-3xl font-serif drop-shadow-lg tracking-wide text-center mt-2">
-              Taylor Swift&apos;s Career Timeline
-            </h2>
-          </div>
-        )}
+            {/* Desktop layout: left title, right logo + buttons (centered under logo) */}
+            <div className="hidden md:flex md:w-[55%] flex-col items-start">
+              <h2 className="text-white text-3xl md:text-4xl font-serif drop-shadow-lg tracking-wide text-left">
+                Taylor Swift&apos;s Career Timeline
+              </h2>
+            </div>
 
+            <div className="hidden md:flex md:w-[35%] justify-end">
+              {/* This inner column keeps logo + buttons centered with each other
+                  while the whole group stays on the right side */}
+              <div className="flex flex-col items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleLogoClick}
+                  className="cursor-pointer flex justify-center"
+                >
+                  <img
+                    src="/images/swift_lore.png"
+                    alt="Swift Lore"
+                    className="h-auto object-contain max-h-[120px] md:max-h-[140px] logo-glow"
+                    style={{ maxWidth: "260px" }}
+                  />
+                </button>
+
+                <div className="flex gap-3 mt-1">
+                  <button
+                    onClick={() => navigate("/")}
+                    className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+                  >
+                    Return to Home
+                  </button>
+                  <button
+                    onClick={() => navigate("/eras-tour-shows")}
+                    className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+                  >
+                    Eras Tour Shows
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* =============== EVENT DETAILS PAGE HEADER =============== */}
         {isEventPage && (
