@@ -122,23 +122,25 @@ export default function Header() {
       <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 pt-4 md:pt-5 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 relative">
         
                 {/* MOBILE-FIRST LAYOUT: Full Timeline Page */}
-        {isFullTimelinePage && !isEventPage && (
-          <>
-            {/* Mobile: Centered logo on top */}
-            <div className="w-full md:hidden flex flex-col items-center gap-4">
-              <button
-                type="button"
-                onClick={handleLogoClick}
-                className="cursor-pointer"
-              >
-                <img
-                  src="/images/swift_lore.png"
-                  alt="Swift Lore"
-                  className="h-auto object-contain max-h-[100px] logo-glow"
-                  style={{ maxWidth: "180px" }}
-                />
-              </button>
-            </div>
+{isFullTimelinePage && !isEventPage && (
+  <>
+    {/* Mobile: Centered logo and button on top */}
+    <div className="w-full md:hidden flex flex-col items-center gap-4">
+      <button
+        type="button"
+        onClick={handleLogoClick}
+        className="cursor-pointer"
+      >
+        <img
+          src="/images/swift_lore.png"
+          alt="Swift Lore"
+          className="h-auto object-contain max-h-[100px] logo-glow"
+          style={{ maxWidth: "180px" }}
+        />
+      </button>
+    </div>
+  </>
+)}
 
             {/* Mobile: Timeline text below */}
             <div className="w-full md:hidden flex flex-col items-center mt-4">
