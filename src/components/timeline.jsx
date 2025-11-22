@@ -89,6 +89,8 @@ export default function Timeline() {
 
 // ===== Card component =====
 const TimelineCard = ({ record, index }) => {
+  const [isSelectingText, setIsSelectingText] = useState(false)
+
   const handleTagClick = (e, keyword) => {
     e.preventDefault()
     e.stopPropagation()
@@ -96,16 +98,28 @@ const TimelineCard = ({ record, index }) => {
   }
 
   const handleCardClick = () => {
-    navigate(`/post_details?id=${record.id}`)
+    // Only navigate if user wasn't selecting text
+    if (!isSelectingText) {
+      navigate(`/post_details?id=${record.id}`)
+    }
+    // Reset the selection state
+    setIsSelectingText(false)
   }
 
-  // Track if text is being selected
-  const handleTextSelect = (e) => {
-    // If user is selecting text (not just clicking), don't navigate
+  const handleMouseDown = (e) => {
+    // Check if the mouse down is on text (not on keywords or empty space)
+    const isTextElement = e.target.closest('.timeline-card-text h3') || 
+                         e.target.closest('.timeline-card-text div:not(.keyword-container)')
+    if (isTextElement) {
+      setIsSelectingText(false) // Reset, will be set to true if they drag
+    }
+  }
+
+  const handleMouseUp = (e) => {
+    // Check if text was actually selected
     const selection = window.getSelection()
     if (selection.toString().length > 0) {
-      e.preventDefault()
-      e.stopPropagation()
+      setIsSelectingText(true)
     }
   }
 
@@ -127,6 +141,8 @@ const TimelineCard = ({ record, index }) => {
       className="block relative hover:opacity-95 transition-opacity timeline-card"
       style={{ marginTop: index === 0 ? "17px" : "43px" }}
       onClick={handleCardClick}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
     >
       <div className="relative">
         <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
@@ -136,10 +152,7 @@ const TimelineCard = ({ record, index }) => {
               {formatDate(record?.fields?.DATE)}
             </div>
 
-            <div 
-              className="flex flex-col gap-2.5 mt-1.5 timeline-card-text"
-              onMouseUp={handleTextSelect} // Add this to prevent navigation after text selection
-            >
+            <div className="flex flex-col gap-2.5 mt-1.5 timeline-card-text">
               {/* Event Description */}
               <h3 className="text-[#8e3e3e] font-bold text-sm md:text-base leading-relaxed text-center">
                 {record?.fields?.EVENT || "Event description unavailable"}
