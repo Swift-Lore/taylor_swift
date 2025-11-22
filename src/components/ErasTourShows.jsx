@@ -1,23 +1,40 @@
 import { useEffect, useState } from "react";
 
-// TODO: Replace this with your real endpoint or import
-// For now, assume your Netlify function or JSON endpoint
-// returns an array of objects with the same keys as your CSV:
-// EVENT, DATE, VENUE, "SHOW DISPLAY NAME", "Surprise Song 1", "Surprise Song 2", NOTES, YOUTUBE, ID, etc.
-const SHOWS_ENDPOINT = "/api/events"; // <-- update to your real URL
+// POINT THIS TO THE SAME ENDPOINT YOUR TIMELINE USES
+// Example if your timeline uses axios.get("/.netlify/functions/events"):
+// const SHOWS_ENDPOINT = "/.netlify/functions/events";
+const SHOWS_ENDPOINT =
+  import.meta.env.VITE_EVENTS_ENDPOINT || "/.netlify/functions/events";
 
+// Normalize any record shape into a flat "show" object
 function normalizeShow(raw) {
+  // Support Airtable-style { id, fields: {...} } OR flat objects
+  const fields = raw.fields || raw;
+
   return {
-    id: raw.ID ?? raw.id ?? raw.EVENT, // fallback if ID missing
-    event: raw.EVENT,
-    date: raw.DATE,
-    showDisplayName: raw["SHOW DISPLAY NAME"] || raw.EVENT,
-    venue: raw.VENUE || "",
-    surprise1: raw["Surprise Song 1"] || "",
-    surprise2: raw["Surprise Song 2"] || "",
-    notes: raw.NOTES || "",
-    youtube: raw.YOUTUBE || "",
+    id: fields.ID ?? raw.id ?? fields.EVENT, // use your ID column if present
+    event: fields.EVENT,
+    date: fields.DATE,
+    showDisplayName: fields["SHOW DISPLAY NAME"] || fields.EVENT,
+    venue: fields.VENUE || "",
+    surprise1: fields["Surprise Song 1"] || "",
+    surprise2: fields["Surprise Song 2"] || "",
+    notes: fields.NOTES || "",
+    youtube: fields.YOUTUBE || "",
   };
+}
+
+// Optional: prettier date display
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.getTime())) return dateStr; // fallback: raw
+
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 export default function ErasTourShows() {
@@ -40,20 +57,37 @@ export default function ErasTourShows() {
 
         const data = await res.json();
 
+        // Handle different possible shapes:
+        // - [{ EVENT, ... }]
+        // - { records: [{ id, fields: { EVENT, ... } }] }
+        const rawArray = Array.isArray(data)
+          ? data
+          : Array.isArray(data.records)
+          ? data.records
+          : [];
+
+        // Flatten to just "fields + id"
+        const flattened = rawArray.map((item) => {
+          if (item.fields) {
+            return { ...item.fields, id: item.id };
+          }
+          return item;
+        });
+
         // Filter down to Eras Tour shows only
-        const erasOnly = (data || []).filter((item) =>
-          typeof item.EVENT === "string" &&
-          item.EVENT.startsWith("The Eras Tour:")
+        const erasOnly = flattened.filter(
+          (item) =>
+            typeof item.EVENT === "string" &&
+            item.EVENT.startsWith("The Eras Tour:")
         );
 
         // Normalize shape
         const normalized = erasOnly
-          .map(normalizeShow)
+          .map((item) => normalizeShow(item))
           .sort((a, b) => {
-            // Sort by date ascending
             const da = new Date(a.date);
             const db = new Date(b.date);
-            if (isNaN(da) || isNaN(db)) return 0;
+            if (Number.isNaN(da.getTime()) || Number.isNaN(db.getTime())) return 0;
             return da - db;
           });
 
@@ -145,7 +179,7 @@ export default function ErasTourShows() {
               {selectedShow.date && (
                 <p>
                   <span className="font-semibold text-[#8e3e3e]">Date:</span>{" "}
-                  {selectedShow.date}
+                  {formatDate(selectedShow.date)}
                 </p>
               )}
               {selectedShow.venue && (
@@ -166,17 +200,13 @@ export default function ErasTourShows() {
               <ul className="text-sm md:text-base text-[#4b5563] list-disc list-inside space-y-1">
                 {selectedShow.surprise1 && (
                   <li>
-                    <span className="font-medium text-[#8e3e3e]">
-                      Song 1:
-                    </span>{" "}
+                    <span className="font-medium text-[#8e3e3e]">Song 1:</span>{" "}
                     {selectedShow.surprise1}
                   </li>
                 )}
                 {selectedShow.surprise2 && (
                   <li>
-                    <span className="font-medium text-[#8e3e3e]">
-                      Song 2:
-                    </span>{" "}
+                    <span className="font-medium text-[#8e3e3e]">Song 2:</span>{" "}
                     {selectedShow.surprise2}
                   </li>
                 )}
