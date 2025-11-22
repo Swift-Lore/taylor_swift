@@ -1,33 +1,34 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function Header() {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const [searchQuery, setSearchQuery] = useState("")
-  const [eventData, setEventData] = useState(null)
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [eventData, setEventData] = useState(null);
 
-  const isFullTimelinePage = location.pathname === "/posts"
-  const isEventPage = location.pathname === "/post_details"
-  const showHero = !isFullTimelinePage && !isEventPage
+  const isFullTimelinePage = location.pathname === "/posts";
+  const isEventPage = location.pathname === "/post_details";
+  const showHero = !isFullTimelinePage && !isEventPage;
 
+  // Sync search box with ?q=
   useEffect(() => {
-    const urlParams = new URLSearchParams(location.search)
-    const queryFromUrl = urlParams.get("q")
+    const urlParams = new URLSearchParams(location.search);
+    const queryFromUrl = urlParams.get("q");
     if (queryFromUrl) {
-      setSearchQuery(queryFromUrl)
+      setSearchQuery(queryFromUrl);
     } else {
-      setSearchQuery("")
+      setSearchQuery("");
     }
-  }, [location.search])
+  }, [location.search]);
 
-  // Fetch event data when on event page
+  // Fetch event data for event header
   useEffect(() => {
     if (isEventPage) {
-      const searchParams = new URLSearchParams(location.search)
-      const postId = searchParams.get("id")
+      const searchParams = new URLSearchParams(location.search);
+      const postId = searchParams.get("id");
 
       if (postId) {
         const fetchEventData = async () => {
@@ -39,68 +40,68 @@ export default function Header() {
                   Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
                 },
               }
-            )
+            );
 
             if (response.ok) {
-              const data = await response.json()
-              setEventData(data.fields)
+              const data = await response.json();
+              setEventData(data.fields);
             }
           } catch (error) {
-            console.error("Error fetching event data for header:", error)
+            console.error("Error fetching event data for header:", error);
           }
-        }
+        };
 
-        fetchEventData()
+        fetchEventData();
       }
     }
-  }, [isEventPage, location.search])
+  }, [isEventPage, location.search]);
 
-  // Safe date formatting function
+  // Safe date formatting
   const formatEventDate = (isoDate) => {
-    if (!isoDate) return ""
+    if (!isoDate) return "";
 
     try {
-      const d = new Date(isoDate)
-      if (Number.isNaN(d.getTime())) return ""
+      const d = new Date(isoDate);
+      if (Number.isNaN(d.getTime())) return "";
 
       const month = d.toLocaleString("en-US", {
         month: "short",
         timeZone: "UTC",
-      })
-      const day = String(d.getUTCDate()).padStart(2, "0")
-      const year = d.getUTCFullYear()
+      });
+      const day = String(d.getUTCDate()).padStart(2, "0");
+      const year = d.getUTCFullYear();
 
-      return `${month}-${day}-${year}`
+      return `${month}-${day}-${year}`;
     } catch (error) {
-      console.error("Error formatting date:", error)
-      return ""
+      console.error("Error formatting date:", error);
+      return "";
     }
-  }
+  };
 
   const handleSearch = (e) => {
-    e.preventDefault()
-    const trimmedQuery = searchQuery.trim()
+    e.preventDefault();
+    const trimmedQuery = searchQuery.trim();
     if (!trimmedQuery) {
-      navigate("/")
-      return
+      navigate("/");
+      return;
     }
 
     const formattedQuery =
-      trimmedQuery.charAt(0).toUpperCase() + trimmedQuery.slice(1)
+      trimmedQuery.charAt(0).toUpperCase() + trimmedQuery.slice(1);
 
-    navigate(`/?q=${encodeURIComponent(formattedQuery)}`)
-  }
+    navigate(`/?q=${encodeURIComponent(formattedQuery)}`);
+  };
 
-  const handleInputChange = (e) => setSearchQuery(e.target.value)
+  const handleInputChange = (e) => setSearchQuery(e.target.value);
 
   const handleKeyPress = (e) => {
-    if (e.key === "Enter") handleSearch(e)
-  }
+    if (e.key === "Enter") handleSearch(e);
+  };
 
   const handleLogoClick = () => {
-    setSearchQuery("")
-    navigate("/")
-  }
+    setSearchQuery("");
+    navigate("/");
+  };
 
   return (
     <header className="relative w-full bg-gradient-to-b from-[#9fa8f5] via-[#8a9ad4] to-[#e6edf7] pb-2 md:pb-3 shadow-[0_10px_30px_rgba(75,85,160,0.35)] fade-in-up overflow-visible z-10">
@@ -108,10 +109,10 @@ export default function Header() {
       <div className="pointer-events-none absolute -top-4 left-1/2 -translate-x-1/2 md:left-12 md:translate-x-0 w-40 h-40 blur-2xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
 
       <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 pt-4 md:pt-5 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 relative">
-        {/* MOBILE-FIRST LAYOUT: Full Timeline Page */}
+        {/* =============== FULL TIMELINE PAGE HEADER =============== */}
         {isFullTimelinePage && !isEventPage && (
           <>
-            {/* Mobile: Centered logo and button on top */}
+            {/* Mobile: centered logo + buttons */}
             <div className="w-full md:hidden flex flex-col items-center gap-4">
               <button
                 type="button"
@@ -125,27 +126,36 @@ export default function Header() {
                   style={{ maxWidth: "180px" }}
                 />
               </button>
-              <button
-                onClick={() => navigate("/")}
-                className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
-              >
-                Return to Home
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => navigate("/")}
+                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+                >
+                  Return to Home
+                </button>
+                <button
+                  onClick={() => navigate("/eras-tour-shows")}
+                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+                >
+                  Eras Tour Shows
+                </button>
+              </div>
             </div>
 
-            {/* Mobile: Timeline text below */}
+            {/* Mobile: timeline text below */}
             <div className="w-full md:hidden flex flex-col items-center mt-4">
               <h2 className="text-white text-2xl font-serif drop-shadow-lg tracking-wide text-center">
                 Taylor Swift&apos;s Career Timeline
               </h2>
             </div>
 
-            {/* Desktop: Original layout */}
+            {/* Desktop: left = title, right = logo + buttons */}
             <div className="hidden md:flex md:w-[40%] flex-col items-start">
               <h2 className="text-white text-3xl md:text-4xl font-serif drop-shadow-lg tracking-wide text-left">
                 Taylor Swift&apos;s Career Timeline
               </h2>
             </div>
+
             <div className="hidden md:flex md:w-[30%] flex-col items-end">
               <div className="flex justify-end w-full">
                 <button
@@ -161,22 +171,28 @@ export default function Header() {
                   />
                 </button>
               </div>
-              <div className="flex justify-end w-full mt-2 pr-2 md:pr-4">
+              <div className="flex justify-end w-full mt-2 pr-2 md:pr-4 gap-3">
                 <button
                   onClick={() => navigate("/")}
                   className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
                 >
                   Return to Home
                 </button>
+                <button
+                  onClick={() => navigate("/eras-tour-shows")}
+                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+                >
+                  Eras Tour Shows
+                </button>
               </div>
             </div>
           </>
         )}
 
-        {/* MOBILE-FIRST LAYOUT: Event Page */}
+        {/* =============== EVENT DETAILS PAGE HEADER =============== */}
         {isEventPage && (
           <>
-            {/* Mobile: Logo + buttons on top */}
+            {/* Mobile: logo + buttons */}
             <div className="w-full md:hidden flex flex-col items-center gap-4 mb-4">
               <button
                 type="button"
@@ -206,7 +222,7 @@ export default function Header() {
               </div>
             </div>
 
-            {/* Mobile: Event info below */}
+            {/* Mobile: event title/date */}
             <div className="w-full md:hidden flex flex-col items-center text-center">
               <h2 className="text-white text-2xl font-serif drop-shadow-lg tracking-wide">
                 {eventData?.EVENT || "Loading event..."}
@@ -231,7 +247,6 @@ export default function Header() {
             </div>
 
             <div className="hidden md:flex md:w-[35%] flex-col items-end">
-              {/* Logo container with centered alignment */}
               <div className="flex flex-col items-center w-full">
                 <button
                   type="button"
@@ -246,7 +261,6 @@ export default function Header() {
                   />
                 </button>
 
-                {/* Buttons container - centered under logo */}
                 <div className="flex gap-3 mt-3 justify-center w-full">
                   <button
                     onClick={() => navigate("/")}
@@ -266,58 +280,70 @@ export default function Header() {
           </>
         )}
 
-        {/* CENTER: Logo section for Home Page (unchanged) */}
+        {/* =============== HOME / OTHER PAGES HERO HEADER =============== */}
         {!isFullTimelinePage && !isEventPage && (
-          <div className="w-full flex flex-col items-center relative z-20 overflow-visible">
-            <button
-              type="button"
-              onClick={handleLogoClick}
-              className="w-full max-w-[800px] cursor-pointer relative -mt-2 md:-mt-4"
-            >
-              <span className="absolute left-8 md:left-12 top-8 md:top-10 text-white/80 text-xl md:text-3xl twinkle">
-                ✨
-              </span>
-              <span className="absolute right-10 md:right-16 top-6 md:top-8 text-white/80 text-2xl md:text-4xl twinkle">
-                ✨
-              </span>
-              <span className="absolute right-20 md:right-28 bottom-8 md:bottom-12 text-white/80 text-lg md:text-2xl twinkle">
-                ✨
-              </span>
+          <>
+            {/* Centered logo banner (home-style) */}
+            <div className="w-full flex flex-col items-center relative z-20 overflow-visible">
+              <button
+                type="button"
+                onClick={handleLogoClick}
+                className="w-full max-w-[800px] cursor-pointer relative -mt-2 md:-mt-4"
+              >
+                <span className="absolute left-8 md:left-12 top-8 md:top-10 text-white/80 text-xl md:text-3xl twinkle">
+                  ✨
+                </span>
+                <span className="absolute right-10 md:right-16 top-6 md:top-8 text-white/80 text-2xl md:text-4xl twinkle">
+                  ✨
+                </span>
+                <span className="absolute right-20 md:right-28 bottom-8 md:bottom-12 text-white/80 text-lg md:text-2xl twinkle">
+                  ✨
+                </span>
 
-              <img
-                src="/images/swift_lore.png"
-                alt="Swift Lore"
-                className="w-full h-auto object-contain max-h-[200px] md:max-h-[240px] logo-glow"
-              />
-            </button>
-          </div>
-        )}
-
-        {/* Home page content - search + CTA only */}
-        {showHero && (
-          <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-3 text-center md:text-left relative z-20">
-            <div className="w-full max-w-xs">
-              <form onSubmit={handleSearch} className="relative">
-                <input
-                  type="text"
-                  placeholder="Search events, locations, categories..."
-                  value={searchQuery}
-                  onChange={handleInputChange}
-                  onKeyPress={handleKeyPress}
-                  className="w-full rounded-full py-2 pl-7 pr-4 text-sm bg-white/90 text-gray-800 shadow focus:outline-none focus:ring-2 focus:ring-[#fbb1c3]"
+                <img
+                  src="/images/swift_lore.png"
+                  alt="Swift Lore"
+                  className="w-full h-auto object-contain max-h-[200px] md:max-h-[240px] logo-glow"
                 />
-              </form>
+              </button>
             </div>
 
-            <button
-              className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-2 font-semibold text-sm w-auto shadow transition-transform hover:-translate-y-0.5 whitespace-nowrap"
-              onClick={() => navigate("/posts")}
-            >
-              View Full Timeline
-            </button>
-          </div>
+            {/* Home hero content (search + CTAs) */}
+            {showHero && (
+              <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-3 text-center md:text-left relative z-20">
+                <div className="w-full max-w-xs">
+                  <form onSubmit={handleSearch} className="relative">
+                    <input
+                      type="text"
+                      placeholder="Search events, locations, categories..."
+                      value={searchQuery}
+                      onChange={handleInputChange}
+                      onKeyPress={handleKeyPress}
+                      className="w-full rounded-full py-2 pl-7 pr-4 text-sm bg-white/90 text-gray-800 shadow focus:outline-none focus:ring-2 focus:ring-[#fbb1c3]"
+                    />
+                  </form>
+                </div>
+
+                {/* CTA row: View Full Timeline + Eras Tour Shows */}
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-1">
+                  <button
+                    className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-2 font-semibold text-sm w-full sm:w-auto shadow transition-transform hover:-translate-y-0.5 whitespace-nowrap"
+                    onClick={() => navigate("/posts")}
+                  >
+                    View Full Timeline
+                  </button>
+                  <button
+                    className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-2 font-semibold text-sm w-full sm:w-auto shadow transition-transform hover:-translate-y-0.5 whitespace-nowrap"
+                    onClick={() => navigate("/eras-tour-shows")}
+                  >
+                    Eras Tour Shows
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </header>
-  )
+  );
 }
