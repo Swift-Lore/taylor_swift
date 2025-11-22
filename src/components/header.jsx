@@ -11,12 +11,12 @@ export default function Header() {
 
   const isFullTimelinePage = location.pathname === "/posts";
   const isEventPage = location.pathname === "/post_details";
+  const showHero = !isFullTimelinePage && !isEventPage;
+
   const currentPath = location.pathname;
   const isHomeRoute = currentPath === "/" || currentPath === "/timeline";
   const isTimelineRoute = currentPath === "/posts";
   const isErasRoute = currentPath === "/eras-tour-shows";
-
-  const showHero = !isFullTimelinePage && !isEventPage;
 
   const navBaseClasses =
     "rounded-full px-4 py-1.5 text-sm font-medium whitespace-nowrap border transition-all";
@@ -25,63 +25,57 @@ export default function Header() {
   const navInactiveClasses =
     "bg-white/80 text-[#8e3e3e] border-white/70 hover:bg-white hover:shadow-md";
 
+  // sync search with URL
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const queryFromUrl = urlParams.get("q");
-    if (queryFromUrl) {
-      setSearchQuery(queryFromUrl);
-    } else {
-      setSearchQuery("");
-    }
+    setSearchQuery(queryFromUrl || "");
   }, [location.search]);
 
-  // Fetch event data when on event page
+  // fetch event data for header on event page
   useEffect(() => {
-    if (isEventPage) {
-      const searchParams = new URLSearchParams(location.search);
-      const postId = searchParams.get("id");
-
-      if (postId) {
-        const fetchEventData = async () => {
-          try {
-            const response = await fetch(
-              `https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker/${postId}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-                },
-              }
-            );
-
-            if (response.ok) {
-              const data = await response.json();
-              setEventData(data.fields);
-            }
-          } catch (error) {
-            console.error("Error fetching event data for header:", error);
-          }
-        };
-
-        fetchEventData();
-      }
+    if (!isEventPage) {
+      setEventData(null);
+      return;
     }
+
+    const searchParams = new URLSearchParams(location.search);
+    const postId = searchParams.get("id");
+    if (!postId) return;
+
+    const fetchEventData = async () => {
+      try {
+        const response = await fetch(
+          `https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker/${postId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+            },
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setEventData(data.fields);
+        }
+      } catch (error) {
+        console.error("Error fetching event data for header:", error);
+      }
+    };
+
+    fetchEventData();
   }, [isEventPage, location.search]);
 
-  // Safe date formatting function
   const formatEventDate = (isoDate) => {
     if (!isoDate) return "";
-
     try {
       const d = new Date(isoDate);
       if (Number.isNaN(d.getTime())) return "";
-
       const month = d.toLocaleString("en-US", {
         month: "short",
         timeZone: "UTC",
       });
       const day = String(d.getUTCDate()).padStart(2, "0");
       const year = d.getUTCFullYear();
-
       return `${month}-${day}-${year}`;
     } catch (error) {
       console.error("Error formatting date:", error);
@@ -96,10 +90,8 @@ export default function Header() {
       navigate("/");
       return;
     }
-
     const formattedQuery =
       trimmedQuery.charAt(0).toUpperCase() + trimmedQuery.slice(1);
-
     navigate(`/?q=${encodeURIComponent(formattedQuery)}`);
   };
 
@@ -116,66 +108,15 @@ export default function Header() {
 
   return (
     <header className="relative w-full bg-gradient-to-b from-[#9fa8f5] via-[#8a9ad4] to-[#e6edf7] pb-2 md:pb-3 shadow-[0_10px_30px_rgba(75,85,160,0.35)] fade-in-up overflow-visible z-10">
-      {/* Compact decorative glow */}
+      {/* soft glow behind logo area */}
       <div className="pointer-events-none absolute -top-4 left-1/2 -translate-x-1/2 md:left-12 md:translate-x-0 w-40 h-40 blur-2xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
 
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 pt-4 md:pt-5 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 relative">
-       
-        {/* MOBILE-FIRST LAYOUT: Full Timeline Page */}
-{isFullTimelinePage && !isEventPage && (
-  <>
-    {/* Mobile: Centered logo */}
-    <div className="w-full md:hidden flex flex-col items-center gap-4">
-      <button
-        type="button"
-        onClick={handleLogoClick}
-        className="cursor-pointer"
-      >
-        <img
-          src="/images/swift_lore.png"
-          alt="Swift Lore"
-          className="h-auto object-contain max-h-[100px] logo-glow"
-          style={{ maxWidth: "180px" }}
-        />
-      </button>
-    </div>
-
-    {/* Mobile: Title below logo */}
-    <div className="w-full md:hidden flex flex-col items-center mt-4">
-      <h2 className="text-white text-2xl font-serif drop-shadow-lg tracking-wide text-center">
-        Taylor Swift&apos;s Career Timeline
-      </h2>
-    </div>
-
-    {/* Desktop Layout — NO return button */}
-    <div className="hidden md:flex md:w-[40%] flex-col items-start">
-      <h2 className="text-white text-3xl md:text-4xl font-serif drop-shadow-lg tracking-wide text-left">
-        Taylor Swift&apos;s Career Timeline
-      </h2>
-    </div>
-
-    <div className="hidden md:flex md:w-[30%] flex-col items-end">
-      <button
-        type="button"
-        onClick={handleLogoClick}
-        className="cursor-pointer flex justify-end"
-      >
-        <img
-          src="/images/swift_lore.png"
-          alt="Swift Lore"
-          className="h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow"
-          style={{ maxWidth: "200px" }}
-        />
-      </button>
-    </div>
-  </>
-)}
-
-        {/* MOBILE-FIRST LAYOUT: Event Page */}
-        {isEventPage && (
-          <>
-            {/* Mobile: Logo + buttons on top */}
-            <div className="w-full md:hidden flex flex-col items-center gap-4 mb-4">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 pt-4 md:pt-5 flex flex-col gap-3 md:gap-4 relative">
+        {/* ============== FULL TIMELINE HEADER ============== */}
+        {isFullTimelinePage && !isEventPage && (
+          <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
+            {/* Mobile: logo + title stacked */}
+            <div className="w-full md:hidden flex flex-col items-center gap-3">
               <button
                 type="button"
                 onClick={handleLogoClick}
@@ -188,6 +129,53 @@ export default function Header() {
                   style={{ maxWidth: "180px" }}
                 />
               </button>
+              <h2 className="text-white text-2xl font-serif drop-shadow-lg tracking-wide text-center">
+                Taylor Swift&apos;s Career Timeline
+              </h2>
+            </div>
+
+            {/* Desktop: title left, logo right (NO extra button) */}
+            <div className="hidden md:flex md:w-[45%] flex-col items-start">
+              <h2 className="text-white text-3xl md:text-4xl font-serif drop-shadow-lg tracking-wide text-left leading-snug">
+                Taylor Swift&apos;s Career Timeline
+              </h2>
+            </div>
+
+            <div className="hidden md:flex md:w-[35%] flex-col items-end">
+              <button
+                type="button"
+                onClick={handleLogoClick}
+                className="cursor-pointer flex justify-end"
+              >
+                <img
+                  src="/images/swift_lore.png"
+                  alt="Swift Lore"
+                  className="h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow"
+                  style={{ maxWidth: "200px" }}
+                />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ============== EVENT DETAIL HEADER ============== */}
+        {isEventPage && (
+          <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
+            {/* Mobile: logo + buttons + event text */}
+            <div className="w-full md:hidden flex flex-col items-center gap-4 mb-2">
+              <button
+                type="button"
+                onClick={handleLogoClick}
+                className="cursor-pointer"
+              >
+                <img
+                  src="/images/swift_lore.png"
+                  alt="Swift Lore"
+                  className="h-auto object-contain max-h-[100px] logo-glow"
+                  style={{ maxWidth: "180px" }}
+                />
+              </button>
+
               <div className="flex gap-3">
                 <button
                   onClick={() => navigate("/")}
@@ -202,23 +190,22 @@ export default function Header() {
                   View Full Timeline
                 </button>
               </div>
-            </div>
 
-            {/* Mobile: Event info below */}
-            <div className="w-full md:hidden flex flex-col items-center text-center">
-              <h2 className="text-white text-2xl font-serif drop-shadow-lg tracking-wide">
-                {eventData?.EVENT || "Loading event..."}
-              </h2>
-              {eventData?.DATE && (
-                <p className="text-white/90 text-sm font-medium drop-shadow-md mt-1">
-                  {formatEventDate(eventData.DATE)}
-                </p>
-              )}
+              <div className="text-center">
+                <h2 className="text-white text-2xl font-serif drop-shadow-lg tracking-wide">
+                  {eventData?.EVENT || "Loading event..."}
+                </h2>
+                {eventData?.DATE && (
+                  <p className="text-white/90 text-sm font-medium drop-shadow-md mt-1">
+                    {formatEventDate(eventData.DATE)}
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Desktop: left = event info, right = logo + buttons */}
             <div className="hidden md:flex md:w-[55%] flex-col items-start">
-              <h2 className="text-white text-3xl md:text-4xl font-serif drop-shadow-lg tracking-wide text-left">
+              <h2 className="text-white text-3xl md:text-4xl font-serif drop-shadow-lg tracking-wide text-left leading-snug">
                 {eventData?.EVENT || "Loading event..."}
               </h2>
               {eventData?.DATE && (
@@ -229,7 +216,6 @@ export default function Header() {
             </div>
 
             <div className="hidden md:flex md:w-[35%] flex-col items-end">
-              {/* Logo container with centered alignment */}
               <div className="flex flex-col items-center w-full">
                 <button
                   type="button"
@@ -244,7 +230,6 @@ export default function Header() {
                   />
                 </button>
 
-                {/* Buttons container - centered under logo */}
                 <div className="flex gap-3 mt-3 justify-center w-full">
                   <button
                     onClick={() => navigate("/")}
@@ -261,12 +246,13 @@ export default function Header() {
                 </div>
               </div>
             </div>
-          </>
+          </div>
         )}
 
-        {/* CENTER: Logo section for Home Page (unchanged) */}
+        {/* ============== HOME / ERAS (DEFAULT) HEADER ============== */}
         {!isFullTimelinePage && !isEventPage && (
           <div className="w-full flex flex-col items-center relative z-20 overflow-visible">
+            {/* Big logo */}
             <button
               type="button"
               onClick={handleLogoClick}
@@ -288,31 +274,31 @@ export default function Header() {
                 className="w-full h-auto object-contain max-h-[200px] md:max-h-[240px] logo-glow"
               />
             </button>
+
+            {/* Search hero (home & eras only) */}
+            {showHero && (
+              <div className="w-full md:w-1/2 flex flex-col items-center md:items-start gap-3 text-center md:text-left mt-3">
+                <div className="w-full max-w-lg">
+                  <form onSubmit={handleSearch} className="relative">
+                    <input
+                      type="text"
+                      placeholder="Search events, locations, categories..."
+                      value={searchQuery}
+                      onChange={handleInputChange}
+                      onKeyPress={handleKeyPress}
+                      className="w-full rounded-full py-2.5 pl-7 pr-4 text-sm bg-white/90 text-gray-800 shadow focus:outline-none focus:ring-2 focus:ring-[#fbb1c3]"
+                    />
+                  </form>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
-        {/* Home page content - search only (no duplicate CTA) */}
-        {showHero && (
-          <div className="w-full md:w-1/2 flex flex-col items-center md:items-start gap-3 text-center md:text-left relative z-20">
-            <div className="w-full max-w-lg">
-              <form onSubmit={handleSearch} className="relative">
-                <input
-                  type="text"
-                  placeholder="Search events, locations, categories..."
-                  value={searchQuery}
-                  onChange={handleInputChange}
-                  onKeyPress={handleKeyPress}
-                  className="w-full rounded-full py-2.5 pl-7 pr-4 text-sm bg-white/90 text-gray-800 shadow focus:outline-none focus:ring-2 focus:ring-[#fbb1c3]"
-                />
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* Global nav row – appears on all pages */}
+        {/* ============== GLOBAL NAV (ALL PAGES) ============== */}
         <nav className="w-full mt-4 mb-2">
           <div className="flex flex-wrap justify-center gap-2 md:gap-3">
-            {/* Hide Home button on home page */}
+            {/* Hide Home button on the actual home route */}
             {!isHomeRoute && (
               <button
                 onClick={handleLogoClick}
