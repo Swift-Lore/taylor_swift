@@ -11,6 +11,7 @@ export default function Header() {
 
   const isFullTimelinePage = location.pathname === "/posts";
   const isEventPage = location.pathname === "/post_details";
+  const isErasPage = location.pathname === "/eras-tour-shows";
   const showHero = !isFullTimelinePage && !isEventPage;
 
   // Sync search box with ?q=
@@ -112,9 +113,8 @@ export default function Header() {
         {/* =============== FULL TIMELINE PAGE HEADER =============== */}
         {isFullTimelinePage && !isEventPage && (
           <>
-            {/* Mobile layout: what you have now, kept as-is */}
+            {/* Mobile layout */}
             <div className="w-full md:hidden flex flex-col items-center gap-4">
-              {/* Centered logo */}
               <button
                 type="button"
                 onClick={handleLogoClick}
@@ -128,7 +128,6 @@ export default function Header() {
                 />
               </button>
 
-              {/* Buttons row */}
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <button
                   onClick={() => navigate("/")}
@@ -144,13 +143,12 @@ export default function Header() {
                 </button>
               </div>
 
-              {/* Timeline subtitle under buttons */}
               <h2 className="text-white text-2xl md:text-3xl font-serif drop-shadow-lg tracking-wide text-center mt-2">
                 Taylor Swift&apos;s Career Timeline
               </h2>
             </div>
 
-            {/* Desktop layout: left title, right logo + buttons (centered under logo) */}
+            {/* Desktop layout */}
             <div className="hidden md:flex md:w-[55%] flex-col items-start">
               <h2 className="text-white text-3xl md:text-4xl font-serif drop-shadow-lg tracking-wide text-left">
                 Taylor Swift&apos;s Career Timeline
@@ -158,8 +156,6 @@ export default function Header() {
             </div>
 
             <div className="hidden md:flex md:w-[35%] justify-end">
-              {/* This inner column keeps logo + buttons centered with each other
-                  while the whole group stays on the right side */}
               <div className="flex flex-col items-center gap-2">
                 <button
                   type="button"
@@ -284,7 +280,7 @@ export default function Header() {
           </>
         )}
 
-        {/* =============== HOME / OTHER PAGES HERO HEADER =============== */}
+        {/* =============== HOME / ERAS / OTHER PAGES HERO HEADER =============== */}
         {!isFullTimelinePage && !isEventPage && (
           <>
             {/* Centered logo banner (home-style) */}
@@ -312,7 +308,7 @@ export default function Header() {
               </button>
             </div>
 
-            {/* Home hero content (search + CTAs) */}
+            {/* Home / Eras hero content (search + CTAs) */}
             {showHero && (
               <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-3 text-center md:text-left relative z-20">
                 <div className="w-full max-w-xs">
@@ -328,7 +324,10 @@ export default function Header() {
                   </form>
                 </div>
 
-                {/* CTA row: View Full Timeline + Eras Tour Shows */}
+                {/* CTA row:
+                    - On Home: View Full Timeline + Eras Tour Shows
+                    - On Eras page: View Full Timeline + Home
+                */}
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-1">
                   <button
                     className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-2 font-semibold text-sm w-full sm:w-auto shadow transition-transform hover:-translate-y-0.5 whitespace-nowrap"
@@ -336,12 +335,22 @@ export default function Header() {
                   >
                     View Full Timeline
                   </button>
-                  <button
-                    className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-2 font-semibold text-sm w-full sm:w-auto shadow transition-transform hover:-translate-y-0.5 whitespace-nowrap"
-                    onClick={() => navigate("/eras-tour-shows")}
-                  >
-                    Eras Tour Shows
-                  </button>
+
+                  {!isErasPage ? (
+                    <button
+                      className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-2 font-semibold text-sm w-full sm:w-auto shadow transition-transform hover:-translate-y-0.5 whitespace-nowrap"
+                      onClick={() => navigate("/eras-tour-shows")}
+                    >
+                      Eras Tour Shows
+                    </button>
+                  ) : (
+                    <button
+                      className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-2 font-semibold text-sm w-full sm:w-auto shadow transition-transform hover:-translate-y-0.5 whitespace-nowrap"
+                      onClick={() => navigate("/")}
+                    >
+                      Home
+                    </button>
+                  )}
                 </div>
               </div>
             )}
