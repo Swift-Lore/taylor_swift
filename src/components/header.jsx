@@ -12,6 +12,18 @@ export default function Header() {
   const isFullTimelinePage = location.pathname === "/posts"
   const isEventPage = location.pathname === "/post_details"
   const showHero = !isFullTimelinePage && !isEventPage
+  const currentPath = location.pathname
+  const isHomeRoute =
+    currentPath === "/" || currentPath === "/timeline"
+  const isTimelineRoute = currentPath === "/posts"
+  const isErasRoute = currentPath === "/eras-tour-shows"
+
+  const navBaseClasses =
+    "rounded-full px-4 py-1.5 text-sm font-medium whitespace-nowrap border transition-all"
+  const navActiveClasses =
+    "bg-[#b66b6b] text-white border-[#b66b6b] shadow-md hover:bg-[#a55e5e] hover:-translate-y-0.5 transform"
+  const navInactiveClasses =
+    "bg-white/80 text-[#8e3e3e] border-white/70 hover:bg-white hover:shadow-md"
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search)
