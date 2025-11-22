@@ -9,9 +9,9 @@ import CookiePolicy from "./components/cookie_policy";
 import PrivacyPolicy from "./components/privacy_policy";
 import CookieConsent from "react-cookie-consent";
 
-// 🔹 IMPORTANT: file is `erastourshows.jsx` in your screenshot,
-// so the import path should be all lowercase:
-import ErasTourShows from "./components/erastourshows";
+// 🔹 IMPORTANT: file is `ErasTourShows.jsx` in your components folder,
+// so the import path must match the capitalization exactly:
+import ErasTourShows from "./components/ErasTourShows";
 
 /* ------------ Shared layout ------------ */
 
