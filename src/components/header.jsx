@@ -327,14 +327,17 @@ export default function Header() {
                 {/* Global nav row – appears on all pages */}
         <nav className="w-full mt-4 mb-2">
           <div className="flex flex-wrap justify-center gap-2 md:gap-3">
-            <button
-              onClick={handleLogoClick}
-              className={`${navBaseClasses} ${
-                isHomeRoute ? navActiveClasses : navInactiveClasses
-              }`}
-            >
-              Home
-            </button>
+           {/* Hide Home button on home page */}
+{!isHomeRoute && (
+  <button
+    onClick={handleLogoClick}
+    className={`${navBaseClasses} ${
+      isHomeRoute ? navActiveClasses : navInactiveClasses
+    }`}
+  >
+    Home
+  </button>
+)}
 
             <button
               onClick={() => navigate("/posts")}
