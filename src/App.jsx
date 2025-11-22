@@ -73,7 +73,13 @@ function PrivacyPolicyPage() {
     </Layout>
   );
 }
-
+function ErasTourShowsPage() {
+  return (
+    <Layout showHero={false}>
+      <ErasTourShows />
+    </Layout>
+  );
+}
 /* ------------ App root ------------ */
 
 function App() {
