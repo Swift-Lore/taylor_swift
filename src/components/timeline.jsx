@@ -99,6 +99,16 @@ const TimelineCard = ({ record, index }) => {
     navigate(`/post_details?id=${record.id}`)
   }
 
+  // Track if text is being selected
+  const handleTextSelect = (e) => {
+    // If user is selecting text (not just clicking), don't navigate
+    const selection = window.getSelection()
+    if (selection.toString().length > 0) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+  }
+
   // Format date function
   const formatDate = (dateString) => {
     if (!dateString) return "Loading..."
@@ -126,7 +136,10 @@ const TimelineCard = ({ record, index }) => {
               {formatDate(record?.fields?.DATE)}
             </div>
 
-            <div className="flex flex-col gap-2.5 mt-1.5 timeline-card-text">
+            <div 
+              className="flex flex-col gap-2.5 mt-1.5 timeline-card-text"
+              onMouseUp={handleTextSelect} // Add this to prevent navigation after text selection
+            >
               {/* Event Description */}
               <h3 className="text-[#8e3e3e] font-bold text-sm md:text-base leading-relaxed text-center">
                 {record?.fields?.EVENT || "Event description unavailable"}
