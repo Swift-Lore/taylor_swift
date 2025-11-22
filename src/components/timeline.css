@@ -123,10 +123,18 @@
   cursor: pointer;
 }
 
-/* Make the main card content selectable */
+/* Make the main card content selectable but show text cursor */
 .timeline-card-content {
-  user-select: text;
-  -webkit-user-select: text;
-  -moz-user-select: text;
-  -ms-user-select: text;
+  cursor: pointer; /* Whole card is clickable */
+}
+
+/* Show text selection cursor when hovering over selectable text */
+.timeline-card-text:hover {
+  cursor: text;
+}
+
+/* Force text cursor on the actual text elements */
+.timeline-card-text h3,
+.timeline-card-text div {
+  cursor: text;
 }
