@@ -96,47 +96,70 @@ const TimelineCard = ({ record, index }) => {
   }
 
   return (
-    <div
-      className="block relative cursor-pointer hover:opacity-95 transition-opacity"
+    <Link
+      to={`/post_details?id=${record.id}`}
+      className="block relative cursor-pointer hover:opacity-95 transition-opacity timeline-card-content"
       style={{ marginTop: index === 0 ? "17px" : "43px" }}
     >
-      <Link to={`/post_details?id=${record.id}`} className="block">
-        <div className="relative">
-          <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
-            <div className="bg-white/80 backdrop-blur-sm rounded-[10px] p-3 border border-[#f0d0d3]">
-              {/* Date Badge */}
-              <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 -translate-y-1/4 border border-[#8e3e3e] bg-white rounded-full px-3 py-1 text-sm text-[#8e3e3e] font-semibold shadow-md z-10 min-w-[150px] text-center">
-                {record?.fields?.DATE
-                  ? (() => {
-                      const date = new Date(record.fields.DATE)
-                      const options = {
-                        month: "short",
-                        day: "2-digit",
-                        year: "numeric",
-                        timeZone: "UTC",
-                      }
-                      return date.toLocaleDateString("en-US", options)
-                    })()
-                  : "Loading..."}
-              </div>
+      <div className="relative">
+        <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
+          <div className="bg-white/80 backdrop-blur-sm rounded-[10px] p-3 border border-[#f0d0d3]">
+            {/* Date Badge */}
+            <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 -translate-y-1/4 border border-[#8e3e3e] bg-white rounded-full px-3 py-1 text-sm text-[#8e3e3e] font-semibold shadow-md z-10 min-w-[150px] text-center">
+              {record?.fields?.DATE
+                ? (() => {
+                    const date = new Date(record.fields.DATE)
+                    const options = {
+                      month: "short",
+                      day: "2-digit",
+                      year: "numeric",
+                      timeZone: "UTC",
+                    }
+                    return date.toLocaleDateString("en-US", options)
+                  })()
+                : "Loading..."}
+            </div>
 
-              <div className="flex flex-col gap-2.5 mt-1.5">
-                {/* Event Description */}
-                <h3 className="text-[#8e3e3e] font-bold text-sm md:text-base leading-relaxed text-center select-text">
-                  {record?.fields?.EVENT || "Event description unavailable"}
-                </h3>
+            <div className="flex flex-col gap-2.5 mt-1.5 timeline-card-text">
+              {/* Event Description */}
+              <h3 className="text-[#8e3e3e] font-bold text-sm md:text-base leading-relaxed text-center">
+                {record?.fields?.EVENT || "Event description unavailable"}
+              </h3>
 
-                {/* Notes with line breaks */}
-                {record?.fields?.NOTES && (
-                  <div className="text-xs md:text-sm text-center font-medium text-gray-700 leading-relaxed whitespace-pre-line select-text">
-                    {record.fields.NOTES}
-                  </div>
-                )}
-              </div>
+              {/* Notes with line breaks */}
+              {record?.fields?.NOTES && (
+                <div className="text-xs md:text-sm text-center font-medium text-gray-700 leading-relaxed whitespace-pre-line">
+                  {record.fields.NOTES}
+                </div>
+              )}
+
+              {/* Keywords section with clickable tags */}
+              {record?.fields?.KEYWORDS && record.fields.KEYWORDS.length > 0 && (
+                <div className="flex flex-wrap gap-1 md:gap-1.5 justify-center">
+                  {record.fields.KEYWORDS.slice(0, 4).map((tag, tagIndex) => (
+                    <button
+                      key={tagIndex}
+                      type="button"
+                      className="bg-[#8a9ac7] text-white font-medium text-xs px-2 py-0.5 rounded-full whitespace-nowrap shadow-sm cursor-pointer hover:bg-[#6b7db3] transition-colors select-none"
+                      onClick={(e) => handleTagClick(e, tag)}
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                  {record.fields.KEYWORDS.length > 4 && (
+                    <div className="bg-[#b8c5e8] text-[#8e3e3e] font-medium text-xs px-2 py-0.5 rounded-full select-none">
+                      +{record.fields.KEYWORDS.length - 4}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
-      </Link>
+      </div>
+    </Link>
+  )
+}
 
       {/* Keywords section with clickable tags */}
       {record?.fields?.KEYWORDS && record.fields.KEYWORDS.length > 0 && (
