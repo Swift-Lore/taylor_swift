@@ -87,21 +87,20 @@ export default function Timeline() {
     return () => timelineElement?.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // ===== Card component =====
-  const TimelineCard = ({ record, index }) => {
+// ===== Card component =====
+const TimelineCard = ({ record, index }) => {
+  const handleTagClick = (e, keyword) => {
+    e.preventDefault()
+    e.stopPropagation()
+    navigate(`/posts?keyword=${encodeURIComponent(keyword)}`)
+  }
 
-    const handleTagClick = (e, keyword) => {
-      e.preventDefault()
-      e.stopPropagation()
-      navigate(`/posts?keyword=${encodeURIComponent(keyword)}`)
-    }
-
-    return (
-      <Link
-        to={`/post_details?id=${record.id}`}
-        className="block relative cursor-pointer hover:opacity-95 transition-opacity"
-        style={{ marginTop: index === 0 ? "17px" : "43px" }}
-      >
+  return (
+    <div
+      className="block relative cursor-pointer hover:opacity-95 transition-opacity"
+      style={{ marginTop: index === 0 ? "17px" : "43px" }}
+    >
+      <Link to={`/post_details?id=${record.id}`} className="block">
         <div className="relative">
           <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
             <div className="bg-white/80 backdrop-blur-sm rounded-[10px] p-3 border border-[#f0d0d3]">
@@ -123,35 +122,14 @@ export default function Timeline() {
 
               <div className="flex flex-col gap-2.5 mt-1.5">
                 {/* Event Description */}
-                <h3 className="text-[#8e3e3e] font-bold text-sm md:text-base leading-relaxed text-center">
+                <h3 className="text-[#8e3e3e] font-bold text-sm md:text-base leading-relaxed text-center select-text">
                   {record?.fields?.EVENT || "Event description unavailable"}
                 </h3>
 
                 {/* Notes with line breaks */}
-{record?.fields?.NOTES && (
-  <div className="text-xs md:text-sm text-center font-medium text-gray-700 leading-relaxed whitespace-pre-line">
-    {record.fields.NOTES}
-  </div>
-)}
-
-                {/* Keywords section with clickable tags */}
-                {record?.fields?.KEYWORDS && record.fields.KEYWORDS.length > 0 && (
-                  <div className="flex flex-wrap gap-1 md:gap-1.5 justify-center">
-                    {record.fields.KEYWORDS.slice(0, 4).map((tag, tagIndex) => (
-                      <button
-                        key={tagIndex}
-                        type="button"
-                        className="bg-[#8a9ac7] text-white font-medium text-xs px-2 py-0.5 rounded-full whitespace-nowrap shadow-sm cursor-pointer hover:bg-[#6b7db3] transition-colors"
-                        onClick={(e) => handleTagClick(e, tag)}
-                      >
-                        {tag}
-                      </button>
-                    ))}
-                    {record.fields.KEYWORDS.length > 4 && (
-                      <div className="bg-[#b8c5e8] text-[#8e3e3e] font-medium text-xs px-2 py-0.5 rounded-full">
-                        +{record.fields.KEYWORDS.length - 4}
-                      </div>
-                    )}
+                {record?.fields?.NOTES && (
+                  <div className="text-xs md:text-sm text-center font-medium text-gray-700 leading-relaxed whitespace-pre-line select-text">
+                    {record.fields.NOTES}
                   </div>
                 )}
               </div>
@@ -159,8 +137,30 @@ export default function Timeline() {
           </div>
         </div>
       </Link>
-    )
-  }
+
+      {/* Keywords section with clickable tags */}
+      {record?.fields?.KEYWORDS && record.fields.KEYWORDS.length > 0 && (
+        <div className="flex flex-wrap gap-1 md:gap-1.5 justify-center mt-3">
+          {record.fields.KEYWORDS.slice(0, 4).map((tag, tagIndex) => (
+            <button
+              key={tagIndex}
+              type="button"
+              className="bg-[#8a9ac7] text-white font-medium text-xs px-2 py-0.5 rounded-full whitespace-nowrap shadow-sm cursor-pointer hover:bg-[#6b7db3] transition-colors select-text"
+              onClick={(e) => handleTagClick(e, tag)}
+            >
+              {tag}
+            </button>
+          ))}
+          {record.fields.KEYWORDS.length > 4 && (
+            <div className="bg-[#b8c5e8] text-[#8e3e3e] font-medium text-xs px-2 py-0.5 rounded-full select-text">
+              +{record.fields.KEYWORDS.length - 4}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
   // ===== JSX =====
 return (
   <section className="w-full bg-[#e8ecf7] py-2 px-2 md:px-10 flex flex-col min-h-0">
