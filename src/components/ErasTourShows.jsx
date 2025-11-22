@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 
-// Direct Airtable endpoint (same base + table as Timeline)
+// If you have a Netlify function, set VITE_EVENTS_ENDPOINT to it in your env.
+// Example: "/.netlify/functions/events"
+const SERVER_EVENTS_ENDPOINT = import.meta.env.VITE_EVENTS_ENDPOINT || "";
+
+// Direct Airtable fallback (same base/table as Timeline)
 const AIRTABLE_URL =
   "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker";
 
@@ -10,7 +14,7 @@ function normalizeShow(raw) {
   const fields = raw.fields || raw;
 
   return {
-    id: fields.ID ?? raw.id ?? fields.EVENT, // use your ID column if present
+    id: fields.ID ?? raw.id ?? fields.EVENT,
     event: fields.EVENT,
     date: fields.DATE,
     showDisplayName: fields["SHOW DISPLAY NAME"] || fields.EVENT,
@@ -26,8 +30,7 @@ function normalizeShow(raw) {
 function formatDate(dateStr) {
   if (!dateStr) return "";
   const d = new Date(dateStr);
-  if (Number.isNaN(d.getTime())) return dateStr; // fallback: raw
-
+  if (Number.isNaN(d.getTime())) return dateStr;
   return d.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
@@ -42,40 +45,63 @@ export default function ErasTourShows() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-    useEffect(() => {
+  useEffect(() => {
     async function loadShows() {
       try {
         setLoading(true);
         setError("");
 
-        // Only pull Eras Tour rows from Airtable
-        const params =
-          "filterByFormula=" +
-          encodeURIComponent('SEARCH("The Eras Tour:", {EVENT})') +
-          "&pageSize=200" +
-          "&sort[0][field]=DATE&sort[0][direction]=asc";
+        let data;
 
-        const res = await fetch(`${AIRTABLE_URL}?${params}`, {
-          headers: {
-            Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-          },
-        });
+        if (SERVER_EVENTS_ENDPOINT) {
+          // Use your Netlify/server endpoint if configured
+          const res = await fetch(SERVER_EVENTS_ENDPOINT);
+          if (!res.ok) {
+            throw new Error(`Failed to fetch shows from server: ${res.status}`);
+          }
+          data = await res.json();
+        } else {
+          // Fallback: query Airtable directly for Eras Tour shows
+          const filterFormula = encodeURIComponent(
+            `FIND("The Eras Tour:", {EVENT})`
+          );
 
-        if (!res.ok) {
-          throw new Error(`Failed to fetch shows: ${res.status}`);
+          const res = await fetch(
+            `${AIRTABLE_URL}?filterByFormula=${filterFormula}`,
+            {
+              headers: {
+                Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+              },
+            }
+          );
+
+          if (!res.ok) {
+            throw new Error(`Failed to fetch shows from Airtable: ${res.status}`);
+          }
+          data = await res.json();
         }
 
-        const data = await res.json();
-        const records = Array.isArray(data.records) ? data.records : [];
+        // Handle array or { records: [...] }
+        const rawArray = Array.isArray(data)
+          ? data
+          : Array.isArray(data.records)
+          ? data.records
+          : [];
 
-        // Normalize Airtable records
-        const normalized = records
-          .map((record) => normalizeShow(record))
-          .filter(
-            (show) =>
-              typeof show.event === "string" &&
-              show.event.startsWith("The Eras Tour:")
-          )
+        // Flatten { id, fields } → { ...fields, id }
+        const flattened = rawArray.map((item) =>
+          item.fields ? { ...item.fields, id: item.id } : item
+        );
+
+        // Double-check "Eras Tour" filter on the client side
+        const erasOnly = flattened.filter(
+          (item) =>
+            typeof item.EVENT === "string" &&
+            item.EVENT.startsWith("The Eras Tour:")
+        );
+
+        const normalized = erasOnly
+          .map((item) => normalizeShow(item))
           .sort((a, b) => {
             const da = new Date(a.date);
             const db = new Date(b.date);
@@ -89,6 +115,9 @@ export default function ErasTourShows() {
           const first = normalized[0];
           setSelectedShowId(first.id);
           setSelectedShow(first);
+        } else {
+          setSelectedShowId("");
+          setSelectedShow(null);
         }
       } catch (err) {
         console.error(err);
@@ -117,11 +146,12 @@ export default function ErasTourShows() {
         </h1>
         <p className="text-sm md:text-base text-[#6b7db3] max-w-2xl mx-auto">
           Choose a specific Eras Tour date to see its core details: venue, date,
-          surprise songs, and notes. Outfit visuals and deeper linking can come next.
+          surprise songs, and notes. Outfit visuals and deeper linking can come
+          next.
         </p>
       </header>
 
-      {/* Dropdown + State */}
+      {/* Dropdown + state */}
       <div className="mb-8">
         {loading && (
           <p className="text-sm text-[#6b7db3] italic">
@@ -135,7 +165,7 @@ export default function ErasTourShows() {
           </p>
         )}
 
-        {!loading && shows.length > 0 && (
+        {!loading && !error && shows.length > 0 && (
           <div className="flex flex-col md:flex-row md:items-center gap-3">
             <label
               htmlFor="eras-show-select"
@@ -159,7 +189,7 @@ export default function ErasTourShows() {
         )}
       </div>
 
-      {/* Detail Card */}
+      {/* Detail card */}
       {selectedShow && (
         <div className="glass-soft card-soft rounded-xl bg-white/70 px-5 py-6 md:px-7 md:py-7 border border-[#f3d6d6] space-y-5">
           {/* Show title & basics */}
@@ -218,7 +248,7 @@ export default function ErasTourShows() {
             </div>
           )}
 
-          {/* YouTube link (basic for now) */}
+          {/* YouTube link */}
           {selectedShow.youtube && (
             <div>
               <h3 className="text-sm font-semibold tracking-wide uppercase text-[#8e3e3e] mb-2">
@@ -235,9 +265,9 @@ export default function ErasTourShows() {
             </div>
           )}
 
-          {/* Placeholder for future outfits/media */}
           <div className="pt-2 text-xs text-[#9ca3af] italic">
-            Outfits, gallery, and deeper show stats can plug in below this card next.
+            Outfits, gallery, and deeper show stats can plug in below this card
+            next.
           </div>
         </div>
       )}
