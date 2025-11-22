@@ -28,19 +28,19 @@ export default function Header() {
     if (isEventPage) {
       const searchParams = new URLSearchParams(location.search)
       const postId = searchParams.get("id")
-      
+
       if (postId) {
         const fetchEventData = async () => {
           try {
             const response = await fetch(
-              https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker/${postId},
+              `https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker/${postId}`,
               {
                 headers: {
-                  Authorization: Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY},
+                  Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
                 },
               }
             )
-            
+
             if (response.ok) {
               const data = await response.json()
               setEventData(data.fields)
@@ -49,7 +49,7 @@ export default function Header() {
             console.error("Error fetching event data for header:", error)
           }
         }
-        
+
         fetchEventData()
       }
     }
@@ -58,7 +58,7 @@ export default function Header() {
   // Safe date formatting function
   const formatEventDate = (isoDate) => {
     if (!isoDate) return ""
-    
+
     try {
       const d = new Date(isoDate)
       if (Number.isNaN(d.getTime())) return ""
@@ -70,7 +70,7 @@ export default function Header() {
       const day = String(d.getUTCDate()).padStart(2, "0")
       const year = d.getUTCFullYear()
 
-      return ${month}-${day}-${year}
+      return `${month}-${day}-${year}`
     } catch (error) {
       console.error("Error formatting date:", error)
       return ""
@@ -88,7 +88,7 @@ export default function Header() {
     const formattedQuery =
       trimmedQuery.charAt(0).toUpperCase() + trimmedQuery.slice(1)
 
-    navigate(/?q=${encodeURIComponent(formattedQuery)})
+    navigate(`/?q=${encodeURIComponent(formattedQuery)}`)
   }
 
   const handleInputChange = (e) => setSearchQuery(e.target.value)
@@ -108,7 +108,6 @@ export default function Header() {
       <div className="pointer-events-none absolute -top-4 left-1/2 -translate-x-1/2 md:left-12 md:translate-x-0 w-40 h-40 blur-2xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.9),_rgba(148,163,233,0))] opacity-80" />
 
       <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 pt-4 md:pt-5 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 relative">
-        
         {/* MOBILE-FIRST LAYOUT: Full Timeline Page */}
         {isFullTimelinePage && !isEventPage && (
           <>
@@ -123,7 +122,7 @@ export default function Header() {
                   src="/images/swift_lore.png"
                   alt="Swift Lore"
                   className="h-auto object-contain max-h-[100px] logo-glow"
-                  style={{ maxWidth: '180px' }}
+                  style={{ maxWidth: "180px" }}
                 />
               </button>
               <button
@@ -137,14 +136,14 @@ export default function Header() {
             {/* Mobile: Timeline text below */}
             <div className="w-full md:hidden flex flex-col items-center mt-4">
               <h2 className="text-white text-2xl font-serif drop-shadow-lg tracking-wide text-center">
-                Taylor Swift's Career Timeline
+                Taylor Swift&apos;s Career Timeline
               </h2>
             </div>
 
             {/* Desktop: Original layout */}
             <div className="hidden md:flex md:w-[40%] flex-col items-start">
               <h2 className="text-white text-3xl md:text-4xl font-serif drop-shadow-lg tracking-wide text-left">
-                Taylor Swift's Career Timeline
+                Taylor Swift&apos;s Career Timeline
               </h2>
             </div>
             <div className="hidden md:flex md:w-[30%] flex-col items-end">
@@ -158,7 +157,7 @@ export default function Header() {
                     src="/images/swift_lore.png"
                     alt="Swift Lore"
                     className="h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow"
-                    style={{ maxWidth: '200px' }}
+                    style={{ maxWidth: "200px" }}
                   />
                 </button>
               </div>
@@ -175,97 +174,97 @@ export default function Header() {
         )}
 
         {/* MOBILE-FIRST LAYOUT: Event Page */}
-{isEventPage && (
-  <>
-    {/* Mobile: Logo + buttons on top */}
-    <div className="w-full md:hidden flex flex-col items-center gap-4 mb-4">
-      <button
-        type="button"
-        onClick={handleLogoClick}
-        className="cursor-pointer"
-      >
-        <img
-          src="/images/swift_lore.png"
-          alt="Swift Lore"
-          className="h-auto object-contain max-h-[100px] logo-glow"
-          style={{ maxWidth: "180px" }}
-        />
-      </button>
-      <div className="flex gap-3">
-        <button
-          onClick={() => navigate("/")}
-          className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
-        >
-          Return to Home
-        </button>
-        <button
-          onClick={() => navigate("/posts")}
-          className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
-        >
-          View Full Timeline
-        </button>
-      </div>
-    </div>
+        {isEventPage && (
+          <>
+            {/* Mobile: Logo + buttons on top */}
+            <div className="w-full md:hidden flex flex-col items-center gap-4 mb-4">
+              <button
+                type="button"
+                onClick={handleLogoClick}
+                className="cursor-pointer"
+              >
+                <img
+                  src="/images/swift_lore.png"
+                  alt="Swift Lore"
+                  className="h-auto object-contain max-h-[100px] logo-glow"
+                  style={{ maxWidth: "180px" }}
+                />
+              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => navigate("/")}
+                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+                >
+                  Return to Home
+                </button>
+                <button
+                  onClick={() => navigate("/posts")}
+                  className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+                >
+                  View Full Timeline
+                </button>
+              </div>
+            </div>
 
-    {/* Mobile: Event info below */}
-    <div className="w-full md:hidden flex flex-col items-center text-center">
-      <h2 className="text-white text-2xl font-serif drop-shadow-lg tracking-wide">
-        {eventData?.EVENT || "Loading event..."}
-      </h2>
-      {eventData?.DATE && (
-        <p className="text-white/90 text-sm font-medium drop-shadow-md mt-1">
-          {formatEventDate(eventData.DATE)}
-        </p>
-      )}
-    </div>
+            {/* Mobile: Event info below */}
+            <div className="w-full md:hidden flex flex-col items-center text-center">
+              <h2 className="text-white text-2xl font-serif drop-shadow-lg tracking-wide">
+                {eventData?.EVENT || "Loading event..."}
+              </h2>
+              {eventData?.DATE && (
+                <p className="text-white/90 text-sm font-medium drop-shadow-md mt-1">
+                  {formatEventDate(eventData.DATE)}
+                </p>
+              )}
+            </div>
 
-        {/* Desktop: left = event info, right = logo + buttons */}
-    <div className="hidden md:flex md:w-[55%] flex-col items-start">
-      <h2 className="text-white text-3xl md:text-4xl font-serif drop-shadow-lg tracking-wide text-left">
-        {eventData?.EVENT || "Loading event..."}
-      </h2>
-      {eventData?.DATE && (
-        <p className="text-white/90 text-sm md:text-base font-medium drop-shadow-md text-left mt-1">
-          {formatEventDate(eventData.DATE)}
-        </p>
-      )}
-    </div>
+            {/* Desktop: left = event info, right = logo + buttons */}
+            <div className="hidden md:flex md:w-[55%] flex-col items-start">
+              <h2 className="text-white text-3xl md:text-4xl font-serif drop-shadow-lg tracking-wide text-left">
+                {eventData?.EVENT || "Loading event..."}
+              </h2>
+              {eventData?.DATE && (
+                <p className="text-white/90 text-sm md:text-base font-medium drop-shadow-md text-left mt-1">
+                  {formatEventDate(eventData.DATE)}
+                </p>
+              )}
+            </div>
 
-    <div className="hidden md:flex md:w-[35%] flex-col items-end">
-      {/* Logo container with centered alignment */}
-      <div className="flex flex-col items-center w-full">
-        <button
-          type="button"
-          onClick={handleLogoClick}
-          className="cursor-pointer flex justify-center w-full"
-        >
-          <img
-            src="/images/swift_lore.png"
-            alt="Swift Lore"
-            className="h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow"
-            style={{ maxWidth: "200px" }}
-          />
-        </button>
+            <div className="hidden md:flex md:w-[35%] flex-col items-end">
+              {/* Logo container with centered alignment */}
+              <div className="flex flex-col items-center w-full">
+                <button
+                  type="button"
+                  onClick={handleLogoClick}
+                  className="cursor-pointer flex justify-center w-full"
+                >
+                  <img
+                    src="/images/swift_lore.png"
+                    alt="Swift Lore"
+                    className="h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow"
+                    style={{ maxWidth: "200px" }}
+                  />
+                </button>
 
-        {/* Buttons container - centered under logo */}
-        <div className="flex gap-3 mt-3 justify-center w-full">
-          <button
-            onClick={() => navigate("/")}
-            className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
-          >
-            Return to Home
-          </button>
-          <button
-            onClick={() => navigate("/posts")}
-            className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
-          >
-            View Full Timeline
-          </button>
-        </div>
-      </div>
-    </div>
-  </>
-)}
+                {/* Buttons container - centered under logo */}
+                <div className="flex gap-3 mt-3 justify-center w-full">
+                  <button
+                    onClick={() => navigate("/")}
+                    className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+                  >
+                    Return to Home
+                  </button>
+                  <button
+                    onClick={() => navigate("/posts")}
+                    className="bg-white/90 text-[#8e3e3e] hover:bg-white rounded-full px-5 py-1.5 text-sm font-medium shadow-md border border-white/70 transition-all whitespace-nowrap"
+                  >
+                    View Full Timeline
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* CENTER: Logo section for Home Page (unchanged) */}
         {!isFullTimelinePage && !isEventPage && (
@@ -294,7 +293,7 @@ export default function Header() {
           </div>
         )}
 
-                {/* Home page content - search + CTA only */}
+        {/* Home page content - search + CTA only */}
         {showHero && (
           <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-3 text-center md:text-left relative z-20">
             <div className="w-full max-w-xs">
@@ -320,5 +319,5 @@ export default function Header() {
         )}
       </div>
     </header>
-  );
+  )
 }
