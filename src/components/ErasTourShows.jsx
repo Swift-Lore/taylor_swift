@@ -48,87 +48,85 @@ export default function ErasTourShows() {
   }, []);
 
   useEffect(() => {
-    async function loadShows() {
-      try {
-        setLoading(true);
-        setError("");
+  async function loadShows() {
+    try {
+      setLoading(true);
+      setError("");
 
-        let data;
+      let data;
 
-        if (SERVER_EVENTS_ENDPOINT) {
-          const res = await fetch(SERVER_EVENTS_ENDPOINT);
-          if (!res.ok) {
-            throw new Error(`Failed to fetch shows from server: ${res.status}`);
-          }
-          data = await res.json();
-        } else {
-          const filterFormula = encodeURIComponent(
-            `FIND("The Eras Tour:", {EVENT})`
-          );
-
-          const res = await fetch(
-            `${AIRTABLE_URL}?filterByFormula=${filterFormula}`,
-            {
-              headers: {
-                Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-              },
-            }
-          );
-
-          if (!res.ok) {
-            throw new Error(
-              `Failed to fetch shows from Airtable: ${res.status}`
-            );
-          }
-          data = await res.json();
+      if (SERVER_EVENTS_ENDPOINT) {
+        const res = await fetch(SERVER_EVENTS_ENDPOINT);
+        if (!res.ok) {
+          throw new Error(`Failed to fetch shows from server: ${res.status}`);
         }
-
-        const rawArray = Array.isArray(data)
-          ? data
-          : Array.isArray(data.records)
-          ? data.records
-          : [];
-
-        const flattened = rawArray.map((item) =>
-          item.fields ? { ...item.fields, id: item.id } : item
+        data = await res.json();
+      } else {
+        // Filter by "Eras Show #" not being blank
+        const filterFormula = encodeURIComponent(
+          `NOT({Eras Show #} = '')`
         );
 
-        const erasOnly = flattened.filter(
-          (item) =>
-            typeof item.EVENT === "string" &&
-            item.EVENT.startsWith("The Eras Tour:")
+        const res = await fetch(
+          `${AIRTABLE_URL}?filterByFormula=${filterFormula}&sort[0][field]=DATE&sort[0][direction]=asc`,
+          {
+            headers: {
+              Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+            },
+          }
         );
 
-        const normalized = erasOnly
-          .map((item) => normalizeShow(item))
-          .sort((a, b) => {
-            const da = new Date(a.date);
-            const db = new Date(b.date);
-            if (Number.isNaN(da.getTime()) || Number.isNaN(db.getTime()))
-              return 0;
-            return da - db;
-          });
-
-        setShows(normalized);
-
-        if (normalized.length > 0) {
-          const first = normalized[0];
-          setSelectedShowId(first.id);
-          setSelectedShow(first);
-        } else {
-          setSelectedShowId("");
-          setSelectedShow(null);
+        if (!res.ok) {
+          throw new Error(
+            `Failed to fetch shows from Airtable: ${res.status}`
+          );
         }
-      } catch (err) {
-        console.error(err);
-        setError("There was a problem loading Eras Tour shows.");
-      } finally {
-        setLoading(false);
+        data = await res.json();
       }
-    }
 
-    loadShows();
-  }, []);
+      const rawArray = Array.isArray(data)
+        ? data
+        : Array.isArray(data.records)
+        ? data.records
+        : [];
+
+      console.log("Raw Eras Tour shows:", rawArray.length, "records");
+
+      // No additional filtering needed since Airtable already filtered by "Eras Show #"
+      const erasOnly = rawArray;
+
+      const normalized = erasOnly
+        .map((item) => normalizeShow(item))
+        .sort((a, b) => {
+          const da = new Date(a.date);
+          const db = new Date(b.date);
+          if (Number.isNaN(da.getTime()) || Number.isNaN(db.getTime()))
+            return 0;
+          return da - db;
+        });
+
+      console.log("Final normalized shows:", normalized);
+
+      setShows(normalized);
+
+      if (normalized.length > 0) {
+        const first = normalized[0];
+        setSelectedShowId(first.id);
+        setSelectedShow(first);
+      } else {
+        setSelectedShowId("");
+        setSelectedShow(null);
+      }
+    } catch (err) {
+      console.error(err);
+      setError("There was a problem loading Eras Tour shows.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  loadShows();
+}, []);
 
   const handleSelectChange = (e) => {
     const value = e.target.value;
