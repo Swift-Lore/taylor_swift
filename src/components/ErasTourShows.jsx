@@ -12,7 +12,7 @@ function normalizeShow(raw) {
   const fields = raw.fields || raw;
 
   return {
-    id: fields.ID ?? raw.id ?? fields.EVENT,
+    id: raw.id,
     event: fields.EVENT,
     date: fields.DATE,
     showDisplayName: fields["SHOW DISPLAY NAME"] || fields.EVENT,
