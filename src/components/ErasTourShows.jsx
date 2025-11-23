@@ -241,9 +241,6 @@ export default function ErasTourShows() {
     </svg>
     Full Details
   </button>
-  <p className="text-xs text-[#6b7db3] mt-1 text-center md:text-right">
-    Videos & Photos
-  </p>
 </div>
   </div>
 </div>
