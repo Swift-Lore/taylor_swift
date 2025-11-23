@@ -182,10 +182,10 @@ export default function ErasTourShows() {
           options={shows.map(show => ({
             value: show.id,
             label: show.showDisplayName,
-            // Add searchable fields for better filtering
-            searchTerm: show.showDisplayName.toLowerCase() + 
-                       ' ' + (show.venue || '').toLowerCase() +
-                       ' ' + (formatDate(show.date) || '').toLowerCase()
+            venue: show.venue || '',
+            date: show.date || '',
+            // Debug: log what we're searching
+            searchTerm: (show.showDisplayName + ' ' + (show.venue || '') + ' ' + (show.date || '')).toLowerCase()
           }))}
           value={shows.find(s => s.id === selectedShowId) ? {
             value: selectedShowId,
@@ -196,11 +196,19 @@ export default function ErasTourShows() {
           isSearchable
           filterOption={(option, inputValue) => {
             if (!inputValue) return true;
-            return option.data.searchTerm.includes(inputValue.toLowerCase());
+            const matches = option.data.searchTerm.includes(inputValue.toLowerCase());
+            console.log('Searching for:', inputValue.toLowerCase(), 'in:', option.data.searchTerm, 'Match:', matches);
+            return matches;
           }}
-          noOptionsMessage={({ inputValue }) => 
-            inputValue ? `No shows found for "${inputValue}"` : "No shows available"
-          }
+          noOptionsMessage={({ inputValue }) => {
+            console.log('No options for:', inputValue);
+            console.log('Available shows:', shows.map(s => ({
+              name: s.showDisplayName,
+              venue: s.venue,
+              date: s.date
+            })));
+            return inputValue ? `No shows found for "${inputValue}"` : "No shows available";
+          }}
           styles={{
             control: (base) => ({
               ...base,
@@ -254,6 +262,19 @@ export default function ErasTourShows() {
     <p className="text-xs text-[#6b7db3] mt-2 italic">
       Tip: Search by city (e.g., "London"), date (e.g., "May 2024"), or venue name
     </p>
+    
+    {/* Debug info - remove this after testing */}
+    <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs">
+      <p className="font-semibold">Debug Info (first 3 shows):</p>
+      {shows.slice(0, 3).map((show, index) => (
+        <div key={index} className="mt-1">
+          <p>Name: {show.showDisplayName}</p>
+          <p>Venue: {show.venue}</p>
+          <p>Date: {show.date}</p>
+          <hr className="my-1" />
+        </div>
+      ))}
+    </div>
   </div>
 )}
 
