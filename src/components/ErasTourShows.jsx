@@ -167,7 +167,7 @@ export default function ErasTourShows() {
         </p>
       </header>
 
-      // REPLACE THE ENTIRE DROPDOWN SECTION WITH THIS IMPROVED VERSION:
+      {/* REPLACE THE ENTIRE DROPDOWN SECTION WITH THIS IMPROVED VERSION: */}
 {!loading && !error && shows.length > 0 && (
   <div className="mb-8">
     <div className="flex flex-col md:flex-row md:items-center gap-3">
