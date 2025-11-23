@@ -205,24 +205,42 @@ export default function ErasTourShows() {
       {!loading && selectedShow && (
         <div className="glass-soft card-soft rounded-xl bg-white/70 px-5 py-6 md:px-7 md:py-7 border border-[#f3d6d6] space-y-5">
           <div className="border-b border-[#f5e3e3] pb-4">
-            <h2 className="text-xl md:text-2xl font-serif text-[#8e3e3e] mb-2 leading-snug">
-              {selectedShow.showDisplayName}
-            </h2>
-            <div className="text-sm md:text-base text-[#6b7db3] space-y-1">
-              {selectedShow.date && (
-                <p>
-                  <span className="font-semibold text-[#8e3e3e]">Date:</span>{" "}
-                  {formatDate(selectedShow.date)}
-                </p>
-              )}
-              {selectedShow.venue && (
-                <p>
-                  <span className="font-semibold text-[#8e3e3e]">Venue:</span>{" "}
-                  {selectedShow.venue}
-                </p>
-              )}
-            </div>
-          </div>
+  <h2 className="text-xl md:text-2xl font-serif text-[#8e3e3e] mb-2 leading-snug">
+    {selectedShow.showDisplayName}
+  </h2>
+  <div className="text-sm md:text-base text-[#6b7db3] space-y-1">
+    {selectedShow.date && (
+      <p>
+        <span className="font-semibold text-[#8e3e3e]">Date:</span>{" "}
+        {formatDate(selectedShow.date)}
+      </p>
+    )}
+    {selectedShow.venue && (
+      <p>
+        <span className="font-semibold text-[#8e3e3e]">Venue:</span>{" "}
+        {selectedShow.venue}
+      </p>
+    )}
+  </div>
+  
+  {/* ADD THIS PROMINENT BUTTON SECTION */}
+  <div className="mt-6 pt-4 border-t border-[#f5e3e3]">
+    <a
+      href={`/post?id=${selectedShow.id}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center px-5 py-3 bg-[#b91c1c] text-white text-base font-semibold rounded-lg hover:bg-[#7f1515] transition-colors shadow-md hover:shadow-lg"
+    >
+      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+      </svg>
+      View Full Event Details
+    </a>
+    <p className="text-xs text-[#6b7db3] mt-2">
+      Opens in new tab • See videos, Instagram posts, photos, and more
+    </p>
+  </div>
+</div>
 
           {(selectedShow.surprise1 || selectedShow.surprise2) && (
             <div className="border-b border-[#f5e3e3] pb-4">
