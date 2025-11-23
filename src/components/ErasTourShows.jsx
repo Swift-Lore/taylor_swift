@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Select from 'react-select'; // ADD THIS IMPORT
 
 const SERVER_EVENTS_ENDPOINT = import.meta.env.VITE_EVENTS_ENDPOINT || "";
 
@@ -48,95 +49,99 @@ export default function ErasTourShows() {
   }, []);
 
   useEffect(() => {
-  async function loadShows() {
-    try {
-      setLoading(true);
-      setError("");
+    async function loadShows() {
+      try {
+        setLoading(true);
+        setError("");
 
-      let data;
+        let data;
 
-      if (SERVER_EVENTS_ENDPOINT) {
-        const res = await fetch(SERVER_EVENTS_ENDPOINT);
-        if (!res.ok) {
-          throw new Error(`Failed to fetch shows from server: ${res.status}`);
-        }
-        data = await res.json();
-      } else {
-        // Filter by "Eras Show #" not being blank
-        const filterFormula = encodeURIComponent(
-          `NOT({Eras Show #} = '')`
-        );
-
-        const res = await fetch(
-          `${AIRTABLE_URL}?filterByFormula=${filterFormula}&sort[0][field]=DATE&sort[0][direction]=asc`,
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-            },
+        if (SERVER_EVENTS_ENDPOINT) {
+          const res = await fetch(SERVER_EVENTS_ENDPOINT);
+          if (!res.ok) {
+            throw new Error(`Failed to fetch shows from server: ${res.status}`);
           }
-        );
-
-        if (!res.ok) {
-          throw new Error(
-            `Failed to fetch shows from Airtable: ${res.status}`
+          data = await res.json();
+        } else {
+          // Filter by "Eras Show #" not being blank
+          const filterFormula = encodeURIComponent(
+            `NOT({Eras Show #} = '')`
           );
+
+          const res = await fetch(
+            `${AIRTABLE_URL}?filterByFormula=${filterFormula}&sort[0][field]=DATE&sort[0][direction]=asc`,
+            {
+              headers: {
+                Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+              },
+            }
+          );
+
+          if (!res.ok) {
+            throw new Error(
+              `Failed to fetch shows from Airtable: ${res.status}`
+            );
+          }
+          data = await res.json();
         }
-        data = await res.json();
+
+        const rawArray = Array.isArray(data)
+          ? data
+          : Array.isArray(data.records)
+          ? data.records
+          : [];
+
+        console.log("Raw Eras Tour shows:", rawArray.length, "records");
+
+        // No additional filtering needed since Airtable already filtered by "Eras Show #"
+        const erasOnly = rawArray;
+
+        const normalized = erasOnly
+          .map((item) => normalizeShow(item))
+          .sort((a, b) => {
+            const da = new Date(a.date);
+            const db = new Date(b.date);
+            if (Number.isNaN(da.getTime()) || Number.isNaN(db.getTime()))
+              return 0;
+            return da - db;
+          });
+
+        console.log("Final normalized shows:", normalized);
+
+        setShows(normalized);
+
+        if (normalized.length > 0) {
+          const first = normalized[0];
+          setSelectedShowId(first.id);
+          setSelectedShow(first);
+        } else {
+          setSelectedShowId("");
+          setSelectedShow(null);
+        }
+      } catch (err) {
+        console.error(err);
+        setError("There was a problem loading Eras Tour shows.");
+      } finally {
+        setLoading(false);
       }
-
-      const rawArray = Array.isArray(data)
-        ? data
-        : Array.isArray(data.records)
-        ? data.records
-        : [];
-
-      console.log("Raw Eras Tour shows:", rawArray.length, "records");
-
-      // No additional filtering needed since Airtable already filtered by "Eras Show #"
-      const erasOnly = rawArray;
-
-      const normalized = erasOnly
-        .map((item) => normalizeShow(item))
-        .sort((a, b) => {
-          const da = new Date(a.date);
-          const db = new Date(b.date);
-          if (Number.isNaN(da.getTime()) || Number.isNaN(db.getTime()))
-            return 0;
-          return da - db;
-        });
-
-      console.log("Final normalized shows:", normalized);
-
-      setShows(normalized);
-
-      if (normalized.length > 0) {
-        const first = normalized[0];
-        setSelectedShowId(first.id);
-        setSelectedShow(first);
-      } else {
-        setSelectedShowId("");
-        setSelectedShow(null);
-      }
-    } catch (err) {
-      console.error(err);
-      setError("There was a problem loading Eras Tour shows.");
-    } finally {
-      setLoading(false);
     }
-  }
 
-  loadShows();
-}, []);
+    loadShows();
+  }, []);
 
-  const handleSelectChange = (e) => {
-    const value = e.target.value;
-    setSelectedShowId(value);
-    const found = shows.find((show) => String(show.id) === String(value));
-    setSelectedShow(found || null);
+  // REPLACE THE handleSelectChange FUNCTION WITH THIS:
+  const handleSelectChange = (selectedOption) => {
+    if (selectedOption) {
+      setSelectedShowId(selectedOption.value);
+      const found = shows.find((show) => show.id === selectedOption.value);
+      setSelectedShow(found || null);
+    } else {
+      setSelectedShowId("");
+      setSelectedShow(null);
+    }
   };
 
   return (
-    // 🔹 Removed "fade-in" in case the CSS is hiding it on first mount
     <section className="max-w-5xl mx-auto px-4 py-10 min-h-[60vh]">
       {/* Always-visible debug state at top */}
       {loading && (
@@ -162,7 +167,7 @@ export default function ErasTourShows() {
         </p>
       </header>
 
-      {/* Dropdown + state */}
+      {/* REPLACE THE ENTIRE DROPDOWN SECTION WITH THIS: */}
       {!loading && !error && shows.length > 0 && (
         <div className="mb-8">
           <div className="flex flex-col md:flex-row md:items-center gap-3">
@@ -172,23 +177,54 @@ export default function ErasTourShows() {
             >
               Select a show:
             </label>
-            <select
-              id="eras-show-select"
-              className="w-full md:flex-1 rounded-md border border-[#ffcaca] bg-white/80 px-3 py-2 text-sm text-[#4b5563] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#b91c1c]/40"
-              value={selectedShowId || ""}
-              onChange={handleSelectChange}
-            >
-              {shows.map((show) => (
-                <option key={show.id} value={show.id}>
-                  {show.showDisplayName}
-                </option>
-              ))}
-            </select>
+            <div className="w-full md:flex-1">
+              <Select
+                options={shows.map(show => ({
+                  value: show.id,
+                  label: show.showDisplayName
+                }))}
+                value={shows.find(s => s.id === selectedShowId) ? {
+                  value: selectedShowId,
+                  label: shows.find(s => s.id === selectedShowId).showDisplayName
+                } : null}
+                onChange={handleSelectChange}
+                placeholder="Search for a show..."
+                isSearchable
+                styles={{
+                  control: (base) => ({
+                    ...base,
+                    border: '1px solid #ffcaca',
+                    borderRadius: '6px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    padding: '2px 8px',
+                    minHeight: '42px',
+                    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                    '&:hover': {
+                      borderColor: '#ffcaca'
+                    }
+                  }),
+                  menu: (base) => ({
+                    ...base,
+                    borderRadius: '6px',
+                    border: '1px solid #ffcaca',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                  }),
+                  option: (base, state) => ({
+                    ...base,
+                    backgroundColor: state.isFocused ? '#fef2f2' : 'white',
+                    color: state.isFocused ? '#8e3e3e' : '#4b5563',
+                    '&:active': {
+                      backgroundColor: '#fecaca'
+                    }
+                  })
+                }}
+              />
+            </div>
           </div>
         </div>
       )}
 
-      {/* Detail card */}
+      {/* Detail card (KEEP THIS SECTION EXACTLY AS IS) */}
       {!loading && selectedShow && (
         <div className="glass-soft card-soft rounded-xl bg-white/70 px-5 py-6 md:px-7 md:py-7 border border-[#f3d6d6] space-y-5">
           <div className="border-b border-[#f5e3e3] pb-4">
