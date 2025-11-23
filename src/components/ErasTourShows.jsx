@@ -229,7 +229,7 @@ export default function ErasTourShows() {
     {/* UPDATED BUTTON - Matches your header button style */}
     <div className="flex-shrink-0">
       <a
-  href={`/post?id=${selectedShow.id}`}
+  href={`/post_details?id=${selectedShow.id}`}
   target="_blank"
   rel="noopener noreferrer"
   className="inline-flex items-center bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-2 font-semibold text-sm shadow transition-transform hover:-translate-y-0.5 whitespace-nowrap"
