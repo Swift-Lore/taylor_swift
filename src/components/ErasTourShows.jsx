@@ -182,28 +182,19 @@ export default function ErasTourShows() {
           options={shows.map(show => ({
             value: show.id,
             label: show.showDisplayName,
-            venue: show.venue || '',
-            date: show.date || '',
-            // Extract city from display name for better searching
-            city: show.showDisplayName.split('—')[0]?.split(':')[1]?.trim() || '',
-            // Improved search term that includes just the city/state part
-            searchTerm: (
-              (show.showDisplayName.split('—')[0]?.split(':')[1]?.trim() || '') + ' ' + 
-              (show.venue || '') + ' ' + 
-              (show.date || '')
-            ).toLowerCase()
+            // Simple search that uses the full display name
+            searchTerm: show.showDisplayName.toLowerCase()
           }))}
           value={shows.find(s => s.id === selectedShowId) ? {
             value: selectedShowId,
             label: shows.find(s => s.id === selectedShowId).showDisplayName
           } : null}
           onChange={handleSelectChange}
-          placeholder="Type to search (city, date, venue...)"
+          placeholder="Type to search shows..."
           isSearchable
           filterOption={(option, inputValue) => {
             if (!inputValue) return true;
-            const searchTerm = inputValue.toLowerCase().trim();
-            return option.data.searchTerm.includes(searchTerm);
+            return option.data.searchTerm.includes(inputValue.toLowerCase());
           }}
           noOptionsMessage={({ inputValue }) => 
             inputValue ? `No shows found for "${inputValue}"` : "No shows available"
@@ -257,10 +248,14 @@ export default function ErasTourShows() {
         />
       </div>
     </div>
-    {/* Updated helper text with examples from your data */}
     <p className="text-xs text-[#6b7db3] mt-2 italic">
-      Tip: Search by city (e.g., "Glendale", "Las Vegas"), date (e.g., "2023-03"), or venue name
+      Search by city name, date, or show details
     </p>
+    
+    {/* Quick debug - check if any shows have "London" in the name */}
+    <div className="mt-2 text-xs text-gray-500">
+      Shows with "London": {shows.filter(s => s.showDisplayName.toLowerCase().includes('london')).length}
+    </div>
   </div>
 )}
 
