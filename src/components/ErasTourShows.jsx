@@ -261,11 +261,6 @@ export default function ErasTourShows() {
               </a>
             </div>
           )}
-
-          <div className="pt-2 text-xs text-[#9ca3af] italic">
-            Outfits, gallery, and deeper show stats can plug in below this card
-            next.
-          </div>
         </div>
       )}
 
