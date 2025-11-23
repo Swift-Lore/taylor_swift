@@ -256,22 +256,6 @@ export default function ErasTourShows() {
               </p>
             </div>
           )}
-
-          {selectedShow.youtube && (
-            <div>
-              <h3 className="text-sm font-semibold tracking-wide uppercase text-[#8e3e3e] mb-2">
-                Video
-              </h3>
-              <a
-                href={selectedShow.youtube}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center text-sm md:text-base text-[#b91c1c] underline hover:text-[#7f1515] transition-colors"
-              >
-                Watch on YouTube
-              </a>
-            </div>
-          )}
         </div>
       )}
 
