@@ -228,21 +228,23 @@ export default function ErasTourShows() {
     
     {/* UPDATED BUTTON - Matches your header button style */}
     <div className="flex-shrink-0">
-      <a
-  href={`/post_details?id=${selectedShow.id}`}
-  target="_blank"
-  rel="noopener noreferrer"
-  className="inline-flex items-center bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-2 font-semibold text-sm shadow transition-transform hover:-translate-y-0.5 whitespace-nowrap"
->
-  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-  </svg>
-  Full Details
-</a>
-      <p className="text-xs text-[#6b7db3] mt-1 text-center md:text-right">
-        Videos & Photos
-      </p>
-    </div>
+  <button
+    onClick={() => {
+      const baseUrl = window.location.origin;
+      const url = `${baseUrl}/post_details?id=${selectedShow.id}`;
+      window.open(url, '_blank');
+    }}
+    className="inline-flex items-center bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-2 font-semibold text-sm shadow transition-transform hover:-translate-y-0.5 whitespace-nowrap"
+  >
+    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+    </svg>
+    Full Details
+  </button>
+  <p className="text-xs text-[#6b7db3] mt-1 text-center md:text-right">
+    Videos & Photos
+  </p>
+</div>
   </div>
 </div>
 
