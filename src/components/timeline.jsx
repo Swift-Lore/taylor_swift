@@ -87,80 +87,111 @@ export default function Timeline() {
     return () => timelineElement?.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // ===== Card component =====
-  const TimelineCard = ({ record, index }) => {
+// ===== Card component =====
+const TimelineCard = ({ record, index }) => {
+  const [isSelectingText, setIsSelectingText] = useState(false)
 
-    const handleTagClick = (e, keyword) => {
-      e.preventDefault()
-      e.stopPropagation()
-      navigate(`/posts?keyword=${encodeURIComponent(keyword)}`)
+  const handleTagClick = (e, keyword) => {
+    e.preventDefault()
+    e.stopPropagation()
+    navigate(`/posts?keyword=${encodeURIComponent(keyword)}`)
+  }
+
+  const handleCardClick = () => {
+    // Only navigate if user wasn't selecting text
+    if (!isSelectingText) {
+      navigate(`/post_details?id=${record.id}`)
     }
+    // Reset the selection state
+    setIsSelectingText(false)
+  }
 
-    return (
-      <Link
-        to={`/post_details?id=${record.id}`}
-        className="block relative cursor-pointer hover:opacity-95 transition-opacity"
-        style={{ marginTop: index === 0 ? "17px" : "43px" }}
-      >
-        <div className="relative">
-          <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
-            <div className="bg-white/80 backdrop-blur-sm rounded-[10px] p-3 border border-[#f0d0d3]">
-              {/* Date Badge */}
-              <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 -translate-y-1/4 border border-[#8e3e3e] bg-white rounded-full px-3 py-1 text-sm text-[#8e3e3e] font-semibold shadow-md z-10 min-w-[150px] text-center">
-                {record?.fields?.DATE
-                  ? (() => {
-                      const date = new Date(record.fields.DATE)
-                      const options = {
-                        month: "short",
-                        day: "2-digit",
-                        year: "numeric",
-                        timeZone: "UTC",
-                      }
-                      return date.toLocaleDateString("en-US", options)
-                    })()
-                  : "Loading..."}
-              </div>
+  const handleMouseDown = (e) => {
+    // Check if the mouse down is on text (not on keywords or empty space)
+    const isTextElement = e.target.closest('.timeline-card-text h3') || 
+                         e.target.closest('.timeline-card-text div:not(.keyword-container)')
+    if (isTextElement) {
+      setIsSelectingText(false) // Reset, will be set to true if they drag
+    }
+  }
 
-              <div className="flex flex-col gap-2.5 mt-1.5">
-                {/* Event Description */}
-                <h3 className="text-[#8e3e3e] font-bold text-sm md:text-base leading-relaxed text-center">
-                  {record?.fields?.EVENT || "Event description unavailable"}
-                </h3>
+  const handleMouseUp = (e) => {
+    // Check if text was actually selected
+    const selection = window.getSelection()
+    if (selection.toString().length > 0) {
+      setIsSelectingText(true)
+    }
+  }
 
-                {/* Notes with line breaks */}
-{record?.fields?.NOTES && (
-  <div className="text-xs md:text-sm text-center font-medium text-gray-700 leading-relaxed whitespace-pre-line">
-    {record.fields.NOTES}
-  </div>
-)}
+  // Format date function
+  const formatDate = (dateString) => {
+    if (!dateString) return "Loading..."
+    const date = new Date(dateString)
+    const options = {
+      month: "short",
+      day: "2-digit", 
+      year: "numeric",
+      timeZone: "UTC",
+    }
+    return date.toLocaleDateString("en-US", options)
+  }
 
-                {/* Keywords section with clickable tags */}
-                {record?.fields?.KEYWORDS && record.fields.KEYWORDS.length > 0 && (
-                  <div className="flex flex-wrap gap-1 md:gap-1.5 justify-center">
-                    {record.fields.KEYWORDS.slice(0, 4).map((tag, tagIndex) => (
-                      <button
-                        key={tagIndex}
-                        type="button"
-                        className="bg-[#8a9ac7] text-white font-medium text-xs px-2 py-0.5 rounded-full whitespace-nowrap shadow-sm cursor-pointer hover:bg-[#6b7db3] transition-colors"
-                        onClick={(e) => handleTagClick(e, tag)}
-                      >
-                        {tag}
-                      </button>
-                    ))}
-                    {record.fields.KEYWORDS.length > 4 && (
-                      <div className="bg-[#b8c5e8] text-[#8e3e3e] font-medium text-xs px-2 py-0.5 rounded-full">
-                        +{record.fields.KEYWORDS.length - 4}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+  return (
+    <div
+      className="block relative hover:opacity-95 transition-opacity timeline-card"
+      style={{ marginTop: index === 0 ? "17px" : "43px" }}
+      onClick={handleCardClick}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+    >
+      <div className="relative">
+        <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
+          <div className="bg-white/80 backdrop-blur-sm rounded-[10px] p-3 border border-[#f0d0d3]">
+            {/* Date Badge */}
+            <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 -translate-y-1/4 border border-[#8e3e3e] bg-white rounded-full px-3 py-1 text-sm text-[#8e3e3e] font-semibold shadow-md z-10 min-w-[150px] text-center">
+              {formatDate(record?.fields?.DATE)}
+            </div>
+
+            <div className="flex flex-col gap-2.5 mt-1.5 timeline-card-text">
+              {/* Event Description */}
+              <h3 className="text-[#8e3e3e] font-bold text-sm md:text-base leading-relaxed text-center">
+                {record?.fields?.EVENT || "Event description unavailable"}
+              </h3>
+
+              {/* Notes with line breaks */}
+              {record?.fields?.NOTES && (
+                <div className="text-xs md:text-sm text-center font-medium text-gray-700 leading-relaxed whitespace-pre-line">
+                  {record.fields.NOTES}
+                </div>
+              )}
+
+              {/* Keywords section with clickable tags - INSIDE the card */}
+              {record?.fields?.KEYWORDS && record.fields.KEYWORDS.length > 0 && (
+                <div className="flex flex-wrap gap-1 md:gap-1.5 justify-center keyword-container">
+                  {record.fields.KEYWORDS.slice(0, 4).map((tag, tagIndex) => (
+                    <button
+                      key={tagIndex}
+                      type="button"
+                      className="bg-[#8a9ac7] text-white font-medium text-xs px-2 py-0.5 rounded-full whitespace-nowrap shadow-sm hover:bg-[#6b7db3] transition-colors"
+                      onClick={(e) => handleTagClick(e, tag)}
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                  {record.fields.KEYWORDS.length > 4 && (
+                    <div className="bg-[#b8c5e8] text-[#8e3e3e] font-medium text-xs px-2 py-0.5 rounded-full">
+                      +{record.fields.KEYWORDS.length - 4}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
-      </Link>
-    )
-  }
+      </div>
+    </div>
+  )
+}
   // ===== JSX =====
 return (
   <section className="w-full bg-[#e8ecf7] py-2 px-2 md:px-10 flex flex-col min-h-0">

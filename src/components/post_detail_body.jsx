@@ -144,13 +144,13 @@ export default function PostDetailBody() {
   };
 
   const formatNotes = (notes) => {
-    if (!notes) return null;
-    return notes.split("\n\n").map((paragraph, index) => (
-      <p key={index} className="mb-2">
-        {paragraph}
-      </p>
-    ));
-  };
+  if (!notes) return null;
+  return notes.split("\n\n").map((paragraph, index) => (
+    <p key={index} className="mb-2 whitespace-pre-line">
+      {paragraph}
+    </p>
+  ));
+};
 
   // Keyboard navigation for modal
   useEffect(() => {

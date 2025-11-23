@@ -104,3 +104,30 @@
     border-width: 1px;
   }
 }
+/* Enable text selection on timeline cards */
+.timeline-card-text {
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+}
+
+/* Show text cursor when hovering over selectable text */
+.timeline-card-text h3,
+.timeline-card-text div:not(.keyword-container) {
+  cursor: text;
+}
+
+/* Keep the main card as pointer cursor */
+.timeline-card {
+  cursor: pointer;
+}
+
+/* Keywords should have pointer cursor */
+.keyword-container button {
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}

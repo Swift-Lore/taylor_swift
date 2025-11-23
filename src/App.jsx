@@ -8,6 +8,7 @@ import SearchResults from "./components/search_results";
 import CookiePolicy from "./components/cookie_policy";
 import PrivacyPolicy from "./components/privacy_policy";
 import CookieConsent from "react-cookie-consent";
+import ErasTourShows from "./components/ErasTourShows";
 
 /* ------------ Shared layout ------------ */
 
@@ -15,14 +16,11 @@ function Layout({ children, showHero = true }) {
   return (
     <div className="min-h-screen flex flex-col">
       <Header showHero={showHero} />
-      
       <main className="flex-1 min-h-0 relative z-0">
         {children}
-        
         {/* Reduced height gradient - only show if needed */}
         <div className="pointer-events-none w-full h-4 bg-gradient-to-b from-transparent to-[#e8ecf7]" />
       </main>
-
       <Footer />
     </div>
   );
@@ -73,6 +71,15 @@ function PrivacyPolicyPage() {
   );
 }
 
+// 🔹 NEW: Eras Tour Shows page wrapper
+function ErasTourShowsPage() {
+  return (
+    <Layout showHero={false}>
+      <ErasTourShows />
+    </Layout>
+  );
+}
+
 /* ------------ App root ------------ */
 
 function App() {
@@ -80,11 +87,14 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/timeline" element={<HomePage />} />
         <Route path="/posts" element={<PostsPage />} />
         <Route path="/post_details" element={<PostDetailPage />} />
-        <Route path="/timeline" element={<HomePage />} />
         <Route path="/cookie_policy" element={<CookiePolicyPage />} />
         <Route path="/privacy_policy" element={<PrivacyPolicyPage />} />
+
+        {/* 🔹 NEW ROUTE: this is what your header button navigates to */}
+        <Route path="/eras-tour-shows" element={<ErasTourShowsPage />} />
       </Routes>
 
       {/* Cookie banner stays once at the very bottom */}

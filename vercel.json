@@ -7,6 +7,10 @@
     {
       "source": "/cookie_policy", 
       "destination": "/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "git": {
@@ -15,9 +19,3 @@
     }
   }
 }
-
-
-
-
-
-
