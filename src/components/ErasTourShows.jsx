@@ -171,90 +171,34 @@ export default function ErasTourShows() {
 {!loading && !error && shows.length > 0 && (
   <div className="mb-8">
     <div className="flex flex-col md:flex-row md:items-center gap-3">
-      <label
-        htmlFor="eras-show-select"
-        className="text-sm font-medium text-[#8e3e3e] md:w-40"
-      >
+      <label className="text-sm font-medium text-[#8e3e3e] md:w-40">
         Select a show:
       </label>
       <div className="w-full md:flex-1">
         <Select
           options={shows.map(show => ({
             value: show.id,
-            label: show.showDisplayName,
-            // Simple search that uses the full display name
-            searchTerm: show.showDisplayName.toLowerCase()
+            label: show.showDisplayName
           }))}
-          value={shows.find(s => s.id === selectedShowId) ? {
-            value: selectedShowId,
-            label: shows.find(s => s.id === selectedShowId).showDisplayName
-          } : null}
+          value={shows.find(s => s.id === selectedShowId)}
           onChange={handleSelectChange}
-          placeholder="Type to search shows..."
+          placeholder="Type to search (e.g., London, Paris, etc.)"
           isSearchable
-          filterOption={(option, inputValue) => {
-            if (!inputValue) return true;
-            return option.data.searchTerm.includes(inputValue.toLowerCase());
-          }}
-          noOptionsMessage={({ inputValue }) => 
-            inputValue ? `No shows found for "${inputValue}"` : "No shows available"
-          }
-          styles={{
-            control: (base) => ({
-              ...base,
-              border: '1px solid #ffcaca',
-              borderRadius: '6px',
-              backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              padding: '2px 8px',
-              minHeight: '42px',
-              boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-              '&:hover': {
-                borderColor: '#ffcaca'
-              }
-            }),
-            menu: (base) => ({
-              ...base,
-              borderRadius: '6px',
-              border: '1px solid #ffcaca',
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-              zIndex: 9999
-            }),
-            option: (base, state) => ({
-              ...base,
-              backgroundColor: state.isFocused ? '#fef2f2' : 'white',
-              color: state.isFocused ? '#8e3e3e' : '#4b5563',
-              fontSize: '14px',
-              '&:active': {
-                backgroundColor: '#fecaca'
-              }
-            }),
-            placeholder: (base) => ({
-              ...base,
-              color: '#9ca3af',
-              fontSize: '14px'
-            }),
-            input: (base) => ({
-              ...base,
-              color: '#4b5563',
-              fontSize: '14px'
-            })
-          }}
-          components={{
-            DropdownIndicator: () => (
-              <div className="pr-2 text-[#6b7db3]">🔍</div>
-            ),
-            IndicatorSeparator: () => null
-          }}
         />
       </div>
     </div>
-    <p className="text-xs text-[#6b7db3] mt-2 italic">
-      Search by city name, date, or show details
-    </p>
     
-    {/* Quick debug - check if any shows have "London" in the name */}
-    <div className="mt-2 text-xs text-gray-500">
-      Shows with "London": {shows.filter(s => s.showDisplayName.toLowerCase().includes('london')).length}
+    {/* Enhanced debug info */}
+    <div className="mt-4 space-y-2 text-xs">
+      <div className="text-gray-500">
+        Total shows loaded: {shows.length}
+      </div>
+      <div className="text-gray-500">
+        Shows with "London": {shows.filter(s => s.showDisplayName && s.showDisplayName.toLowerCase().includes('london')).length}
+      </div>
+      <div className="text-gray-500">
+        Last 3 shows: {shows.slice(-3).map(s => s.showDisplayName).join(', ')}
+      </div>
     </div>
   </div>
 )}
