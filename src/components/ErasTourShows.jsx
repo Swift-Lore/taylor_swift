@@ -184,8 +184,14 @@ export default function ErasTourShows() {
             label: show.showDisplayName,
             venue: show.venue || '',
             date: show.date || '',
-            // Debug: log what we're searching
-            searchTerm: (show.showDisplayName + ' ' + (show.venue || '') + ' ' + (show.date || '')).toLowerCase()
+            // Extract city from display name for better searching
+            city: show.showDisplayName.split('—')[0]?.split(':')[1]?.trim() || '',
+            // Improved search term that includes just the city/state part
+            searchTerm: (
+              (show.showDisplayName.split('—')[0]?.split(':')[1]?.trim() || '') + ' ' + 
+              (show.venue || '') + ' ' + 
+              (show.date || '')
+            ).toLowerCase()
           }))}
           value={shows.find(s => s.id === selectedShowId) ? {
             value: selectedShowId,
@@ -196,19 +202,12 @@ export default function ErasTourShows() {
           isSearchable
           filterOption={(option, inputValue) => {
             if (!inputValue) return true;
-            const matches = option.data.searchTerm.includes(inputValue.toLowerCase());
-            console.log('Searching for:', inputValue.toLowerCase(), 'in:', option.data.searchTerm, 'Match:', matches);
-            return matches;
+            const searchTerm = inputValue.toLowerCase().trim();
+            return option.data.searchTerm.includes(searchTerm);
           }}
-          noOptionsMessage={({ inputValue }) => {
-            console.log('No options for:', inputValue);
-            console.log('Available shows:', shows.map(s => ({
-              name: s.showDisplayName,
-              venue: s.venue,
-              date: s.date
-            })));
-            return inputValue ? `No shows found for "${inputValue}"` : "No shows available";
-          }}
+          noOptionsMessage={({ inputValue }) => 
+            inputValue ? `No shows found for "${inputValue}"` : "No shows available"
+          }
           styles={{
             control: (base) => ({
               ...base,
@@ -258,23 +257,10 @@ export default function ErasTourShows() {
         />
       </div>
     </div>
-    {/* Add helper text */}
+    {/* Updated helper text with examples from your data */}
     <p className="text-xs text-[#6b7db3] mt-2 italic">
-      Tip: Search by city (e.g., "London"), date (e.g., "May 2024"), or venue name
+      Tip: Search by city (e.g., "Glendale", "Las Vegas"), date (e.g., "2023-03"), or venue name
     </p>
-    
-    {/* Debug info - remove this after testing */}
-    <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs">
-      <p className="font-semibold">Debug Info (first 3 shows):</p>
-      {shows.slice(0, 3).map((show, index) => (
-        <div key={index} className="mt-1">
-          <p>Name: {show.showDisplayName}</p>
-          <p>Venue: {show.venue}</p>
-          <p>Date: {show.date}</p>
-          <hr className="my-1" />
-        </div>
-      ))}
-    </div>
   </div>
 )}
 
