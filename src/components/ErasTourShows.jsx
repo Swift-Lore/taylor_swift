@@ -198,19 +198,6 @@ export default function ErasTourShows() {
         />
       </div>
     </div>
-    
-    {/* Enhanced debug info */}
-    <div className="mt-4 space-y-2 text-xs">
-      <div className="text-gray-500">
-        Total shows loaded: {shows.length}
-      </div>
-      <div className="text-gray-500">
-        Shows with "London": {shows.filter(s => s.showDisplayName && s.showDisplayName.toLowerCase().includes('london')).length}
-      </div>
-      <div className="text-gray-500">
-        Last 3 shows: {shows.slice(-3).map(s => s.showDisplayName).join(', ')}
-      </div>
-    </div>
   </div>
 )}
 
