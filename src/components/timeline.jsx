@@ -177,26 +177,31 @@ export default function Timeline() {
           <div className="grid grid-cols-7 gap-1">
             {calendarDays.map((day, index) => (
               <button
-                key={index}
-                onClick={() => handleDateSelect(day)}
-                disabled={!day}
-                className={`
-                  relative h-8 rounded-lg text-sm font-medium transition-all
-                  transform hover:scale-105 active:scale-95
-                  ${!day ? 'invisible' : ''}
-                  ${day === currentDay && (calendarMonth + 1) === currentMonth
-                    ? 'bg-[#8e3e3e] text-white shadow-md scale-105'
-                    : 'hover:bg-[#f8d7da] text-[#8e3e3e]'
-                  }
-                  ${hasEvents(day) ? 'border-2 border-[#ffd700]' : 'border border-transparent'}
-                `}
-              >
-                {day}
-                {/* Event indicator dot */}
-                {hasEvents(day) && (
-                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#ff6b6b] rounded-full"></div>
-                )}
-              </button>
+  key={index}
+  onClick={() => handleDateSelect(day)}
+  disabled={!day}
+  className={`
+    relative h-8 rounded-lg text-sm font-medium transition-all
+    transform hover:scale-105 active:scale-95
+    ${!day ? 'invisible' : ''}
+    ${
+      day === currentDay && (calendarMonth + 1) === currentMonth
+        ? 'bg-[#8e3e3e] text-white shadow-md scale-105'
+        : 'bg-white/80 text-[#8e3e3e] hover:bg-[#f8d7da]'
+    }
+    ${
+      hasEvents(day)
+        ? 'border-2 border-[#e3b0b0]'
+        : 'border border-transparent'
+    }
+  `}
+>
+  {day}
+  {/* Event indicator dot */}
+  {hasEvents(day) && (
+    <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#8e3e3e] rounded-full"></div>
+  )}
+</button>
             ))}
           </div>
 
