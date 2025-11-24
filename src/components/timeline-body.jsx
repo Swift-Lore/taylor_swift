@@ -39,6 +39,95 @@ const isCompleteMonthDay = (value) => {
   return true
 }
 
+// ===== Calendar Functions =====
+const getDaysInMonth = (month, year) => {
+  return new Date(year, month + 1, 0).getDate()
+}
+
+const getFirstDayOfMonth = (month, year) => {
+  return new Date(year, month, 1).getDay()
+}
+
+const generateCalendar = () => {
+  const daysInMonth = getDaysInMonth(calendarMonth, calendarYear)
+  const firstDay = getFirstDayOfMonth(calendarMonth, calendarYear)
+  const calendar = []
+
+  // Add empty cells for days before the first day of month
+  for (let i = 0; i < firstDay; i++) {
+    calendar.push(null)
+  }
+
+  // Add days of the month
+  for (let i = 1; i <= daysInMonth; i++) {
+    calendar.push(i)
+  }
+
+  return calendar
+}
+
+const handleDateSelect = (day) => {
+  if (day) {
+    const selectedMonth = calendarMonth + 1
+    const selectedDay = day
+    const monthStr = selectedMonth.toString().padStart(2, '0')
+    const dayStr = selectedDay.toString().padStart(2, '0')
+    
+    // Set the monthDay input with MM/DD format
+    setMonthDay(`${monthStr}/${dayStr}`)
+    setShowCalendar(false)
+    resetPagination()
+  }
+}
+
+const navigateCalendarMonth = (direction) => {
+  if (direction === 'prev') {
+    if (calendarMonth === 0) {
+      setCalendarMonth(11)
+      setCalendarYear(calendarYear - 1)
+    } else {
+      setCalendarMonth(calendarMonth - 1)
+    }
+  } else {
+    if (calendarMonth === 11) {
+      setCalendarMonth(0)
+      setCalendarYear(calendarYear + 1)
+    } else {
+      setCalendarMonth(calendarMonth + 1)
+    }
+  }
+}
+
+const jumpToToday = () => {
+  const today = new Date()
+  const monthStr = (today.getMonth() + 1).toString().padStart(2, '0')
+  const dayStr = today.getDate().toString().padStart(2, '0')
+  
+  setMonthDay(`${monthStr}/${dayStr}`)
+  setCalendarMonth(today.getMonth())
+  setCalendarYear(today.getFullYear())
+  setShowCalendar(false)
+  resetPagination()
+}
+
+const jumpToThisMonth = () => {
+  const today = new Date()
+  setCalendarMonth(today.getMonth())
+  setCalendarYear(today.getFullYear())
+}
+
+const hasEvents = (day) => {
+  const dateKey = `${calendarYear}-${calendarMonth + 1}-${day}`
+  return dateEventsMap[dateKey]
+}
+
+const monthNames = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+]
+
+const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+
 export default function TimelineBody() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -1042,8 +1131,8 @@ const handleEndDateChange = (value) => {
             />
           </div>
 
-          {/* Month/Day */}
-          <div className="relative">
+                    {/* Month/Day with Calendar Button */}
+          <div className="relative flex items-center">
             <input
               type="text"
               placeholder="Month/Day (MM/DD)"
@@ -1051,6 +1140,15 @@ const handleEndDateChange = (value) => {
               value={monthDay}
               onChange={(e) => handleMonthDayChange(e.target.value)}
             />
+            {/* Calendar button positioned inside the input */}
+            <button
+              onClick={() => setShowCalendar(true)}
+              className="absolute -right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-1 shadow-sm border border-[#b66b6b] hover:bg-[#f8d7da] transition-colors"
+              title="Open calendar"
+              type="button"
+            >
+              <Calendar size={14} className="text-[#8e3e3e]" />
+            </button>
           </div>
 
           {/* Search */}
