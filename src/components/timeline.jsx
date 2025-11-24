@@ -107,14 +107,20 @@ export default function Timeline() {
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
   // ===== Enhanced Calendar Modal =====
-  const CalendarModal = () => {
+    const CalendarModal = () => {
     if (!showCalendar) return null
 
     const calendarDays = generateCalendar()
 
     return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in fade-in-zoom-in-95">
+      <div
+        className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+        onClick={() => setShowCalendar(false)}   // click outside closes
+      >
+        <div
+          className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in fade-in-zoom-in-95"
+          onClick={(e) => e.stopPropagation()}   // clicks inside don't close
+        >
           {/* Quick Actions Bar */}
           <div className="flex gap-2 mb-4">
             <Button
