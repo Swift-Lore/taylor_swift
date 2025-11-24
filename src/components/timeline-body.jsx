@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
 import { useNavigate, useLocation, Link } from "react-router-dom"
+import { ChevronLeft, ChevronRight, Calendar, Star, Zap, Clock } from "lucide-react"
+import { Button } from "./ui/Button" // Adjust path as needed
 // import AdComponent from "./ad_component" // COMMENT OUT FOR NOW
 
 // helper: convert "MM/DD/YYYY" -> "YYYY-MM-DD" for Airtable
@@ -96,7 +98,13 @@ export default function TimelineBody() {
   const [isSearchMode, setIsSearchMode] = useState(false)
   const [searchResults, setSearchResults] = useState([])
 
-  const [isFilterMode, setIsFilterMode] = useState(false)
+    const [isFilterMode, setIsFilterMode] = useState(false)
+
+  // Calendar state
+  const [showCalendar, setShowCalendar] = useState(false)
+  const [dateEventsMap, setDateEventsMap] = useState({})
+  const [calendarMonth, setCalendarMonth] = useState(new Date().getMonth())
+  const [calendarYear, setCalendarYear] = useState(new Date().getFullYear())
 
   // view mode: "grid" or "compact"
   const [viewMode, setViewMode] = useState("grid")
