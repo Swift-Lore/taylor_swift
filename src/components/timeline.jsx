@@ -547,7 +547,16 @@ export default function Timeline() {
           <div className="bg-white rounded-full px-2 sm:px-3 md:px-4 py-1 border border-[#b66b6b] shadow-sm">
             <div className="flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
-              <span className="text-[#8e3e3e] text-xs md:text-sm font-medium">
+              <span
+  className="
+    text-[#8e3e3e] text-xs md:text-sm font-medium
+    select-none
+    user-select-none
+    [-webkit-user-select:none]
+    [-webkit-touch-callout:none]
+    [-webkit-tap-highlight-color:transparent]
+  "
+>
                 {isLoading
                   ? "Loading events..."
                   : `${records.length} ${
