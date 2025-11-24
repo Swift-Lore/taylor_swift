@@ -972,7 +972,135 @@ const handleEndDateChange = (value) => {
       </div>
     )
   }
+// ===== Enhanced Calendar Modal =====
+const CalendarModal = () => {
+  if (!showCalendar) return null
 
+  const calendarDays = generateCalendar()
+
+  return (
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      onClick={() => setShowCalendar(false)}
+    >
+      <div
+        className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in fade-in-zoom-in-95"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Quick Actions Bar */}
+        <div className="flex gap-2 mb-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={jumpToToday}
+            className="flex-1 text-xs py-1 h-auto"
+          >
+            <Clock size={12} className="mr-1" />
+            Today
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={jumpToThisMonth}
+            className="flex-1 text-xs py-1 h-auto"
+          >
+            <Zap size={12} className="mr-1" />
+            This Month
+          </Button>
+        </div>
+
+        {/* Calendar Header */}
+        <div className="flex items-center justify-between mb-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigateCalendarMonth('prev')}
+            className="p-2 hover:bg-[#f8d7da] transition-colors"
+          >
+            <ChevronLeft size={18} className="text-[#8e3e3e]" />
+          </Button>
+          
+          <div className="text-lg font-semibold text-[#8e3e3e] flex items-center gap-2">
+            <Star size={16} className="text-[#ffd700]" fill="#ffd700" />
+            {monthNames[calendarMonth]} {calendarYear}
+            <Star size={16} className="text-[#ffd700]" fill="#ffd700" />
+          </div>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigateCalendarMonth('next')}
+            className="p-2 hover:bg-[#f8d7da] transition-colors"
+          >
+            <ChevronRight size={18} className="text-[#8e3e3e]" />
+          </Button>
+        </div>
+
+        {/* Day Headers */}
+        <div className="grid grid-cols-7 gap-1 mb-2">
+          {dayNames.map(day => (
+            <div key={day} className="text-center text-xs font-semibold text-[#6b7db3] py-1">
+              {day}
+            </div>
+          ))}
+        </div>
+
+        {/* Calendar Grid */}
+        <div className="grid grid-cols-7 gap-1">
+          {calendarDays.map((day, index) => (
+            <button
+              key={index}
+              onClick={() => handleDateSelect(day)}
+              disabled={!day}
+              className={`
+                relative h-8 rounded-lg text-sm font-medium transition-all
+                transform hover:scale-105 active:scale-95
+                ${!day ? 'invisible' : ''}
+                ${
+                  day === parseInt(monthDay.split('/')[1]) && 
+                  monthDay.includes('/') &&
+                  (calendarMonth + 1) === parseInt(monthDay.split('/')[0])
+                    ? 'bg-[#8e3e3e] text-white shadow-md scale-105'
+                    : 'bg-white/80 text-[#8e3e3e] hover:bg-[#f8d7da]'
+                }
+                ${
+                  hasEvents(day)
+                    ? 'border-2 border-[#e3b0b0]'
+                    : 'border border-transparent'
+                }
+              `}
+            >
+              {day}
+              {/* Event indicator dot */}
+              {hasEvents(day) && (
+                <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#8e3e3e] rounded-full"></div>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2 justify-center mt-4">
+          <Button
+            variant="secondary"
+            onClick={() => setShowCalendar(false)}
+            className="rounded-full px-6 flex-1"
+          >
+            Close
+          </Button>
+          <Button
+            onClick={jumpToToday}
+            className="rounded-full px-6 flex-1 bg-[#8e3e3e] hover:bg-[#7a3434]"
+          >
+            Go to Today
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+    // AdSense init - COMMENT OUT FOR NOW
     // AdSense init - COMMENT OUT FOR NOW
   // useEffect(() => {
   //   if (
