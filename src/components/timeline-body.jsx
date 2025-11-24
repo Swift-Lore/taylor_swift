@@ -1296,25 +1296,29 @@ const CalendarModal = () => {
             />
           </div>
 
-                    {/* Month/Day with Calendar Button */}
-          <div className="relative flex items-center">
-            <input
-              type="text"
-              placeholder="Month/Day (MM/DD)"
-              className="bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-1.5 text-sm min-w-[150px]"
-              value={monthDay}
-              onChange={(e) => handleMonthDayChange(e.target.value)}
-            />
-            {/* Calendar button positioned inside the input */}
-            <button
-              onClick={() => setShowCalendar(true)}
-              className="absolute -right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-1 shadow-sm border border-[#b66b6b] hover:bg-[#f8d7da] transition-colors"
-              title="Open calendar"
-              type="button"
-            >
-              <Calendar size={14} className="text-[#8e3e3e]" />
-            </button>
-          </div>
+                    {/* Month/Day */}
+<div className="relative">
+  <input
+    type="text"
+    placeholder="Month/Day (MM/DD)"
+    className="bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-1.5 text-sm min-w-[150px]"
+    value={monthDay}
+    onChange={(e) => handleMonthDayChange(e.target.value)}
+  />
+</div>
+
+{/* Standalone Calendar Button */}
+<div className="relative">
+  <button
+    onClick={() => setShowCalendar(true)}
+    className="flex items-center justify-between bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-1.5 text-sm min-w-[120px] hover:bg-[#f8d7da] transition-colors"
+    title="Open calendar"
+    type="button"
+  >
+    <Calendar size={14} className="text-[#8e3e3e] mr-1" />
+    <span>Calendar</span>
+  </button>
+</div>
 
           {/* Search */}
           <div className="relative flex-grow min-w-[200px]">
