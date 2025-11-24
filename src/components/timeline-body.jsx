@@ -358,6 +358,43 @@ useEffect(() => {
   const timer = setTimeout(checkForUpdates, 30000);
   return () => clearTimeout(timer);
 }, []);
+  // ===== Pre-fetch events for calendar indicators =====
+useEffect(() => {
+  const fetchEventsForMonth = async (month, year) => {
+    try {
+      const response = await axios.get(
+        "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+        {
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+          },
+          params: {
+            filterByFormula: `AND(MONTH(DATE) = ${month}, YEAR(DATE) = ${year})`,
+            fields: ["DATE"],
+          },
+        }
+      )
+      
+      // Create a map of dates that have events
+      const eventsMap = {}
+      response.data.records?.forEach(record => {
+        if (record.fields.DATE) {
+          const date = new Date(record.fields.DATE)
+          const dateKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
+          eventsMap[dateKey] = true
+        }
+      })
+      
+      setDateEventsMap(prev => ({ ...prev, ...eventsMap }))
+    } catch (error) {
+      console.error("Error fetching calendar events:", error)
+    }
+  }
+
+  if (showCalendar) {
+    fetchEventsForMonth(calendarMonth + 1, calendarYear)
+  }
+}, [calendarMonth, calendarYear, showCalendar])
 useEffect(() => {
   const timer = setTimeout(() => {
     // Only trigger filter when cleared or when MM/DD is valid
