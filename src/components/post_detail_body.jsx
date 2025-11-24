@@ -214,14 +214,6 @@ export default function PostDetailBody() {
       setTimeout(loadInstagramScript, 500);
     }
     if (event.TWITTER) loadTwitterScript();
-
-    if (event["GETTY EMBED"] && !document.getElementById("getty-embed-script")) {
-      const script = document.createElement("script");
-      script.id = "getty-embed-script";
-      script.src = "//www.gettyimages.com/showcase/embed.js";
-      script.async = true;
-      document.body.appendChild(script);
-    }
   }, [event]);
 
   // TikTok embed script loading
