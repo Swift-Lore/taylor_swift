@@ -115,3 +115,37 @@ body {
   opacity: 1;
   transform: translateY(0);
 }
+/* ============================
+   GLOBAL MOBILE TAP + SELECTION FIX
+   ============================ */
+
+/* Remove blue highlight on mobile tap */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Remove text selection background color */
+*::selection {
+  background: transparent !important;
+  color: inherit !important;
+}
+
+*::-moz-selection {
+  background: transparent !important;
+  color: inherit !important;
+}
+
+/* Prevent iOS from adding grey/blue highlight to inline elements */
+html, body {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Explicitly re-enable text selection ONLY for timeline text */
+.timeline-card-text,
+.timeline-card-text * {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+  -webkit-touch-callout: default !important;
+}
