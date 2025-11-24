@@ -215,7 +215,43 @@ export default function PostDetailBody() {
     }
     if (event.TWITTER) loadTwitterScript();
   }, [event]);
+  // Getty embed: inject HTML and execute its scripts
+  useEffect(() => {
+    const embedHtml = event?.["GETTY EMBED"];
+    if (!embedHtml) return;
 
+    const container = document.getElementById("getty-embed-container");
+    if (!container) return;
+
+    // Put the raw embed HTML into the container
+    container.innerHTML = embedHtml;
+
+    // Find any <script> tags in the embed and re-run them
+    const scripts = Array.from(container.getElementsByTagName("script"));
+
+    scripts.forEach((oldScript) => {
+      const newScript = document.createElement("script");
+
+      if (oldScript.src) {
+        // Avoid adding duplicate external scripts if already on the page
+        const alreadyLoaded = Array.from(
+          document.getElementsByTagName("script")
+        ).some((s) => s.src === oldScript.src);
+
+        if (alreadyLoaded) return;
+
+        newScript.src = oldScript.src;
+        newScript.async = oldScript.async;
+        if (oldScript.charset) newScript.charset = oldScript.charset;
+      } else {
+        // Inline script (this is where gie.widgets.load(...) lives)
+        newScript.text = oldScript.innerHTML;
+      }
+
+      document.body.appendChild(newScript);
+    });
+  }, [event?.["GETTY EMBED"]]);
+  
   // TikTok embed script loading
   useEffect(() => {
     if (!event?.TIKTOK) return;
