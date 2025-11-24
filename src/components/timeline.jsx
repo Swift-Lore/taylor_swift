@@ -19,8 +19,9 @@ export default function Timeline() {
   const today = new Date()
   const [currentMonth, setCurrentMonth] = useState(today.getMonth() + 1)
   const [currentDay, setCurrentDay] = useState(today.getDate())
+  const [currentYear, setCurrentYear] = useState(2020)
 
-  const displayDate = new Date(2020, currentMonth - 1, currentDay)
+  const displayDate = new Date(currentYear, currentMonth - 1, currentDay)
 
   // Calendar state - use actual current year
   const [calendarMonth, setCalendarMonth] = useState(today.getMonth())
@@ -234,17 +235,19 @@ export default function Timeline() {
 
   // ===== Existing Functions =====
   const handleNextDay = () => {
-    const currentDate = new Date(2020, currentMonth - 1, currentDay)
+    const currentDate = new Date(currentYear, currentMonth - 1, currentDay)
     currentDate.setDate(currentDate.getDate() + 1)
     setCurrentMonth(currentDate.getMonth() + 1)
     setCurrentDay(currentDate.getDate())
+    setCurrentYear(currentDate.getFullYear())
   }
 
   const handlePreviousDay = () => {
-    const currentDate = new Date(2020, currentMonth - 1, currentDay)
+    const currentDate = new Date(currentYear, currentMonth - 1, currentDay)
     currentDate.setDate(currentDate.getDate() - 1)
     setCurrentMonth(currentDate.getMonth() + 1)
     setCurrentDay(currentDate.getDate())
+    setCurrentYear(currentDate.getFullYear())
   }
 
   // ===== Airtable fetch =====
@@ -278,7 +281,6 @@ export default function Timeline() {
       }
     }
 
-    console.log("Fetching Airtable for:", currentMonth, currentDay)
     if (currentMonth && currentDay) {
       fetchRecordsByDate(currentMonth, currentDay)
     }
@@ -326,10 +328,10 @@ export default function Timeline() {
   useEffect(() => {
     const timelineElement = document.querySelector(".mobile-timeline-container")
 
-    const handleScroll = () => {
-      if (timelineElement && timelineElement.scrollTop > 0) {
-        setShowScrollHint(false)
-      }
+    const handleTagClick = (e, keyword) => {
+      e.preventDefault()
+      e.stopPropagation()
+      navigate(`/posts?keyword=${encodeURIComponent(keyword)}`)
     }
 
     timelineElement?.addEventListener("scroll", handleScroll)
