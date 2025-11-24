@@ -436,7 +436,7 @@ export default function Timeline() {
 
   // ===== JSX =====
   return (
-    <section className="w-full bg-[#e8ecf7] py-2 px-2 md:px-10 flex flex-col min-h-0">
+    <section className="w-full bg-gradient-to-b from-[#3d2965] via-[#5e3f83] to-[#f7d7e3] py-6 px-2 md:px-10 flex flex-col min-h-0">
       <div className="container mx-auto flex flex-col min-h-0 flex-1">
         {/* Homepage Intro for SEO / AdSense */}
         <div className="max-w-3xl mx-auto mt-4 mb-8 px-4">
@@ -455,14 +455,23 @@ export default function Timeline() {
         {/* ON THIS DAY Section */}
         <div className="text-center mb-4 flex-shrink-0">
           <div className="relative w-full mb-3 md:mb-4 px-2 md:px-5">
-            <div className="relative w-full px-3 md:px-4 py-3 md:py-4 bg-[#e8eef9] rounded-2xl">
+  <div
+    className="
+      relative w-full px-4 md:px-6 py-4 md:py-5
+      bg-white/10
+      backdrop-blur-xl
+      rounded-3xl
+      border border-white/30
+      shadow-[0_0_45px_rgba(255,255,255,0.35)]
+    "
+  >
               <div className="max-w-3xl mx-auto text-center">
-                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif text-[#8e3e3e]">
-                  <span className="block tracking-wide">ON THIS DAY</span>
-                  <span className="text-sm sm:text-base md:text-lg lg:text-xl block mt-1">
-                    across Taylor's eras
-                  </span>
-                </h2>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif text-[#ffe5f3]">
+  <span className="block tracking-wide">ON THIS DAY</span>
+  <span className="text-sm sm:text-base md:text-lg lg:text-xl block mt-1 text-[#fbd3f0]">
+    across Taylor&apos;s eras
+  </span>
+</h2>
 
                 <p className="mt-3 text-[#6b7db3] text-xs sm:text-sm md:text-base leading-relaxed px-2">
                   Each day in Taylor's career has a story. Explore everything that
