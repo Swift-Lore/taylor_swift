@@ -543,30 +543,42 @@ export default function Timeline() {
         </div>
 
         {/* Event Counter */}
-        <div className="flex justify-center mb-2 flex-shrink-0">
-          <div className="bg-white rounded-full px-2 sm:px-3 md:px-4 py-1 border border-[#b66b6b] shadow-sm">
-            <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
-              <span
-  className="
-    text-[#8e3e3e] text-xs md:text-sm font-medium
-    select-none
-    user-select-none
-    [-webkit-user-select:none]
-    [-webkit-touch-callout:none]
-    [-webkit-tap-highlight-color:transparent]
-  "
->
-                {isLoading
-                  ? "Loading events..."
-                  : `${records.length} ${
-                      records.length === 1 ? "Event" : "Events"
-                    } Found`}
-              </span>
-              <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
-            </div>
-          </div>
-        </div>
+<div className="flex justify-center mb-2 flex-shrink-0">
+  <div
+    className="
+      bg-white rounded-full px-2 sm:px-3 md:px-4 py-1
+      border border-[#b66b6b] shadow-sm
+    "
+    onMouseDown={(e) => e.preventDefault()}
+    style={{
+      WebkitTapHighlightColor: "transparent",
+      WebkitUserSelect: "none",
+      userSelect: "none",
+      WebkitTouchCallout: "none",
+    }}
+  >
+    <div className="flex items-center gap-1.5">
+      <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
+
+      <span
+        className="text-[#8e3e3e] text-xs md:text-sm font-medium"
+        style={{
+          WebkitUserSelect: "none",
+          userSelect: "none",
+          WebkitTouchCallout: "none",
+        }}
+      >
+        {isLoading
+          ? "Loading events..."
+          : `${records.length} ${
+              records.length === 1 ? "Event" : "Events"
+            } Found`}
+      </span>
+
+      <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
+    </div>
+  </div>
+</div>
 
         {/* Timeline Section */}
         <div className="flex-1 min-h-0 relative">
