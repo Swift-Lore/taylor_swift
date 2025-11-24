@@ -501,46 +501,46 @@ export default function Timeline() {
 
           {/* Date navigation - Calendar integrated into the bubble */}
           <div className="flex items-center justify-center gap-1 sm:gap-2 md:gap-3 mt-1 md:mt-2">
-            <Button
-              variant="secondary"
-              className="rounded-full px-2 sm:px-3 md:px-5 text-xs sm:text-sm flex items-center gap-1 md:gap-2 mr-2.5"
-              onClick={handlePreviousDay}
-            >
-              <ChevronLeft size={10} className="md:size-14" />
-              <span className="hidden sm:inline">Previous Day</span>
-              <span className="sm:hidden mr-1.5">Prev</span>
-            </Button>
+  <Button
+    variant="secondary"
+    className="rounded-full h-8 md:h-9 px-2 sm:px-3 md:px-4 text-[11px] sm:text-xs md:text-sm flex items-center gap-1 mr-1"
+    onClick={handlePreviousDay}
+  >
+    <ChevronLeft size={12} />
+    <span className="hidden sm:inline">Previous</span>
+    <span className="sm:hidden">Prev</span>
+  </Button>
 
-            {/* Date bubble with calendar button integrated */}
-            <div className="relative">
-              <div className="bg-white rounded-full px-3 sm:px-5 md:px-7 py-1 md:py-1.5 min-w-[102px] sm:min-w-[136px] md:min-w-[170px] border border-[#b66b6b] flex items-center justify-center">
-                <span className="text-[#8e3e3e] text-sm md:text-base font-medium">
-                  {displayDate.toLocaleDateString("en-US", {
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </span>
-              </div>
-              {/* Calendar button positioned inside the bubble */}
-              <button
-                onClick={() => setShowCalendar(true)}
-                className="absolute -right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-1 shadow-sm border border-[#b66b6b] hover:bg-[#f8d7da] transition-colors"
-                title="Open calendar"
-              >
-                <Calendar size={14} className="text-[#8e3e3e]" />
-              </button>
-            </div>
+  {/* Date bubble with calendar button integrated */}
+  <div className="relative">
+    <div className="bg-white rounded-full px-3 sm:px-5 md:px-6 py-1 md:py-1.5 min-w-[102px] sm:min-w-[136px] md:min-w-[170px] border border-[#b66b6b] flex items-center justify-center">
+      <span className="text-[#8e3e3e] text-sm md:text-base font-medium">
+        {displayDate.toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+        })}
+      </span>
+    </div>
+    {/* Calendar button positioned inside the bubble */}
+    <button
+      onClick={() => setShowCalendar(true)}
+      className="absolute -right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-1 shadow-sm border border-[#b66b6b] hover:bg-[#f8d7da] transition-colors"
+      title="Open calendar"
+    >
+      <Calendar size={14} className="text-[#8e3e3e]" />
+    </button>
+  </div>
 
-            <Button
-              variant="secondary"
-              className="rounded-full px-2 sm:px-3 md:px-5 text-xs sm:text-sm flex items-center gap-1 md:gap-2 ml-2.5"
-              onClick={handleNextDay}
-            >
-              <span className="hidden sm:inline">Next Day</span>
-              <span className="sm:hidden ml-1.5">Next</span>
-              <ChevronRight size={10} className="md:size-14" />
-            </Button>
-          </div>
+  <Button
+    variant="secondary"
+    className="rounded-full h-8 md:h-9 px-2 sm:px-3 md:px-4 text-[11px] sm:text-xs md:text-sm flex items-center gap-1 ml-1"
+    onClick={handleNextDay}
+  >
+    <span className="hidden sm:inline">Next</span>
+    <span className="sm:hidden">Next</span>
+    <ChevronRight size={12} />
+  </Button>
+</div>
         </div>
 
         {/* Event Counter */}
