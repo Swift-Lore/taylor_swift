@@ -429,7 +429,7 @@ export default function Timeline() {
 
   // ===== JSX =====
   return (
-    <section className="w-full bg-gradient-to-b from-[#3d2965] via-[#5e3f83] to-[#f7d7e3] py-6 px-2 md:px-10 flex flex-col min-h-0">
+    <section className="w-full bg-[#e8ecf7] py-2 px-2 md:px-10 flex flex-col min-h-0">
       <div className="container mx-auto flex flex-col min-h-0 flex-1">
         {/* Homepage Intro for SEO / AdSense */}
         <div className="max-w-3xl mx-auto mt-4 mb-8 px-4">
