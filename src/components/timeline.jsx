@@ -546,28 +546,15 @@ export default function Timeline() {
 <div className="flex justify-center mb-2 flex-shrink-0">
   <div
     className="
+      event-counter-pill
       bg-white rounded-full px-2 sm:px-3 md:px-4 py-1
       border border-[#b66b6b] shadow-sm
     "
-    onMouseDown={(e) => e.preventDefault()}
-    style={{
-      WebkitTapHighlightColor: "transparent",
-      WebkitUserSelect: "none",
-      userSelect: "none",
-      WebkitTouchCallout: "none",
-    }}
   >
     <div className="flex items-center gap-1.5">
       <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
 
-      <span
-        className="text-[#8e3e3e] text-xs md:text-sm font-medium"
-        style={{
-          WebkitUserSelect: "none",
-          userSelect: "none",
-          WebkitTouchCallout: "none",
-        }}
-      >
+      <span className="event-counter-text text-[#8e3e3e] text-xs md:text-sm font-medium">
         {isLoading
           ? "Loading events..."
           : `${records.length} ${
