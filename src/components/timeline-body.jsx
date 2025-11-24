@@ -1355,7 +1355,7 @@ const handleEndDateChange = (value) => {
           </div>
         )}
 
-      {/* View On This Day Button */}
+            {/* View On This Day Button */}
       <div className="max-w-6xl mx-auto px-4 mt-16">
         <button
           className="w-full bg-[#c25e5e] text.white py-3 rounded-full font-medium text-white"
@@ -1367,6 +1367,10 @@ const handleEndDateChange = (value) => {
           View On This Day
         </button>
       </div>
+      
+      {/* Calendar Modal */}
+      <CalendarModal />
+      
       <br />
     </div>
   )
