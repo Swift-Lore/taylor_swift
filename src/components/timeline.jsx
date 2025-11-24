@@ -14,7 +14,7 @@ export default function Timeline() {
   const [records, setRecords] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [showCalendar, setShowCalendar] = useState(false)
-  const [dateEventsMap, setDateEventsMap] = useState({}) // Track which dates have events
+  const [dateEventsMap, setDateEventsMap] = useState({})
 
   const today = new Date()
   const [currentMonth, setCurrentMonth] = useState(today.getMonth() + 1)
@@ -23,47 +23,9 @@ export default function Timeline() {
 
   const displayDate = new Date(currentYear, currentMonth - 1, currentDay)
 
-  // Calendar state - initialize to current selected date
-  const [calendarMonth, setCalendarMonth] = useState(currentMonth - 1)
-  const [calendarYear, setCalendarYear] = useState(currentYear)
-
-  // ===== Pre-fetch events for calendar indicators =====
-  useEffect(() => {
-    const fetchEventsForMonth = async (month, year) => {
-      try {
-        const response = await axios.get(
-          "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-            },
-            params: {
-              filterByFormula: `AND(MONTH(DATE) = ${month}, YEAR(DATE) = ${year})`,
-              fields: ["DATE"],
-            },
-          }
-        )
-        
-        // Create a map of dates that have events
-        const eventsMap = {}
-        response.data.records?.forEach(record => {
-          if (record.fields.DATE) {
-            const date = new Date(record.fields.DATE)
-            const dateKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
-            eventsMap[dateKey] = true
-          }
-        })
-        
-        setDateEventsMap(prev => ({ ...prev, ...eventsMap }))
-      } catch (error) {
-        console.error("Error fetching calendar events:", error)
-      }
-    }
-
-    if (showCalendar) {
-      fetchEventsForMonth(calendarMonth + 1, calendarYear)
-    }
-  }, [calendarMonth, calendarYear, showCalendar])
+  // Calendar state - use actual current year
+  const [calendarMonth, setCalendarMonth] = useState(today.getMonth())
+  const [calendarYear, setCalendarYear] = useState(today.getFullYear())
 
   // ===== Calendar Functions =====
   const getDaysInMonth = (month, year) => {
@@ -96,7 +58,6 @@ export default function Timeline() {
     if (day) {
       setCurrentMonth(calendarMonth + 1)
       setCurrentDay(day)
-      setCurrentYear(calendarYear)
       setShowCalendar(false)
     }
   }
@@ -123,16 +84,15 @@ export default function Timeline() {
     const today = new Date()
     setCurrentMonth(today.getMonth() + 1)
     setCurrentDay(today.getDate())
-    setCurrentYear(2020) // Your timeline's base year
     setCalendarMonth(today.getMonth())
-    setCalendarYear(2020)
+    setCalendarYear(today.getFullYear())
     setShowCalendar(false)
   }
 
   const jumpToThisMonth = () => {
     const today = new Date()
     setCalendarMonth(today.getMonth())
-    setCalendarYear(2020)
+    setCalendarYear(today.getFullYear())
   }
 
   const hasEvents = (day) => {
@@ -148,14 +108,20 @@ export default function Timeline() {
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
   // ===== Enhanced Calendar Modal =====
-  const CalendarModal = () => {
+    const CalendarModal = () => {
     if (!showCalendar) return null
 
     const calendarDays = generateCalendar()
 
     return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in fade-in-zoom-in-95">
+      <div
+        className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+        onClick={() => setShowCalendar(false)}   // click outside closes
+      >
+        <div
+          className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in fade-in-zoom-in-95"
+          onClick={(e) => e.stopPropagation()}   // clicks inside don't close
+        >
           {/* Quick Actions Bar */}
           <div className="flex gap-2 mb-4">
             <Button
@@ -218,39 +184,32 @@ export default function Timeline() {
           <div className="grid grid-cols-7 gap-1">
             {calendarDays.map((day, index) => (
               <button
-                key={index}
-                onClick={() => handleDateSelect(day)}
-                disabled={!day}
-                className={`
-                  relative h-8 rounded-lg text-sm font-medium transition-all
-                  transform hover:scale-105 active:scale-95
-                  ${!day ? 'invisible' : ''}
-                  ${day === currentDay && (calendarMonth + 1) === currentMonth && calendarYear === currentYear
-                    ? 'bg-[#8e3e3e] text-white shadow-md scale-105'
-                    : 'hover:bg-[#f8d7da] text-[#8e3e3e]'
-                  }
-                  ${hasEvents(day) ? 'border-2 border-[#ffd700]' : 'border border-transparent'}
-                `}
-              >
-                {day}
-                {/* Event indicator dot */}
-                {hasEvents(day) && (
-                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#ff6b6b] rounded-full"></div>
-                )}
-              </button>
+  key={index}
+  onClick={() => handleDateSelect(day)}
+  disabled={!day}
+  className={`
+    relative h-8 rounded-lg text-sm font-medium transition-all
+    transform hover:scale-105 active:scale-95
+    ${!day ? 'invisible' : ''}
+    ${
+      day === currentDay && (calendarMonth + 1) === currentMonth
+        ? 'bg-[#8e3e3e] text-white shadow-md scale-105'
+        : 'bg-white/80 text-[#8e3e3e] hover:bg-[#f8d7da]'
+    }
+    ${
+      hasEvents(day)
+        ? 'border-2 border-[#e3b0b0]'
+        : 'border border-transparent'
+    }
+  `}
+>
+  {day}
+  {/* Event indicator dot */}
+  {hasEvents(day) && (
+    <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#8e3e3e] rounded-full"></div>
+  )}
+</button>
             ))}
-          </div>
-
-          {/* Legend */}
-          <div className="flex items-center justify-center gap-4 mt-4 text-xs text-gray-600">
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 bg-[#ff6b6b] rounded-full"></div>
-              <span>Has Events</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 border-2 border-[#ffd700] rounded"></div>
-              <span>Featured</span>
-            </div>
           </div>
 
           {/* Action Buttons */}
@@ -327,9 +286,60 @@ export default function Timeline() {
     }
   }, [currentMonth, currentDay])
 
-  // ===== TimelineCard Component (keep your existing one) =====
+  // ===== Pre-fetch events for calendar indicators =====
+  useEffect(() => {
+    const fetchEventsForMonth = async (month, year) => {
+      try {
+        const response = await axios.get(
+          "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+          {
+            headers: {
+              Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+            },
+            params: {
+              filterByFormula: `AND(MONTH(DATE) = ${month}, YEAR(DATE) = ${year})`,
+              fields: ["DATE"],
+            },
+          }
+        )
+        
+        // Create a map of dates that have events
+        const eventsMap = {}
+        response.data.records?.forEach(record => {
+          if (record.fields.DATE) {
+            const date = new Date(record.fields.DATE)
+            const dateKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
+            eventsMap[dateKey] = true
+          }
+        })
+        
+        setDateEventsMap(prev => ({ ...prev, ...eventsMap }))
+      } catch (error) {
+        console.error("Error fetching calendar events:", error)
+      }
+    }
+
+    if (showCalendar) {
+      fetchEventsForMonth(calendarMonth + 1, calendarYear)
+    }
+  }, [calendarMonth, calendarYear, showCalendar])
+
+  // ===== scroll hint =====
+  useEffect(() => {
+    const timelineElement = document.querySelector(".mobile-timeline-container")
+
+    const handleTagClick = (e, keyword) => {
+      e.preventDefault()
+      e.stopPropagation()
+      navigate(`/posts?keyword=${encodeURIComponent(keyword)}`)
+    }
+
+    timelineElement?.addEventListener("scroll", handleScroll)
+    return () => timelineElement?.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  // ===== Card component =====
   const TimelineCard = ({ record, index }) => {
-    // ... your existing TimelineCard code ...
     const [isSelectingText, setIsSelectingText] = useState(false)
 
     const handleTagClick = (e, keyword) => {
@@ -429,7 +439,7 @@ export default function Timeline() {
   return (
     <section className="w-full bg-[#e8ecf7] py-2 px-2 md:px-10 flex flex-col min-h-0">
       <div className="container mx-auto flex flex-col min-h-0 flex-1">
-        {/* Homepage Intro */}
+        {/* Homepage Intro for SEO / AdSense */}
         <div className="max-w-3xl mx-auto mt-4 mb-8 px-4">
           <div className="bg-white/70 border border-[#e3d5dd] rounded-2xl shadow-sm px-5 py-4 md:px-8 md:py-5 text-center">
             <h2 className="text-xl md:text-2xl font-semibold text-[#8e3e3e] mb-2">
@@ -443,33 +453,33 @@ export default function Timeline() {
           </div>
         </div>
 
-        {/* ON THIS DAY Section */}
+                {/* ON THIS DAY Section */}
         <div className="text-center mb-4 flex-shrink-0">
+          {/* Glowy header card */}
           <div className="relative w-full mb-3 md:mb-4 px-2 md:px-5">
-            <div className="relative w-full px-3 md:px-4 py-3 md:py-4 bg-[#e8eef9] rounded-2xl">
+            <div
+              className="
+                relative w-full px-4 md:px-6 py-4 md:py-5
+                bg-gradient-to-b from-[#fdf6fb] via-[#fbeff7] to-[#f6e5f0]
+                rounded-3xl
+                border border-[#e6d2e1]
+                shadow-[0_10px_25px_rgba(210,160,180,0.28)]
+              "
+            >
               <div className="max-w-3xl mx-auto text-center">
                 <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif text-[#8e3e3e]">
                   <span className="block tracking-wide">ON THIS DAY</span>
-                  <span className="text-sm sm:text-base md:text-lg lg:text-xl block mt-1">
-                    across Taylor's eras
+                  <span className="text-sm sm:text-base md:text-lg lg:text-xl block mt-1 text-[#b4667f]">
+                    across Taylor&apos;s eras
                   </span>
                 </h2>
 
                 <p className="mt-3 text-[#6b7db3] text-xs sm:text-sm md:text-base leading-relaxed px-2">
-                  Each day in Taylor's career has a story. Explore everything that
+                  Each day in Taylor&apos;s career has a story. Explore everything that
                   happened on this day across years: releases, performances,
                   interviews, and more.
                 </p>
               </div>
-
-              {/* Enhanced Calendar Button */}
-              <button
-                onClick={() => setShowCalendar(true)}
-                className="absolute top-4 right-4 bg-white/80 hover:bg-white rounded-full p-2 shadow-sm border border-[#e3d5dd] transition-all transform hover:scale-110 group"
-                title="Open calendar"
-              >
-                <Calendar size={20} className="text-[#8e3e3e] group-hover:text-[#7a3434]" />
-              </button>
 
               {/* Side stars */}
               <div className="pointer-events-none absolute left-1 sm:left-2 md:left-3 lg:left-7 top-1/2 -translate-y-1/2 opacity-70">
@@ -490,56 +500,74 @@ export default function Timeline() {
             </div>
           </div>
 
-          {/* Date navigation */}
+          {/* Date navigation - Calendar integrated into the bubble */}
           <div className="flex items-center justify-center gap-1 sm:gap-2 md:gap-3 mt-1 md:mt-2">
             <Button
               variant="secondary"
-              className="rounded-full px-2 sm:px-3 md:px-5 text-xs sm:text-sm flex items-center gap-1 md:gap-2 mr-2.5"
+              className="rounded-full h-8 md:h-9 px-2 sm:px-3 md:px-4 text-[11px] sm:text-xs md:text-sm flex items-center gap-1 mr-1"
               onClick={handlePreviousDay}
             >
-              <ChevronLeft size={10} className="md:size-14" />
-              <span className="hidden sm:inline">Previous Day</span>
-              <span className="sm:hidden mr-1.5">Prev</span>
+              <ChevronLeft size={12} />
+              <span className="hidden sm:inline">Previous</span>
+              <span className="sm:hidden">Prev</span>
             </Button>
 
-            <div className="bg-white rounded-full px-3 sm:px-5 md:px-7 py-1 md:py-1.5 min-w-[102px] sm:min-w-[136px] md:min-w-[170px] border border-[#b66b6b]">
-              <span className="text-[#8e3e3e] text-sm md:text-base font-medium">
-                {displayDate.toLocaleDateString("en-US", {
-                  month: "long",
-                  day: "numeric",
-                  year: "numeric"
-                })}
-              </span>
+            {/* Date bubble with calendar button integrated */}
+            <div className="relative">
+              <div className="bg-white rounded-full px-3 sm:px-5 md:px-6 py-1 md:py-1.5 min-w-[102px] sm:min-w-[136px] md:min-w-[170px] border border-[#b66b6b] flex items-center justify-center">
+                <span className="text-[#8e3e3e] text-sm md:text-base font-medium">
+                  {displayDate.toLocaleDateString("en-US", {
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </span>
+              </div>
+              {/* Calendar button positioned inside the bubble */}
+              <button
+                onClick={() => setShowCalendar(true)}
+                className="absolute -right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-1 shadow-sm border border-[#b66b6b] hover:bg-[#f8d7da] transition-colors"
+                title="Open calendar"
+              >
+                <Calendar size={14} className="text-[#8e3e3e]" />
+              </button>
             </div>
 
             <Button
               variant="secondary"
-              className="rounded-full px-2 sm:px-3 md:px-5 text-xs sm:text-sm flex items-center gap-1 md:gap-2 ml-2.5"
+              className="rounded-full h-8 md:h-9 px-2 sm:px-3 md:px-4 text-[11px] sm:text-xs md:text-sm flex items-center gap-1 ml-1"
               onClick={handleNextDay}
             >
-              <span className="hidden sm:inline">Next Day</span>
-              <span className="sm:hidden ml-1.5">Next</span>
-              <ChevronRight size={10} className="md:size-14" />
+              <span className="hidden sm:inline">Next</span>
+              <span className="sm:hidden">Next</span>
+              <ChevronRight size={12} />
             </Button>
           </div>
         </div>
 
         {/* Event Counter */}
-        <div className="flex justify-center mb-2 flex-shrink-0">
-          <div className="bg-white rounded-full px-2 sm:px-3 md:px-4 py-1 border border-[#b66b6b] shadow-sm">
-            <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
-              <span className="text-[#8e3e3e] text-xs md:text-sm font-medium">
-                {isLoading
-                  ? "Loading events..."
-                  : `${records.length} ${
-                      records.length === 1 ? "Event" : "Events"
-                    } Found`}
-              </span>
-              <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
-            </div>
-          </div>
-        </div>
+<div className="flex justify-center mb-2 flex-shrink-0">
+  <div
+    className="
+      event-counter-pill
+      bg-white rounded-full px-2 sm:px-3 md:px-4 py-1
+      border border-[#b66b6b] shadow-sm
+    "
+  >
+    <div className="flex items-center gap-1.5">
+      <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
+
+      <span className="event-counter-text text-[#8e3e3e] text-xs md:text-sm font-medium">
+        {isLoading
+          ? "Loading events..."
+          : `${records.length} ${
+              records.length === 1 ? "Event" : "Events"
+            } Found`}
+      </span>
+
+      <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
+    </div>
+  </div>
+</div>
 
         {/* Timeline Section */}
         <div className="flex-1 min-h-0 relative">
@@ -557,12 +585,14 @@ export default function Timeline() {
           {/* Desktop Timeline */}
           <div className="hidden md:block min-h-0">
             <div className="relative flex justify-center">
+              {/* Center line - spans full height */}
               <div className="absolute w-[2px] flex flex-col items-center h-full">
                 <div className="w-[5px] bg-[#8a9ad4] h-full"></div>
                 <div className="absolute left-1/2 -translate-x-1/2 top-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
                 <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
               </div>
 
+              {/* Desktop Timeline Items */}
               <div className="relative left-[37.5%] -translate-x-1/4 w-3/4">
                 {records.map((record, index) => (
                   <div
@@ -596,7 +626,7 @@ export default function Timeline() {
           </Button>
         </div>
         
-        {/* Enhanced Calendar Modal */}
+        {/* Calendar Modal */}
         <CalendarModal />
       </div>
     </section>

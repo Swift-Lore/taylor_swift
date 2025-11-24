@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
 import { useNavigate, useLocation, Link } from "react-router-dom"
+import { ChevronLeft, ChevronRight, Calendar, Star, Zap, Clock } from "lucide-react"
+import { Button } from "./ui/Button" // Adjust path as needed
 // import AdComponent from "./ad_component" // COMMENT OUT FOR NOW
 
 // helper: convert "MM/DD/YYYY" -> "YYYY-MM-DD" for Airtable
@@ -96,11 +98,106 @@ export default function TimelineBody() {
   const [isSearchMode, setIsSearchMode] = useState(false)
   const [searchResults, setSearchResults] = useState([])
 
-  const [isFilterMode, setIsFilterMode] = useState(false)
+    const [isFilterMode, setIsFilterMode] = useState(false)
+
+  // Calendar state
+  const [showCalendar, setShowCalendar] = useState(false)
+  const [dateEventsMap, setDateEventsMap] = useState({})
+  const [calendarMonth, setCalendarMonth] = useState(new Date().getMonth())
+  const [calendarYear, setCalendarYear] = useState(new Date().getFullYear())
 
   // view mode: "grid" or "compact"
   const [viewMode, setViewMode] = useState("grid")
   const TIMELINE_FILTERS_KEY = "swiftLoreTimelineFilters"
+
+  // ===== Calendar Functions =====
+  const getDaysInMonth = (month, year) => {
+    return new Date(year, month + 1, 0).getDate()
+  }
+
+  const getFirstDayOfMonth = (month, year) => {
+    return new Date(year, month, 1).getDay()
+  }
+
+  const generateCalendar = () => {
+    const daysInMonth = getDaysInMonth(calendarMonth, calendarYear)
+    const firstDay = getFirstDayOfMonth(calendarMonth, calendarYear)
+    const calendar = []
+
+    // Add empty cells for days before the first day of month
+    for (let i = 0; i < firstDay; i++) {
+      calendar.push(null)
+    }
+
+    // Add days of the month
+    for (let i = 1; i <= daysInMonth; i++) {
+      calendar.push(i)
+    }
+
+    return calendar
+  }
+
+  const handleDateSelect = (day) => {
+    if (day) {
+      const selectedMonth = calendarMonth + 1
+      const selectedDay = day
+      const monthStr = selectedMonth.toString().padStart(2, '0')
+      const dayStr = selectedDay.toString().padStart(2, '0')
+      
+      // Set the monthDay input with MM/DD format
+      setMonthDay(`${monthStr}/${dayStr}`)
+      setShowCalendar(false)
+      resetPagination()
+    }
+  }
+
+  const navigateCalendarMonth = (direction) => {
+    if (direction === 'prev') {
+      if (calendarMonth === 0) {
+        setCalendarMonth(11)
+        setCalendarYear(calendarYear - 1)
+      } else {
+        setCalendarMonth(calendarMonth - 1)
+      }
+    } else {
+      if (calendarMonth === 11) {
+        setCalendarMonth(0)
+        setCalendarYear(calendarYear + 1)
+      } else {
+        setCalendarMonth(calendarMonth + 1)
+      }
+    }
+  }
+
+  const jumpToToday = () => {
+    const today = new Date()
+    const monthStr = (today.getMonth() + 1).toString().padStart(2, '0')
+    const dayStr = today.getDate().toString().padStart(2, '0')
+    
+    setMonthDay(`${monthStr}/${dayStr}`)
+    setCalendarMonth(today.getMonth())
+    setCalendarYear(today.getFullYear())
+    setShowCalendar(false)
+    resetPagination()
+  }
+
+  const jumpToThisMonth = () => {
+    const today = new Date()
+    setCalendarMonth(today.getMonth())
+    setCalendarYear(today.getFullYear())
+  }
+
+  const hasEvents = (day) => {
+    const dateKey = `${calendarYear}-${calendarMonth + 1}-${day}`
+    return dateEventsMap[dateKey]
+  }
+
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ]
+
+  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
   // Tag click = add filter, don’t navigate
   const handleTagClick = (e, keyword) => {
     e.preventDefault()
@@ -261,6 +358,43 @@ useEffect(() => {
   const timer = setTimeout(checkForUpdates, 30000);
   return () => clearTimeout(timer);
 }, []);
+  // ===== Pre-fetch events for calendar indicators =====
+useEffect(() => {
+  const fetchEventsForMonth = async (month, year) => {
+    try {
+      const response = await axios.get(
+        "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+        {
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+          },
+          params: {
+            filterByFormula: `AND(MONTH(DATE) = ${month}, YEAR(DATE) = ${year})`,
+            fields: ["DATE"],
+          },
+        }
+      )
+      
+      // Create a map of dates that have events
+      const eventsMap = {}
+      response.data.records?.forEach(record => {
+        if (record.fields.DATE) {
+          const date = new Date(record.fields.DATE)
+          const dateKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
+          eventsMap[dateKey] = true
+        }
+      })
+      
+      setDateEventsMap(prev => ({ ...prev, ...eventsMap }))
+    } catch (error) {
+      console.error("Error fetching calendar events:", error)
+    }
+  }
+
+  if (showCalendar) {
+    fetchEventsForMonth(calendarMonth + 1, calendarYear)
+  }
+}, [calendarMonth, calendarYear, showCalendar])
 useEffect(() => {
   const timer = setTimeout(() => {
     // Only trigger filter when cleared or when MM/DD is valid
@@ -838,7 +972,135 @@ const handleEndDateChange = (value) => {
       </div>
     )
   }
+// ===== Enhanced Calendar Modal =====
+const CalendarModal = () => {
+  if (!showCalendar) return null
 
+  const calendarDays = generateCalendar()
+
+  return (
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      onClick={() => setShowCalendar(false)}
+    >
+      <div
+        className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in fade-in-zoom-in-95"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Quick Actions Bar */}
+        <div className="flex gap-2 mb-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={jumpToToday}
+            className="flex-1 text-xs py-1 h-auto"
+          >
+            <Clock size={12} className="mr-1" />
+            Today
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={jumpToThisMonth}
+            className="flex-1 text-xs py-1 h-auto"
+          >
+            <Zap size={12} className="mr-1" />
+            This Month
+          </Button>
+        </div>
+
+        {/* Calendar Header */}
+        <div className="flex items-center justify-between mb-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigateCalendarMonth('prev')}
+            className="p-2 hover:bg-[#f8d7da] transition-colors"
+          >
+            <ChevronLeft size={18} className="text-[#8e3e3e]" />
+          </Button>
+          
+          <div className="text-lg font-semibold text-[#8e3e3e] flex items-center gap-2">
+            <Star size={16} className="text-[#ffd700]" fill="#ffd700" />
+            {monthNames[calendarMonth]} {calendarYear}
+            <Star size={16} className="text-[#ffd700]" fill="#ffd700" />
+          </div>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigateCalendarMonth('next')}
+            className="p-2 hover:bg-[#f8d7da] transition-colors"
+          >
+            <ChevronRight size={18} className="text-[#8e3e3e]" />
+          </Button>
+        </div>
+
+        {/* Day Headers */}
+        <div className="grid grid-cols-7 gap-1 mb-2">
+          {dayNames.map(day => (
+            <div key={day} className="text-center text-xs font-semibold text-[#6b7db3] py-1">
+              {day}
+            </div>
+          ))}
+        </div>
+
+        {/* Calendar Grid */}
+        <div className="grid grid-cols-7 gap-1">
+          {calendarDays.map((day, index) => (
+            <button
+              key={index}
+              onClick={() => handleDateSelect(day)}
+              disabled={!day}
+              className={`
+                relative h-8 rounded-lg text-sm font-medium transition-all
+                transform hover:scale-105 active:scale-95
+                ${!day ? 'invisible' : ''}
+                ${
+                  day === parseInt(monthDay.split('/')[1]) && 
+                  monthDay.includes('/') &&
+                  (calendarMonth + 1) === parseInt(monthDay.split('/')[0])
+                    ? 'bg-[#8e3e3e] text-white shadow-md scale-105'
+                    : 'bg-white/80 text-[#8e3e3e] hover:bg-[#f8d7da]'
+                }
+                ${
+                  hasEvents(day)
+                    ? 'border-2 border-[#e3b0b0]'
+                    : 'border border-transparent'
+                }
+              `}
+            >
+              {day}
+              {/* Event indicator dot */}
+              {hasEvents(day) && (
+                <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#8e3e3e] rounded-full"></div>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2 justify-center mt-4">
+          <Button
+            variant="secondary"
+            onClick={() => setShowCalendar(false)}
+            className="rounded-full px-6 flex-1"
+          >
+            Close
+          </Button>
+          <Button
+            onClick={jumpToToday}
+            className="rounded-full px-6 flex-1 bg-[#8e3e3e] hover:bg-[#7a3434]"
+          >
+            Go to Today
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+    // AdSense init - COMMENT OUT FOR NOW
     // AdSense init - COMMENT OUT FOR NOW
   // useEffect(() => {
   //   if (
@@ -1034,16 +1296,28 @@ const handleEndDateChange = (value) => {
             />
           </div>
 
-          {/* Month/Day */}
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Month/Day (MM/DD)"
-              className="bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-1.5 text-sm min-w-[150px]"
-              value={monthDay}
-              onChange={(e) => handleMonthDayChange(e.target.value)}
-            />
-          </div>
+                    {/* Month/Day */}
+<div className="relative">
+  <input
+    type="text"
+    placeholder="Month/Day (MM/DD)"
+    className="bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-1.5 text-sm min-w-[150px]"
+    value={monthDay}
+    onChange={(e) => handleMonthDayChange(e.target.value)}
+  />
+</div>
+
+{/* Standalone Calendar Button */}
+<div className="relative">
+  <button
+    onClick={() => setShowCalendar(true)}
+    className="flex items-center gap-2 bg-white text-[#8e3e3e] border border-[#8e3e3e] rounded-full px-4 py-1.5 text-sm hover:bg-[#f8d7da] transition-colors"
+    type="button"
+  >
+    <Calendar size={16} />
+    <span>Calendar</span>
+  </button>
+</div>
 
           {/* Search */}
           <div className="relative flex-grow min-w-[200px]">
@@ -1249,7 +1523,7 @@ const handleEndDateChange = (value) => {
           </div>
         )}
 
-      {/* View On This Day Button */}
+            {/* View On This Day Button */}
       <div className="max-w-6xl mx-auto px-4 mt-16">
         <button
           className="w-full bg-[#c25e5e] text.white py-3 rounded-full font-medium text-white"
@@ -1261,6 +1535,10 @@ const handleEndDateChange = (value) => {
           View On This Day
         </button>
       </div>
+      
+      {/* Calendar Modal */}
+      <CalendarModal />
+      
       <br />
     </div>
   )
