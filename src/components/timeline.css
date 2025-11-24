@@ -151,3 +151,25 @@
   background: transparent !important;
   color: inherit !important;
 }
+/* Disable selection + highlight just for the Events Found pill */
+.event-counter-pill,
+.event-counter-pill * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+}
+
+/* Remove any selection background on that text */
+.event-counter-text::selection,
+.event-counter-pill::selection,
+.event-counter-pill *::selection {
+  background: transparent !important;
+  color: inherit !important;
+}
+
+.event-counter-text::-moz-selection,
+.event-counter-pill::-moz-selection,
+.event-counter-pill *::-moz-selection {
+  background: transparent !important;
+  color: inherit !important;
+}
