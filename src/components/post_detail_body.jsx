@@ -457,12 +457,12 @@ export default function PostDetailBody() {
         </section>
       )}
 
-      {/* Getty embed (if you ever use it) */}
+            {/* Getty */}
       {event["GETTY EMBED"] && (
         <section className="max-w-4xl mx-auto px-4 mb-10">
           <div
+            id="getty-embed-container"
             className="getty-embed w-full max-w-4xl"
-            dangerouslySetInnerHTML={{ __html: event["GETTY EMBED"] }}
           />
         </section>
       )}
