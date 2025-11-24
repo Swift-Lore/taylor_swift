@@ -215,42 +215,56 @@ export default function PostDetailBody() {
     }
     if (event.TWITTER) loadTwitterScript();
   }, [event]);
+  
   // Getty embed: inject HTML and execute its scripts
-  useEffect(() => {
-    const embedHtml = event?.["GETTY EMBED"];
-    if (!embedHtml) return;
+useEffect(() => {
+  const embedHtml = event?.["GETTY EMBED"];
+  if (!embedHtml) return;
 
-    const container = document.getElementById("getty-embed-container");
-    if (!container) return;
+  const container = document.getElementById("getty-embed-container");
+  if (!container) return;
 
-    // Put the raw embed HTML into the container
-    container.innerHTML = embedHtml;
+  // Clear previous content
+  container.innerHTML = '';
 
-    // Find any <script> tags in the embed and re-run them
-    const scripts = Array.from(container.getElementsByTagName("script"));
+  // Create a temporary div to parse the HTML
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = embedHtml;
+  
+  // Append all elements to the container
+  while (tempDiv.firstChild) {
+    container.appendChild(tempDiv.firstChild);
+  }
 
-    scripts.forEach((oldScript) => {
-      const newScript = document.createElement("script");
+  // Find and re-execute script tags
+  const scripts = container.getElementsByTagName('script');
+  const scriptsArray = Array.from(scripts);
 
-      if (oldScript.src) {
-        // Avoid adding duplicate external scripts if already on the page
-        const alreadyLoaded = Array.from(
-          document.getElementsByTagName("script")
-        ).some((s) => s.src === oldScript.src);
-
-        if (alreadyLoaded) return;
-
-        newScript.src = oldScript.src;
-        newScript.async = oldScript.async;
-        if (oldScript.charset) newScript.charset = oldScript.charset;
-      } else {
-        // Inline script (this is where gie.widgets.load(...) lives)
-        newScript.text = oldScript.innerHTML;
-      }
-
-      document.body.appendChild(newScript);
+  scriptsArray.forEach((oldScript) => {
+    const newScript = document.createElement('script');
+    
+    // Copy all attributes
+    Array.from(oldScript.attributes).forEach(attr => {
+      newScript.setAttribute(attr.name, attr.value);
     });
-  }, [event?.["GETTY EMBED"]]);
+    
+    // Copy inner content for inline scripts
+    if (oldScript.innerHTML) {
+      newScript.innerHTML = oldScript.innerHTML;
+    }
+    
+    // Remove the old script
+    oldScript.parentNode.removeChild(oldScript);
+    
+    // Append the new script to body to execute it
+    document.body.appendChild(newScript);
+  });
+
+  // If gie.widgets exists, call load
+  if (window.gie && window.gie.widgets) {
+    window.gie.widgets.load();
+  }
+}, [event?.["GETTY EMBED"]]);
   
   // TikTok embed script loading
   useEffect(() => {
