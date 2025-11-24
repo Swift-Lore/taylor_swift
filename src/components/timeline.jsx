@@ -205,18 +205,6 @@ export default function Timeline() {
             ))}
           </div>
 
-          {/* Legend */}
-          <div className="flex items-center justify-center gap-4 mt-4 text-xs text-gray-600">
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 bg-[#ff6b6b] rounded-full"></div>
-              <span>Has Events</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 border-2 border-[#ffd700] rounded"></div>
-              <span>Featured</span>
-            </div>
-          </div>
-
           {/* Action Buttons */}
           <div className="flex gap-2 justify-center mt-4">
             <Button
