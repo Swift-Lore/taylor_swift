@@ -473,11 +473,11 @@ export default function Timeline() {
   </span>
 </h2>
 
-                <p className="mt-3 text-[#6b7db3] text-xs sm:text-sm md:text-base leading-relaxed px-2">
-                  Each day in Taylor's career has a story. Explore everything that
-                  happened on this day across years: releases, performances,
-                  interviews, and more.
-                </p>
+                <p className="mt-3 text-[#e3d4ff] text-xs sm:text-sm md:text-base leading-relaxed px-2">
+  Each day in Taylor&apos;s career has a story. Explore everything that
+  happened on this day across years: releases, performances,
+  interviews, and more.
+</p>
               </div>
 
               {/* Side stars */}
