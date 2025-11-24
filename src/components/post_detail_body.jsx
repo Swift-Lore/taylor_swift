@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-// import AdComponent from "./ad_component"; // COMMENT OUT FOR NOW
 import Microlink from "@microlink/react";
 import "./post_detail_body.css";
 
@@ -34,6 +33,7 @@ const isLikelyImage = (url) => {
     lower.includes("twimg.com/media/")
   );
 };
+
 // Simple helper to detect Getty URLs
 const isGettyUrl = (url) => {
   if (!url) return false;
@@ -150,13 +150,13 @@ export default function PostDetailBody() {
   };
 
   const formatNotes = (notes) => {
-  if (!notes) return null;
-  return notes.split("\n\n").map((paragraph, index) => (
-    <p key={index} className="mb-2 whitespace-pre-line">
-      {paragraph}
-    </p>
-  ));
-};
+    if (!notes) return null;
+    return notes.split("\n\n").map((paragraph, index) => (
+      <p key={index} className="mb-2 whitespace-pre-line">
+        {paragraph}
+      </p>
+    ));
+  };
 
   // Keyboard navigation for modal
   useEffect(() => {
@@ -172,7 +172,7 @@ export default function PostDetailBody() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isModalOpen, selectedImageIndex, event?.IMAGE]);
 
-        // Social media embeds script loading (Instagram, Twitter, Getty)
+  // Social media embeds script loading (Instagram, Twitter, Getty)
   useEffect(() => {
     if (!event) return;
 
@@ -241,8 +241,6 @@ export default function PostDetailBody() {
     }
 
     document.body.appendChild(script);
-
-    // no special cleanup needed
   }, [event?.TIKTOK]);
 
   // Loading / missing state
@@ -292,15 +290,17 @@ export default function PostDetailBody() {
             {formatEventDate(event.DATE)}
           </p>
         )}
-              {/* No Notes Fallback */}
-{!event.NOTES && (
-  <p className="mt-3 text-sm md:text-base text-[#8e3e3e] font-medium italic leading-relaxed px-2">
-    No additional notes are available for this event yet, but more context may be
-    added later as Swift Lore expands its archive of Taylor Swift’s releases,
-    performances, interviews, and cultural milestones.
-  </p>
-)}
-</section>
+
+        {/* No Notes Fallback */}
+        {!event.NOTES && (
+          <p className="mt-3 text-sm md:text-base text-[#8e3e3e] font-medium italic leading-relaxed px-2">
+            No additional notes are available for this event yet, but more
+            context may be added later as Swift Lore expands its archive of
+            Taylor Swift’s releases, performances, interviews, and cultural
+            milestones.
+          </p>
+        )}
+      </section>
 
       {/* NOTES + SOURCES */}
       {(hasNotes || hasSources) && (
@@ -346,97 +346,99 @@ export default function PostDetailBody() {
               )}
 
               {nonImageLinks.length > 0 && (
-  <div className="microlink-grid">
-    {nonImageLinks.map((url, index) => {
-      const isGetty = isGettyUrl(url);
+                <div className="microlink-grid">
+                  {nonImageLinks.map((url, index) => {
+                    const isGetty = isGettyUrl(url);
 
-      if (isGetty) {
-        // Clean, branded Getty card instead of Microlink
-        return (
-          <a
-            key={`link-${index}`}
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="microlink-card block max-w-md mx-auto mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded bg-black flex items-center justify-center text-white text-xs font-semibold">
-                GETTY
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-[#8e3e3e] truncate">
-                  View this photo on Getty Images
-                </p>
-                <p className="text-xs text-gray-500 truncate">
-                  gettyimages.com
-                </p>
-              </div>
+                    if (isGetty) {
+                      // Clean, branded Getty card instead of Microlink
+                      return (
+                        <a
+                          key={`link-${index}`}
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="microlink-card block max-w-md mx-auto mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded bg-black flex items-center justify-center text-white text-xs font-semibold">
+                              GETTY
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-[#8e3e3e] truncate">
+                                View this photo on Getty Images
+                              </p>
+                              <p className="text-xs text-gray-500 truncate">
+                                gettyimages.com
+                              </p>
+                            </div>
+                          </div>
+                        </a>
+                      );
+                    }
+
+                    // Non-Getty links: keep using Microlink + fallback as before
+                    return (
+                      <div key={`link-${index}`} className="microlink-card">
+                        <div id={`microlink-wrapper-${index}`}>
+                          <Microlink
+                            url={url}
+                            size="large"
+                            media="image"
+                            onError={() => {
+                              const fallback = document.getElementById(
+                                `fallback-${index}`
+                              );
+                              if (fallback) fallback.style.display = "flex";
+                            }}
+                            fallback={{
+                              image: `https://logo.clearbit.com/${new URL(
+                                url
+                              ).hostname}`,
+                              title: url
+                                .split("/")
+                                .slice(-1)[0]
+                                .replace(/[-_]/g, " "),
+                              description: new URL(url).hostname.replace(
+                                "www.",
+                                ""
+                              ),
+                            }}
+                          />
+                        </div>
+
+                        {/* Fallback card */}
+                        <div
+                          id={`fallback-${index}`}
+                          style={{ display: "none" }}
+                          className="fallback-card flex items-center p-3 border border-gray-200 rounded-lg bg-white"
+                        >
+                          <img
+                            src={`https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(
+                              url
+                            )}`}
+                            alt=""
+                            className="w-8 h-8 mr-3"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-red-400 truncate">
+                              {url
+                                .split("/")
+                                .slice(-1)[0]
+                                .replace(/[-_]/g, " ")}
+                            </p>
+                            <p className="text-xs text-gray-500 truncate">
+                              {new URL(url).hostname.replace("www.", "")}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          </a>
-        );
-      }
-
-      // Non-Getty links: keep using Microlink + fallback as before
-      return (
-        <div key={`link-${index}`} className="microlink-card">
-          <div id={`microlink-wrapper-${index}`}>
-            <Microlink
-              url={url}
-              size="large"
-              media="image"
-              onError={() => {
-                const fallback = document.getElementById(
-                  `fallback-${index}`
-                );
-                if (fallback) fallback.style.display = "flex";
-              }}
-              fallback={{
-                image: `https://logo.clearbit.com/${new URL(
-                  url
-                ).hostname}`,
-                title: url
-                  .split("/")
-                  .slice(-1)[0]
-                  .replace(/[-_]/g, " "),
-                description: new URL(url).hostname.replace(
-                  "www.",
-                  ""
-                ),
-              }}
-            />
-          </div>
-
-          {/* Fallback card */}
-          <div
-            id={`fallback-${index}`}
-            style={{ display: "none" }}
-            className="fallback-card flex items-center p-3 border border-gray-200 rounded-lg bg-white"
-          >
-            <img
-              src={`https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(
-                url
-              )}`}
-              alt=""
-              className="w-8 h-8 mr-3"
-            />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-red-400 truncate">
-                {url
-                  .split("/")
-                  .slice(-1)[0]
-                  .replace(/[-_]/g, " ")}
-              </p>
-              <p className="text-xs text-gray-500 truncate">
-                {new URL(url).hostname.replace("www.", "")}
-              </p>
-            </div>
-          </div>
-        </div>
-      );
-    })}
-  </div>
-)}
+          )}
         </section>
       )}
 
@@ -455,7 +457,7 @@ export default function PostDetailBody() {
         </section>
       )}
 
-      {/* Getty */}
+      {/* Getty embed (if you ever use it) */}
       {event["GETTY EMBED"] && (
         <section className="max-w-4xl mx-auto px-4 mb-10">
           <div
@@ -501,7 +503,7 @@ export default function PostDetailBody() {
         </section>
       )}
 
-                  {/* Instagram */}
+      {/* Instagram */}
       {event.INSTAGRAM && (
         <section className="w-full px-4 mb-10">
           <div className="flex flex-wrap justify-center gap-6 mt-2">
@@ -535,27 +537,31 @@ export default function PostDetailBody() {
         </section>
       )}
 
-
       {/* Twitter / X */}
       {event.TWITTER && (
-  <section className="w-full px-4 mb-10">
-    <div className="flex flex-wrap justify-center gap-6 mt-2">
-      {event.TWITTER.split(/ \|\| |\s+/).map((url, index) => {
-        const cleanUrl = url.trim().replace("x.com", "twitter.com");
-        const isValid =
-          /^https:\/\/twitter\.com\/[^/]+\/status\/\d+/.test(cleanUrl);
-        return isValid ? (
-          <div key={index} className="twitter-container flex-shrink-0" style={{ width: "320px" }}>
-            <blockquote className="twitter-tweet" data-lang="en">
-              <a href={cleanUrl}>{cleanUrl}</a>
-            </blockquote>
+        <section className="w-full px-4 mb-10">
+          <div className="flex flex-wrap justify-center gap-6 mt-2">
+            {event.TWITTER.split(/ \|\| |\s+/).map((url, index) => {
+              const cleanUrl = url.trim().replace("x.com", "twitter.com");
+              const isValid =
+                /^https:\/\/twitter\.com\/[^/]+\/status\/\d+/.test(cleanUrl);
+              return isValid ? (
+                <div
+                  key={index}
+                  className="twitter-container flex-shrink-0"
+                  style={{ width: "320px" }}
+                >
+                  <blockquote className="twitter-tweet" data-lang="en">
+                    <a href={cleanUrl}>{cleanUrl}</a>
+                  </blockquote>
+                </div>
+              ) : null;
+            })}
           </div>
-        ) : null;
-      })}
-    </div>
-  </section>
-)}
-{/* TikTok */}
+        </section>
+      )}
+
+      {/* TikTok */}
       {event.TIKTOK && (
         <section className="max-w-6xl mx-auto px-4 mb-10">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center mt-2">
@@ -582,6 +588,7 @@ export default function PostDetailBody() {
           </div>
         </section>
       )}
+
       {/* Image Modal */}
       <AnimatePresence>
         {isModalOpen && (
@@ -611,7 +618,9 @@ export default function PostDetailBody() {
                 } else if (selectedImageIndex < totalImages) {
                   return (
                     <img
-                      src={sourceImages[selectedImageIndex - imageArrayLength]}
+                      src={
+                        sourceImages[selectedImageIndex - imageArrayLength]
+                      }
                       alt="Full view"
                       className="max-w-full max-h-[80vh] object-contain rounded-lg"
                     />
