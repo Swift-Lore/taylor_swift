@@ -1312,11 +1312,10 @@ const CalendarModal = () => {
 <div className="relative">
   <button
     onClick={() => setShowCalendar(true)}
-    className="flex items-center justify-between bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-1.5 text-sm min-w-[120px] hover:bg-[#f8d7da] transition-colors"
-    title="Open calendar"
+    className="flex items-center gap-2 bg-white text-[#8e3e3e] border border-[#8e3e3e] rounded-full px-4 py-1.5 text-sm hover:bg-[#f8d7da] transition-colors"
     type="button"
   >
-    <Calendar size={14} className="text-[#8e3e3e] mr-1" />
+    <Calendar size={16} />
     <span>Calendar</span>
   </button>
 </div>
