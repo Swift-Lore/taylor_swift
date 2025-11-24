@@ -109,7 +109,6 @@ export default function TimelineBody() {
   // view mode: "grid" or "compact"
   const [viewMode, setViewMode] = useState("grid")
   const TIMELINE_FILTERS_KEY = "swiftLoreTimelineFilters"
-    const TIMELINE_FILTERS_KEY = "swiftLoreTimelineFilters"
 
   // ===== Calendar Functions =====
   const getDaysInMonth = (month, year) => {
