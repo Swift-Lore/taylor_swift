@@ -578,7 +578,7 @@ const handlePreviousDay = () => {
           </div>
 
           {/* Date navigation + Taylor Nation alternate timeline box */}
-<div className="mt-1 md:mt-3 relative flex flex-col items-center md:min-h-[80px]">
+<div className="mt-1 md:mt-2 relative flex flex-col items-center md:min-h-[70px]">
   {/* Main date navigation (stays centered) */}
   <div className="flex items-center justify-center gap-1 sm:gap-2 md:gap-3">
     <Button
@@ -689,70 +689,61 @@ const handlePreviousDay = () => {
   </div>
 
     {/* TN box – desktop: floated to the right, doesn’t push the center */}
-  <div className="hidden md:block md:absolute md:right-6 md:top-10">
-    <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-4 py-3 md:max-w-xs">
+  <div className="hidden md:block md:absolute md:right-6 md:top-3">
+  <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-5 py-3 md:max-w-md">
 
-            {/* Hide helper text while in Toronto mode */}
-      {!isTorontoMode && (
-        <p className="text-xs text-[#6b7db3] leading-snug mb-2">
-          Click to see the events that took place on this day on Taylor Nation&apos;s
-          alternate timeline.
-          <button
-            type="button"
-            onClick={() => setShowTNInfo(true)}
-            className="inline-flex items-center ml-1 text-[11px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
-          >
-            <HelpCircle size={12} className="mr-0.5" />
-            What is this?
-          </button>
-        </p>
+    {!isTorontoMode && (
+      <p className="text-xs text-[#6b7db3] leading-snug mb-2">
+        Click to see the events that took place on this day on Taylor Nation&apos;s
+        alternate timeline.
+      </p>
+    )}
+
+    <Button
+      variant="outline"
+      className="
+        rounded-full px-4 py-1.5
+        text-xs
+        border-[#b66b6b] text-[#8e3e3e]
+        bg-white/90 hover:bg-[#fbeff7]
+      "
+      onClick={() => {
+        if (isTorontoMode) {
+          const today = new Date()
+          setCurrentYear(today.getFullYear())
+          setCurrentMonth(today.getMonth() + 1)
+          setCurrentDay(today.getDate())
+          setIsTorontoMode(false)
+        } else {
+          setCurrentYear(torontoDate.getFullYear())
+          setCurrentMonth(torontoDate.getMonth() + 1)
+          setCurrentDay(torontoDate.getDate())
+          setIsTorontoMode(true)
+        }
+      }}
+    >
+      {isTorontoMode ? (
+        <>
+          <span className="font-semibold mr-1">← Return to Today:</span>
+          {new Date().toLocaleDateString("en-US", {
+            month: "short",
+            day: "2-digit",
+            year: "numeric",
+          })}
+        </>
+      ) : (
+        <>
+          <span className="font-semibold mr-1">TN Timeline Date:</span>
+          {torontoDate.toLocaleDateString("en-US", {
+            month: "short",
+            day: "2-digit",
+            year: "numeric",
+          })}
+        </>
       )}
-
-      <Button
-        variant="outline"
-        className="
-          rounded-full px-4 py-1.5
-          text-xs
-          border-[#b66b6b] text-[#8e3e3e]
-          bg-white/90 hover:bg-[#fbeff7]
-        "
-        onClick={() => {
-          if (isTorontoMode) {
-            const today = new Date()
-            setCurrentYear(today.getFullYear())
-            setCurrentMonth(today.getMonth() + 1)
-            setCurrentDay(today.getDate())
-            setIsTorontoMode(false)
-          } else {
-            setCurrentYear(torontoDate.getFullYear())
-            setCurrentMonth(torontoDate.getMonth() + 1)
-            setCurrentDay(torontoDate.getDate())
-            setIsTorontoMode(true)
-          }
-        }}
-      >
-        {isTorontoMode ? (
-          <>
-            <span className="font-semibold mr-1">← Return to Today:</span>
-            {new Date().toLocaleDateString("en-US", {
-              month: "short",
-              day: "2-digit",
-              year: "numeric",
-            })}
-          </>
-        ) : (
-          <>
-            <span className="font-semibold mr-1">TN Timeline Date:</span>
-            {torontoDate.toLocaleDateString("en-US", {
-              month: "short",
-              day: "2-digit",
-              year: "numeric",
-            })}
-          </>
-        )}
-      </Button>
-    </div>
+    </Button>
   </div>
+</div>
 </div>
         </div>
 
