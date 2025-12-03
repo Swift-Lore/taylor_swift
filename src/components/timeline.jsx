@@ -629,7 +629,7 @@ const handlePreviousDay = () => {
   </div>
 
   {/* TN box – desktop: floated to the right, doesn’t push the center */}
-  <div className="hidden md:block md:absolute md:right-6 md:top-1/2 md:-translate-y-1/2">
+  <div className="hidden md:block md:absolute md:right-6 md:top-[65px]">
     <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-4 py-3 md:max-w-xs">
       <p className="text-xs text-[#6b7db3] leading-snug mb-2">
         Click to see the events that took place on this day on Taylor Nation&apos;s
