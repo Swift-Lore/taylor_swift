@@ -622,67 +622,66 @@ const handlePreviousDay = () => {
     </Button>
   </div>
 
-  {/* TN box – mobile: under the date nav */}
-<div className="mt-3 w-full max-w-xs md:hidden">
-  <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-3 sm:px-4 py-3">
+    {/* TN box – mobile: under the date nav */}
+  <div className="mt-3 w-full max-w-xs md:hidden">
+    <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-3 sm:px-4 py-3">
 
-    <p className="text-[11px] sm:text-xs text-[#6b7db3] leading-snug mb-2">
-      {!isTorontoMode && "View this day on Taylor Nation’s alternate timeline."}
-      <button
-        type="button"
-        onClick={() => setShowTNInfo(true)}
-        className="inline-flex items-center ml-1 text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
+      <p className="text-[11px] sm:text-xs text-[#6b7db3] leading-snug mb-2">
+        {!isTorontoMode && "View this day on Taylor Nation’s alternate timeline."}
+        <button
+          type="button"
+          onClick={() => setShowTNInfo(true)}
+          className="inline-flex items-center ml-1 text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
+        >
+          <HelpCircle size={12} className="mr-0.5" />
+          What is this?
+        </button>
+      </p>
+
+      <Button
+        variant="outline"
+        className="
+          rounded-full px-3 sm:px-4 py-1.5
+          text-[11px] sm:text-xs
+          border-[#b66b6b] text-[#8e3e3e]
+          bg-white/90 hover:bg-[#fbeff7]
+        "
+        onClick={() => {
+          if (isTorontoMode) {
+            const today = new Date()
+            setCurrentYear(today.getFullYear())
+            setCurrentMonth(today.getMonth() + 1)
+            setCurrentDay(today.getDate())
+            setIsTorontoMode(false)
+          } else {
+            setCurrentYear(torontoDate.getFullYear())
+            setCurrentMonth(torontoDate.getMonth() + 1)
+            setCurrentDay(torontoDate.getDate())
+            setIsTorontoMode(true)
+          }
+        }}
       >
-        <HelpCircle size={12} className="mr-0.5" />
-        What is this?
-      </button>
-    </p>
-  )}
-
-  <Button
-    variant="outline"
-    className="
-      rounded-full px-3 sm:px-4 py-1.5
-      text-[11px] sm:text-xs
-      border-[#b66b6b] text-[#8e3e3e]
-      bg-white/90 hover:bg-[#fbeff7]
-    "
-    onClick={() => {
-      if (isTorontoMode) {
-        const today = new Date()
-        setCurrentYear(today.getFullYear())
-        setCurrentMonth(today.getMonth() + 1)
-        setCurrentDay(today.getDate())
-        setIsTorontoMode(false)
-      } else {
-        setCurrentYear(torontoDate.getFullYear())
-        setCurrentMonth(torontoDate.getMonth() + 1)
-        setCurrentDay(torontoDate.getDate())
-        setIsTorontoMode(true)
-      }
-    }}
-  >
-    {isTorontoMode ? (
-      <>
-        <span className="font-semibold mr-1">← Return to Today:</span>
-        {new Date().toLocaleDateString("en-US", {
-          month: "short",
-          day: "2-digit",
-          year: "numeric",
-        })}
-      </>
-    ) : (
-      <>
-        <span className="font-semibold mr-1">TN Timeline Date:</span>
-        {torontoDate.toLocaleDateString("en-US", {
-          month: "short",
-          day: "2-digit",
-          year: "numeric",
-        })}
-      </>
-    )}
-  </Button>
-</div>
+        {isTorontoMode ? (
+          <>
+            <span className="font-semibold mr-1">← Return to Today:</span>
+            {new Date().toLocaleDateString("en-US", {
+              month: "short",
+              day: "2-digit",
+              year: "numeric",
+            })}
+          </>
+        ) : (
+          <>
+            <span className="font-semibold mr-1">TN Timeline Date:</span>
+            {torontoDate.toLocaleDateString("en-US", {
+              month: "short",
+              day: "2-digit",
+              year: "numeric",
+            })}
+          </>
+        )}
+      </Button>
+    </div>
   </div>
 
     {/* TN box – desktop: floated to the right, doesn’t push the center */}
