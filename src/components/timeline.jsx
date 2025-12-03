@@ -578,54 +578,59 @@ const handlePreviousDay = () => {
   {/* TN box – mobile: under the date nav */}
   <div className="mt-3 w-full max-w-xs md:hidden">
     <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-3 sm:px-4 py-3">
-      <p className="text-[11px] sm:text-xs text-[#6b7db3] leading-snug mb-2">
-        Click to see the events that took place on this day on Taylor Nation&apos;s
-        alternate timeline.
-      </p>
-      <Button
-        variant="outline"
-        className="
-          rounded-full px-3 sm:px-4 py-1.5
-          text-[11px] sm:text-xs
-          border-[#b66b6b] text-[#8e3e3e]
-          bg-white/90 hover:bg-[#fbeff7]
-        "
-        onClick={() => {
-          if (isTorontoMode) {
-            const today = new Date()
-            setCurrentYear(today.getFullYear())
-            setCurrentMonth(today.getMonth() + 1)
-            setCurrentDay(today.getDate())
-            setIsTorontoMode(false)
-          } else {
-            setCurrentYear(torontoDate.getFullYear())
-            setCurrentMonth(torontoDate.getMonth() + 1)
-            setCurrentDay(torontoDate.getDate())
-            setIsTorontoMode(true)
-          }
-        }}
-      >
-        {isTorontoMode ? (
-          <>
-            <span className="font-semibold mr-1">← Return to Today:</span>
-            {new Date().toLocaleDateString("en-US", {
-              month: "short",
-              day: "2-digit",
-              year: "numeric",
-            })}
-          </>
-        ) : (
-          <>
-            <span className="font-semibold mr-1">TN Timeline Date:</span>
-            {torontoDate.toLocaleDateString("en-US", {
-              month: "short",
-              day: "2-digit",
-              year: "numeric",
-            })}
-          </>
-        )}
-      </Button>
-    </div>
+
+  {/* Hide this message when in Toronto mode */}
+  {!isTorontoMode && (
+    <p className="text-[11px] sm:text-xs text-[#6b7db3] leading-snug mb-2">
+      Click to see the events that took place on this day on Taylor Nation&apos;s
+      alternate timeline.
+    </p>
+  )}
+
+  <Button
+    variant="outline"
+    className="
+      rounded-full px-3 sm:px-4 py-1.5
+      text-[11px] sm:text-xs
+      border-[#b66b6b] text-[#8e3e3e]
+      bg-white/90 hover:bg-[#fbeff7]
+    "
+    onClick={() => {
+      if (isTorontoMode) {
+        const today = new Date()
+        setCurrentYear(today.getFullYear())
+        setCurrentMonth(today.getMonth() + 1)
+        setCurrentDay(today.getDate())
+        setIsTorontoMode(false)
+      } else {
+        setCurrentYear(torontoDate.getFullYear())
+        setCurrentMonth(torontoDate.getMonth() + 1)
+        setCurrentDay(torontoDate.getDate())
+        setIsTorontoMode(true)
+      }
+    }}
+  >
+    {isTorontoMode ? (
+      <>
+        <span className="font-semibold mr-1">← Return to Today:</span>
+        {new Date().toLocaleDateString("en-US", {
+          month: "short",
+          day: "2-digit",
+          year: "numeric",
+        })}
+      </>
+    ) : (
+      <>
+        <span className="font-semibold mr-1">TN Timeline Date:</span>
+        {torontoDate.toLocaleDateString("en-US", {
+          month: "short",
+          day: "2-digit",
+          year: "numeric",
+        })}
+      </>
+    )}
+  </Button>
+</div>
   </div>
 
   {/* TN box – desktop: floated to the right, doesn’t push the center */}
