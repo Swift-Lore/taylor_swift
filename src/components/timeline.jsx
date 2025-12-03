@@ -1,12 +1,25 @@
 "use client"
 
-import { ChevronLeft, ChevronRight, Calendar, Star, Zap, Clock } from "lucide-react"
+import { ChevronLeft, ChevronRight, Calendar, Star, Zap, Clock, HelpCircle } from "lucide-react"
 import { Button } from "./ui/Button"
 import { useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
 import axios from "axios"
-
 import "./timeline.css"
+
+// ===== Toronto Theory Alternate Timeline (helper) =====
+// Anchor: REAL date  = Nov 22, 2024
+//         ALT date   = Apr 25, 2019
+const REAL_ANCHOR_DATE = new Date(2024, 10, 22) // month is 0-based → 10 = November
+const ALT_ANCHOR_DATE  = new Date(2019, 3, 25)  // 3 = April
+
+function getTorontoTimelineDate(date) {
+  // Normalize to midnight to avoid timezone issues
+  const base = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+  const diffMs = base.getTime() - REAL_ANCHOR_DATE.getTime()
+  const altTime = ALT_ANCHOR_DATE.getTime() + diffMs
+  return new Date(altTime)
+}
 
 export default function Timeline() {
   const navigate = useNavigate()
@@ -15,18 +28,18 @@ export default function Timeline() {
   const [isLoading, setIsLoading] = useState(true)
   const [showCalendar, setShowCalendar] = useState(false)
   const [dateEventsMap, setDateEventsMap] = useState({})
-
+  const [isTorontoMode, setIsTorontoMode] = useState(false)
   const today = new Date()
   const [currentMonth, setCurrentMonth] = useState(today.getMonth() + 1)
   const [currentDay, setCurrentDay] = useState(today.getDate())
-  const [currentYear, setCurrentYear] = useState(2020)
-
+  const [currentYear, setCurrentYear] = useState(today.getFullYear())
   const displayDate = new Date(currentYear, currentMonth - 1, currentDay)
-
+  const [showTNInfo, setShowTNInfo] = useState(false)
+  // The mapped date for whatever "On This Day" you're currently viewing
+  const torontoDate = getTorontoTimelineDate(displayDate)
   // Calendar state - use actual current year
   const [calendarMonth, setCalendarMonth] = useState(today.getMonth())
   const [calendarYear, setCalendarYear] = useState(today.getFullYear())
-
   // ===== Calendar Functions =====
   const getDaysInMonth = (month, year) => {
     return new Date(year, month + 1, 0).getDate()
@@ -107,8 +120,8 @@ export default function Timeline() {
 
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
-  // ===== Enhanced Calendar Modal =====
-    const CalendarModal = () => {
+  // ===== Calendar Modal Component =====
+  const CalendarModal = () => {
     if (!showCalendar) return null
 
     const calendarDays = generateCalendar()
@@ -184,31 +197,31 @@ export default function Timeline() {
           <div className="grid grid-cols-7 gap-1">
             {calendarDays.map((day, index) => (
               <button
-  key={index}
-  onClick={() => handleDateSelect(day)}
-  disabled={!day}
-  className={`
-    relative h-8 rounded-lg text-sm font-medium transition-all
-    transform hover:scale-105 active:scale-95
-    ${!day ? 'invisible' : ''}
-    ${
-      day === currentDay && (calendarMonth + 1) === currentMonth
-        ? 'bg-[#8e3e3e] text-white shadow-md scale-105'
-        : 'bg-white/80 text-[#8e3e3e] hover:bg-[#f8d7da]'
-    }
-    ${
-      hasEvents(day)
-        ? 'border-2 border-[#e3b0b0]'
-        : 'border border-transparent'
-    }
-  `}
->
-  {day}
-  {/* Event indicator dot */}
-  {hasEvents(day) && (
-    <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#8e3e3e] rounded-full"></div>
-  )}
-</button>
+                key={index}
+                onClick={() => handleDateSelect(day)}
+                disabled={!day}
+                className={`
+                  relative h-8 rounded-lg text-sm font-medium transition-all
+                  transform hover:scale-105 active:scale-95
+                  ${!day ? 'invisible' : ''}
+                  ${
+                    day === currentDay && (calendarMonth + 1) === currentMonth
+                      ? 'bg-[#8e3e3e] text-white shadow-md scale-105'
+                      : 'bg-white/80 text-[#8e3e3e] hover:bg-[#f8d7da]'
+                  }
+                  ${
+                    hasEvents(day)
+                      ? 'border-2 border-[#e3b0b0]'
+                      : 'border border-transparent'
+                  }
+                `}
+              >
+                {day}
+                {/* Event indicator dot */}
+                {hasEvents(day) && (
+                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#8e3e3e] rounded-full"></div>
+                )}
+              </button>
             ))}
           </div>
 
@@ -232,28 +245,92 @@ export default function Timeline() {
       </div>
     )
   }
+  const TNInfoModal = () => {
+    if (!showTNInfo) return null
+
+    return (
+      <div
+        className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+        onClick={() => setShowTNInfo(false)}
+      >
+        <div
+          className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <h3 className="text-lg font-semibold text-[#8e3e3e]">
+            What is the Taylor Nation Timeline?
+          </h3>
+
+          <p className="text-sm text-[#5c678f] leading-relaxed">
+            On November 22, 2024, Taylor Nation tweeted about everyone being
+            &quot;back in Nashville that one morning on April 25th, 2019&quot; and
+            praised fans for their top-notch detective skills. That playful post
+            sparked a fan theory about a &quot;Taylor Nation timeline&quot; - an
+            alternate timeline that runs in parallel to the current date.
+          </p>
+
+          <p className="text-sm text-[#5c678f] leading-relaxed">
+            This tool lets you jump to the date that lines up with that alternate
+            timeline so you can see what Taylor was doing on that &quot;TN
+            timeline&quot; day.
+          </p>
+
+          <a
+            href="https://x.com/taylornation13/status/1860097353564446759?s=20"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-[#8a3f5b] underline decoration-dotted hover:text-[#6c3047]"
+          >
+            View the original Taylor Nation tweet
+          </a>
+
+          <div className="flex justify-end pt-2">
+            <Button
+              variant="secondary"
+              className="rounded-full px-4"
+              onClick={() => setShowTNInfo(false)}
+            >
+              Got it
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   // ===== Existing Functions =====
-  const handleNextDay = () => {
-    const currentDate = new Date(currentYear, currentMonth - 1, currentDay)
-    currentDate.setDate(currentDate.getDate() + 1)
-    setCurrentMonth(currentDate.getMonth() + 1)
-    setCurrentDay(currentDate.getDate())
-    setCurrentYear(currentDate.getFullYear())
-  }
+    const handleNextDay = () => {
+  const currentDate = new Date(currentYear, currentMonth - 1, currentDay)
+  currentDate.setDate(currentDate.getDate() + 1)
+  setCurrentMonth(currentDate.getMonth() + 1)
+  setCurrentDay(currentDate.getDate())
+  setCurrentYear(currentDate.getFullYear())
+  // DON'T exit Toronto mode - keep it active
+}
 
-  const handlePreviousDay = () => {
-    const currentDate = new Date(currentYear, currentMonth - 1, currentDay)
-    currentDate.setDate(currentDate.getDate() - 1)
-    setCurrentMonth(currentDate.getMonth() + 1)
-    setCurrentDay(currentDate.getDate())
-    setCurrentYear(currentDate.getFullYear())
-  }
+const handlePreviousDay = () => {
+  const currentDate = new Date(currentYear, currentMonth - 1, currentDay)
+  currentDate.setDate(currentDate.getDate() - 1)
+  setCurrentMonth(currentDate.getMonth() + 1)
+  setCurrentDay(currentDate.getDate())
+  setCurrentYear(currentDate.getFullYear())
+  // DON'T exit Toronto mode - keep it active
+}
 
-  // ===== Airtable fetch =====
+    // ===== Airtable fetch =====
   useEffect(() => {
-    const fetchRecordsByDate = async (month, day) => {
+    const fetchRecordsByDate = async (month, day, year) => {
       const fetchByDate = async () => {
+        let filterFormula
+      
+        if (isTorontoMode) {
+          // In Toronto mode: show ONLY this specific year
+          filterFormula = `AND(MONTH(DATE) = ${month}, DAY(DATE) = ${day}, YEAR(DATE) = ${year})`
+        } else {
+          // Normal mode: show this day across all years
+          filterFormula = `AND(MONTH(DATE) = ${month}, DAY(DATE) = ${day})`
+        }
+      
         const response = await axios.get(
           "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
           {
@@ -261,7 +338,7 @@ export default function Timeline() {
               Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
             },
             params: {
-              filterByFormula: `AND(MONTH(DATE) = ${month}, DAY(DATE) = ${day})`,
+              filterByFormula: filterFormula,
               sort: [{ field: "DATE", direction: "desc" }],
             },
           }
@@ -282,9 +359,9 @@ export default function Timeline() {
     }
 
     if (currentMonth && currentDay) {
-      fetchRecordsByDate(currentMonth, currentDay)
+      fetchRecordsByDate(currentMonth, currentDay, currentYear)
     }
-  }, [currentMonth, currentDay])
+  }, [currentMonth, currentDay, currentYear, isTorontoMode])
 
   // ===== Pre-fetch events for calendar indicators =====
   useEffect(() => {
@@ -453,7 +530,7 @@ export default function Timeline() {
           </div>
         </div>
 
-                {/* ON THIS DAY Section */}
+        {/* ON THIS DAY Section */}
         <div className="text-center mb-4 flex-shrink-0">
           {/* Glowy header card */}
           <div className="relative w-full mb-3 md:mb-4 px-2 md:px-5">
@@ -500,74 +577,209 @@ export default function Timeline() {
             </div>
           </div>
 
-          {/* Date navigation - Calendar integrated into the bubble */}
-          <div className="flex items-center justify-center gap-1 sm:gap-2 md:gap-3 mt-1 md:mt-2">
-            <Button
-              variant="secondary"
-              className="rounded-full h-8 md:h-9 px-2 sm:px-3 md:px-4 text-[11px] sm:text-xs md:text-sm flex items-center gap-1 mr-1"
-              onClick={handlePreviousDay}
-            >
-              <ChevronLeft size={12} />
-              <span className="hidden sm:inline">Previous</span>
-              <span className="sm:hidden">Prev</span>
-            </Button>
+          {/* Date navigation + Taylor Nation alternate timeline box */}
+<div className="mt-1 md:mt-3 relative flex flex-col items-center md:min-h-[80px]">
+  {/* Main date navigation (stays centered) */}
+  <div className="flex items-center justify-center gap-1 sm:gap-2 md:gap-3">
+    <Button
+      variant="secondary"
+      className="rounded-full h-8 md:h-9 px-2 sm:px-3 md:px-4 text-[11px] sm:text-xs md:text-sm flex items-center gap-1 mr-1"
+      onClick={handlePreviousDay}
+    >
+      <ChevronLeft size={12} />
+      <span className="hidden sm:inline">Previous</span>
+      <span className="sm:hidden">Prev</span>
+    </Button>
 
-            {/* Date bubble with calendar button integrated */}
-            <div className="relative">
-              <div className="bg-white rounded-full px-3 sm:px-5 md:px-6 py-1 md:py-1.5 min-w-[102px] sm:min-w-[136px] md:min-w-[170px] border border-[#b66b6b] flex items-center justify-center">
-                <span className="text-[#8e3e3e] text-sm md:text-base font-medium">
-                  {displayDate.toLocaleDateString("en-US", {
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </span>
-              </div>
-              {/* Calendar button positioned inside the bubble */}
-              <button
-                onClick={() => setShowCalendar(true)}
-                className="absolute -right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-1 shadow-sm border border-[#b66b6b] hover:bg-[#f8d7da] transition-colors"
-                title="Open calendar"
-              >
-                <Calendar size={14} className="text-[#8e3e3e]" />
-              </button>
-            </div>
+    {/* Date bubble with calendar button integrated */}
+    <div className="relative">
+      <div className="bg-white rounded-full px-3 sm:px-5 md:px-6 py-1 md:py-1.5 min-w-[102px] sm:min-w-[136px] md:min-w-[170px] border border-[#b66b6b] flex items-center justify-center">
+        <span className="text-[#8e3e3e] text-sm md:text-base font-medium">
+          {displayDate.toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+          })}
+        </span>
+      </div>
+      {/* Calendar button positioned inside the bubble */}
+      <button
+        onClick={() => setShowCalendar(true)}
+        className="absolute -right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-1 shadow-sm border border-[#b66b6b] hover:bg-[#f8d7da] transition-colors"
+        title="Open calendar"
+      >
+        <Calendar size={14} className="text-[#8e3e3e]" />
+      </button>
+    </div>
 
-            <Button
-              variant="secondary"
-              className="rounded-full h-8 md:h-9 px-2 sm:px-3 md:px-4 text-[11px] sm:text-xs md:text-sm flex items-center gap-1 ml-1"
-              onClick={handleNextDay}
-            >
-              <span className="hidden sm:inline">Next</span>
-              <span className="sm:hidden">Next</span>
-              <ChevronRight size={12} />
-            </Button>
-          </div>
-        </div>
+    <Button
+      variant="secondary"
+      className="rounded-full h-8 md:h-9 px-2 sm:px-3 md:px-4 text-[11px] sm:text-xs md:text-sm flex items-center gap-1 ml-1"
+      onClick={handleNextDay}
+    >
+      <span className="hidden sm:inline">Next</span>
+      <span className="sm:hidden">Next</span>
+      <ChevronRight size={12} />
+    </Button>
+  </div>
 
-        {/* Event Counter */}
-<div className="flex justify-center mb-2 flex-shrink-0">
-  <div
+  {/* TN box – mobile: under the date nav */}
+  <div className="mt-3 w-full max-w-xs md:hidden">
+    <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-3 sm:px-4 py-3">
+
+    {/* Hide this message when in Toronto mode */}
+  {!isTorontoMode && (
+    <p className="text-[11px] sm:text-xs text-[#6b7db3] leading-snug mb-2">
+      Click to see the events that took place on this day on Taylor Nation&apos;s
+      alternate timeline.
+      <button
+        type="button"
+        onClick={() => setShowTNInfo(true)}
+        className="inline-flex items-center ml-1 text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
+      >
+        <HelpCircle size={12} className="mr-0.5" />
+        What is this?
+      </button>
+    </p>
+  )}
+
+  <Button
+    variant="outline"
     className="
-      event-counter-pill
-      bg-white rounded-full px-2 sm:px-3 md:px-4 py-1
-      border border-[#b66b6b] shadow-sm
+      rounded-full px-3 sm:px-4 py-1.5
+      text-[11px] sm:text-xs
+      border-[#b66b6b] text-[#8e3e3e]
+      bg-white/90 hover:bg-[#fbeff7]
     "
+    onClick={() => {
+      if (isTorontoMode) {
+        const today = new Date()
+        setCurrentYear(today.getFullYear())
+        setCurrentMonth(today.getMonth() + 1)
+        setCurrentDay(today.getDate())
+        setIsTorontoMode(false)
+      } else {
+        setCurrentYear(torontoDate.getFullYear())
+        setCurrentMonth(torontoDate.getMonth() + 1)
+        setCurrentDay(torontoDate.getDate())
+        setIsTorontoMode(true)
+      }
+    }}
   >
-    <div className="flex items-center gap-1.5">
-      <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
+    {isTorontoMode ? (
+      <>
+        <span className="font-semibold mr-1">← Return to Today:</span>
+        {new Date().toLocaleDateString("en-US", {
+          month: "short",
+          day: "2-digit",
+          year: "numeric",
+        })}
+      </>
+    ) : (
+      <>
+        <span className="font-semibold mr-1">TN Timeline Date:</span>
+        {torontoDate.toLocaleDateString("en-US", {
+          month: "short",
+          day: "2-digit",
+          year: "numeric",
+        })}
+      </>
+    )}
+  </Button>
+</div>
+  </div>
 
-      <span className="event-counter-text text-[#8e3e3e] text-xs md:text-sm font-medium">
-        {isLoading
-          ? "Loading events..."
-          : `${records.length} ${
-              records.length === 1 ? "Event" : "Events"
-            } Found`}
-      </span>
+    {/* TN box – desktop: floated to the right, doesn’t push the center */}
+  <div className="hidden md:block md:absolute md:right-6 md:top-6">
+    <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-4 py-3 md:max-w-xs">
 
-      <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
+            {/* Hide helper text while in Toronto mode */}
+      {!isTorontoMode && (
+        <p className="text-xs text-[#6b7db3] leading-snug mb-2">
+          Click to see the events that took place on this day on Taylor Nation&apos;s
+          alternate timeline.
+          <button
+            type="button"
+            onClick={() => setShowTNInfo(true)}
+            className="inline-flex items-center ml-1 text-[11px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
+          >
+            <HelpCircle size={12} className="mr-0.5" />
+            What is this?
+          </button>
+        </p>
+      )}
+
+      <Button
+        variant="outline"
+        className="
+          rounded-full px-4 py-1.5
+          text-xs
+          border-[#b66b6b] text-[#8e3e3e]
+          bg-white/90 hover:bg-[#fbeff7]
+        "
+        onClick={() => {
+          if (isTorontoMode) {
+            const today = new Date()
+            setCurrentYear(today.getFullYear())
+            setCurrentMonth(today.getMonth() + 1)
+            setCurrentDay(today.getDate())
+            setIsTorontoMode(false)
+          } else {
+            setCurrentYear(torontoDate.getFullYear())
+            setCurrentMonth(torontoDate.getMonth() + 1)
+            setCurrentDay(torontoDate.getDate())
+            setIsTorontoMode(true)
+          }
+        }}
+      >
+        {isTorontoMode ? (
+          <>
+            <span className="font-semibold mr-1">← Return to Today:</span>
+            {new Date().toLocaleDateString("en-US", {
+              month: "short",
+              day: "2-digit",
+              year: "numeric",
+            })}
+          </>
+        ) : (
+          <>
+            <span className="font-semibold mr-1">TN Timeline Date:</span>
+            {torontoDate.toLocaleDateString("en-US", {
+              month: "short",
+              day: "2-digit",
+              year: "numeric",
+            })}
+          </>
+        )}
+      </Button>
     </div>
   </div>
 </div>
+        </div>
+
+        {/* Event Counter */}
+        <div className="flex justify-center mb-2 flex-shrink-0">
+          <div
+            className="
+              event-counter-pill
+              bg-white rounded-full px-2 sm:px-3 md:px-4 py-1
+              border border-[#b66b6b] shadow-sm
+            "
+          >
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
+
+             <span className="event-counter-text text-[#8e3e3e] text-xs md:text-sm font-medium">
+  {isLoading
+    ? "Loading events..."
+    : `${records.length} ${
+        records.length === 1 ? "Event" : "Events"
+      } Found${isTorontoMode ? " (Toronto Timeline)" : ""}`}
+</span>
+
+              <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
+            </div>
+          </div>
+        </div>
 
         {/* Timeline Section */}
         <div className="flex-1 min-h-0 relative">
@@ -626,8 +838,9 @@ export default function Timeline() {
           </Button>
         </div>
         
-        {/* Calendar Modal */}
+                {/* Modals */}
         <CalendarModal />
+        <TNInfoModal />
       </div>
     </section>
   )
