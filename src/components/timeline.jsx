@@ -252,12 +252,14 @@ export default function Timeline() {
   }
 
   // ===== Existing Functions =====
-  const handleNextDay = () => {
+    const handleNextDay = () => {
     const currentDate = new Date(currentYear, currentMonth - 1, currentDay)
     currentDate.setDate(currentDate.getDate() + 1)
     setCurrentMonth(currentDate.getMonth() + 1)
     setCurrentDay(currentDate.getDate())
     setCurrentYear(currentDate.getFullYear())
+    // Exit Toronto mode when user navigates manually
+    setIsTorontoMode(false)
   }
 
   const handlePreviousDay = () => {
@@ -266,6 +268,8 @@ export default function Timeline() {
     setCurrentMonth(currentDate.getMonth() + 1)
     setCurrentDay(currentDate.getDate())
     setCurrentYear(currentDate.getFullYear())
+    // Exit Toronto mode when user navigates manually
+    setIsTorontoMode(false)
   }
 
     // ===== Airtable fetch =====
@@ -589,11 +593,13 @@ export default function Timeline() {
                     bg-white/90 hover:bg-[#fbeff7]
                   "
                   onClick={() => {
-                    // Jump the main timeline to the Toronto Theory date
-                    setCurrentYear(torontoDate.getFullYear())
-                    setCurrentMonth(torontoDate.getMonth() + 1) // month is 0-based
-                    setCurrentDay(torontoDate.getDate())
-                  }}
+  // Jump the main timeline to the Toronto Theory date
+  setCurrentYear(torontoDate.getFullYear())
+  setCurrentMonth(torontoDate.getMonth() + 1) // month is 0-based
+  setCurrentDay(torontoDate.getDate())
+  // Enable Toronto mode (show only this specific year)
+  setIsTorontoMode(true)
+}}
                 >
                   <span className="font-semibold mr-1">TN Timeline Date:</span>
                   {torontoDate.toLocaleDateString("en-US", {
