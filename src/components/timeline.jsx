@@ -769,7 +769,7 @@ const handlePreviousDay = () => {
     ? "Loading events..."
     : `${records.length} ${
         records.length === 1 ? "Event" : "Events"
-      } Found${isTorontoMode ? " (Toronto Timeline)" : ""}`}
+      } Found${isTorontoMode ? " (TN Timeline)" : ""}`}
 </span>
 
               <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
