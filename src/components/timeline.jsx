@@ -688,15 +688,19 @@ const handlePreviousDay = () => {
   </div>
 
     {/* TN box – desktop: floated to the right, doesn’t push the center */}
-  <div className="hidden md:block md:absolute md:right-6 md:top-3">
-  <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-5 py-3 md:max-w-md">
-
-    {!isTorontoMode && (
-      <p className="text-xs text-[#6b7db3] leading-snug mb-2 whitespace-nowrap">
-  View this day on Taylor Nation’s alternate timeline.
-</p>
-
-    )}
+<div className="hidden md:block md:absolute md:right-6 md:top-3">
+  <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-5 py-3 md:max-w-lg">
+    <p className="text-xs text-[#6b7db3] leading-snug mb-2 whitespace-nowrap">
+      {!isTorontoMode && "View this day on Taylor Nation’s alternate timeline."}
+      <button
+        type="button"
+        onClick={() => setShowTNInfo(true)}
+        className="inline-flex items-center ml-1 text-[11px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
+      >
+        <HelpCircle size={12} className="mr-0.5" />
+        What is this?
+      </button>
+    </p>
 
     <Button
       variant="outline"
