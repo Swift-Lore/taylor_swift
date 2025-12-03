@@ -8,6 +8,20 @@ import axios from "axios"
 
 import "./timeline.css"
 
+// ===== Toronto Theory Alternate Timeline (helper) =====
+// Anchor: REAL date  = Nov 22, 2024
+//         ALT date   = Apr 25, 2019
+const REAL_ANCHOR_DATE = new Date(2024, 10, 22) // month is 0-based → 10 = November
+const ALT_ANCHOR_DATE  = new Date(2019, 3, 25)  // 3 = April
+
+function getTorontoTimelineDate(date) {
+  // Normalize to midnight to avoid timezone issues
+  const base = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+  const diffMs = base.getTime() - REAL_ANCHOR_DATE.getTime()
+  const altTime = ALT_ANCHOR_DATE.getTime() + diffMs
+  return new Date(altTime)
+}
+
 export default function Timeline() {
   const navigate = useNavigate()
   const [showScrollHint, setShowScrollHint] = useState(true)
