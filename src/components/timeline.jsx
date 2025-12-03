@@ -35,22 +35,11 @@ export default function Timeline() {
   const [currentDay, setCurrentDay] = useState(today.getDate())
   const [currentYear, setCurrentYear] = useState(2020)
 
-  const displayDate = new Date(currentYear, currentMonth - 1, currentDay)
-  // ===== Toronto Theory Alternate Timeline =====
-  // Anchor: Nov 22, 2024 (real) ↔ Apr 25, 2019 (alternate)
-  const REAL_ANCHOR_DATE = new Date(2024, 10, 22)   // 10 = November (0-based)
-  const ALT_ANCHOR_DATE = new Date(2019, 3, 25)     // 3 = April (0-based)
-
-  const getTorontoTimelineDate = (date) => {
-    // Normalize to midnight to avoid timezone/timezone drift
-    const base = new Date(date.getFullYear(), date.getMonth(), date.getDate())
-    const diffMs = base.getTime() - REAL_ANCHOR_DATE.getTime()
-    const altTime = ALT_ANCHOR_DATE.getTime() + diffMs
-    return new Date(altTime)
-  }
+    const displayDate = new Date(currentYear, currentMonth - 1, currentDay)
 
   // The mapped date for whatever "On This Day" you're currently viewing
   const torontoDate = getTorontoTimelineDate(displayDate)
+
 
   // Calendar state - use actual current year
   const [calendarMonth, setCalendarMonth] = useState(today.getMonth())
