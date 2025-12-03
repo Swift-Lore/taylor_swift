@@ -8,11 +8,11 @@ import axios from "axios"
 
 import "./timeline.css"
 
-// Toronto Theory Alternate Timeline helper
+// ===== Toronto Theory Alternate Timeline (helper) =====
 // Anchor: REAL date  = Nov 22, 2024
 //         ALT date   = Apr 25, 2019
-const REAL_ANCHOR_DATE = new Date(2024, 10, 22) // 10 = November (0-based)
-const ALT_ANCHOR_DATE = new Date(2019, 3, 25)   // 3 = April (0-based)
+const REAL_ANCHOR_DATE = new Date(2024, 10, 22) // month is 0-based → 10 = November
+const ALT_ANCHOR_DATE  = new Date(2019, 3, 25)  // 3 = April
 
 function getTorontoTimelineDate(date) {
   // Normalize to midnight to avoid timezone issues
@@ -124,8 +124,8 @@ export default function Timeline() {
 
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
-  // ===== Enhanced Calendar Modal =====
-    const CalendarModal = () => {
+  // ===== Calendar Modal Component =====
+  const CalendarModal = () => {
     if (!showCalendar) return null
 
     const calendarDays = generateCalendar()
@@ -201,31 +201,31 @@ export default function Timeline() {
           <div className="grid grid-cols-7 gap-1">
             {calendarDays.map((day, index) => (
               <button
-  key={index}
-  onClick={() => handleDateSelect(day)}
-  disabled={!day}
-  className={`
-    relative h-8 rounded-lg text-sm font-medium transition-all
-    transform hover:scale-105 active:scale-95
-    ${!day ? 'invisible' : ''}
-    ${
-      day === currentDay && (calendarMonth + 1) === currentMonth
-        ? 'bg-[#8e3e3e] text-white shadow-md scale-105'
-        : 'bg-white/80 text-[#8e3e3e] hover:bg-[#f8d7da]'
-    }
-    ${
-      hasEvents(day)
-        ? 'border-2 border-[#e3b0b0]'
-        : 'border border-transparent'
-    }
-  `}
->
-  {day}
-  {/* Event indicator dot */}
-  {hasEvents(day) && (
-    <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#8e3e3e] rounded-full"></div>
-  )}
-</button>
+                key={index}
+                onClick={() => handleDateSelect(day)}
+                disabled={!day}
+                className={`
+                  relative h-8 rounded-lg text-sm font-medium transition-all
+                  transform hover:scale-105 active:scale-95
+                  ${!day ? 'invisible' : ''}
+                  ${
+                    day === currentDay && (calendarMonth + 1) === currentMonth
+                      ? 'bg-[#8e3e3e] text-white shadow-md scale-105'
+                      : 'bg-white/80 text-[#8e3e3e] hover:bg-[#f8d7da]'
+                  }
+                  ${
+                    hasEvents(day)
+                      ? 'border-2 border-[#e3b0b0]'
+                      : 'border border-transparent'
+                  }
+                `}
+              >
+                {day}
+                {/* Event indicator dot */}
+                {hasEvents(day) && (
+                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#8e3e3e] rounded-full"></div>
+                )}
+              </button>
             ))}
           </div>
 
@@ -470,7 +470,7 @@ export default function Timeline() {
           </div>
         </div>
 
-                {/* ON THIS DAY Section */}
+        {/* ON THIS DAY Section */}
         <div className="text-center mb-4 flex-shrink-0">
           {/* Glowy header card */}
           <div className="relative w-full mb-3 md:mb-4 px-2 md:px-5">
@@ -517,7 +517,7 @@ export default function Timeline() {
             </div>
           </div>
 
-                    {/* Date navigation + Taylor Nation alternate timeline box */}
+          {/* Date navigation + Taylor Nation alternate timeline box */}
           <div className="mt-1 md:mt-3 flex flex-col md:flex-row md:items-start md:justify-center md:gap-6">
             {/* Main date navigation */}
             <div className="flex items-center justify-center gap-1 sm:gap-2 md:gap-3">
@@ -594,31 +594,32 @@ export default function Timeline() {
               </div>
             </div>
           </div>
+        </div>
 
         {/* Event Counter */}
-<div className="flex justify-center mb-2 flex-shrink-0">
-  <div
-    className="
-      event-counter-pill
-      bg-white rounded-full px-2 sm:px-3 md:px-4 py-1
-      border border-[#b66b6b] shadow-sm
-    "
-  >
-    <div className="flex items-center gap-1.5">
-      <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
+        <div className="flex justify-center mb-2 flex-shrink-0">
+          <div
+            className="
+              event-counter-pill
+              bg-white rounded-full px-2 sm:px-3 md:px-4 py-1
+              border border-[#b66b6b] shadow-sm
+            "
+          >
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
 
-      <span className="event-counter-text text-[#8e3e3e] text-xs md:text-sm font-medium">
-        {isLoading
-          ? "Loading events..."
-          : `${records.length} ${
-              records.length === 1 ? "Event" : "Events"
-            } Found`}
-      </span>
+              <span className="event-counter-text text-[#8e3e3e] text-xs md:text-sm font-medium">
+                {isLoading
+                  ? "Loading events..."
+                  : `${records.length} ${
+                      records.length === 1 ? "Event" : "Events"
+                    } Found`}
+              </span>
 
-      <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
-    </div>
-  </div>
-</div>
+              <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
+            </div>
+          </div>
+        </div>
 
         {/* Timeline Section */}
         <div className="flex-1 min-h-0 relative">
