@@ -637,7 +637,7 @@ const handlePreviousDay = () => {
         className="inline-flex items-center ml-1 text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
       >
         <HelpCircle size={12} className="mr-0.5" />
-        What is the TN Timeline?
+        What is this?
       </button>
     </p>
   )}
