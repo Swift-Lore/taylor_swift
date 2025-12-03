@@ -629,7 +629,7 @@ const handlePreviousDay = () => {
     {/* Hide this message when in Toronto mode */}
   {!isTorontoMode && (
     <p className="text-[11px] sm:text-xs text-[#6b7db3] leading-snug mb-2">
-      Click to see the events that took place on this day on Taylor Nation&apos;s
+      Click to see events that took place this day on Taylor Nation&apos;s
       alternate timeline.
       <button
         type="button"
