@@ -629,8 +629,7 @@ const handlePreviousDay = () => {
     {/* Hide this message when in Toronto mode */}
   {!isTorontoMode && (
     <p className="text-[11px] sm:text-xs text-[#6b7db3] leading-snug mb-2">
-      Click to see events that took place this day on Taylor Nation&apos;s
-      alternate timeline.
+      View this day on Taylor Nation’s alternate timeline.
       <button
         type="button"
         onClick={() => setShowTNInfo(true)}
@@ -693,10 +692,10 @@ const handlePreviousDay = () => {
   <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-5 py-3 md:max-w-md">
 
     {!isTorontoMode && (
-      <p className="text-xs text-[#6b7db3] leading-snug mb-2">
-        Click to see events that took place this day on Taylor Nation&apos;s
-        alternate timeline.
-      </p>
+      <p className="text-xs text-[#6b7db3] leading-snug mb-2 whitespace-nowrap">
+  View this day on Taylor Nation’s alternate timeline.
+</p>
+
     )}
 
     <Button
