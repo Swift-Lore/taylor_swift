@@ -33,7 +33,7 @@ export default function Timeline() {
   const today = new Date()
   const [currentMonth, setCurrentMonth] = useState(today.getMonth() + 1)
   const [currentDay, setCurrentDay] = useState(today.getDate())
-  const [currentYear, setCurrentYear] = useState(2020)
+  const [currentYear, setCurrentYear] = useState(today.getFullYear())
 
   const displayDate = new Date(currentYear, currentMonth - 1, currentDay)
 
