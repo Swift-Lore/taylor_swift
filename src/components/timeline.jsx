@@ -623,13 +623,11 @@ const handlePreviousDay = () => {
   </div>
 
   {/* TN box – mobile: under the date nav */}
-  <div className="mt-3 w-full max-w-xs md:hidden">
-    <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-3 sm:px-4 py-3">
+<div className="mt-3 w-full max-w-xs md:hidden">
+  <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-3 sm:px-4 py-3">
 
-    {/* Hide this message when in Toronto mode */}
-  {!isTorontoMode && (
     <p className="text-[11px] sm:text-xs text-[#6b7db3] leading-snug mb-2">
-      View this day on Taylor Nation’s alternate timeline.
+      {!isTorontoMode && "View this day on Taylor Nation’s alternate timeline."}
       <button
         type="button"
         onClick={() => setShowTNInfo(true)}
