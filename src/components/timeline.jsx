@@ -253,24 +253,22 @@ export default function Timeline() {
 
   // ===== Existing Functions =====
     const handleNextDay = () => {
-    const currentDate = new Date(currentYear, currentMonth - 1, currentDay)
-    currentDate.setDate(currentDate.getDate() + 1)
-    setCurrentMonth(currentDate.getMonth() + 1)
-    setCurrentDay(currentDate.getDate())
-    setCurrentYear(currentDate.getFullYear())
-    // Exit Toronto mode when user navigates manually
-    setIsTorontoMode(false)
-  }
+  const currentDate = new Date(currentYear, currentMonth - 1, currentDay)
+  currentDate.setDate(currentDate.getDate() + 1)
+  setCurrentMonth(currentDate.getMonth() + 1)
+  setCurrentDay(currentDate.getDate())
+  setCurrentYear(currentDate.getFullYear())
+  // DON'T exit Toronto mode - keep it active
+}
 
-  const handlePreviousDay = () => {
-    const currentDate = new Date(currentYear, currentMonth - 1, currentDay)
-    currentDate.setDate(currentDate.getDate() - 1)
-    setCurrentMonth(currentDate.getMonth() + 1)
-    setCurrentDay(currentDate.getDate())
-    setCurrentYear(currentDate.getFullYear())
-    // Exit Toronto mode when user navigates manually
-    setIsTorontoMode(false)
-  }
+const handlePreviousDay = () => {
+  const currentDate = new Date(currentYear, currentMonth - 1, currentDay)
+  currentDate.setDate(currentDate.getDate() - 1)
+  setCurrentMonth(currentDate.getMonth() + 1)
+  setCurrentDay(currentDate.getDate())
+  setCurrentYear(currentDate.getFullYear())
+  // DON'T exit Toronto mode - keep it active
+}
 
     // ===== Airtable fetch =====
   useEffect(() => {
@@ -625,13 +623,13 @@ export default function Timeline() {
             <div className="flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
 
-              <span className="event-counter-text text-[#8e3e3e] text-xs md:text-sm font-medium">
-                {isLoading
-                  ? "Loading events..."
-                  : `${records.length} ${
-                      records.length === 1 ? "Event" : "Events"
-                    } Found`}
-              </span>
+             <span className="event-counter-text text-[#8e3e3e] text-xs md:text-sm font-medium">
+  {isLoading
+    ? "Loading events..."
+    : `${records.length} ${
+        records.length === 1 ? "Event" : "Events"
+      } Found${isTorontoMode ? " (Toronto Timeline)" : ""}`}
+</span>
 
               <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
             </div>
