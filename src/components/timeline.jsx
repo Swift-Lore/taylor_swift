@@ -29,6 +29,7 @@ export default function Timeline() {
   const [isLoading, setIsLoading] = useState(true)
   const [showCalendar, setShowCalendar] = useState(false)
   const [dateEventsMap, setDateEventsMap] = useState({})
+  const [isTorontoMode, setIsTorontoMode] = useState(false)
 
   const today = new Date()
   const [currentMonth, setCurrentMonth] = useState(today.getMonth() + 1)
@@ -267,10 +268,20 @@ export default function Timeline() {
     setCurrentYear(currentDate.getFullYear())
   }
 
-  // ===== Airtable fetch =====
+    // ===== Airtable fetch =====
   useEffect(() => {
-    const fetchRecordsByDate = async (month, day) => {
+    const fetchRecordsByDate = async (month, day, year) => {
       const fetchByDate = async () => {
+        let filterFormula
+      
+        if (isTorontoMode) {
+          // In Toronto mode: show ONLY this specific year
+          filterFormula = `AND(MONTH(DATE) = ${month}, DAY(DATE) = ${day}, YEAR(DATE) = ${year})`
+        } else {
+          // Normal mode: show this day across all years
+          filterFormula = `AND(MONTH(DATE) = ${month}, DAY(DATE) = ${day})`
+        }
+      
         const response = await axios.get(
           "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
           {
@@ -278,7 +289,7 @@ export default function Timeline() {
               Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
             },
             params: {
-              filterByFormula: `AND(MONTH(DATE) = ${month}, DAY(DATE) = ${day})`,
+              filterByFormula: filterFormula,
               sort: [{ field: "DATE", direction: "desc" }],
             },
           }
@@ -299,9 +310,9 @@ export default function Timeline() {
     }
 
     if (currentMonth && currentDay) {
-      fetchRecordsByDate(currentMonth, currentDay)
+      fetchRecordsByDate(currentMonth, currentDay, currentYear)
     }
-  }, [currentMonth, currentDay])
+  }, [currentMonth, currentDay, currentYear, isTorontoMode])
 
   // ===== Pre-fetch events for calendar indicators =====
   useEffect(() => {
