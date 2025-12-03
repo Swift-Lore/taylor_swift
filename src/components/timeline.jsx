@@ -1,11 +1,10 @@
 "use client"
 
-import { ChevronLeft, ChevronRight, Calendar, Star, Zap, Clock } from "lucide-react"
+import { ChevronLeft, ChevronRight, Calendar, Star, Zap, Clock, HelpCircle } from "lucide-react"
 import { Button } from "./ui/Button"
 import { useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
 import axios from "axios"
-
 import "./timeline.css"
 
 // ===== Toronto Theory Alternate Timeline (helper) =====
@@ -30,21 +29,17 @@ export default function Timeline() {
   const [showCalendar, setShowCalendar] = useState(false)
   const [dateEventsMap, setDateEventsMap] = useState({})
   const [isTorontoMode, setIsTorontoMode] = useState(false)
-
   const today = new Date()
   const [currentMonth, setCurrentMonth] = useState(today.getMonth() + 1)
   const [currentDay, setCurrentDay] = useState(today.getDate())
   const [currentYear, setCurrentYear] = useState(today.getFullYear())
-
   const displayDate = new Date(currentYear, currentMonth - 1, currentDay)
-
+  const [showTNInfo, setShowTNInfo] = useState(false)
   // The mapped date for whatever "On This Day" you're currently viewing
   const torontoDate = getTorontoTimelineDate(displayDate)
-
   // Calendar state - use actual current year
   const [calendarMonth, setCalendarMonth] = useState(today.getMonth())
   const [calendarYear, setCalendarYear] = useState(today.getFullYear())
-
   // ===== Calendar Functions =====
   const getDaysInMonth = (month, year) => {
     return new Date(year, month + 1, 0).getDate()
@@ -244,6 +239,58 @@ export default function Timeline() {
               className="rounded-full px-6 flex-1 bg-[#8e3e3e] hover:bg-[#7a3434]"
             >
               Go to Today
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+  const TNInfoModal = () => {
+    if (!showTNInfo) return null
+
+    return (
+      <div
+        className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+        onClick={() => setShowTNInfo(false)}
+      >
+        <div
+          className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <h3 className="text-lg font-semibold text-[#8e3e3e]">
+            What is the Taylor Nation Timeline?
+          </h3>
+
+          <p className="text-sm text-[#5c678f] leading-relaxed">
+            On November 22, 2024, Taylor Nation tweeted about everyone being
+            &quot;back in Nashville that one morning on April 25th, 2019&quot; and
+            praised fans for their top-notch detective skills. That playful post
+            sparked a fan theory about a &quot;Taylor Nation timeline&quot; – an
+            alternate timeline that runs in parallel to real-world dates.
+          </p>
+
+          <p className="text-sm text-[#5c678f] leading-relaxed">
+            This tool lets you jump to the dates that line up with that alternate
+            timeline so you can see what Taylor was doing on those &quot;TN
+            timeline&quot; days.
+          </p>
+
+          <a
+            href="https://x.com/taylornation13/status/1860097353564446759?s=20"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-[#8a3f5b] underline decoration-dotted hover:text-[#6c3047]"
+          >
+            View the original Taylor Nation tweet
+          </a>
+
+          <div className="flex justify-end pt-2">
+            <Button
+              variant="secondary"
+              className="rounded-full px-4"
+              onClick={() => setShowTNInfo(false)}
+            >
+              Got it
             </Button>
           </div>
         </div>
@@ -579,11 +626,19 @@ const handlePreviousDay = () => {
   <div className="mt-3 w-full max-w-xs md:hidden">
     <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-3 sm:px-4 py-3">
 
-  {/* Hide this message when in Toronto mode */}
+    {/* Hide this message when in Toronto mode */}
   {!isTorontoMode && (
     <p className="text-[11px] sm:text-xs text-[#6b7db3] leading-snug mb-2">
       Click to see the events that took place on this day on Taylor Nation&apos;s
       alternate timeline.
+      <button
+        type="button"
+        onClick={() => setShowTNInfo(true)}
+        className="inline-flex items-center ml-1 text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
+      >
+        <HelpCircle size={12} className="mr-0.5" />
+        What is this?
+      </button>
     </p>
   )}
 
@@ -637,11 +692,19 @@ const handlePreviousDay = () => {
   <div className="hidden md:block md:absolute md:right-6 md:top-6">
     <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-4 py-3 md:max-w-xs">
 
-      {/* Hide helper text while in Toronto mode */}
+            {/* Hide helper text while in Toronto mode */}
       {!isTorontoMode && (
         <p className="text-xs text-[#6b7db3] leading-snug mb-2">
           Click to see the events that took place on this day on Taylor Nation&apos;s
           alternate timeline.
+          <button
+            type="button"
+            onClick={() => setShowTNInfo(true)}
+            className="inline-flex items-center ml-1 text-[11px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
+          >
+            <HelpCircle size={12} className="mr-0.5" />
+            What is this?
+          </button>
         </p>
       )}
 
@@ -775,8 +838,9 @@ const handlePreviousDay = () => {
           </Button>
         </div>
         
-        {/* Calendar Modal */}
+                {/* Modals */}
         <CalendarModal />
+        <TNInfoModal />
       </div>
     </section>
   )
