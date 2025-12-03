@@ -531,7 +531,7 @@ const handlePreviousDay = () => {
         </div>
 
         {/* ON THIS DAY Section */}
-        <div className="text-center mb-4 flex-shrink-0">
+        <div className="text-center mb-3 flex-shrink-0">
           {/* Glowy header card */}
           <div className="relative w-full mb-3 md:mb-4 px-2 md:px-5">
             <div
@@ -689,7 +689,7 @@ const handlePreviousDay = () => {
   </div>
 
     {/* TN box – desktop: floated to the right, doesn’t push the center */}
-  <div className="hidden md:block md:absolute md:right-6 md:top-6">
+  <div className="hidden md:block md:absolute md:right-6 md:top-10">
     <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-4 py-3 md:max-w-xs">
 
             {/* Hide helper text while in Toronto mode */}
