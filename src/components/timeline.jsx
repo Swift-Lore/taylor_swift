@@ -8,11 +8,11 @@ import axios from "axios"
 
 import "./timeline.css"
 
-// ===== Toronto Theory Alternate Timeline (helper) =====
+// Toronto Theory Alternate Timeline helper
 // Anchor: REAL date  = Nov 22, 2024
 //         ALT date   = Apr 25, 2019
-const REAL_ANCHOR_DATE = new Date(2024, 10, 22) // month is 0-based → 10 = November
-const ALT_ANCHOR_DATE  = new Date(2019, 3, 25)  // 3 = April
+const REAL_ANCHOR_DATE = new Date(2024, 10, 22) // 10 = November (0-based)
+const ALT_ANCHOR_DATE = new Date(2019, 3, 25)   // 3 = April (0-based)
 
 function getTorontoTimelineDate(date) {
   // Normalize to midnight to avoid timezone issues
@@ -35,11 +35,10 @@ export default function Timeline() {
   const [currentDay, setCurrentDay] = useState(today.getDate())
   const [currentYear, setCurrentYear] = useState(2020)
 
-    const displayDate = new Date(currentYear, currentMonth - 1, currentDay)
+  const displayDate = new Date(currentYear, currentMonth - 1, currentDay)
 
   // The mapped date for whatever "On This Day" you're currently viewing
   const torontoDate = getTorontoTimelineDate(displayDate)
-
 
   // Calendar state - use actual current year
   const [calendarMonth, setCalendarMonth] = useState(today.getMonth())
