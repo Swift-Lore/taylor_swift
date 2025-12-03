@@ -583,29 +583,50 @@ const handlePreviousDay = () => {
                   alternate timeline.
                 </p>
                 <Button
-                  variant="outline"
-                  className="
-                    rounded-full px-3 sm:px-4 py-1.5
-                    text-[11px] sm:text-xs
-                    border-[#b66b6b] text-[#8e3e3e]
-                    bg-white/90 hover:bg-[#fbeff7]
-                  "
-                  onClick={() => {
-  // Jump the main timeline to the Toronto Theory date
-  setCurrentYear(torontoDate.getFullYear())
-  setCurrentMonth(torontoDate.getMonth() + 1) // month is 0-based
-  setCurrentDay(torontoDate.getDate())
-  // Enable Toronto mode (show only this specific year)
-  setIsTorontoMode(true)
-}}
-                >
-                  <span className="font-semibold mr-1">TN Timeline Date:</span>
-                  {torontoDate.toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "2-digit",
-                    year: "numeric",
-                  })}
-                </Button>
+  variant="outline"
+  className="
+    rounded-full px-3 sm:px-4 py-1.5
+    text-[11px] sm:text-xs
+    border-[#b66b6b] text-[#8e3e3e]
+    bg-white/90 hover:bg-[#fbeff7]
+  "
+  onClick={() => {
+    if (isTorontoMode) {
+      // If already in Toronto mode, return to today
+      const today = new Date()
+      setCurrentYear(today.getFullYear())
+      setCurrentMonth(today.getMonth() + 1)
+      setCurrentDay(today.getDate())
+      setIsTorontoMode(false)
+    } else {
+      // Enter Toronto mode
+      setCurrentYear(torontoDate.getFullYear())
+      setCurrentMonth(torontoDate.getMonth() + 1)
+      setCurrentDay(torontoDate.getDate())
+      setIsTorontoMode(true)
+    }
+  }}
+>
+  {isTorontoMode ? (
+    <>
+      <span className="font-semibold mr-1">← Return to Today:</span>
+      {new Date().toLocaleDateString("en-US", {
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+      })}
+    </>
+  ) : (
+    <>
+      <span className="font-semibold mr-1">TN Timeline Date:</span>
+      {torontoDate.toLocaleDateString("en-US", {
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+      })}
+    </>
+  )}
+</Button>
               </div>
             </div>
           </div>
