@@ -265,14 +265,14 @@ export default function Timeline() {
             On November 22, 2024, Taylor Nation tweeted about everyone being
             &quot;back in Nashville that one morning on April 25th, 2019&quot; and
             praised fans for their top-notch detective skills. That playful post
-            sparked a fan theory about a &quot;Taylor Nation timeline&quot; – an
-            alternate timeline that runs in parallel to real-world dates.
+            sparked a fan theory about a &quot;Taylor Nation timeline&quot; - an
+            alternate timeline that runs in parallel to the current date.
           </p>
 
           <p className="text-sm text-[#5c678f] leading-relaxed">
-            This tool lets you jump to the dates that line up with that alternate
-            timeline so you can see what Taylor was doing on those &quot;TN
-            timeline&quot; days.
+            This tool lets you jump to the date that lines up with that alternate
+            timeline so you can see what Taylor was doing on that &quot;TN
+            timeline&quot; day.
           </p>
 
           <a
