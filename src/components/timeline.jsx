@@ -12,6 +12,92 @@ import "./timeline.css"
 //         ALT date   = Apr 25, 2019
 const REAL_ANCHOR_DATE = new Date(2024, 10, 22) // month is 0-based → 10 = November
 const ALT_ANCHOR_DATE  = new Date(2019, 3, 25)  // 3 = April
+// ---- Holiday helpers shared by timeline + cards ----
+const parseHolidayTags = (holidayTagsRaw) => {
+  if (Array.isArray(holidayTagsRaw)) return holidayTagsRaw
+  if (typeof holidayTagsRaw === "string") {
+    return holidayTagsRaw
+      .split(/[;,|]/)
+      .map((tag) => tag.trim())
+      .filter(Boolean)
+  }
+  return []
+}
+
+// Holidays we only want to show once at the top of the timeline
+const isGlobalHolidayName = (holiday) => {
+  const name = holiday.toLowerCase()
+
+  return (
+    name.includes("christmas") ||
+    name.includes("new year") ||
+    name.includes("independence") ||
+    name.includes("memorial day") ||
+    name.includes("labor day")
+  )
+}
+
+// Map holiday names to emojis
+const getHolidayEmoji = (holiday) => {
+  const name = holiday.toLowerCase()
+
+  // 🐱🎂 Taylor's cats (Meredith, Olivia, Benjamin)
+  if (
+    name.includes("meredith") ||
+    name.includes("olivia") ||
+    name.includes("benjamin")
+  ) {
+    return "🐱🎂"
+  }
+
+  // ☘️ Saint Patrick's Day
+  if (name.includes("patrick")) return "☘️"
+
+  // 🍩 National Donut Day
+  if (name.includes("donut") || name.includes("doughnut")) return "🍩"
+
+  // 🎂 Any "birthday"
+  if (name.includes("birthday")) return "🎂"
+
+  // 🇺🇸 American holidays
+  if (
+    name.includes("independence") ||
+    name.includes("memorial day") ||
+    name.includes("labor day")
+  ) {
+    return "🇺🇸"
+  }
+
+  // 🍷 Wine days
+  if (name.includes("red wine") || name.includes("white wine")) return "🍷"
+
+  // 🐍 “Mean Girls Cat”
+  if (name.includes("mean girls")) return "🐍"
+
+  // 🐱 Any holiday with “cat” in it
+  if (name.includes("cat")) return "🐱"
+
+  // 🎃 Halloween
+  if (name.includes("halloween")) return "🎃"
+
+  // 🎄 Christmas
+  if (name.includes("christmas") || name.includes("xmas")) return "🎄"
+
+  // 🎆 New Years
+  if (name.includes("new year")) return "🎆"
+
+  // 💘 Valentine’s Day
+  if (name.includes("valentine")) return "💘"
+
+  // 🐣 Easter
+  if (name.includes("easter")) return "🐣"
+
+  // 🦃 Thanksgiving
+  if (name.includes("thanksgiving")) return "🦃"
+
+  // 🎀 Default
+  return "🎀"
+}
 
 function getTorontoTimelineDate(date) {
   console.log("=== Toronto Date Calculation ===")
@@ -57,6 +143,29 @@ export default function Timeline() {
   const [showTNInfo, setShowTNInfo] = useState(false)
   // The mapped date for whatever "On This Day" you're currently viewing
   const torontoDate = getTorontoTimelineDate(displayDate)
+
+    // Global (fixed-date) holidays for this day (shown once at top)
+  const globalHolidayTagsForDay = (() => {
+    const seen = new Set()
+    const result = []
+
+    records.forEach((record) => {
+      const tags = parseHolidayTags(record?.fields?.HOLIDAYS)
+      tags.forEach((tag) => {
+        if (!tag) return
+        if (!isGlobalHolidayName(tag)) return
+
+        const key = tag.toLowerCase()
+        if (!seen.has(key)) {
+          seen.add(key)
+          result.push(tag)
+        }
+      })
+    })
+
+    return result
+  })()
+
   // Calendar state - use actual current year
   const [calendarMonth, setCalendarMonth] = useState(today.getMonth())
   const [calendarYear, setCalendarYear] = useState(today.getFullYear())
@@ -482,76 +591,11 @@ const handlePreviousDay = () => {
     }
 
     // HOLIDAYS badges helper (supports array or text with multiple tags)
-    const holidayTagsRaw = record?.fields?.HOLIDAYS
-    const holidayTags = Array.isArray(holidayTagsRaw)
-      ? holidayTagsRaw
-      : typeof holidayTagsRaw === "string"
-        ? holidayTagsRaw
-            .split(/[;,|]/) // supports comma, semicolon, or |
-            .map((tag) => tag.trim())
-            .filter(Boolean)
-        : []
+// Use shared helpers and remove global (top-of-page) holidays from cards
+const rawHolidayTags = parseHolidayTags(record?.fields?.HOLIDAYS)
+const holidayTags = rawHolidayTags.filter((tag) => !isGlobalHolidayName(tag))
 const hasHoliday = holidayTags.length > 0
-    const getHolidayEmoji = (holiday) => {
-  const name = holiday.toLowerCase();
-
-  // 🐱🎂 Taylor's cats (Meredith, Olivia, Benjamin)
-  if (
-    name.includes("meredith") ||
-    name.includes("olivia") ||
-    name.includes("benjamin")
-  ) {
-    return "🐱🎂";
-  }
-
-  // 🌈 Saint Patrick's Day → Clover
-  if (name.includes("patrick")) return "☘️";
-
-  // 🍩 National Donut Day → Donut
-  if (name.includes("donut") || name.includes("doughnut")) return "🍩";
-
-  // 🎂 Any "birthday" → Birthday cake
-  if (name.includes("birthday")) return "🎂";
-
-  // 🇺🇸 American holidays
-  if (
-    name.includes("independence") ||
-    name.includes("memorial day") ||
-    name.includes("labor day")
-  ) {
-    return "🇺🇸";
-  }
-
-  // 🍷 Wine days
-  if (name.includes("red wine") || name.includes("white wine")) return "🍷";
-
-  // 🐍 “Mean Girls Cat” → Snake
-  if (name.includes("mean girls")) return "🐍";
-
-  // 🐱 Any holiday with “cat” in it
-  if (name.includes("cat")) return "🐱";
-
-  // 🎃 Halloween
-  if (name.includes("halloween")) return "🎃";
-
-  // 🎄 Christmas
-  if (name.includes("christmas") || name.includes("xmas")) return "🎄";
-
-  // 🎆 New Years
-  if (name.includes("new year")) return "🎆";
-
-  // 💘 Valentine’s Day
-  if (name.includes("valentine")) return "💘";
-
-  // 🐣 Easter
-  if (name.includes("easter")) return "🐣";
-
-  // 🦃 Thanksgiving
-  if (name.includes("thanksgiving")) return "🦃";
-
-  // 🎀 Default
-  return "🎀";
-};
+const hasHoliday = holidayTags.length > 0
 
     return (
       <div
