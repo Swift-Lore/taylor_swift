@@ -863,11 +863,12 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
     </Button>
   </div>
 
-  {/* TN box - Desktop: positioned to right, Mobile: centered */}
+  {/* TN box - Separate containers for desktop vs mobile for proper centering */}
+  
+  {/* Desktop TN box */}
   <div className="
-    mt-2 mx-auto
-    md:mt-3 md:max-w-xs
-    lg:mt-0 lg:absolute lg:right-0 lg:top-[5px]
+    hidden
+    lg:block lg:absolute lg:right-[-30px] lg:top-0
   ">
     <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 w-56">
       <Button
@@ -907,7 +908,6 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
         </span>
       </Button>
 
-      {/* What is this? - LEFT ALIGNED */}
       <div className="mt-1">
         <button
           type="button"
@@ -917,6 +917,65 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           <HelpCircle size={10} className="mr-0.5" />
           What is this?
         </button>
+      </div>
+    </div>
+  </div>
+
+  {/* Mobile/Tablet TN box - PROPERLY CENTERED */}
+  <div className="
+    mt-2
+    md:mt-3
+    lg:hidden
+  ">
+    <div className="flex justify-center">
+      <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 w-56">
+        <Button
+          variant="outline"
+          className="
+            rounded-xl px-2 py-1
+            text-xs font-medium
+            border-[#b66b6b] text-[#8e3e3e]
+            bg-white/95 hover:bg-[#fbeff7]
+            w-full break-words whitespace-normal
+            flex flex-col items-center text-center
+          "
+          onClick={() => {
+            if (isTorontoMode) {
+              const today = new Date()
+              setCurrentYear(today.getFullYear())
+              setCurrentMonth(today.getMonth() + 1)
+              setCurrentDay(today.getDate())
+              setIsTorontoMode(false)
+            } else {
+              setCurrentYear(torontoDate.getFullYear())
+              setCurrentMonth(torontoDate.getMonth() + 1)
+              setCurrentDay(torontoDate.getDate())
+              setIsTorontoMode(true)
+            }
+          }}
+        >
+          <span className="font-semibold">
+            Taylor Nation Timeline Date:
+          </span>
+          <span className="text-[11px] mt-0.5">
+            {torontoDate.toLocaleDateString("en-US", {
+              month: "short",
+              day: "2-digit",
+              year: "numeric",
+            })}
+          </span>
+        </Button>
+
+        <div className="mt-1">
+          <button
+            type="button"
+            onClick={() => setShowTNInfo(true)}
+            className="inline-flex items-center text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
+          >
+            <HelpCircle size={10} className="mr-0.5" />
+            What is this?
+          </button>
+        </div>
       </div>
     </div>
   </div>
