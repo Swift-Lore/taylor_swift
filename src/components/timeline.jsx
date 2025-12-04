@@ -595,12 +595,24 @@ const TimelineCard = ({ record, index }) => {
       to={`/post_details?id=${record.id}`}
       className="block relative hover:opacity-95 transition-opacity timeline-card"
       style={{ marginTop: index === 0 ? "17px" : "43px" }}
+      onClick={(e) => {
+        // Allow default behavior for middle-click or ctrl+click (open in new tab)
+        if (e.metaKey || e.ctrlKey || e.button === 1) {
+          return
+        }
+        
+        // Check if text is selected - if yes, prevent navigation
+        const selection = window.getSelection()
+        if (selection && selection.toString().length > 0) {
+          e.preventDefault()
+        }
+      }}
     >
       <div className="relative">
         <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
           <div className="bg-white/80 backdrop-blur-sm rounded-[10px] p-3 border border-[#f0d0d3] relative">
             {/* Top date pill */}
-            <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 -translate-y-1/4 border border-[#8e3e3e] bg-white rounded-full px-3 py-1 text-sm text-[#8e3e3e] font-semibold shadow-md z-10 min-w-[150px] text-center">
+            <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 -translate-y-1/4 border border-[#8e3e3e] bg-white rounded-full px-3 py-1 text-sm text-[#8e3e3e] font-semibold shadow-md z-10 min-w-[150px] text-center no-text-highlight">
               {formatDate(record?.fields?.DATE)}
             </div>
 
@@ -612,7 +624,7 @@ const TimelineCard = ({ record, index }) => {
                     {holidayTags.map((holiday, i) => (
                       <span
                         key={i}
-                        className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#fbeff7] text-[#8e3e3e] border border-[#e3b0b0] shadow-sm"
+                        className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#fbeff7] text-[#8e3e3e] border border-[#e3b0b0] shadow-sm no-text-highlight"
                       >
                         <span className="mr-1">
                           {getHolidayEmoji(holiday)}
@@ -629,7 +641,7 @@ const TimelineCard = ({ record, index }) => {
                   {holidayTags.map((holiday, i) => (
                     <span
                       key={i}
-                      className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-[#fbeff7] text-[#8e3e3e] border border-[#e3b0b0] shadow-sm"
+                      className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-[#fbeff7] text-[#8e3e3e] border border-[#e3b0b0] shadow-sm no-text-highlight"
                     >
                       <span className="mr-1 text-sm">
                         {getHolidayEmoji(holiday)}
@@ -645,12 +657,9 @@ const TimelineCard = ({ record, index }) => {
 
             {/* Main card content - TEXT AREA (allows selection) */}
             <div
-              className={`text-content-area flex flex-col gap-2.5 mt-3 ${
+              className={`timeline-card-text flex flex-col gap-2.5 mt-3 ${
                 hasHoliday ? "md:mt-7" : "md:mt-3"
               }`}
-              style={{
-                pointerEvents: 'none'  // This allows clicks to pass through to parent Link
-              }}
             >
               <h3 className="text-[#8e3e3e] font-bold text-sm md:text-base leading-relaxed text-center">
                 {record?.fields?.EVENT || "Event description unavailable"}
@@ -662,12 +671,12 @@ const TimelineCard = ({ record, index }) => {
                 </div>
               )}
 
-              {/* Keywords - These NEED pointer events to be clickable */}
+              {/* Keywords - These are clickable buttons */}
               {record?.fields?.KEYWORDS &&
                 record.fields.KEYWORDS.length > 0 && (
                   <div 
                     className="flex flex-wrap gap-1 md:gap-1.5 justify-center keyword-container"
-                    style={{ pointerEvents: 'auto' }}  // Re-enable pointer events for keywords
+                    onClick={(e) => e.stopPropagation()}
                   >
                     {record.fields.KEYWORDS.slice(0, 4).map((tag, tagIndex) => (
                       <button
