@@ -12,6 +12,118 @@ import "./timeline.css"
 //         ALT date   = Apr 25, 2019
 const REAL_ANCHOR_DATE = new Date(2024, 10, 22) // month is 0-based → 10 = November
 const ALT_ANCHOR_DATE  = new Date(2019, 3, 25)  // 3 = April
+// ---- Holiday helpers shared by timeline + cards ----
+const parseHolidayTags = (holidayTagsRaw) => {
+  if (Array.isArray(holidayTagsRaw)) return holidayTagsRaw
+  if (typeof holidayTagsRaw === "string") {
+    return holidayTagsRaw
+      .split(/[;,|]/)
+      .map((tag) => tag.trim())
+      .filter(Boolean)
+  }
+  return []
+}
+
+// Holidays we only want to show once at the top of the timeline
+const FIXED_HOLIDAYS = new Set(
+  [
+    "New Year's Eve",
+    "New Year's Day",
+    "Sant Patrick's Day",      // matches your Airtable exactly
+    "Austin Swift's Birthday",
+    "Andrea Swift's Birthday",
+    "Scott Swift's Birthday",
+    "Taylor's Birthday",
+    "National White Wine Day",
+    "National Red Wine Day",
+    "World Bread Day",
+    "Olivia's Birthday",
+    "Meredith's Birthday",
+    "Benjamin's Birthday",
+    "National French Fry Day",
+    "Valentine's Day",
+    "National Siblings Day",
+    "National Cat Day",
+    "International Cat Day",
+    "Mean Girls Day",
+    "Last Kiss Day",
+    "High Infidelity Day",
+    "International Women's Day",
+    "International Dance Day",
+    "Halloween",
+    "Marjorie Finlay's Birthday",
+    "Christmas Eve",
+    "Christmas Day",
+  ].map((s) => s.toLowerCase())
+)
+
+const isGlobalHolidayName = (holiday) => {
+  if (!holiday) return false
+  const name = holiday.trim().toLowerCase()
+  return FIXED_HOLIDAYS.has(name)
+}
+
+// Map holiday names to emojis
+const getHolidayEmoji = (holiday) => {
+  const name = holiday.toLowerCase()
+
+  // 🐱🎂 Taylor's cats (Meredith, Olivia, Benjamin)
+  if (
+    name.includes("meredith") ||
+    name.includes("olivia") ||
+    name.includes("benjamin")
+  ) {
+    return "🐱🎂"
+  }
+
+  // ☘️ Saint Patrick's Day
+  if (name.includes("patrick")) return "☘️"
+
+  // 🍩 National Donut Day
+  if (name.includes("donut") || name.includes("doughnut")) return "🍩"
+
+  // 🎂 Any "birthday"
+  if (name.includes("birthday")) return "🎂"
+
+  // 🇺🇸 American holidays
+  if (
+    name.includes("independence") ||
+    name.includes("memorial day") ||
+    name.includes("labor day")
+  ) {
+    return "🇺🇸"
+  }
+
+  // 🍷 Wine days
+  if (name.includes("red wine") || name.includes("white wine")) return "🍷"
+
+  // 🐍 “Mean Girls Cat”
+  if (name.includes("mean girls")) return "🐍"
+
+  // 🐱 Any holiday with “cat” in it
+  if (name.includes("cat")) return "🐱"
+
+  // 🎃 Halloween
+  if (name.includes("halloween")) return "🎃"
+
+  // 🎄 Christmas
+  if (name.includes("christmas") || name.includes("xmas")) return "🎄"
+
+  // 🎆 New Years
+  if (name.includes("new year")) return "🎆"
+
+  // 💘 Valentine’s Day
+  if (name.includes("valentine")) return "💘"
+
+  // 🐣 Easter
+  if (name.includes("easter")) return "🐣"
+
+  // 🦃 Thanksgiving
+  if (name.includes("thanksgiving")) return "🦃"
+
+  // 🎀 Default
+  return "🎀"
+}
 
 function getTorontoTimelineDate(date) {
   console.log("=== Toronto Date Calculation ===")
@@ -43,7 +155,6 @@ function getTorontoTimelineDate(date) {
 
 export default function Timeline() {
   const navigate = useNavigate()
-  const [showScrollHint, setShowScrollHint] = useState(true)
   const [records, setRecords] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [showCalendar, setShowCalendar] = useState(false)
@@ -57,6 +168,29 @@ export default function Timeline() {
   const [showTNInfo, setShowTNInfo] = useState(false)
   // The mapped date for whatever "On This Day" you're currently viewing
   const torontoDate = getTorontoTimelineDate(displayDate)
+
+    // Global (fixed-date) holidays for this day (shown once at top)
+  const globalHolidayTagsForDay = (() => {
+    const seen = new Set()
+    const result = []
+
+    records.forEach((record) => {
+      const tags = parseHolidayTags(record?.fields?.HOLIDAYS)
+      tags.forEach((tag) => {
+        if (!tag) return
+        if (!isGlobalHolidayName(tag)) return
+
+        const key = tag.toLowerCase()
+        if (!seen.has(key)) {
+          seen.add(key)
+          result.push(tag)
+        }
+      })
+    })
+
+    return result
+  })()
+
   // Calendar state - use actual current year
   const [calendarMonth, setCalendarMonth] = useState(today.getMonth())
   const [calendarYear, setCalendarYear] = useState(today.getFullYear())
@@ -423,20 +557,6 @@ const handlePreviousDay = () => {
     }
   }, [calendarMonth, calendarYear, showCalendar])
 
-  // ===== scroll hint =====
-  useEffect(() => {
-    const timelineElement = document.querySelector(".mobile-timeline-container")
-
-    const handleTagClick = (e, keyword) => {
-      e.preventDefault()
-      e.stopPropagation()
-      navigate(`/posts?keyword=${encodeURIComponent(keyword)}`)
-    }
-
-    timelineElement?.addEventListener("scroll", handleScroll)
-    return () => timelineElement?.removeEventListener("scroll", handleScroll)
-  }, [])
-
   // ===== Card component =====
   const TimelineCard = ({ record, index }) => {
     const [isSelectingText, setIsSelectingText] = useState(false)
@@ -482,78 +602,12 @@ const handlePreviousDay = () => {
     }
 
     // HOLIDAYS badges helper (supports array or text with multiple tags)
-    const holidayTagsRaw = record?.fields?.HOLIDAYS
-    const holidayTags = Array.isArray(holidayTagsRaw)
-      ? holidayTagsRaw
-      : typeof holidayTagsRaw === "string"
-        ? holidayTagsRaw
-            .split(/[;,|]/) // supports comma, semicolon, or |
-            .map((tag) => tag.trim())
-            .filter(Boolean)
-        : []
+// Use shared helpers and remove global (top-of-page) holidays from cards
+const rawHolidayTags = parseHolidayTags(record?.fields?.HOLIDAYS)
+const holidayTags = rawHolidayTags.filter((tag) => !isGlobalHolidayName(tag))
 const hasHoliday = holidayTags.length > 0
-    const getHolidayEmoji = (holiday) => {
-  const name = holiday.toLowerCase();
 
-  // 🐱🎂 Taylor's cats (Meredith, Olivia, Benjamin)
-  if (
-    name.includes("meredith") ||
-    name.includes("olivia") ||
-    name.includes("benjamin")
-  ) {
-    return "🐱🎂";
-  }
-
-  // 🌈 Saint Patrick's Day → Clover
-  if (name.includes("patrick")) return "☘️";
-
-  // 🍩 National Donut Day → Donut
-  if (name.includes("donut") || name.includes("doughnut")) return "🍩";
-
-  // 🎂 Any "birthday" → Birthday cake
-  if (name.includes("birthday")) return "🎂";
-
-  // 🇺🇸 American holidays
-  if (
-    name.includes("independence") ||
-    name.includes("memorial day") ||
-    name.includes("labor day")
-  ) {
-    return "🇺🇸";
-  }
-
-  // 🍷 Wine days
-  if (name.includes("red wine") || name.includes("white wine")) return "🍷";
-
-  // 🐍 “Mean Girls Cat” → Snake
-  if (name.includes("mean girls")) return "🐍";
-
-  // 🐱 Any holiday with “cat” in it
-  if (name.includes("cat")) return "🐱";
-
-  // 🎃 Halloween
-  if (name.includes("halloween")) return "🎃";
-
-  // 🎄 Christmas
-  if (name.includes("christmas") || name.includes("xmas")) return "🎄";
-
-  // 🎆 New Years
-  if (name.includes("new year")) return "🎆";
-
-  // 💘 Valentine’s Day
-  if (name.includes("valentine")) return "💘";
-
-  // 🐣 Easter
-  if (name.includes("easter")) return "🐣";
-
-  // 🦃 Thanksgiving
-  if (name.includes("thanksgiving")) return "🦃";
-
-  // 🎀 Default
-  return "🎀";
-};
-
-    return (
+            return (
       <div
         className="block relative hover:opacity-95 transition-opacity timeline-card"
         style={{ marginTop: index === 0 ? "17px" : "43px" }}
@@ -643,7 +697,7 @@ const hasHoliday = holidayTags.length > 0
       </div>
     )
   }
-
+const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   // ===== JSX =====
   return (
     <section className="w-full bg-[#e8ecf7] py-2 px-2 md:px-10 flex flex-col min-h-0">
@@ -662,7 +716,7 @@ const hasHoliday = holidayTags.length > 0
           </div>
         </div>
 
-        {/* ON THIS DAY Section */}
+                {/* ON THIS DAY Section */}
         <div className="text-center mb-3 flex-shrink-0">
           {/* Glowy header card */}
           <div className="relative w-full mb-3 md:mb-4 px-2 md:px-5">
@@ -710,12 +764,17 @@ const hasHoliday = holidayTags.length > 0
           </div>
 
           {/* Date navigation + Taylor Nation alternate timeline box */}
-<div className="mt-1 md:mt-2 relative flex flex-col items-center md:min-h-[70px]">
-  {/* Main date navigation (stays centered) */}
-  <div className="flex items-center justify-center gap-1 sm:gap-2 md:gap-3">
+<div className="relative mt-1 md:mt-2 flex flex-col items-center md:min-h-[82px]">
+  {/* Main date navigation (centered) */}
+  <div className="flex items-center justify-center gap-2 md:gap-3">
+    {/* PREVIOUS – same size as NEXT */}
     <Button
       variant="secondary"
-      className="rounded-full h-8 md:h-9 px-2 sm:px-3 md:px-4 text-[11px] sm:text-xs md:text-sm flex items-center gap-1 mr-1"
+      className="
+        rounded-full h-8 md:h-9 px-3 md:px-4
+        text-[11px] sm:text-xs md:text-sm
+        flex items-center justify-center gap-1 min-w-[96px]
+      "
       onClick={handlePreviousDay}
     >
       <ChevronLeft size={12} />
@@ -723,9 +782,19 @@ const hasHoliday = holidayTags.length > 0
       <span className="sm:hidden">Prev</span>
     </Button>
 
-    {/* Date bubble with calendar button integrated */}
-    <div className="relative mr-6 sm:mr-0">
-      <div className="bg-white rounded-full px-3 sm:px-5 md:px-6 py-1 md:py-1.5 min-w-[102px] sm:min-w-[136px] md:min-w-[170px] border border-[#b66b6b] flex items-center justify-center">
+    {/* Date bubble with calendar icon INSIDE, but still centered */}
+    <div className="relative">
+      <div
+        className="
+          bg-white rounded-full
+          pl-3 sm:pl-5 md:pl-6
+          pr-8 sm:pr-10 md:pr-11
+          py-1 md:py-1.5
+          min-w-[130px] sm:min-w-[160px] md:min-w-[190px]
+          border border-[#b66b6b]
+          flex items-center justify-center
+        "
+      >
         <span className="text-[#8e3e3e] text-sm md:text-base font-medium">
           {displayDate.toLocaleDateString("en-US", {
             month: "long",
@@ -733,19 +802,31 @@ const hasHoliday = holidayTags.length > 0
           })}
         </span>
       </div>
-      {/* Calendar button positioned inside the bubble */}
+
+      {/* calendar button stays in the bubble but no longer pushes it off-center */}
       <button
         onClick={() => setShowCalendar(true)}
-          className="absolute -right-4 sm:-right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-1 shadow-sm border border-[#b66b6b] hover:bg-[#f8d7da] transition-colors"
+        className="
+          absolute right-1.5 sm:right-2 md:right-2.5
+          top-1/2 -translate-y-1/2
+          bg-white rounded-full p-1
+          shadow-sm border border-[#b66b6b]
+          hover:bg-[#f8d7da] transition-colors
+        "
         title="Open calendar"
       >
         <Calendar size={14} className="text-[#8e3e3e]" />
       </button>
     </div>
 
+    {/* NEXT – same classes as PREVIOUS */}
     <Button
       variant="secondary"
-      className="rounded-full h-8 md:h-9 px-2 sm:px-3 md:px-4 text-[11px] sm:text-xs md:text-sm flex items-center gap-1 ml-1"
+      className="
+        rounded-full h-8 md:h-9 px-3 md:px-4
+        text-[11px] sm:text-xs md:text-sm
+        flex items-center justify-center gap-1 min-w-[96px]
+      "
       onClick={handleNextDay}
     >
       <span className="hidden sm:inline">Next</span>
@@ -754,24 +835,22 @@ const hasHoliday = holidayTags.length > 0
     </Button>
   </div>
 
-    {/* TN box – mobile: under the date nav */}
+  {/* TN box – mobile: stacked under nav */}
   <div className="mt-3 w-full max-w-xs md:hidden">
     <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-3 sm:px-4 py-3">
-
       <p className="text-[11px] sm:text-xs text-[#6b7db3] leading-snug mb-2">
-  {isTorontoMode
-    ? "TN Timeline Mode"
-    : "View this day on Taylor Nation’s alternate timeline."}
-  <button
-    type="button"
-    onClick={() => setShowTNInfo(true)}
-    className="inline-flex items-center ml-1 text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
-  >
-    <HelpCircle size={12} className="mr-0.5" />
-    What is this?
-  </button>
-</p>
-
+        {isTorontoMode
+          ? "TN Timeline Mode"
+          : "View this day on Taylor Nation’s alternate timeline."}
+        <button
+          type="button"
+          onClick={() => setShowTNInfo(true)}
+          className="inline-flex items-center ml-1 text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
+        >
+          <HelpCircle size={12} className="mr-0.5" />
+          What is this?
+        </button>
+      </p>
 
       <Button
         variant="outline"
@@ -782,26 +861,19 @@ const hasHoliday = holidayTags.length > 0
           bg-white/90 hover:bg-[#fbeff7]
         "
         onClick={() => {
-  console.log("=== Toronto Button Click (Mobile) ===")
-  console.log("displayDate:", displayDate)
-  console.log("displayDate year:", displayDate.getFullYear())
-  console.log("torontoDate:", torontoDate)
-  console.log("torontoDate year:", torontoDate.getFullYear())
-  console.log("=== End ===")
-  
-  if (isTorontoMode) {
-    const today = new Date()
-    setCurrentYear(today.getFullYear())
-    setCurrentMonth(today.getMonth() + 1)
-    setCurrentDay(today.getDate())
-    setIsTorontoMode(false)
-  } else {
-    setCurrentYear(torontoDate.getFullYear())
-    setCurrentMonth(torontoDate.getMonth() + 1)
-    setCurrentDay(torontoDate.getDate())
-    setIsTorontoMode(true)
-  }
-}}
+          if (isTorontoMode) {
+            const today = new Date()
+            setCurrentYear(today.getFullYear())
+            setCurrentMonth(today.getMonth() + 1)
+            setCurrentDay(today.getDate())
+            setIsTorontoMode(false)
+          } else {
+            setCurrentYear(torontoDate.getFullYear())
+            setCurrentMonth(torontoDate.getMonth() + 1)
+            setCurrentDay(torontoDate.getDate())
+            setIsTorontoMode(true)
+          }
+        }}
       >
         {isTorontoMode ? (
           <>
@@ -826,115 +898,184 @@ const hasHoliday = holidayTags.length > 0
     </div>
   </div>
 
-    {/* TN box – desktop: floated to the right, doesn’t push the center */}
-<div className="hidden md:block md:absolute md:right-6 md:top-3">
-  <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-5 py-3 md:max-w-lg">
-    <p className="text-xs text-[#6b7db3] leading-snug mb-2 whitespace-nowrap">
-  {isTorontoMode
-    ? "TN Timeline Mode"
-    : "View this day on Taylor Nation’s alternate timeline."}
-  <button
-    type="button"
-    onClick={() => setShowTNInfo(true)}
-    className="inline-flex items-center ml-1 text-[11px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
-  >
-    <HelpCircle size={12} className="mr-0.5" />
-    What is this?
-  </button>
-</p>
+  {/* TN box – desktop: pinned to the right, but does NOT affect centering */}
+  <div className="hidden md:block absolute right-6 top-1/2 -translate-y-1/2">
+    <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-5 py-3 md:max-w-lg">
+      <p className="text-xs text-[#6b7db3] leading-snug mb-2 whitespace-nowrap">
+        {isTorontoMode
+          ? "TN Timeline Mode"
+          : "View this day on Taylor Nation’s alternate timeline."}
+        <button
+          type="button"
+          onClick={() => setShowTNInfo(true)}
+          className="inline-flex items-center ml-1 text-[11px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
+        >
+          <HelpCircle size={12} className="mr-0.5" />
+          What is this?
+        </button>
+      </p>
 
-    <Button
-      variant="outline"
-      className="
-        rounded-full px-4 py-1.5
-        text-xs
-        border-[#b66b6b] text-[#8e3e3e]
-        bg-white/90 hover:bg-[#fbeff7]
-      "
-      onClick={() => {
-  console.log("=== Toronto Button Click (Mobile) ===")
-  console.log("displayDate:", displayDate)
-  console.log("displayDate year:", displayDate.getFullYear())
-  console.log("torontoDate:", torontoDate)
-  console.log("torontoDate year:", torontoDate.getFullYear())
-  console.log("=== End ===")
-  
-  if (isTorontoMode) {
-    const today = new Date()
-    setCurrentYear(today.getFullYear())
-    setCurrentMonth(today.getMonth() + 1)
-    setCurrentDay(today.getDate())
-    setIsTorontoMode(false)
-  } else {
-    setCurrentYear(torontoDate.getFullYear())
-    setCurrentMonth(torontoDate.getMonth() + 1)
-    setCurrentDay(torontoDate.getDate())
-    setIsTorontoMode(true)
-  }
-}}
-    >
-      {isTorontoMode ? (
-        <>
-          <span className="font-semibold mr-1">← Return to Today:</span>
-          {new Date().toLocaleDateString("en-US", {
-            month: "short",
-            day: "2-digit",
-            year: "numeric",
-          })}
-        </>
-      ) : (
-        <>
-          <span className="font-semibold mr-1">TN Timeline Date:</span>
-          {torontoDate.toLocaleDateString("en-US", {
-            month: "short",
-            day: "2-digit",
-            year: "numeric",
-          })}
-        </>
-      )}
-    </Button>
+      <Button
+        variant="outline"
+        className="
+          rounded-full px-4 py-1.5
+          text-xs
+          border-[#b66b6b] text-[#8e3e3e]
+          bg-white/90 hover:bg-[#fbeff7]
+        "
+        onClick={() => {
+          if (isTorontoMode) {
+            const today = new Date()
+            setCurrentYear(today.getFullYear())
+            setCurrentMonth(today.getMonth() + 1)
+            setCurrentDay(today.getDate())
+            setIsTorontoMode(false)
+          } else {
+            setCurrentYear(torontoDate.getFullYear())
+            setCurrentMonth(torontoDate.getMonth() + 1)
+            setCurrentDay(torontoDate.getDate())
+            setIsTorontoMode(true)
+          }
+        }}
+      >
+        {isTorontoMode ? (
+          <>
+            <span className="font-semibold mr-1">← Return to Today:</span>
+            {new Date().toLocaleDateString("en-US", {
+              month: "short",
+              day: "2-digit",
+              year: "numeric",
+            })}
+          </>
+        ) : (
+          <>
+            <span className="font-semibold mr-1">TN Timeline Date:</span>
+            {torontoDate.toLocaleDateString("en-US", {
+              month: "short",
+              day: "2-digit",
+              year: "numeric",
+            })}
+          </>
+        )}
+      </Button>
+    </div>
   </div>
 </div>
+
+{/* 🌟 Global fixed-date holiday badge + Event Counter */}
+<div className="w-full">
+  {/* MOBILE holiday pill – centered under date nav */}
+  {hasGlobalHoliday && (
+    <div className="md:hidden flex justify-center mt-2 mb-0">
+      <span
+        className="
+          inline-flex items-center
+          px-4 py-1.5
+          rounded-full
+          text-sm font-semibold
+          bg-[#fbeff7]
+          text-[#8e3e3e]
+          border border-[#e3b0b0]
+          shadow-sm
+          max-w-[90%]
+        "
+      >
+        <span className="mr-2 text-base">
+          {getHolidayEmoji(globalHolidayTagsForDay[0])}
+        </span>
+        {globalHolidayTagsForDay[0]}
+      </span>
+    </div>
+  )}
+
+  {/* DESKTOP holiday pill – positioned to match timeline cards */}
+  {hasGlobalHoliday && (
+    <div className="hidden md:block">
+      <div className="relative">
+        {/* Position badge to match timeline cards */}
+        <div className="absolute left-1/4 -translate-x-1/4">
+          <span
+            className="
+              inline-flex items-center
+              px-4 py-1.5
+              rounded-full
+              text-sm font-semibold
+              bg-[#fbeff7]
+              text-[#8e3e3e]
+              border border-[#e3b0b0]
+              shadow-sm
+              whitespace-nowrap
+            "
+          >
+            <span className="mr-2 text-base">
+              {getHolidayEmoji(globalHolidayTagsForDay[0])}
+            </span>
+            {globalHolidayTagsForDay[0]}
+          </span>
+        </div>
+      </div>
+    </div>
+  )}
+
+    {/* Event Counter – balanced spacing */}
+  <div
+    className={`flex justify-center ${
+      hasGlobalHoliday ? "mt-4 md:mt-1" : "mt-2 md:-mt-3"
+    } mb-2 flex-shrink-0`}
+  >
+    <div
+      className="
+        event-counter-pill
+        bg-white rounded-full px-2 sm:px-3 md:px-4 py-1
+        border border-[#b66b6b] shadow-sm
+      "
+    >
+      <div className="flex items-center gap-1.5">
+        <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse" />
+
+        <span className="event-counter-text text-[#8e3e3e] text-xs md:text-sm font-medium">
+          {isLoading
+            ? "Loading events..."
+            : `${records.length} ${
+                records.length === 1 ? "Event" : "Events"
+              } Found${isTorontoMode ? " (TN Timeline)" : ""}`}
+        </span>
+
+        <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse" />
+      </div>
+    </div>
+  </div>
 </div>
         </div>
 
-        {/* Event Counter */}
-        <div className="flex justify-center mb-2 flex-shrink-0">
-          <div
-            className="
-              event-counter-pill
-              bg-white rounded-full px-2 sm:px-3 md:px-4 py-1
-              border border-[#b66b6b] shadow-sm
-            "
-          >
-            <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
+        {/* Mobile Timeline - Vertical line behind cards */}
+<div className="md:hidden mt-2 px-4">
+  <div className="relative">
+    {/* Background line + top & bottom bubbles */}
+    <div className="pointer-events-none absolute inset-0 flex justify-center z-0">
+      {/* Main vertical line */}
+      <div className="w-[2px] h-full bg-[#8a9ad4]" />
 
-             <span className="event-counter-text text-[#8e3e3e] text-xs md:text-sm font-medium">
-  {isLoading
-    ? "Loading events..."
-    : `${records.length} ${
-        records.length === 1 ? "Event" : "Events"
-      } Found${isTorontoMode ? " (TN Timeline)" : ""}`}
-</span>
+      {/* TOP bubble (inside container, not negative) */}
+      <div className="absolute left-1/2 -translate-x-1/2 top-0 w-7 h-7 rounded-full bg-[#6B78B4]" />
 
-              <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
-            </div>
-          </div>
+      {/* BOTTOM bubble */}
+      <div className="absolute left-1/2 -translate-x-1/2 -bottom-3 w-7 h-7 rounded-full bg-[#6B78B4]" />
+    </div>
+
+    {/* Cards centered over the line, above the background */}
+    <div className="relative w-full max-w-xl mx-auto z-10 pt-4">
+      {records.map((record, index) => (
+        <div key={`mobile-${record.id}`} className="relative mb-6">
+          {/* Connecting line from card to center line */}
+          <div className="absolute left-1/2 top-6 w-6 h-[2px] bg-[#8a9ad4] -translate-x-1/2" />
+
+          <TimelineCard record={record} index={index} />
         </div>
-
-        {/* Timeline Section */}
-        <div className="flex-1 min-h-0 relative">
-          {/* Mobile Timeline */}
-          <div className="md:hidden mt-2 space-y-6">
-            {records.map((record, index) => (
-              <TimelineCard
-                key={`mobile-${record.id}`}
-                record={record}
-                index={index}
-              />
-            ))}
-          </div>
+      ))}
+    </div>
+  </div>
+</div>
 
           {/* Desktop Timeline */}
           <div className="hidden md:block min-h-0">
@@ -964,7 +1105,6 @@ const hasHoliday = holidayTags.length > 0
               </div>
             </div>
           </div>
-        </div>
 
         {/* View Full Timeline Button */}
         <div className="flex justify-center mt-2 mb-2 flex-shrink-0">
