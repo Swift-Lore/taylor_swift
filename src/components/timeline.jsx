@@ -610,14 +610,11 @@ const TimelineCard = ({ record, index }) => {
   const hasHoliday = holidayTags.length > 0
 
   return (
-    <Link
-      to={`/post_details?id=${record.id}`}
-      className="block relative hover:opacity-95 transition-opacity timeline-card"
-      style={{ marginTop: index === 0 ? "17px" : "43px" }}
-      draggable={false}
-      onDragStart={(e) => e.preventDefault()}
-      onClick={handleCardClick}
-    >
+    <div
+  className="block relative hover:opacity-95 transition-opacity timeline-card"
+  style={{ marginTop: index === 0 ? "17px" : "43px" }}
+  onClick={handleCardClick}
+>
       <div className="relative">
         <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
           <div className="bg-white/80 backdrop-blur-sm rounded-[10px] p-3 border border-[#f0d0d3] relative">
