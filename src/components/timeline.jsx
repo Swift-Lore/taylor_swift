@@ -989,36 +989,62 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
 
 {/* 🌟 Global fixed-date holiday badge + Event Counter */}
 <div className="w-full">
-  {/* DESKTOP holiday pill – centered and compact */}
+  {/* MOBILE holiday pill – centered under date nav */}
   {hasGlobalHoliday && (
-    <div className="hidden md:flex justify-center mt-1 mb-0">
-      <div className="flex justify-center w-full">
-        <span
-          className="
-            inline-flex items-center
-            px-4 py-1.5
-            rounded-full
-            text-sm font-semibold
-            bg-[#fbeff7]
-            text-[#8e3e3e]
-            border border-[#e3b0b0]
-            shadow-sm
-            max-w-[80%] mx-auto
-          "
-        >
-          <span className="mr-2 text-base">
-            {getHolidayEmoji(globalHolidayTagsForDay[0])}
-          </span>
-          {globalHolidayTagsForDay[0]}
+    <div className="md:hidden flex justify-center mt-2 mb-0">
+      <span
+        className="
+          inline-flex items-center
+          px-4 py-1.5
+          rounded-full
+          text-sm font-semibold
+          bg-[#fbeff7]
+          text-[#8e3e3e]
+          border border-[#e3b0b0]
+          shadow-sm
+          max-w-[90%]
+        "
+      >
+        <span className="mr-2 text-base">
+          {getHolidayEmoji(globalHolidayTagsForDay[0])}
         </span>
+        {globalHolidayTagsForDay[0]}
+      </span>
+    </div>
+  )}
+
+  {/* DESKTOP holiday pill – left-aligned with event cards */}
+  {hasGlobalHoliday && (
+    <div className="hidden md:block mt-1 mb-0">
+      <div className="relative flex justify-center">
+        {/* This wrapper matches the timeline cards offset */}
+        <div className="relative left-[37.5%] -translate-x-1/4 w-3/4">
+          <span
+            className="
+              inline-flex items-center
+              px-4 py-1.5
+              rounded-full
+              text-sm font-semibold
+              bg-[#fbeff7]
+              text-[#8e3e3e]
+              border border-[#e3b0b0]
+              shadow-sm
+            "
+          >
+            <span className="mr-2 text-base">
+              {getHolidayEmoji(globalHolidayTagsForDay[0])}
+            </span>
+            {globalHolidayTagsForDay[0]}
+          </span>
+        </div>
       </div>
     </div>
   )}
 
-  {/* Event Counter – tighter to header when no holiday, not overlapping when there is */}
+  {/* Event Counter – tighter spacing */}
   <div
     className={`flex justify-center ${
-      hasGlobalHoliday ? "mt-1" : "-mt-2 md:-mt-3"
+      hasGlobalHoliday ? "mt-2" : "-mt-2 md:-mt-3"
     } mb-2 flex-shrink-0`}
   >
     <div
