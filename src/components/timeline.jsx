@@ -773,79 +773,147 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           </div>
 
           {/* Date navigation + Taylor Nation alternate timeline box */}
-<div className="relative mt-1 md:mt-2 flex flex-col items-center md:min-h-[82px]">
-  {/* Main date navigation (centered) */}
-  <div className="flex items-center justify-center gap-2 md:gap-3">
-    {/* PREVIOUS – same size as NEXT */}
-    <Button
-      variant="secondary"
-      className="
-        rounded-full h-8 md:h-9 px-3 md:px-4
-        text-[11px] sm:text-xs md:text-sm
-        flex items-center justify-center gap-1 min-w-[96px]
-      "
-      onClick={handlePreviousDay}
-    >
-      <ChevronLeft size={12} />
-      <span className="hidden sm:inline">Previous</span>
-      <span className="sm:hidden">Prev</span>
-    </Button>
+<div className="mt-1 md:mt-2 w-full">
+  {/* Desktop & mobile layout container */}
+  <div className="flex flex-col md:flex-row md:items-center">
+    {/* Centered date nav – lives in its own flex-1 column */}
+    <div className="flex-1 flex justify-center">
+      <div className="flex items-center justify-center gap-2 md:gap-3">
+        {/* PREVIOUS – same size as NEXT */}
+        <Button
+          variant="secondary"
+          className="
+            rounded-full h-8 md:h-9 px-3 md:px-4
+            text-[11px] sm:text-xs md:text-sm
+            flex items-center justify-center gap-1 min-w-[96px]
+          "
+          onClick={handlePreviousDay}
+        >
+          <ChevronLeft size={12} />
+          <span className="hidden sm:inline">Previous</span>
+          <span className="sm:hidden">Prev</span>
+        </Button>
 
-    {/* Date bubble with calendar icon INSIDE, but still centered */}
-    <div className="relative">
-      <div
-        className="
-          bg-white rounded-full
-          pl-3 sm:pl-5 md:pl-6
-          pr-8 sm:pr-10 md:pr-11
-          py-1 md:py-1.5
-          min-w-[130px] sm:min-w-[160px] md:min-w-[190px]
-          border border-[#b66b6b]
-          flex items-center justify-center
-        "
-      >
-        <span className="text-[#8e3e3e] text-sm md:text-base font-medium">
-          {displayDate.toLocaleDateString("en-US", {
-            month: "long",
-            day: "numeric",
-          })}
-        </span>
+        {/* Date bubble with calendar icon INSIDE, but still centered */}
+        <div className="relative">
+          <div
+            className="
+              bg-white rounded-full
+              pl-3 sm:pl-5 md:pl-6
+              pr-8 sm:pr-10 md:pr-11
+              py-1 md:py-1.5
+              min-w-[130px] sm:min-w-[160px] md:min-w-[190px]
+              border border-[#b66b6b]
+              flex items-center justify-center
+            "
+          >
+            <span className="text-[#8e3e3e] text-sm md:text-base font-medium">
+              {displayDate.toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+              })}
+            </span>
+          </div>
+
+          <button
+            onClick={() => setShowCalendar(true)}
+            className="
+              absolute right-1.5 sm:right-2 md:right-2.5
+              top-1/2 -translate-y-1/2
+              bg-white rounded-full p-1
+              shadow-sm border border-[#b66b6b]
+              hover:bg-[#f8d7da] transition-colors
+            "
+            title="Open calendar"
+          >
+            <Calendar size={14} className="text-[#8e3e3e]" />
+          </button>
+        </div>
+
+        {/* NEXT – same classes as PREVIOUS */}
+        <Button
+          variant="secondary"
+          className="
+            rounded-full h-8 md:h-9 px-3 md:px-4
+            text-[11px] sm:text-xs md:text-sm
+            flex items-center justify-center gap-1 min-w-[96px]
+          "
+          onClick={handleNextDay}
+        >
+          <span className="hidden sm:inline">Next</span>
+          <span className="sm:hidden">Next</span>
+          <ChevronRight size={12} />
+        </Button>
       </div>
-
-      {/* calendar button stays in the bubble but no longer pushes it off-center */}
-      <button
-        onClick={() => setShowCalendar(true)}
-        className="
-          absolute right-1.5 sm:right-2 md:right-2.5
-          top-1/2 -translate-y-1/2
-          bg-white rounded-full p-1
-          shadow-sm border border-[#b66b6b]
-          hover:bg-[#f8d7da] transition-colors
-        "
-        title="Open calendar"
-      >
-        <Calendar size={14} className="text-[#8e3e3e]" />
-      </button>
     </div>
 
-    {/* NEXT – same classes as PREVIOUS */}
-    <Button
-      variant="secondary"
-      className="
-        rounded-full h-8 md:h-9 px-3 md:px-4
-        text-[11px] sm:text-xs md:text-sm
-        flex items-center justify-center gap-1 min-w-[96px]
-      "
-      onClick={handleNextDay}
-    >
-      <span className="hidden sm:inline">Next</span>
-      <span className="sm:hidden">Next</span>
-      <ChevronRight size={12} />
-    </Button>
+    {/* Desktop TN box – square-ish on the right, no overlap */}
+    <div className="hidden md:flex flex-1 justify-end pr-4">
+      <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-4 py-3 max-w-xs">
+        <p className="text-xs text-[#6b7db3] leading-snug mb-2">
+          {isTorontoMode
+            ? "TN Timeline Mode"
+            : "View this day on Taylor Nation’s alternate timeline."}
+          <button
+            type="button"
+            onClick={() => setShowTNInfo(true)}
+            className="inline-flex items-center ml-1 text-[11px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
+          >
+            <HelpCircle size={12} className="mr-0.5" />
+            What is this?
+          </button>
+        </p>
+
+        <Button
+          variant="outline"
+          className="
+            rounded-full px-3 py-1.5
+            text-[11px]
+            border-[#b66b6b] text-[#8e3e3e]
+            bg-white/90 hover:bg-[#fbeff7]
+            w-full
+          "
+          onClick={() => {
+            if (isTorontoMode) {
+              const today = new Date()
+              setCurrentYear(today.getFullYear())
+              setCurrentMonth(today.getMonth() + 1)
+              setCurrentDay(today.getDate())
+              setIsTorontoMode(false)
+            } else {
+              setCurrentYear(torontoDate.getFullYear())
+              setCurrentMonth(torontoDate.getMonth() + 1)
+              setCurrentDay(torontoDate.getDate())
+              setIsTorontoMode(true)
+            }
+          }}
+        >
+          {isTorontoMode ? (
+            <>
+              <span className="font-semibold mr-1">← Return to Today:</span>
+              {new Date().toLocaleDateString("en-US", {
+                month: "short",
+                day: "2-digit",
+                year: "numeric",
+              })}
+            </>
+          ) : (
+            <>
+              <span className="font-semibold mr-1">TN Timeline Date:</span>
+              {torontoDate.toLocaleDateString("en-US", {
+                month: "short",
+                day: "2-digit",
+                year: "numeric",
+              })}
+            </>
+          )}
+        </Button>
+      </div>
+    </div>
   </div>
 
-  {/* TN box – mobile: stacked under nav */}
-  <div className="mt-3 w-full max-w-xs md:hidden">
+  {/* TN box – mobile: stacked under nav, unchanged */}
+  <div className="mt-3 w-full max-w-xs mx-auto md:hidden">
     <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-3 sm:px-4 py-3">
       <p className="text-[11px] sm:text-xs text-[#6b7db3] leading-snug mb-2">
         {isTorontoMode
@@ -868,69 +936,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           text-[11px] sm:text-xs
           border-[#b66b6b] text-[#8e3e3e]
           bg-white/90 hover:bg-[#fbeff7]
-        "
-        onClick={() => {
-          if (isTorontoMode) {
-            const today = new Date()
-            setCurrentYear(today.getFullYear())
-            setCurrentMonth(today.getMonth() + 1)
-            setCurrentDay(today.getDate())
-            setIsTorontoMode(false)
-          } else {
-            setCurrentYear(torontoDate.getFullYear())
-            setCurrentMonth(torontoDate.getMonth() + 1)
-            setCurrentDay(torontoDate.getDate())
-            setIsTorontoMode(true)
-          }
-        }}
-      >
-        {isTorontoMode ? (
-          <>
-            <span className="font-semibold mr-1">← Return to Today:</span>
-            {new Date().toLocaleDateString("en-US", {
-              month: "short",
-              day: "2-digit",
-              year: "numeric",
-            })}
-          </>
-        ) : (
-          <>
-            <span className="font-semibold mr-1">TN Timeline Date:</span>
-            {torontoDate.toLocaleDateString("en-US", {
-              month: "short",
-              day: "2-digit",
-              year: "numeric",
-            })}
-          </>
-        )}
-      </Button>
-    </div>
-  </div>
-
-  {/* TN box – desktop: pinned to the right, but does NOT affect centering */}
-  <div className="hidden md:block absolute right-6 top-1/2 -translate-y-1/2">
-    <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-5 py-3 md:max-w-lg">
-      <p className="text-xs text-[#6b7db3] leading-snug mb-2 whitespace-nowrap">
-        {isTorontoMode
-          ? "TN Timeline Mode"
-          : "View this day on Taylor Nation’s alternate timeline."}
-        <button
-          type="button"
-          onClick={() => setShowTNInfo(true)}
-          className="inline-flex items-center ml-1 text-[11px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
-        >
-          <HelpCircle size={12} className="mr-0.5" />
-          What is this?
-        </button>
-      </p>
-
-      <Button
-        variant="outline"
-        className="
-          rounded-full px-4 py-1.5
-          text-xs
-          border-[#b66b6b] text-[#8e3e3e]
-          bg-white/90 hover:bg-[#fbeff7]
+          w-full
         "
         onClick={() => {
           if (isTorontoMode) {
