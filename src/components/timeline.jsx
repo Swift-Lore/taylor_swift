@@ -595,7 +595,6 @@ const handlePreviousDay = () => {
 const rawHolidayTags = parseHolidayTags(record?.fields?.HOLIDAYS)
 const holidayTags = rawHolidayTags.filter((tag) => !isGlobalHolidayName(tag))
 const hasHoliday = holidayTags.length > 0
-const hasHoliday = holidayTags.length > 0
 
     return (
       <div
