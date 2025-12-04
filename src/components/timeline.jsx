@@ -749,9 +749,9 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           </div>
         </div>
 
-                {/* ON THIS DAY Section - FIXED overlapping */}
+                       {/* ON THIS DAY Section */}
         <div className="text-center mb-1 flex-shrink-0">
-          {/* Glowy header card - NARROWER to match timeline cards */}
+          {/* Glowy header card */}
           <div className="relative w-full mb-2 md:mb-3 px-2">
             <div
               className="
@@ -775,7 +775,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
                 </p>
               </div>
 
-              {/* Side stars - smaller */}
+              {/* Side stars */}
               <div className="pointer-events-none absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 opacity-70">
                 <img
                   src="/images/star.png"
@@ -794,10 +794,10 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
             </div>
           </div>
 
-          {/* Date navigation - FIXED container with proper positioning */}
-          <div className="relative mt-0 md:mt-1 max-w-3xl mx-auto flex flex-col lg:flex-row items-center lg:items-start justify-center gap-2 lg:gap-4">
-            {/* Main date navigation - Keep centered */}
-            <div className="flex items-center justify-center gap-1 md:gap-2 relative z-10">
+          {/* Date navigation + TN box */}
+          <div className="mt-0 md:mt-1 max-w-3xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-2 lg:gap-4">
+            {/* Main date navigation */}
+            <div className="flex items-center justify-center gap-1 md:gap-2">
               <Button
                 variant="secondary"
                 className="
@@ -864,110 +864,111 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
             </div>
 
             {/* TN box - Mobile */}
-<div className="mt-2 w-full max-w-xs mx-auto md:hidden">
-  <div className="bg-white/80 border border-[#e6d2e1] rounded-xl shadow-sm px-2 py-1.5">
-    <Button
-      variant="outline"
-      className="
-        rounded-xl px-2 py-1
-        text-xs font-medium
-        border-[#b66b6b] text-[#8e3e3e]
-        bg-white/90 hover:bg-[#fbeff7]
-        w-full break-words whitespace-normal
-      "
-      onClick={() => {
-        if (isTorontoMode) {
-          const today = new Date()
-          setCurrentYear(today.getFullYear())
-          setCurrentMonth(today.getMonth() + 1)
-          setCurrentDay(today.getDate())
-          setIsTorontoMode(false)
-        } else {
-          setCurrentYear(torontoDate.getFullYear())
-          setCurrentMonth(torontoDate.getMonth() + 1)
-          setCurrentDay(torontoDate.getDate())
-          setIsTorontoMode(true)
-        }
-      }}
-    >
-      <span className="font-semibold mr-1">
-        Taylor Nation Timeline Date:
-      </span>
-      {torontoDate.toLocaleDateString("en-US", {
-        month: "short",
-        day: "2-digit",
-        year: "numeric",
-      })}
-    </Button>
+            <div className="mt-2 w-full max-w-xs mx-auto md:hidden">
+              <div className="bg-white/80 border border-[#e6d2e1] rounded-xl shadow-sm px-2 py-1.5">
+                <Button
+                  variant="outline"
+                  className="
+                    rounded-xl px-2 py-1
+                    text-xs font-medium
+                    border-[#b66b6b] text-[#8e3e3e]
+                    bg-white/90 hover:bg-[#fbeff7]
+                    w-full break-words whitespace-normal
+                  "
+                  onClick={() => {
+                    if (isTorontoMode) {
+                      const today = new Date()
+                      setCurrentYear(today.getFullYear())
+                      setCurrentMonth(today.getMonth() + 1)
+                      setCurrentDay(today.getDate())
+                      setIsTorontoMode(false)
+                    } else {
+                      setCurrentYear(torontoDate.getFullYear())
+                      setCurrentMonth(torontoDate.getMonth() + 1)
+                      setCurrentDay(torontoDate.getDate())
+                      setIsTorontoMode(true)
+                    }
+                  }}
+                >
+                  <span className="font-semibold mr-1">
+                    Taylor Nation Timeline Date:
+                  </span>
+                  {torontoDate.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "2-digit",
+                    year: "numeric",
+                  })}
+                </Button>
 
-    <div className="mt-1 flex justify-end">
-      <button
-        type="button"
-        onClick={() => setShowTNInfo(true)}
-        className="inline-flex items-center text-[9px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
-      >
-        <HelpCircle size={10} className="mr-0.5" />
-        What is this?
-      </button>
-    </div>
-  </div>
-</div>
+                <div className="mt-1 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setShowTNInfo(true)}
+                    className="inline-flex items-center text-[9px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
+                  >
+                    <HelpCircle size={10} className="mr-0.5" />
+                    What is this?
+                  </button>
+                </div>
+              </div>
+            </div>
 
-                        {/* TN box - Desktop */}
-<div className="hidden lg:block lg:absolute lg:right-0 lg:top-0">
-  <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 w-60">
-    <Button
-      variant="outline"
-      className="
-        rounded-xl px-2 py-1
-        text-xs font-medium
-        border-[#b66b6b] text-[#8e3e3e]
-        bg-white/95 hover:bg-[#fbeff7]
-        w-full break-words whitespace-normal
-      "
-      onClick={() => {
-        if (isTorontoMode) {
-          const today = new Date()
-          setCurrentYear(today.getFullYear())
-          setCurrentMonth(today.getMonth() + 1)
-          setCurrentDay(today.getDate())
-          setIsTorontoMode(false)
-        } else {
-          setCurrentYear(torontoDate.getFullYear())
-          setCurrentMonth(torontoDate.getMonth() + 1)
-          setCurrentDay(torontoDate.getDate())
-          setIsTorontoMode(true)
-        }
-      }}
-    >
-      <span className="font-semibold mr-1">
-        Taylor Nation Timeline Date:
-      </span>
-      {torontoDate.toLocaleDateString("en-US", {
-        month: "short",
-        day: "2-digit",
-        year: "numeric",
-      })}
-    </Button>
+            {/* TN box - Desktop */}
+            <div className="hidden md:block lg:self-center">
+              <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 w-60">
+                <Button
+                  variant="outline"
+                  className="
+                    rounded-xl px-2 py-1
+                    text-xs font-medium
+                    border-[#b66b6b] text-[#8e3e3e]
+                    bg-white/95 hover:bg-[#fbeff7]
+                    w-full break-words whitespace-normal
+                  "
+                  onClick={() => {
+                    if (isTorontoMode) {
+                      const today = new Date()
+                      setCurrentYear(today.getFullYear())
+                      setCurrentMonth(today.getMonth() + 1)
+                      setCurrentDay(today.getDate())
+                      setIsTorontoMode(false)
+                    } else {
+                      setCurrentYear(torontoDate.getFullYear())
+                      setCurrentMonth(torontoDate.getMonth() + 1)
+                      setCurrentDay(torontoDate.getDate())
+                      setIsTorontoMode(true)
+                    }
+                  }}
+                >
+                  <span className="font-semibold mr-1">
+                    Taylor Nation Timeline Date:
+                  </span>
+                  {torontoDate.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "2-digit",
+                    year: "numeric",
+                  })}
+                </Button>
 
-    <div className="mt-1 flex justify-end">
-      <button
-        type="button"
-        onClick={() => setShowTNInfo(true)}
-        className="inline-flex items-center text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e] whitespace-nowrap"
-      >
-        <HelpCircle size={10} className="mr-0.5" />
-        What is this?
-      </button>
-    </div>
-  </div>
-</div>
+                <div className="mt-1 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setShowTNInfo(true)}
+                    className="inline-flex items-center text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e] whitespace-nowrap"
+                  >
+                    <HelpCircle size={10} className="mr-0.5" />
+                    What is this?
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* 🌟 Global fixed-date holiday badge + Event Counter */}
           <div className="w-full mt-2">
-            {/* MOBILE holiday pill */}
+            {/* Holiday pill (mobile + desktop, just centered) */}
             {hasGlobalHoliday && (
-              <div className="md:hidden flex justify-center">
+              <div className="flex justify-center mb-1">
                 <span
                   className="
                     inline-flex items-center
@@ -986,34 +987,6 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
                   </span>
                   {globalHolidayTagsForDay[0]}
                 </span>
-              </div>
-            )}
-
-            {/* DESKTOP holiday pill */}
-            {hasGlobalHoliday && (
-              <div className="hidden md:block">
-                <div className="relative">
-                  <div className="absolute left-1/4 -translate-x-1/4">
-                    <span
-                      className="
-                        inline-flex items-center
-                        px-3 py-1
-                        rounded-full
-                        text-xs font-semibold
-                        bg-[#fbeff7]
-                        text-[#8e3e3e]
-                        border border-[#e3b0b0]
-                        shadow-sm
-                        whitespace-nowrap
-                      "
-                    >
-                      <span className="mr-1 text-sm">
-                        {getHolidayEmoji(globalHolidayTagsForDay[0])}
-                      </span>
-                      {globalHolidayTagsForDay[0]}
-                    </span>
-                  </div>
-                </div>
               </div>
             )}
 
@@ -1039,9 +1012,8 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
                 </div>
               </div>
             </div>
-          </div>   
-        </div>     
-      </div>       
+          </div>
+        </div>
           
         {/* Mobile Timeline */}
         <div className="md:hidden mt-1 px-3">
