@@ -723,431 +723,394 @@ const TimelineCard = ({ record, index }) => {
   )
 }
 const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
-  // ===== JSX =====
+    // ===== JSX =====
   return (
-    <section className="w-full bg-[#e8ecf7] py-2 px-2 md:px-10 flex flex-col min-h-0">
+    <section className="w-full bg-[#e8ecf7] py-2 px-2 md:px-6 flex flex-col min-h-0">
       <div className="container mx-auto flex flex-col min-h-0 flex-1">
-        {/* Homepage Intro for SEO / AdSense */}
-        <div className="max-w-3xl mx-auto mt-2 mb-4 px-4">
-  <div className="bg-white/70 border border-[#e3d5dd] rounded-2xl shadow-sm px-4 py-3 md:px-6 md:py-4 text-center">
-    <h2 className="text-lg md:text-xl font-semibold text-[#8e3e3e] mb-1.5">
-      Swift Lore: Explore Taylor Swift's Complete Career Timeline
-    </h2>
-            <p className="text-[#6b7db3] text-sm md:text-base leading-relaxed">
-  Swift Lore is an independent, fan-run research archive documenting Taylor
-  Swift&apos;s career from her earliest performances to the present day.
-  Each entry is tied to a specific date, with context notes and source links.
-</p>
-<p className="text-[#6b7db3] text-sm md:text-base leading-relaxed mt-2">
-  Browse by date, filter events, and follow her journey across albums and
-  eras — from releases and award shows to interviews, paparazzi spots, and
-  deep-cut easter eggs. The timeline currently tracks thousands of verified
-  moments and is updated regularly.
-</p>
+        {/* Homepage Intro for SEO / AdSense - COMPACT */}
+        <div className="max-w-3xl mx-auto mt-1 mb-2 px-3">
+          <div className="bg-white/70 border border-[#e3d5dd] rounded-xl shadow-sm px-3 py-2 text-center">
+            <h2 className="text-base md:text-lg font-semibold text-[#8e3e3e] mb-1">
+              Swift Lore: Taylor Swift's Career Timeline
+            </h2>
+            <p className="text-[#6b7db3] text-xs md:text-sm leading-relaxed">
+              A fan-run archive documenting Taylor Swift's career from early performances to present day.
+            </p>
           </div>
         </div>
 
-                {/* ON THIS DAY Section */}
-        <div className="text-center mb-2 flex-shrink-0">
+        {/* ON THIS DAY Section - COMPACT */}
+        <div className="text-center mb-1 flex-shrink-0">
           {/* Glowy header card */}
-          <div className="relative w-full mb-2 md:mb-3 px-2 md:px-4">
+          <div className="relative w-full mb-1 md:mb-2 px-2">
             <div
               className="
-                relative w-full px-3 md:px-5 py-3 md:py-4
+                relative w-full px-3 py-2
                 bg-gradient-to-b from-[#fdf6fb] via-[#fbeff7] to-[#f6e5f0]
-                rounded-3xl
+                rounded-2xl
                 border border-[#e6d2e1]
-                shadow-[0_10px_25px_rgba(210,160,180,0.28)]
+                shadow-[0_8px_20px_rgba(210,160,180,0.25)]
               "
             >
               <div className="max-w-3xl mx-auto text-center">
-                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif text-[#8e3e3e]">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-serif text-[#8e3e3e]">
                   <span className="block tracking-wide">ON THIS DAY</span>
-                  <span className="text-sm sm:text-base md:text-lg lg:text-xl block mt-1 text-[#b4667f]">
+                  <span className="text-xs sm:text-sm md:text-base block mt-0.5 text-[#b4667f]">
                     across Taylor&apos;s eras
                   </span>
                 </h2>
 
-                <p className="mt-3 text-[#6b7db3] text-xs sm:text-sm md:text-base leading-relaxed px-2">
-                  Each day in Taylor&apos;s career has a story. Explore everything that
-                  happened on this day across years: releases, performances,
-                  interviews, and more.
+                <p className="mt-1 text-[#6b7db3] text-xs leading-relaxed px-1">
+                  Explore everything that happened on this day across years.
                 </p>
               </div>
 
-              {/* Side stars */}
-              <div className="pointer-events-none absolute left-1 sm:left-2 md:left-3 lg:left-7 top-1/2 -translate-y-1/2 opacity-70">
+              {/* Side stars - smaller */}
+              <div className="pointer-events-none absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 opacity-70">
                 <img
                   src="/images/star.png"
                   alt="Star"
-                  className="w-[26px] h-[26px] sm:w-[34px] sm:h-[34px] md:w-[56px] md:h-[56px] lg:w-[72px] lg:h-[72px]"
+                  className="w-[20px] h-[20px] sm:w-[26px] sm:h-[26px]"
                 />
               </div>
 
-              <div className="pointer-events-none absolute right-1 sm:right-2 md:right-3 lg:right-7 top-1/2 -translate-y-1/2 opacity-70">
+              <div className="pointer-events-none absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 opacity-70">
                 <img
                   src="/images/star.png"
                   alt="Star"
-                  className="w-[26px] h-[26px] sm:w-[34px] sm:h-[34px] md:w-[56px] md:h-[56px] lg:w-[72px] lg:h-[72px]"
+                  className="w-[20px] h-[20px] sm:w-[26px] sm:h-[26px]"
                 />
               </div>
             </div>
           </div>
 
-                    {/* Date navigation + Taylor Nation alternate timeline box */}
-<div className="relative mt-1 md:mt-2 flex flex-col items-center md:min-h-[90px]">
-  {/* Main date navigation (perfectly centered) */}
-  <div className="flex items-center justify-center gap-2 md:gap-3">
-    {/* PREVIOUS – same size as NEXT */}
-    <Button
-      variant="secondary"
-      className="
-        rounded-full h-8 md:h-9 px-3 md:px-4
-        text-[11px] sm:text-xs md:text-sm
-        flex items-center justify-center gap-1 min-w-[96px]
-      "
-      onClick={handlePreviousDay}
-    >
-      <ChevronLeft size={12} />
-      <span className="hidden sm:inline">Previous</span>
-      <span className="sm:hidden">Prev</span>
-    </Button>
+          {/* Date navigation + Taylor Nation alternate timeline box - COMPACT */}
+          <div className="relative mt-0 md:mt-1 flex flex-col items-center md:min-h-[60px]">
+            {/* Main date navigation */}
+            <div className="flex items-center justify-center gap-1 md:gap-2">
+              <Button
+                variant="secondary"
+                className="
+                  rounded-full h-7 md:h-8 px-2 md:px-3
+                  text-[10px] sm:text-xs
+                  flex items-center justify-center gap-1 min-w-[80px]
+                "
+                onClick={handlePreviousDay}
+              >
+                <ChevronLeft size={10} />
+                <span className="hidden sm:inline">Previous</span>
+                <span className="sm:hidden">Prev</span>
+              </Button>
 
-    {/* Date bubble with calendar icon INSIDE, but still centered */}
-    <div className="relative">
-      <div
-        className="
-          bg-white rounded-full
-          pl-3 sm:pl-5 md:pl-6
-          pr-8 sm:pr-10 md:pr-11
-          py-1 md:py-1.5
-          min-w-[130px] sm:min-w-[160px] md:min-w-[190px]
-          border border-[#b66b6b]
-          flex items-center justify-center
-        "
-      >
-        <span className="text-[#8e3e3e] text-sm md:text-base font-medium">
-          {displayDate.toLocaleDateString("en-US", {
-            month: "long",
-            day: "numeric",
-          })}
-        </span>
-      </div>
+              {/* Date bubble */}
+              <div className="relative">
+                <div
+                  className="
+                    bg-white rounded-full
+                    pl-3 sm:pl-4
+                    pr-7 sm:pr-8
+                    py-0.5
+                    min-w-[120px] sm:min-w-[140px]
+                    border border-[#b66b6b]
+                    flex items-center justify-center
+                  "
+                >
+                  <span className="text-[#8e3e3e] text-sm font-medium">
+                    {displayDate.toLocaleDateString("en-US", {
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </span>
+                </div>
 
-      <button
-        onClick={() => setShowCalendar(true)}
-        className="
-          absolute right-1.5 sm:right-2 md:right-2.5
-          top-1/2 -translate-y-1/2
-          bg-white rounded-full p-1
-          shadow-sm border border-[#b66b6b]
-          hover:bg-[#f8d7da] transition-colors
-        "
-        title="Open calendar"
-      >
-        <Calendar size={14} className="text-[#8e3e3e]" />
-      </button>
-    </div>
-
-    {/* NEXT – same classes as PREVIOUS */}
-    <Button
-      variant="secondary"
-      className="
-        rounded-full h-8 md:h-9 px-3 md:px-4
-        text-[11px] sm:text-xs md:text-sm
-        flex items-center justify-center gap-1 min-w-[96px]
-      "
-      onClick={handleNextDay}
-    >
-      <span className="hidden sm:inline">Next</span>
-      <span className="sm:hidden">Next</span>
-      <ChevronRight size={12} />
-    </Button>
-  </div>
-
-  {/* TN box – mobile: stacked under nav */}
-<div className="mt-3 w-full max-w-xs md:max-w-md mx-auto md:block lg:hidden">
-  <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-3 sm:px-4 py-3">
-    {/* Primary action on top – same style vibe as desktop */}
-    <Button
-      variant="outline"
-      className="
-        rounded-xl px-3 sm:px-4 py-1.5
-        text-xs sm:text-sm font-medium
-        border-[#b66b6b] text-[#8e3e3e]
-        bg-white/90 hover:bg-[#fbeff7]
-        w-full break-words whitespace-normal
-      "
-      onClick={() => {
-        if (isTorontoMode) {
-          const today = new Date()
-          setCurrentYear(today.getFullYear())
-          setCurrentMonth(today.getMonth() + 1)
-          setCurrentDay(today.getDate())
-          setIsTorontoMode(false)
-        } else {
-          setCurrentYear(torontoDate.getFullYear())
-          setCurrentMonth(torontoDate.getMonth() + 1)
-          setCurrentDay(torontoDate.getDate())
-          setIsTorontoMode(true)
-        }
-      }}
-    >
-      {isTorontoMode ? (
-        <>
-          <span className="font-semibold mr-1">← Return to Today:</span>
-          {new Date().toLocaleDateString("en-US", {
-            month: "short",
-            day: "2-digit",
-            year: "numeric",
-          })}
-        </>
-      ) : (
-        <>
-          <span className="font-semibold mr-1">Taylor Nation Timeline:</span>
-          {torontoDate.toLocaleDateString("en-US", {
-            month: "short",
-            day: "2-digit",
-            year: "numeric",
-          })}
-        </>
-      )}
-    </Button>
-
-    {/* Helper text under the button, mirroring desktop copy */}
-    <p className="mt-2 text-[11px] sm:text-xs text-[#6b7db3] leading-snug">
-      {isTorontoMode
-        ? "TN Timeline Mode"
-        : "Click to view events on this day on Taylor Nation's alternate timeline."}
-      <button
-        type="button"
-        onClick={() => setShowTNInfo(true)}
-        className="inline-flex items-center ml-1 text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
-      >
-        <HelpCircle size={12} className="mr-0.5" />
-        What is this?
-      </button>
-    </p>
-  </div>
-</div>
-
-    {/* TN box – desktop: compact TN control */}
-<div className="hidden lg:block absolute right-6 top-1/2 -translate-y-1/2">
-  <div className="bg-white/90 border border-[#e6d2e1] rounded-2xl shadow-sm px-4 py-3 max-w-xs">
-    {/* Primary action on top – shows TN date directly */}
-    <Button
-      variant="outline"
-      className="
-        rounded-xl px-3 py-1.5
-        text-xs md:text-sm font-medium
-        border-[#b66b6b] text-[#8e3e3e]
-        bg-white/95 hover:bg-[#fbeff7]
-        w-full break-words whitespace-normal
-      "
-      onClick={() => {
-        if (isTorontoMode) {
-          const today = new Date()
-          setCurrentYear(today.getFullYear())
-          setCurrentMonth(today.getMonth() + 1)
-          setCurrentDay(today.getDate())
-          setIsTorontoMode(false)
-        } else {
-          setCurrentYear(torontoDate.getFullYear())
-          setCurrentMonth(torontoDate.getMonth() + 1)
-          setCurrentDay(torontoDate.getDate())
-          setIsTorontoMode(true)
-        }
-      }}
-    >
-      {isTorontoMode ? (
-  <>
-    <span className="font-semibold mr-1">← Return to Today:</span>
-    {new Date().toLocaleDateString("en-US", {
-      month: "short",
-      day: "2-digit",
-      year: "numeric",
-    })}
-  </>
-) : (
-  <>
-    <span className="font-semibold mr-1">Taylor Nation Timeline:</span>
-    {torontoDate.toLocaleDateString("en-US", {
-      month: "short",
-      day: "2-digit",
-      year: "numeric",
-    })}
-  </>
-)}
-    </Button>
-
-    {/* Short, more readable helper text */}
-    <p className="mt-2 text-xs md:text-sm text-[#5c678f] leading-snug">
-  {isTorontoMode ? (
-    <>TN Timeline Mode</>
-  ) : (
-    <>Click to view events on this day on Taylor Nation's alternate timeline.</>
-  )}
-
-  <button
-    type="button"
-    onClick={() => setShowTNInfo(true)}
-    className="inline-flex items-center ml-1 text-[11px] md:text-xs text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
-  >
-    <HelpCircle size={12} className="mr-0.5" />
-    What is this?
-  </button>
-</p>
-  </div>
-</div>
-</div>
-
-{/* 🌟 Global fixed-date holiday badge + Event Counter */}
-<div className="w-full">
-  {/* MOBILE holiday pill – centered under date nav */}
-  {hasGlobalHoliday && (
-    <div className="md:hidden flex justify-center mt-2 mb-0">
-      <span
-        className="
-          inline-flex items-center
-          px-4 py-1.5
-          rounded-full
-          text-sm font-semibold
-          bg-[#fbeff7]
-          text-[#8e3e3e]
-          border border-[#e3b0b0]
-          shadow-sm
-          max-w-[90%]
-        "
-      >
-        <span className="mr-2 text-base">
-          {getHolidayEmoji(globalHolidayTagsForDay[0])}
-        </span>
-        {globalHolidayTagsForDay[0]}
-      </span>
-    </div>
-  )}
-
-  {/* DESKTOP holiday pill – positioned to match timeline cards */}
-  {hasGlobalHoliday && (
-    <div className="hidden md:block">
-      <div className="relative">
-        {/* Position badge to match timeline cards */}
-        <div className="absolute left-1/4 -translate-x-1/4">
-          <span
-            className="
-              inline-flex items-center
-              px-4 py-1.5
-              rounded-full
-              text-sm font-semibold
-              bg-[#fbeff7]
-              text-[#8e3e3e]
-              border border-[#e3b0b0]
-              shadow-sm
-              whitespace-nowrap
-            "
-          >
-            <span className="mr-2 text-base">
-              {getHolidayEmoji(globalHolidayTagsForDay[0])}
-            </span>
-            {globalHolidayTagsForDay[0]}
-          </span>
-        </div>
-      </div>
-    </div>
-  )}
-
-    {/* Event Counter – balanced spacing */}
-  <div
-  className="flex justify-center mt-3 md:mt-3 mb-2 flex-shrink-0"
->
-    <div
-      className="
-        event-counter-pill
-        bg-white rounded-full px-2 sm:px-3 md:px-4 py-1
-        border border-[#b66b6b] shadow-sm
-      "
-    >
-      <div className="flex items-center gap-1.5">
-        <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse" />
-
-        <span className="event-counter-text text-[#8e3e3e] text-xs md:text-sm font-medium">
-          {isLoading
-            ? "Loading events..."
-            : `${records.length} ${
-                records.length === 1 ? "Event" : "Events"
-              } Found${isTorontoMode ? " (TN Timeline)" : ""}`}
-        </span>
-
-        <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse" />
-      </div>
-    </div>
-  </div>
-</div>
-        </div>
-
-        {/* Mobile Timeline - Vertical line behind cards */}
-<div className="md:hidden mt-2 px-4">
-  <div className="relative">
-    {/* Background line + top & bottom bubbles */}
-    <div className="pointer-events-none absolute inset-0 flex justify-center z-0">
-      {/* Main vertical line */}
-      <div className="w-[2px] h-full bg-[#8a9ad4]" />
-
-      {/* TOP bubble (inside container, not negative) */}
-      <div className="absolute left-1/2 -translate-x-1/2 top-0 w-7 h-7 rounded-full bg-[#6B78B4]" />
-
-      {/* BOTTOM bubble */}
-      <div className="absolute left-1/2 -translate-x-1/2 -bottom-3 w-7 h-7 rounded-full bg-[#6B78B4]" />
-    </div>
-
-    {/* Cards centered over the line, above the background */}
-    <div className="relative w-full max-w-xl mx-auto z-10 pt-4">
-      {records.map((record, index) => (
-        <div key={`mobile-${record.id}`} className="relative mb-6">
-          {/* Connecting line from card to center line */}
-          <div className="absolute left-1/2 top-6 w-6 h-[2px] bg-[#8a9ad4] -translate-x-1/2" />
-
-          <TimelineCard record={record} index={index} />
-        </div>
-      ))}
-    </div>
-  </div>
-</div>
-
-          {/* Desktop Timeline */}
-          <div className="hidden md:block min-h-0">
-            <div className="relative flex justify-center">
-              {/* Center line - spans full height */}
-              <div className="absolute w-[2px] flex flex-col items-center h-full">
-                <div className="w-[5px] bg-[#8a9ad4] h-full"></div>
-                <div className="absolute left-1/2 -translate-x-1/2 top-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
-                <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
+                <button
+                  onClick={() => setShowCalendar(true)}
+                  className="
+                    absolute right-1 sm:right-1.5
+                    top-1/2 -translate-y-1/2
+                    bg-white rounded-full p-0.5
+                    shadow-sm border border-[#b66b6b]
+                    hover:bg-[#f8d7da] transition-colors
+                  "
+                  title="Open calendar"
+                >
+                  <Calendar size={12} className="text-[#8e3e3e]" />
+                </button>
               </div>
 
-              {/* Desktop Timeline Items */}
-              <div className="relative left-[37.5%] -translate-x-1/4 w-3/4">
-                {records.map((record, index) => (
-                  <div
-                    key={`desktop-${record.id}`}
-                    className="relative transition-all duration-300"
-                    style={{
-                      marginTop: index === 0 ? "0" : "50px",
-                    }}
+              <Button
+                variant="secondary"
+                className="
+                  rounded-full h-7 md:h-8 px-2 md:px-3
+                  text-[10px] sm:text-xs
+                  flex items-center justify-center gap-1 min-w-[80px]
+                "
+                onClick={handleNextDay}
+              >
+                <span className="hidden sm:inline">Next</span>
+                <span className="sm:hidden">Next</span>
+                <ChevronRight size={10} />
+              </Button>
+            </div>
+
+            {/* TN box – mobile */}
+            <div className="mt-2 w-full max-w-xs mx-auto md:block lg:hidden">
+              <div className="bg-white/80 border border-[#e6d2e1] rounded-xl shadow-sm px-2 py-1.5">
+                <Button
+                  variant="outline"
+                  className="
+                    rounded-xl px-2 py-1
+                    text-xs font-medium
+                    border-[#b66b6b] text-[#8e3e3e]
+                    bg-white/90 hover:bg-[#fbeff7]
+                    w-full break-words whitespace-normal
+                  "
+                  onClick={() => {
+                    if (isTorontoMode) {
+                      const today = new Date()
+                      setCurrentYear(today.getFullYear())
+                      setCurrentMonth(today.getMonth() + 1)
+                      setCurrentDay(today.getDate())
+                      setIsTorontoMode(false)
+                    } else {
+                      setCurrentYear(torontoDate.getFullYear())
+                      setCurrentMonth(torontoDate.getMonth() + 1)
+                      setCurrentDay(torontoDate.getDate())
+                      setIsTorontoMode(true)
+                    }
+                  }}
+                >
+                  {isTorontoMode ? (
+                    <>
+                      <span className="font-semibold mr-1">← Today:</span>
+                      {new Date().toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "2-digit",
+                      })}
+                    </>
+                  ) : (
+                    <>
+                      <span className="font-semibold mr-1">TN Timeline:</span>
+                      {torontoDate.toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "2-digit",
+                        year: "numeric",
+                      })}
+                    </>
+                  )}
+                </Button>
+
+                <p className="mt-1 text-[10px] text-[#6b7db3] leading-snug">
+                  {isTorontoMode
+                    ? "TN Timeline Mode"
+                    : "View events on Taylor Nation's alternate timeline."}
+                  <button
+                    type="button"
+                    onClick={() => setShowTNInfo(true)}
+                    className="inline-flex items-center ml-0.5 text-[9px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
                   >
-                    <div className="transform scale-[0.90] origin-top -translate-x-1/4">
-                      <TimelineCard record={record} index={index} />
-                    </div>
-                  </div>
-                ))}
+                    <HelpCircle size={10} className="mr-0.5" />
+                    What is this?
+                  </button>
+                </p>
+              </div>
+            </div>
+
+            {/* TN box – desktop */}
+            <div className="hidden lg:block absolute right-4 top-1/2 -translate-y-1/2">
+              <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 max-w-xs">
+                <Button
+                  variant="outline"
+                  className="
+                    rounded-xl px-2 py-1
+                    text-xs font-medium
+                    border-[#b66b6b] text-[#8e3e3e]
+                    bg-white/95 hover:bg-[#fbeff7]
+                    w-full break-words whitespace-normal
+                  "
+                  onClick={() => {
+                    if (isTorontoMode) {
+                      const today = new Date()
+                      setCurrentYear(today.getFullYear())
+                      setCurrentMonth(today.getMonth() + 1)
+                      setCurrentDay(today.getDate())
+                      setIsTorontoMode(false)
+                    } else {
+                      setCurrentYear(torontoDate.getFullYear())
+                      setCurrentMonth(torontoDate.getMonth() + 1)
+                      setCurrentDay(torontoDate.getDate())
+                      setIsTorontoMode(true)
+                    }
+                  }}
+                >
+                  {isTorontoMode ? (
+                    <>
+                      <span className="font-semibold mr-1">← Today:</span>
+                      {new Date().toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "2-digit",
+                      })}
+                    </>
+                  ) : (
+                    <>
+                      <span className="font-semibold mr-1">TN Timeline:</span>
+                      {torontoDate.toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "2-digit",
+                        year: "numeric",
+                      })}
+                    </>
+                  )}
+                </Button>
+
+                <p className="mt-1 text-xs text-[#5c678f] leading-snug">
+                  {isTorontoMode
+                    ? "TN Timeline Mode"
+                    : "View events on Taylor Nation's alternate timeline."}
+                  <button
+                    type="button"
+                    onClick={() => setShowTNInfo(true)}
+                    className="inline-flex items-center ml-0.5 text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
+                  >
+                    <HelpCircle size={10} className="mr-0.5" />
+                    What is this?
+                  </button>
+                </p>
               </div>
             </div>
           </div>
 
-        {/* View Full Timeline Button */}
-        <div className="flex justify-center mt-2 mb-2 flex-shrink-0">
+          {/* 🌟 Global fixed-date holiday badge + Event Counter - COMPACT */}
+          <div className="w-full">
+            {/* MOBILE holiday pill */}
+            {hasGlobalHoliday && (
+              <div className="md:hidden flex justify-center mt-1 mb-0">
+                <span
+                  className="
+                    inline-flex items-center
+                    px-3 py-1
+                    rounded-full
+                    text-xs font-semibold
+                    bg-[#fbeff7]
+                    text-[#8e3e3e]
+                    border border-[#e3b0b0]
+                    shadow-sm
+                    max-w-[85%]
+                  "
+                >
+                  <span className="mr-1 text-sm">
+                    {getHolidayEmoji(globalHolidayTagsForDay[0])}
+                  </span>
+                  {globalHolidayTagsForDay[0]}
+                </span>
+              </div>
+            )}
+
+            {/* DESKTOP holiday pill */}
+            {hasGlobalHoliday && (
+              <div className="hidden md:block">
+                <div className="relative">
+                  <div className="absolute left-1/4 -translate-x-1/4">
+                    <span
+                      className="
+                        inline-flex items-center
+                        px-3 py-1
+                        rounded-full
+                        text-xs font-semibold
+                        bg-[#fbeff7]
+                        text-[#8e3e3e]
+                        border border-[#e3b0b0]
+                        shadow-sm
+                        whitespace-nowrap
+                      "
+                    >
+                      <span className="mr-1 text-sm">
+                        {getHolidayEmoji(globalHolidayTagsForDay[0])}
+                      </span>
+                      {globalHolidayTagsForDay[0]}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Event Counter - COMPACT */}
+            <div className="flex justify-center mt-1 mb-1 flex-shrink-0">
+              <div
+                className="
+                  event-counter-pill
+                  bg-white rounded-full px-2 py-0.5
+                  border border-[#b66b6b] shadow-sm
+                "
+              >
+                <div className="flex items-center gap-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse" />
+                  <span className="event-counter-text text-[#8e3e3e] text-xs font-medium">
+                    {isLoading
+                      ? "Loading events..."
+                      : `${records.length} ${
+                          records.length === 1 ? "Event" : "Events"
+                        } Found${isTorontoMode ? " (TN)" : ""}`}
+                  </span>
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Timeline */}
+        <div className="md:hidden mt-1 px-3">
+          <div className="relative">
+            <div className="pointer-events-none absolute inset-0 flex justify-center z-0">
+              <div className="w-[2px] h-full bg-[#8a9ad4]" />
+              <div className="absolute left-1/2 -translate-x-1/2 top-0 w-6 h-6 rounded-full bg-[#6B78B4]" />
+              <div className="absolute left-1/2 -translate-x-1/2 -bottom-2 w-6 h-6 rounded-full bg-[#6B78B4]" />
+            </div>
+
+            <div className="relative w-full max-w-xl mx-auto z-10 pt-2">
+              {records.map((record, index) => (
+                <div key={`mobile-${record.id}`} className="relative mb-4">
+                  <div className="absolute left-1/2 top-4 w-6 h-[2px] bg-[#8a9ad4] -translate-x-1/2" />
+                  <TimelineCard record={record} index={index} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop Timeline */}
+        <div className="hidden md:block min-h-0">
+          <div className="relative flex justify-center">
+            <div className="absolute w-[2px] flex flex-col items-center h-full">
+              <div className="w-[5px] bg-[#8a9ad4] h-full"></div>
+              <div className="absolute left-1/2 -translate-x-1/2 top-0 w-6 h-6 rounded-full bg-[#6B78B4]"></div>
+              <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-6 h-6 rounded-full bg-[#6B78B4]"></div>
+            </div>
+
+            <div className="relative left-[37.5%] -translate-x-1/4 w-3/4">
+              {records.map((record, index) => (
+                <div
+                  key={`desktop-${record.id}`}
+                  className="relative transition-all duration-300"
+                  style={{
+                    marginTop: index === 0 ? "0" : "40px",
+                  }}
+                >
+                  <div className="transform scale-[0.90] origin-top -translate-x-1/4">
+                    <TimelineCard record={record} index={index} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* View Full Timeline Button - COMPACT */}
+        <div className="flex justify-center mt-1 mb-1 flex-shrink-0">
           <Button
             variant="secondary"
-            className="rounded-full px-5 py-1.5 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg"
+            className="rounded-full px-4 py-1 text-sm w-full max-w-xs sm:max-w-sm"
             onClick={() => {
               navigate("/posts")
               window.scrollTo(0, 0)
@@ -1156,8 +1119,8 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
             View Full Timeline
           </Button>
         </div>
-        
-                {/* Modals */}
+
+        {/* Modals */}
         <CalendarModal />
         <TNInfoModal />
       </div>
