@@ -705,7 +705,7 @@ const TimelineCard = ({ record, index }) => {
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   )
 }
 const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
