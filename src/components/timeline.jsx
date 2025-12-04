@@ -863,11 +863,11 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
     </Button>
   </div>
 
-  {/* TN box - Desktop: positioned lower and aligned with event cards */}
+  {/* TN box - Desktop: positioned to right, Mobile: centered */}
   <div className="
-    mt-2 
-    md:mt-3 md:mx-auto md:max-w-xs
-    lg:mt-0 lg:absolute lg:left-[65%] lg:top-[calc(100%+5px)]
+    mt-2 mx-auto
+    md:mt-3 md:max-w-xs
+    lg:mt-0 lg:absolute lg:right-0 lg:top-[5px]
   ">
     <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 w-56">
       <Button
