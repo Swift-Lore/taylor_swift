@@ -537,14 +537,23 @@ const handlePreviousDay = () => {
         )
         
         // Create a map of dates that have events
-        const eventsMap = {}
-        response.data.records?.forEach(record => {
-          if (record.fields.DATE) {
-            const date = new Date(record.fields.DATE)
-            const dateKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
-            eventsMap[dateKey] = true
-          }
-        })
+const eventsMap = {}
+response.data.records?.forEach((record) => {
+  const raw = record.fields.DATE
+  if (!raw) return
+
+  // Handle "YYYY-MM-DD" or "YYYY-MM-DDTHH:MM:SS..."
+  const [datePart] = raw.split("T")
+  const [yearStr, monthStr, dayStr] = datePart.split("-")
+  if (!yearStr || !monthStr || !dayStr) return
+
+  const year = Number(yearStr)
+  const month = Number(monthStr) // 1–12
+  const day = Number(dayStr)
+
+  const dateKey = `${year}-${month}-${day}`
+  eventsMap[dateKey] = true
+})
         
         setDateEventsMap(prev => ({ ...prev, ...eventsMap }))
       } catch (error) {
