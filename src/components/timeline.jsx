@@ -926,8 +926,8 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               </div>
             </div>
 
-                        {/* TN box - Desktop (absolutely positioned, next to Next button) */}
-<div className="hidden lg:block lg:absolute lg:right-4 lg:top-0">
+                        {/* TN box - Desktop (pulled in next to Next button) */}
+<div className="hidden lg:block lg:absolute lg:right-0 lg:top-0">
   <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 w-56">
     <Button
       variant="outline"
