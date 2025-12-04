@@ -510,19 +510,19 @@ const handlePreviousDay = () => {
 {holidayTags.length > 0 && (
   <>
     {/* MOBILE: centered under the date, in normal flow */}
-    <div className="mt-5 mb-1 flex justify-center md:hidden">
-      <div className="flex flex-wrap gap-1 justify-center">
-        {holidayTags.map((holiday, index) => (
-          <span
-            key={index}
-            className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#fbeff7] text-[#8e3e3e] border border-[#e3b0b0] shadow-sm"
-          >
-            <span className="mr-1">{getHolidayEmoji(holiday)}</span>
-            <span className="truncate max-w-[110px]">{holiday}</span>
-          </span>
-        ))}
-      </div>
-    </div>
+<div className="mt-2 mb-1 flex justify-center md:hidden">
+  <div className="flex flex-wrap gap-1 justify-center">
+    {holidayTags.map((holiday, index) => (
+      <span
+        key={index}
+        className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#fbeff7] text-[#8e3e3e] border border-[#e3b0b0] shadow-sm"
+      >
+        <span className="mr-1">{getHolidayEmoji(holiday)}</span>
+        <span className="truncate max-w-[110px]">{holiday}</span>
+      </span>
+    ))}
+  </div>
+</div>
 
     {/* DESKTOP: stays in top-right, but larger */}
     <div className="hidden md:flex absolute top-3 right-5 flex-wrap gap-1 justify-end max-w-[55%]">
