@@ -14,11 +14,28 @@ const REAL_ANCHOR_DATE = new Date(2024, 10, 22) // month is 0-based → 10 = Nov
 const ALT_ANCHOR_DATE  = new Date(2019, 3, 25)  // 3 = April
 
 function getTorontoTimelineDate(date) {
+  console.log("=== Toronto Date Calculation ===")
+  console.log("Input date:", date)
+  console.log("Input date string:", date.toDateString())
+  
   // Normalize to midnight to avoid timezone issues
   const base = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+  console.log("Normalized base:", base.toDateString())
+  
+  console.log("REAL_ANCHOR_DATE:", REAL_ANCHOR_DATE.toDateString())
+  console.log("ALT_ANCHOR_DATE:", ALT_ANCHOR_DATE.toDateString())
+  
   const diffMs = base.getTime() - REAL_ANCHOR_DATE.getTime()
+  console.log("Difference in ms:", diffMs)
+  console.log("Difference in days:", diffMs / (1000 * 60 * 60 * 24))
+  
   const altTime = ALT_ANCHOR_DATE.getTime() + diffMs
-  return new Date(altTime)
+  const result = new Date(altTime)
+  
+  console.log("Result date:", result.toDateString())
+  console.log("=== End Calculation ===")
+  
+  return result
 }
 
 export default function Timeline() {
@@ -717,19 +734,26 @@ const handlePreviousDay = () => {
           bg-white/90 hover:bg-[#fbeff7]
         "
         onClick={() => {
-          if (isTorontoMode) {
-            const today = new Date()
-            setCurrentYear(today.getFullYear())
-            setCurrentMonth(today.getMonth() + 1)
-            setCurrentDay(today.getDate())
-            setIsTorontoMode(false)
-          } else {
-            setCurrentYear(torontoDate.getFullYear())
-            setCurrentMonth(torontoDate.getMonth() + 1)
-            setCurrentDay(torontoDate.getDate())
-            setIsTorontoMode(true)
-          }
-        }}
+  console.log("=== Toronto Button Click (Mobile) ===")
+  console.log("displayDate:", displayDate)
+  console.log("displayDate year:", displayDate.getFullYear())
+  console.log("torontoDate:", torontoDate)
+  console.log("torontoDate year:", torontoDate.getFullYear())
+  console.log("=== End ===")
+  
+  if (isTorontoMode) {
+    const today = new Date()
+    setCurrentYear(today.getFullYear())
+    setCurrentMonth(today.getMonth() + 1)
+    setCurrentDay(today.getDate())
+    setIsTorontoMode(false)
+  } else {
+    setCurrentYear(torontoDate.getFullYear())
+    setCurrentMonth(torontoDate.getMonth() + 1)
+    setCurrentDay(torontoDate.getDate())
+    setIsTorontoMode(true)
+  }
+}}
       >
         {isTorontoMode ? (
           <>
@@ -780,19 +804,26 @@ const handlePreviousDay = () => {
         bg-white/90 hover:bg-[#fbeff7]
       "
       onClick={() => {
-        if (isTorontoMode) {
-          const today = new Date()
-          setCurrentYear(today.getFullYear())
-          setCurrentMonth(today.getMonth() + 1)
-          setCurrentDay(today.getDate())
-          setIsTorontoMode(false)
-        } else {
-          setCurrentYear(torontoDate.getFullYear())
-          setCurrentMonth(torontoDate.getMonth() + 1)
-          setCurrentDay(torontoDate.getDate())
-          setIsTorontoMode(true)
-        }
-      }}
+  console.log("=== Toronto Button Click (Mobile) ===")
+  console.log("displayDate:", displayDate)
+  console.log("displayDate year:", displayDate.getFullYear())
+  console.log("torontoDate:", torontoDate)
+  console.log("torontoDate year:", torontoDate.getFullYear())
+  console.log("=== End ===")
+  
+  if (isTorontoMode) {
+    const today = new Date()
+    setCurrentYear(today.getFullYear())
+    setCurrentMonth(today.getMonth() + 1)
+    setCurrentDay(today.getDate())
+    setIsTorontoMode(false)
+  } else {
+    setCurrentYear(torontoDate.getFullYear())
+    setCurrentMonth(torontoDate.getMonth() + 1)
+    setCurrentDay(torontoDate.getDate())
+    setIsTorontoMode(true)
+  }
+}}
     >
       {isTorontoMode ? (
         <>
