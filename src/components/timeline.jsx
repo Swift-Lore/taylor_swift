@@ -728,11 +728,11 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
     <section className="w-full bg-[#e8ecf7] py-2 px-2 md:px-10 flex flex-col min-h-0">
       <div className="container mx-auto flex flex-col min-h-0 flex-1">
         {/* Homepage Intro for SEO / AdSense */}
-        <div className="max-w-3xl mx-auto mt-4 mb-8 px-4">
-          <div className="bg-white/70 border border-[#e3d5dd] rounded-2xl shadow-sm px-5 py-4 md:px-8 md:py-5 text-center">
-            <h2 className="text-xl md:text-2xl font-semibold text-[#8e3e3e] mb-2">
-              Swift Lore: Explore Taylor Swift's Complete Career Timeline
-            </h2>
+        <div className="max-w-3xl mx-auto mt-2 mb-4 px-4">
+  <div className="bg-white/70 border border-[#e3d5dd] rounded-2xl shadow-sm px-4 py-3 md:px-6 md:py-4 text-center">
+    <h2 className="text-lg md:text-xl font-semibold text-[#8e3e3e] mb-1.5">
+      Swift Lore: Explore Taylor Swift's Complete Career Timeline
+    </h2>
             <p className="text-[#6b7db3] text-sm md:text-base leading-relaxed">
   Swift Lore is an independent, fan-run research archive documenting Taylor
   Swift&apos;s career from her earliest performances to the present day.
@@ -748,12 +748,12 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
         </div>
 
                 {/* ON THIS DAY Section */}
-        <div className="text-center mb-3 flex-shrink-0">
+        <div className="text-center mb-2 flex-shrink-0">
           {/* Glowy header card */}
-          <div className="relative w-full mb-3 md:mb-4 px-2 md:px-5">
+          <div className="relative w-full mb-2 md:mb-3 px-2 md:px-4">
             <div
               className="
-                relative w-full px-4 md:px-6 py-4 md:py-5
+                relative w-full px-3 md:px-5 py-3 md:py-4
                 bg-gradient-to-b from-[#fdf6fb] via-[#fbeff7] to-[#f6e5f0]
                 rounded-3xl
                 border border-[#e6d2e1]
