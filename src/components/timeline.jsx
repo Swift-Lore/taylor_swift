@@ -926,16 +926,16 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               </div>
             </div>
 
-            {/* FIXED: TN box positioning - Desktop (tablet) */}
-            <div className="hidden md:block lg:hidden mt-2">
-              <div className="bg-white/80 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 max-w-md mx-auto">
+                        {/* FIXED: TN box positioning - Desktop (large screens) - MORE COMPACT AND HIGHER */}
+            <div className="hidden lg:block absolute right-0 top-[-10px]">
+              <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 max-w-xs">
                 <Button
                   variant="outline"
                   className="
-                    rounded-xl px-3 py-1
+                    rounded-xl px-2 py-1
                     text-xs font-medium
                     border-[#b66b6b] text-[#8e3e3e]
-                    bg-white/90 hover:bg-[#fbeff7]
+                    bg-white/95 hover:bg-[#fbeff7]
                     w-full break-words whitespace-normal
                   "
                   onClick={() => {
@@ -955,16 +955,15 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
                 >
                   {isTorontoMode ? (
                     <>
-                      <span className="font-semibold mr-1">← Return to Today:</span>
+                      <span className="font-semibold mr-1">← Today:</span>
                       {new Date().toLocaleDateString("en-US", {
                         month: "short",
                         day: "2-digit",
-                        year: "numeric",
                       })}
                     </>
                   ) : (
                     <>
-                      <span className="font-semibold mr-1">Taylor Nation Timeline:</span>
+                      <span className="font-semibold mr-1">TN Timeline:</span>
                       {torontoDate.toLocaleDateString("en-US", {
                         month: "short",
                         day: "2-digit",
@@ -974,14 +973,15 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
                   )}
                 </Button>
 
-                <p className="mt-1 text-xs text-[#5c678f] leading-snug">
+                {/* SINGLE LINE with What is this? */}
+                <p className="mt-1 text-xs text-[#5c678f] leading-snug flex items-center">
                   {isTorontoMode
                     ? "TN Timeline Mode"
-                    : "Click to view events on this day on Taylor Nation's alternate timeline."}
+                    : "View events on Taylor Nation's alternate timeline."}
                   <button
                     type="button"
                     onClick={() => setShowTNInfo(true)}
-                    className="inline-flex items-center ml-1 text-[11px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
+                    className="inline-flex items-center ml-1 text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e] whitespace-nowrap"
                   >
                     <HelpCircle size={10} className="mr-0.5" />
                     What is this?
