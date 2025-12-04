@@ -864,54 +864,55 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
       </Button>
     </div>
 
-    {/* COMPACT Taylor Nation box */}
+    {/* COMPACT Taylor Nation box - Same text, narrower */}
     <div className="lg:w-auto">
-      <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-1.5 w-52">
-        <div className="flex flex-col items-center">
-          <Button
-            variant="outline"
-            className="
-              rounded-lg px-2 py-1
-              text-xs font-medium
-              border-[#b66b6b] text-[#8e3e3e]
-              bg-white/95 hover:bg-[#fbeff7]
-              w-full
-            "
-            onClick={() => {
-              if (isTorontoMode) {
-                const today = new Date()
-                setCurrentYear(today.getFullYear())
-                setCurrentMonth(today.getMonth() + 1)
-                setCurrentDay(today.getDate())
-                setIsTorontoMode(false)
-              } else {
-                setCurrentYear(torontoDate.getFullYear())
-                setCurrentMonth(torontoDate.getMonth() + 1)
-                setCurrentDay(torontoDate.getDate())
-                setIsTorontoMode(true)
-              }
-            }}
+      <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 w-60">
+        <Button
+          variant="outline"
+          className="
+            rounded-xl px-2 py-1
+            text-xs font-medium
+            border-[#b66b6b] text-[#8e3e3e]
+            bg-white/95 hover:bg-[#fbeff7]
+            w-full break-words whitespace-normal
+            flex flex-col items-center text-center
+          "
+          onClick={() => {
+            if (isTorontoMode) {
+              const today = new Date()
+              setCurrentYear(today.getFullYear())
+              setCurrentMonth(today.getMonth() + 1)
+              setCurrentDay(today.getDate())
+              setIsTorontoMode(false)
+            } else {
+              setCurrentYear(torontoDate.getFullYear())
+              setCurrentMonth(torontoDate.getMonth() + 1)
+              setCurrentDay(torontoDate.getDate())
+              setIsTorontoMode(true)
+            }
+          }}
+        >
+          <span className="font-semibold">
+            Taylor Nation Timeline Date:
+          </span>
+          <span className="text-[11px] mt-0.5">
+            {torontoDate.toLocaleDateString("en-US", {
+              month: "short",
+              day: "2-digit",
+              year: "numeric",
+            })}
+          </span>
+        </Button>
+
+        <div className="mt-1 flex justify-end">
+          <button
+            type="button"
+            onClick={() => setShowTNInfo(true)}
+            className="inline-flex items-center text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e] whitespace-nowrap"
           >
-            <span className="font-semibold">TN Timeline</span>
-          </Button>
-          
-          <div className="mt-1 flex items-center justify-between w-full">
-            <span className="text-[10px] text-[#5c678f] truncate">
-              {torontoDate.toLocaleDateString("en-US", {
-                month: "short",
-                day: "2-digit",
-                year: "numeric",
-              })}
-            </span>
-            <button
-              type="button"
-              onClick={() => setShowTNInfo(true)}
-              className="inline-flex items-center text-[9px] text-[#b66b6b] hover:text-[#8e3e3e]"
-              title="What is this?"
-            >
-              <HelpCircle size={10} />
-            </button>
-          </div>
+            <HelpCircle size={10} className="mr-0.5" />
+            What is this?
+          </button>
         </div>
       </div>
     </div>
