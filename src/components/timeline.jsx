@@ -926,70 +926,72 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               </div>
             </div>
 
-                        {/* FIXED: TN box positioning - Desktop (large screens) - MORE COMPACT AND HIGHER */}
-            <div className="hidden lg:block absolute right-0 top-[-10px]">
-              <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 max-w-xs">
-                <Button
-                  variant="outline"
-                  className="
-                    rounded-xl px-2 py-1
-                    text-xs font-medium
-                    border-[#b66b6b] text-[#8e3e3e]
-                    bg-white/95 hover:bg-[#fbeff7]
-                    w-full break-words whitespace-normal
-                  "
-                  onClick={() => {
-                    if (isTorontoMode) {
-                      const today = new Date()
-                      setCurrentYear(today.getFullYear())
-                      setCurrentMonth(today.getMonth() + 1)
-                      setCurrentDay(today.getDate())
-                      setIsTorontoMode(false)
-                    } else {
-                      setCurrentYear(torontoDate.getFullYear())
-                      setCurrentMonth(torontoDate.getMonth() + 1)
-                      setCurrentDay(torontoDate.getDate())
-                      setIsTorontoMode(true)
-                    }
-                  }}
-                >
-                  {isTorontoMode ? (
-                    <>
-                      <span className="font-semibold mr-1">← Today:</span>
-                      {new Date().toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "2-digit",
-                      })}
-                    </>
-                  ) : (
-                    <>
-                      <span className="font-semibold mr-1">TN Timeline:</span>
-                      {torontoDate.toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "2-digit",
-                        year: "numeric",
-                      })}
-                    </>
-                  )}
-                </Button>
+                        {/* FIXED: TN box positioning - Desktop (large screens) - MORE COMPACT AND CLOSER */}
+<div className="hidden lg:block absolute right-4 top-[-10px]">
+  <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 w-48">
+    <Button
+      variant="outline"
+      className="
+        rounded-xl px-2 py-1
+        text-xs font-medium
+        border-[#b66b6b] text-[#8e3e3e]
+        bg-white/95 hover:bg-[#fbeff7]
+        w-full break-words whitespace-normal
+      "
+      onClick={() => {
+        if (isTorontoMode) {
+          const today = new Date()
+          setCurrentYear(today.getFullYear())
+          setCurrentMonth(today.getMonth() + 1)
+          setCurrentDay(today.getDate())
+          setIsTorontoMode(false)
+        } else {
+          setCurrentYear(torontoDate.getFullYear())
+          setCurrentMonth(torontoDate.getMonth() + 1)
+          setCurrentDay(torontoDate.getDate())
+          setIsTorontoMode(true)
+        }
+      }}
+    >
+      {isTorontoMode ? (
+        <>
+          <span className="font-semibold mr-1">← Today:</span>
+          {new Date().toLocaleDateString("en-US", {
+            month: "short",
+            day: "2-digit",
+          })}
+        </>
+      ) : (
+        <>
+          <span className="font-semibold mr-1">TN Timeline:</span>
+          {torontoDate.toLocaleDateString("en-US", {
+            month: "short",
+            day: "2-digit",
+            year: "numeric",
+          })}
+        </>
+      )}
+    </Button>
 
-                {/* SINGLE LINE with What is this? */}
-                <p className="mt-1 text-xs text-[#5c678f] leading-snug flex items-center">
-                  {isTorontoMode
-                    ? "TN Timeline Mode"
-                    : "View events on Taylor Nation's alternate timeline."}
-                  <button
-                    type="button"
-                    onClick={() => setShowTNInfo(true)}
-                    className="inline-flex items-center ml-1 text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e] whitespace-nowrap"
-                  >
-                    <HelpCircle size={10} className="mr-0.5" />
-                    What is this?
-                  </button>
-                </p>
-              </div>
-            </div>
-          </div>
+    {/* MORE COMPACT: Single line with icon before text */}
+    <div className="mt-1 flex items-center justify-between">
+      <p className="text-xs text-[#5c678f] leading-tight">
+        {isTorontoMode
+          ? "TN Timeline Mode"
+          : "Taylor Nation's alternate timeline"}
+      </p>
+      <button
+        type="button"
+        onClick={() => setShowTNInfo(true)}
+        className="inline-flex items-center text-[10px] text-[#b66b6b] hover:text-[#8e3e3e] ml-1"
+        title="What is this?"
+      >
+        <HelpCircle size={12} />
+      </button>
+    </div>
+  </div>
+</div>
+</div> 
 
           {/* 🌟 Global fixed-date holiday badge + Event Counter */}
           <div className="w-full mt-2">
