@@ -494,24 +494,57 @@ const handlePreviousDay = () => {
 
     // Map holiday names to emojis
     const getHolidayEmoji = (holiday) => {
-      const name = holiday.toLowerCase()
+  const name = holiday.toLowerCase();
 
-      if (name.includes("halloween")) return "🎃"
-      if (name.includes("christmas") || name.includes("xmas")) return "🎄"
-      if (name.includes("new year")) return "🎆"
-      if (name.includes("valentine")) return "💘"
-      if (name.includes("easter")) return "🐣"
-      if (name.includes("thanksgiving")) return "🦃"
-      if (
-        name.includes("independence") ||
-        name.includes("4th of july") ||
-        name.includes("fourth of july")
-      )
-        return "🎆"
+  // 🌈 Saint Patrick's Day → Clover
+  if (name.includes("patrick")) return "☘️";
 
-      // default
-      return "🎀"
-    }
+  // 🍩 National Donut Day → Donut
+  if (name.includes("donut") || name.includes("doughnut")) return "🍩";
+
+  // 🎂 Any "birthday" → Birthday cake
+  if (name.includes("birthday")) return "🎂";
+
+  // 🇺🇸 American holidays
+  if (
+    name.includes("independence") ||
+    name.includes("memorial day") ||
+    name.includes("labor day")
+  ) {
+    return "🇺🇸";
+  }
+
+  // 🍷 Wine days
+  if (name.includes("red wine") || name.includes("white wine")) return "🍷";
+
+  // 🐍 “Mean Girls Cat” → Snake
+  if (name.includes("mean girls")) return "🐍";
+
+  // 🐱 Any holiday with “cat” in it
+  if (name.includes("cat")) return "🐱";
+
+  // 🎃 Halloween
+  if (name.includes("halloween")) return "🎃";
+
+  // 🎄 Christmas
+  if (name.includes("christmas") || name.includes("xmas")) return "🎄";
+
+  // 🎆 New Years (already handles Independence overlap above)
+  if (name.includes("new year")) return "🎆";
+
+  // 💘 Valentine’s Day
+  if (name.includes("valentine")) return "💘";
+
+  // 🐣 Easter
+  if (name.includes("easter")) return "🐣";
+
+  // 🦃 Thanksgiving
+  if (name.includes("thanksgiving")) return "🦃";
+
+  // 🎀 Default
+  return "🎀";
+};
+
 
 
     return (
