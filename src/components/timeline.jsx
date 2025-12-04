@@ -926,9 +926,9 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               </div>
             </div>
 
-                        {/* FIXED: TN box positioning - Desktop (large screens) - MORE COMPACT AND CLOSER */}
-<div className="hidden lg:block absolute right-4 top-[-10px]">
-  <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 w-48">
+                        {/* FIXED: TN box positioning - Desktop (large screens) - BETTER POSITIONING */}
+<div className="hidden lg:block absolute right-[-50px] top-[-10px]">
+  <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 w-56">
     <Button
       variant="outline"
       className="
@@ -973,22 +973,20 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
       )}
     </Button>
 
-    {/* MORE COMPACT: Single line with icon before text */}
-    <div className="mt-1 flex items-center justify-between">
-      <p className="text-xs text-[#5c678f] leading-tight">
-        {isTorontoMode
-          ? "TN Timeline Mode"
-          : "Taylor Nation's alternate timeline"}
-      </p>
+    {/* SINGLE LINE with What is this? */}
+    <p className="mt-1 text-xs text-[#5c678f] leading-snug flex items-center">
+      {isTorontoMode
+        ? "TN Timeline Mode"
+        : "View events on Taylor Nation's alternate timeline."}
       <button
         type="button"
         onClick={() => setShowTNInfo(true)}
-        className="inline-flex items-center text-[10px] text-[#b66b6b] hover:text-[#8e3e3e] ml-1"
-        title="What is this?"
+        className="inline-flex items-center ml-1 text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e] whitespace-nowrap"
       >
-        <HelpCircle size={12} />
+        <HelpCircle size={10} className="mr-0.5" />
+        What is this?
       </button>
-    </div>
+    </p>
   </div>
 </div>
 </div> 
