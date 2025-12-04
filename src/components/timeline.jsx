@@ -547,7 +547,7 @@ const handlePreviousDay = () => {
 </div>
 
         {/* DESKTOP: upper-left, a bit lower to avoid long titles */}
-    <div className="hidden md:flex absolute top-5 left-5 flex-wrap gap-1 justify-start max-w-[55%]">
+        <div className="hidden md:flex absolute top-1 left-3 flex-wrap gap-1 justify-start max-w-[45%]">
       {holidayTags.map((holiday, index) => (
         <span
           key={index}
