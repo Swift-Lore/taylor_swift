@@ -734,10 +734,16 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               Swift Lore: Explore Taylor Swift's Complete Career Timeline
             </h2>
             <p className="text-[#6b7db3] text-sm md:text-base leading-relaxed">
-              A fan-crafted, interactive archive chronicling Taylor Swift's life,
-              releases, and iconic moments. Dive into albums, performances, easter
-              eggs, and the evolution of her artistry, all in one place.
-            </p>
+  Swift Lore is an independent, fan-run research archive documenting Taylor
+  Swift&apos;s career from her earliest performances to the present day.
+  Each entry is tied to a specific date, with context notes and source links.
+</p>
+<p className="text-[#6b7db3] text-sm md:text-base leading-relaxed mt-2">
+  Browse by date, filter events, and follow her journey across albums and
+  eras — from releases and award shows to interviews, paparazzi spots, and
+  deep-cut easter eggs. The timeline currently tracks thousands of verified
+  moments and is updated regularly.
+</p>
           </div>
         </div>
 
