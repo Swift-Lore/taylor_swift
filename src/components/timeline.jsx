@@ -989,30 +989,28 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
 
 {/* 🌟 Global fixed-date holiday badge + Event Counter */}
 <div className="w-full">
-  {/* DESKTOP holiday pill – aligned with LEFT EDGE of event cards */}
+  {/* DESKTOP holiday pill – centered and compact */}
   {hasGlobalHoliday && (
-    <div className="hidden md:block mt-1 mb-0">
-      <div className="relative flex justify-center">
-        {/* This wrapper uses the SAME offset as your desktop cards */}
-        <div className="relative left-[37.5%] -translate-x-1/4 w-3/4">
-          <span
-            className="
-              inline-flex items-center
-              px-4 py-1.5
-              rounded-full
-              text-sm font-semibold
-              bg-[#fbeff7]
-              text-[#8e3e3e]
-              border border-[#e3b0b0]
-              shadow-sm
-            "
-          >
-            <span className="mr-2 text-base">
-              {getHolidayEmoji(globalHolidayTagsForDay[0])}
-            </span>
-            {globalHolidayTagsForDay[0]}
+    <div className="hidden md:flex justify-center mt-1 mb-0">
+      <div className="flex justify-center w-full">
+        <span
+          className="
+            inline-flex items-center
+            px-4 py-1.5
+            rounded-full
+            text-sm font-semibold
+            bg-[#fbeff7]
+            text-[#8e3e3e]
+            border border-[#e3b0b0]
+            shadow-sm
+            max-w-[80%] mx-auto
+          "
+        >
+          <span className="mr-2 text-base">
+            {getHolidayEmoji(globalHolidayTagsForDay[0])}
           </span>
-        </div>
+          {globalHolidayTagsForDay[0]}
+        </span>
       </div>
     </div>
   )}
