@@ -25,14 +25,17 @@ function getTorontoTimelineDate(date) {
   console.log("REAL_ANCHOR_DATE:", REAL_ANCHOR_DATE.toDateString())
   console.log("ALT_ANCHOR_DATE:", ALT_ANCHOR_DATE.toDateString())
   
-  const diffMs = base.getTime() - REAL_ANCHOR_DATE.getTime()
-  console.log("Difference in ms:", diffMs)
-  console.log("Difference in days:", diffMs / (1000 * 60 * 60 * 24))
+  // Calculate difference in DAYS (not milliseconds) to avoid floating point issues
+  const diffTime = base.getTime() - REAL_ANCHOR_DATE.getTime()
+  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24))
+  console.log("Difference in days:", diffDays)
   
-  const altTime = ALT_ANCHOR_DATE.getTime() + diffMs
-  const result = new Date(altTime)
+  // Create result by adding days to ALT_ANCHOR_DATE
+  const result = new Date(ALT_ANCHOR_DATE)
+  result.setDate(result.getDate() + diffDays)
   
   console.log("Result date:", result.toDateString())
+  console.log("Result year:", result.getFullYear())
   console.log("=== End Calculation ===")
   
   return result
