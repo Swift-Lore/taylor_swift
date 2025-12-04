@@ -148,3 +148,61 @@
   background: transparent;
   color: inherit;
 }
+/* FIX: Allow text selection in timeline cards */
+.timeline-card-text {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  cursor: auto !important;
+}
+
+/* Make text elements selectable */
+.timeline-card-text h3,
+.timeline-card-text div:not(.keyword-container) {
+  cursor: text !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
+/* Keywords should remain clickable */
+.keyword-container,
+.keyword-container * {
+  cursor: pointer !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+/* Alternative: Use pointer-events solution */
+.text-selectable-area {
+  pointer-events: none !important;
+}
+
+.text-selectable-area h3,
+.text-selectable-area div:not(.keyword-container) {
+  pointer-events: none !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
+.keyword-container {
+  pointer-events: auto !important;
+}
+
+/* Fix for Link wrapper issue */
+a.timeline-card {
+  text-decoration: none !important;
+  color: inherit !important;
+}
+
+a.timeline-card:focus .timeline-card-text,
+a.timeline-card:active .timeline-card-text {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
+/* Prevent text highlighting from interfering with clicks */
+.no-text-highlight {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
