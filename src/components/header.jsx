@@ -308,52 +308,51 @@ export default function Header() {
               </button>
             </div>
 
-            {/* Home / Eras hero content (search + CTAs) */}
-            {showHero && (
-              <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-3 text-center md:text-left relative z-20">
-                <div className="w-full max-w-xs">
-                  <form onSubmit={handleSearch} className="relative">
-                    <input
-                      type="text"
-                      placeholder="Search events, locations, categories..."
-                      value={searchQuery}
-                      onChange={handleInputChange}
-                      onKeyPress={handleKeyPress}
-                      className="w-full rounded-full py-2 pl-7 pr-4 text-sm bg-white/90 text-gray-800 shadow focus:outline-none focus:ring-2 focus:ring-[#fbb1c3]"
-                    />
-                  </form>
-                </div>
+            // In your Header component, update the home/hero section:
 
-                {/* CTA row:
-                    - On Home: View Full Timeline + Eras Tour Shows
-                    - On Eras page: View Full Timeline + Home
-                */}
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-1">
-                  <button
-                    className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-2 font-semibold text-sm w-full sm:w-auto shadow transition-transform hover:-translate-y-0.5 whitespace-nowrap"
-                    onClick={() => navigate("/posts")}
-                  >
-                    View Full Timeline
-                  </button>
+{/* Home / Eras hero content (search + CTAs) */}
+{showHero && (
+  <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-2 text-center md:text-left relative z-20">
+    <div className="w-full max-w-xs">
+      <form onSubmit={handleSearch} className="relative">
+        <input
+          type="text"
+          placeholder="Search events, locations, categories..."
+          value={searchQuery}
+          onChange={handleInputChange}
+          onKeyPress={handleKeyPress}
+          className="w-full rounded-full py-1.5 pl-6 pr-4 text-sm bg-white/90 text-gray-800 shadow focus:outline-none focus:ring-2 focus:ring-[#fbb1c3]"
+        />
+      </form>
+    </div>
 
-                  {!isErasPage ? (
-                    <button
-                      className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-2 font-semibold text-sm w-full sm:w-auto shadow transition-transform hover:-translate-y-0.5 whitespace-nowrap"
-                      onClick={() => navigate("/eras-tour-shows")}
-                    >
-                      Eras Tour Shows
-                    </button>
-                  ) : (
-                    <button
-                      className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-2 font-semibold text-sm w-full sm:w-auto shadow transition-transform hover:-translate-y-0.5 whitespace-nowrap"
-                      onClick={() => navigate("/")}
-                    >
-                      Home
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
+    {/* CTA row - more compact */}
+    <div className="flex flex-col sm:flex-row gap-1.5 sm:gap-2 mt-0">
+      <button
+        className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-4 py-1.5 font-semibold text-xs w-full sm:w-auto shadow transition-transform hover:-translate-y-0.5 whitespace-nowrap"
+        onClick={() => navigate("/posts")}
+      >
+        View Full Timeline
+      </button>
+
+      {!isErasPage ? (
+        <button
+          className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-4 py-1.5 font-semibold text-xs w-full sm:w-auto shadow transition-transform hover:-translate-y-0.5 whitespace-nowrap"
+          onClick={() => navigate("/eras-tour-shows")}
+        >
+          Eras Tour Shows
+        </button>
+      ) : (
+        <button
+          className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-4 py-1.5 font-semibold text-xs w-full sm:w-auto shadow transition-transform hover:-translate-y-0.5 whitespace-nowrap"
+          onClick={() => navigate("/")}
+        >
+          Home
+        </button>
+      )}
+    </div>
+  </div>
+)}
           </>
         )}
       </div>
