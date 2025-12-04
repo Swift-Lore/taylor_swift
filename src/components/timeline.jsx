@@ -619,12 +619,12 @@ const hasHoliday = holidayTags.length > 0
 
     return (
       <div
-        className="block relative hover:opacity-95 transition-opacity timeline-card"
-        style={{ marginTop: index === 0 ? "17px" : "43px" }}
-        onClick={handleCardClick}
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-      >
+  className="block relative hover:opacity-95 transition-opacity timeline-card"
+  style={{ marginTop: index === 0 ? "0px" : "43px" }}
+  onClick={handleCardClick}
+  onMouseDown={handleMouseDown}
+  onMouseUp={handleMouseUp}
+>
         <div className="relative">
                     <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
             <div className="bg-white/80 backdrop-blur-sm rounded-[10px] p-3 border border-[#f0d0d3] relative">
@@ -1061,21 +1061,23 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
         {/* Mobile Timeline - Vertical line behind cards */}
 <div className="md:hidden mt-2 min-h-0 px-4">
   <div className="relative">
-    {/* Vertical line in background */}
-    <div className="absolute left-1/2 -translate-x-1/2 w-[2px] h-full flex flex-col items-center">
-      <div className="w-[5px] bg-[#8a9ad4] h-full"></div>
-      <div className="absolute top-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
-      <div className="absolute bottom-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
+    {/* Vertical line in background - positioned to align with cards */}
+    <div className="absolute left-1/2 -translate-x-1/2 w-[2px] flex flex-col items-center">
+      {/* Top circle - positioned where first card's date badge will be */}
+      <div className="w-7 h-7 rounded-full bg-[#6B78B4] mb-4"></div>
+      <div className="w-[5px] bg-[#8a9ad4] flex-grow"></div>
+      <div className="w-7 h-7 rounded-full bg-[#6B78B4] mt-4"></div>
     </div>
     
-    {/* Cards centered over the line */}
-    <div className="relative w-full max-w-xl mx-auto space-y-6">
+    {/* Cards centered over the line - remove space-y-6 since cards have their own spacing */}
+    <div className="relative w-full max-w-xl mx-auto">
       {records.map((record, index) => (
-        <TimelineCard
-          key={`mobile-${record.id}`}
-          record={record}
-          index={index}
-        />
+        <div key={`mobile-${record.id}`} className="relative">
+          <TimelineCard
+            record={record}
+            index={index}
+          />
+        </div>
       ))}
     </div>
   </div>
