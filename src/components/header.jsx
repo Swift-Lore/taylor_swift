@@ -301,10 +301,10 @@ export default function Header() {
                 </span>
 
                 <img
-                  src="/images/swift_lore.png"
-                  alt="Swift Lore"
-                  className="w-full h-auto object-contain max-h-[200px] md:max-h-[240px] logo-glow"
-                />
+  src="/images/swift_lore.png"
+  alt="Swift Lore"
+  className="w-full h-auto object-contain max-h-[180px] md:max-h-[210px] logo-glow"
+/>
               </button>
             </div>
 
