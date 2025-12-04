@@ -1089,7 +1089,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           <div className="hidden md:block min-h-0">
             <div className="relative flex justify-center">
               {/* Center line - spans full height */}
-              <div className="absolute w-[2px] flex flex-col items-center h-full z-10">
+              <div className="absolute w-[2px] flex flex-col items-center h-full">
                 <div className="w-[5px] bg-[#8a9ad4] h-full"></div>
                 <div className="absolute left-1/2 -translate-x-1/2 top-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
                 <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
