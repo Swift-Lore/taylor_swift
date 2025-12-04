@@ -1039,9 +1039,10 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-          </div>
+          </div>   
+        </div>     
+      </div>       
+          
         {/* Mobile Timeline */}
         <div className="md:hidden mt-1 px-3">
           <div className="relative">
