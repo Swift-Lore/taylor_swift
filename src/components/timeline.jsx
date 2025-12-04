@@ -51,6 +51,7 @@ const FIXED_HOLIDAYS = new Set(
     "International Women's Day",
     "International Dance Day",
     "Halloween",
+    "Marjorie Finlay's Birthday",
     "Christmas Eve",
     "Christmas Day",
   ].map((s) => s.toLowerCase())
