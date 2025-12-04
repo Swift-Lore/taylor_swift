@@ -308,8 +308,6 @@ export default function Header() {
               </button>
             </div>
 
-            // In your Header component, update the home/hero section:
-
 {/* Home / Eras hero content (search + CTAs) */}
 {showHero && (
   <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-2 text-center md:text-left relative z-20">
