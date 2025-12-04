@@ -1074,7 +1074,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
         </div>
 
         {/* Mobile Timeline */}
-<div className="md:hidden mt-2 min-h-0 relative flex justify-center mobile-timeline-container">
+<div className="md:hidden mt-2 min-h-0 relative flex justify-center mobile-timeline-container px-4">
   {/* Center line + dots (same style as desktop, just full width) */}
   <div className="absolute w-[2px] flex flex-col items-center h-full">
     <div className="w-[5px] bg-[#8a9ad4] h-full"></div>
