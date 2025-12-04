@@ -568,20 +568,6 @@ const handlePreviousDay = () => {
     }
   }, [calendarMonth, calendarYear, showCalendar])
 
-  // ===== scroll hint =====
-  useEffect(() => {
-    const timelineElement = document.querySelector(".mobile-timeline-container")
-
-    const handleTagClick = (e, keyword) => {
-      e.preventDefault()
-      e.stopPropagation()
-      navigate(`/posts?keyword=${encodeURIComponent(keyword)}`)
-    }
-
-    timelineElement?.addEventListener("scroll", handleScroll)
-    return () => timelineElement?.removeEventListener("scroll", handleScroll)
-  }, [])
-
   // ===== Card component =====
   const TimelineCard = ({ record, index }) => {
     const [isSelectingText, setIsSelectingText] = useState(false)
