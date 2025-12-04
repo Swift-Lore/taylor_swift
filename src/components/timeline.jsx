@@ -620,7 +620,7 @@ const hasHoliday = holidayTags.length > 0
     return (
       <div
   className="block relative hover:opacity-95 transition-opacity timeline-card"
-  style={{ marginTop: index === 0 ? "0px" : "43px" }}
+  style={{ marginTop: index === 0 ? "17px" : "43px" }}
   onClick={handleCardClick}
   onMouseDown={handleMouseDown}
   onMouseUp={handleMouseUp}
