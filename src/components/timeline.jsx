@@ -492,9 +492,17 @@ const handlePreviousDay = () => {
             .filter(Boolean)
         : []
 
-    // Map holiday names to emojis
     const getHolidayEmoji = (holiday) => {
   const name = holiday.toLowerCase();
+
+  // 🐱🎂 Taylor's cats (Meredith, Olivia, Benjamin)
+  if (
+    name.includes("meredith") ||
+    name.includes("olivia") ||
+    name.includes("benjamin")
+  ) {
+    return "🐱🎂";
+  }
 
   // 🌈 Saint Patrick's Day → Clover
   if (name.includes("patrick")) return "☘️";
@@ -529,7 +537,7 @@ const handlePreviousDay = () => {
   // 🎄 Christmas
   if (name.includes("christmas") || name.includes("xmas")) return "🎄";
 
-  // 🎆 New Years (already handles Independence overlap above)
+  // 🎆 New Years
   if (name.includes("new year")) return "🎆";
 
   // 💘 Valentine’s Day
@@ -544,8 +552,6 @@ const handlePreviousDay = () => {
   // 🎀 Default
   return "🎀";
 };
-
-
 
     return (
       <div
