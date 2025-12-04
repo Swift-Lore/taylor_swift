@@ -927,12 +927,12 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
       <Button
         variant="outline"
         className="
-          rounded-full px-3 py-1.5
-          text-[11px]
-          border-[#b66b6b] text-[#8e3e3e]
-          bg-white/90 hover:bg-[#fbeff7]
-          w-full break-words whitespace-normal
-        "
+  rounded-xl px-3 py-1
+  text-xs md:text-sm font-medium
+  border-[#b66b6b] text-[#8e3e3e]
+  bg-white/90 hover:bg-[#fbeff7]
+  w-full break-words whitespace-normal leading-tight
+"
         onClick={() => {
           if (isTorontoMode) {
             const today = new Date()
