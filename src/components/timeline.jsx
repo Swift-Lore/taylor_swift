@@ -795,7 +795,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           </div>
 
           {/* Date navigation - FIXED container with proper positioning */}
-          <div className="relative mt-0 md:mt-1 flex flex-col lg:flex-row items-center lg:items-start justify-center gap-2 lg:gap-4">
+          <div className="relative mt-0 md:mt-1 max-w-3xl mx-auto flex flex-col lg:flex-row items-center lg:items-start justify-center gap-2 lg:gap-4">
             {/* Main date navigation - Keep centered */}
             <div className="flex items-center justify-center gap-1 md:gap-2 relative z-10">
               <Button
