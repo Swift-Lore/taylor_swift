@@ -772,7 +772,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
             </div>
           </div>
 
-          {/* Date navigation + Taylor Nation alternate timeline box */}
+                    {/* Date navigation + Taylor Nation alternate timeline box */}
 <div className="mt-1 md:mt-2 w-full">
   {/* Desktop & mobile layout container */}
   <div className="flex flex-col md:flex-row md:items-center">
