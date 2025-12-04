@@ -669,21 +669,25 @@ const handlePreviousDay = () => {
         </span>
       </div>
       {/* Calendar button positioned inside the bubble */}
-<button
-  onClick={() => setShowCalendar(true)}
-  className="
-    absolute
-    -right-1      /* mobile: give more breathing room */
-    sm:-right-2   /* tablet/desktop: keep original spacing */
-    top-1/2 -translate-y-1/2
-    bg-white rounded-full p-1
-    shadow-sm border border-[#b66b6b]
-    hover:bg-[#f8d7da] transition-colors
-  "
-  title="Open calendar"
->
-  <Calendar size={14} className="text-[#8e3e3e]" />
-</button>
+      <button
+        onClick={() => setShowCalendar(true)}
+          className="absolute -right-1 sm:-right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-1 shadow-sm border border-[#b66b6b] hover:bg-[#f8d7da] transition-colors"
+        title="Open calendar"
+      >
+        <Calendar size={14} className="text-[#8e3e3e]" />
+      </button>
+    </div>
+
+    <Button
+      variant="secondary"
+      className="rounded-full h-8 md:h-9 px-2 sm:px-3 md:px-4 text-[11px] sm:text-xs md:text-sm flex items-center gap-1 ml-1"
+      onClick={handleNextDay}
+    >
+      <span className="hidden sm:inline">Next</span>
+      <span className="sm:hidden">Next</span>
+      <ChevronRight size={12} />
+    </Button>
+  </div>
 
     {/* TN box – mobile: under the date nav */}
   <div className="mt-3 w-full max-w-xs md:hidden">
