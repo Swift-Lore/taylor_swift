@@ -863,72 +863,59 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               </Button>
             </div>
 
-            {/* FIXED: TN box positioning - Mobile */}
-            <div className="mt-2 w-full max-w-xs mx-auto md:hidden">
-              <div className="bg-white/80 border border-[#e6d2e1] rounded-xl shadow-sm px-2 py-1.5">
-                <Button
-                  variant="outline"
-                  className="
-                    rounded-xl px-2 py-1
-                    text-xs font-medium
-                    border-[#b66b6b] text-[#8e3e3e]
-                    bg-white/90 hover:bg-[#fbeff7]
-                    w-full break-words whitespace-normal
-                  "
-                  onClick={() => {
-                    if (isTorontoMode) {
-                      const today = new Date()
-                      setCurrentYear(today.getFullYear())
-                      setCurrentMonth(today.getMonth() + 1)
-                      setCurrentDay(today.getDate())
-                      setIsTorontoMode(false)
-                    } else {
-                      setCurrentYear(torontoDate.getFullYear())
-                      setCurrentMonth(torontoDate.getMonth() + 1)
-                      setCurrentDay(torontoDate.getDate())
-                      setIsTorontoMode(true)
-                    }
-                  }}
-                >
-                  {isTorontoMode ? (
-                    <>
-                      <span className="font-semibold mr-1">← Today:</span>
-                      {new Date().toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "2-digit",
-                      })}
-                    </>
-                  ) : (
-                    <>
-                      <span className="font-semibold mr-1">TN Timeline:</span>
-                      {torontoDate.toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "2-digit",
-                        year: "numeric",
-                      })}
-                    </>
-                  )}
-                </Button>
+            {/* TN box - Mobile */}
+<div className="mt-2 w-full max-w-xs mx-auto md:hidden">
+  <div className="bg-white/80 border border-[#e6d2e1] rounded-xl shadow-sm px-2 py-1.5">
+    <Button
+      variant="outline"
+      className="
+        rounded-xl px-2 py-1
+        text-xs font-medium
+        border-[#b66b6b] text-[#8e3e3e]
+        bg-white/90 hover:bg-[#fbeff7]
+        w-full break-words whitespace-normal
+      "
+      onClick={() => {
+        if (isTorontoMode) {
+          const today = new Date()
+          setCurrentYear(today.getFullYear())
+          setCurrentMonth(today.getMonth() + 1)
+          setCurrentDay(today.getDate())
+          setIsTorontoMode(false)
+        } else {
+          setCurrentYear(torontoDate.getFullYear())
+          setCurrentMonth(torontoDate.getMonth() + 1)
+          setCurrentDay(torontoDate.getDate())
+          setIsTorontoMode(true)
+        }
+      }}
+    >
+      <span className="font-semibold mr-1">
+        Taylor Nation Timeline Date:
+      </span>
+      {torontoDate.toLocaleDateString("en-US", {
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+      })}
+    </Button>
 
-                <p className="mt-1 text-[10px] text-[#6b7db3] leading-snug">
-                  {isTorontoMode
-                    ? "TN Timeline Mode"
-                    : "View events on Taylor Nation's alternate timeline."}
-                  <button
-                    type="button"
-                    onClick={() => setShowTNInfo(true)}
-                    className="inline-flex items-center ml-0.5 text-[9px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
-                  >
-                    <HelpCircle size={10} className="mr-0.5" />
-                    What is this?
-                  </button>
-                </p>
-              </div>
-            </div>
+    <div className="mt-1 flex justify-end">
+      <button
+        type="button"
+        onClick={() => setShowTNInfo(true)}
+        className="inline-flex items-center text-[9px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
+      >
+        <HelpCircle size={10} className="mr-0.5" />
+        What is this?
+      </button>
+    </div>
+  </div>
+</div>
 
-                        {/* TN box - Desktop (pulled in next to Next button) */}
+                        {/* TN box - Desktop */}
 <div className="hidden lg:block lg:absolute lg:right-0 lg:top-0">
-  <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 w-56">
+  <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 w-60">
     <Button
       variant="outline"
       className="
@@ -953,42 +940,28 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
         }
       }}
     >
-      {isTorontoMode ? (
-        <>
-          <span className="font-semibold mr-1">← Today:</span>
-          {new Date().toLocaleDateString("en-US", {
-            month: "short",
-            day: "2-digit",
-          })}
-        </>
-      ) : (
-        <>
-          <span className="font-semibold mr-1">TN Timeline:</span>
-          {torontoDate.toLocaleDateString("en-US", {
-            month: "short",
-            day: "2-digit",
-            year: "numeric",
-          })}
-        </>
-      )}
+      <span className="font-semibold mr-1">
+        Taylor Nation Timeline Date:
+      </span>
+      {torontoDate.toLocaleDateString("en-US", {
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+      })}
     </Button>
 
-    <p className="mt-1 text-xs text-[#5c678f] leading-snug flex items-center">
-      {isTorontoMode
-        ? "TN Timeline Mode"
-        : "View events on Taylor Nation's alternate timeline."}
+    <div className="mt-1 flex justify-end">
       <button
         type="button"
         onClick={() => setShowTNInfo(true)}
-        className="inline-flex items-center ml-1 text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e] whitespace-nowrap"
+        className="inline-flex items-center text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e] whitespace-nowrap"
       >
         <HelpCircle size={10} className="mr-0.5" />
         What is this?
       </button>
-    </p>
+    </div>
   </div>
 </div>
-</div> 
 
           {/* 🌟 Global fixed-date holiday badge + Event Counter */}
           <div className="w-full mt-2">
