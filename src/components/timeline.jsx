@@ -2,7 +2,7 @@
 
 import { ChevronLeft, ChevronRight, Calendar, Star, Zap, Clock, HelpCircle } from "lucide-react"
 import { Button } from "./ui/Button"
-import { useNavigate, Link } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { useEffect, useState, useRef } from "react"
 import axios from "axios"
 import "./timeline.css"
@@ -575,23 +575,21 @@ const TimelineCard = ({ record, index }) => {
   }
 
   const handleCardClick = (e) => {
-    // If click is on a keyword pill, let that handler do its thing
-    if (e.target.closest(".keyword-container")) {
-      return
-    }
-
-    // If there is ANY selected text, don't navigate
-    const sel = window.getSelection()
-    if (sel && sel.toString().length > 0) {
-      e.preventDefault()
-      return
-    }
-
-    // Otherwise:
-    // - normal left click → let <Link> navigate
-    // - Cmd/Ctrl+click → open in new tab (browser default)
-    // - middle click → open in new tab (browser default)
+  // If click is on a keyword pill, let that handler do its thing
+  if (e.target.closest(".keyword-container")) {
+    return
   }
+
+  // If there is ANY selected text, don't navigate
+  const sel = window.getSelection()
+  if (sel && sel.toString().length > 0) {
+    e.preventDefault()
+    return
+  }
+
+  // Otherwise, navigate programmatically
+  navigate(`/post_details?id=${record.id}`)
+}
 
   const formatDate = (dateString) => {
     if (!dateString) return "Loading..."
