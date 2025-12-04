@@ -1061,20 +1061,20 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
         {/* Mobile Timeline - Vertical line behind cards */}
 <div className="md:hidden mt-2 px-4">
   <div className="relative">
-    {/* Vertical line + top & bottom bubbles (behind cards) */}
+    {/* Background line + top & bottom bubbles */}
     <div className="pointer-events-none absolute inset-0 flex justify-center z-0">
       {/* Main vertical line */}
       <div className="w-[2px] h-full bg-[#8a9ad4]" />
 
-      {/* TOP bubble */}
-      <div className="absolute left-1/2 -translate-x-1/2 -top-3 w-7 h-7 rounded-full bg-[#6B78B4]" />
+      {/* TOP bubble (inside container, not negative) */}
+      <div className="absolute left-1/2 -translate-x-1/2 top-0 w-7 h-7 rounded-full bg-[#6B78B4]" />
 
       {/* BOTTOM bubble */}
       <div className="absolute left-1/2 -translate-x-1/2 -bottom-3 w-7 h-7 rounded-full bg-[#6B78B4]" />
     </div>
 
-    {/* Cards centered over the line, on top of it */}
-    <div className="relative w-full max-w-xl mx-auto z-10">
+    {/* Cards centered over the line, above the background */}
+    <div className="relative w-full max-w-xl mx-auto z-10 pt-4">
       {records.map((record, index) => (
         <div key={`mobile-${record.id}`} className="relative mb-6">
           {/* Connecting line from card to center line */}
