@@ -94,7 +94,7 @@ export default function Timeline() {
     setCurrentDay(day)
     setShowCalendar(false)
   }
-
+}
 
   const navigateCalendarMonth = (direction) => {
     if (direction === 'prev') {
@@ -115,13 +115,14 @@ export default function Timeline() {
   }
 
   const jumpToToday = () => {
-    const today = new Date()
-    setCurrentMonth(today.getMonth() + 1)
-    setCurrentDay(today.getDate())
-    setCalendarMonth(today.getMonth())
-    setCalendarYear(today.getFullYear())
-    setShowCalendar(false)
-  }
+  const today = new Date()
+  setCurrentYear(today.getFullYear())   // Make sure this is here
+  setCurrentMonth(today.getMonth() + 1)
+  setCurrentDay(today.getDate())
+  setCalendarMonth(today.getMonth())
+  setCalendarYear(today.getFullYear())
+  setShowCalendar(false)
+}
 
   const jumpToThisMonth = () => {
     const today = new Date()
