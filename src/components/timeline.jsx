@@ -25,52 +25,41 @@ const parseHolidayTags = (holidayTagsRaw) => {
 }
 
 // Holidays we only want to show once at the top of the timeline
+const FIXED_HOLIDAYS = new Set(
+  [
+    "New Year's Eve",
+    "New Year's Day",
+    "Sant Patrick's Day",      // matches your Airtable exactly
+    "Austin Swift's Birthday",
+    "Andrea Swift's Birthday",
+    "Scott Swift's Birthday",
+    "Taylor's Birthday",
+    "National White Wine Day",
+    "National Red Wine Day",
+    "World Bread Day",
+    "Olivia's Birthday",
+    "Meredith's Birthday",
+    "Benjamin's Birthday",
+    "National French Fry Day",
+    "Valentine's Day",
+    "National Siblings Day",
+    "National Cat Day",
+    "International Cat Day",
+    "Mean Girls Day",
+    "Last Kiss Day",
+    "High Infidelity Day",
+    "International Women's Day",
+    "International Dance Day",
+    "Halloween",
+    "Christmas Eve",
+    "Christmas Day",
+  ].map((s) => s.toLowerCase())
+)
+
 const isGlobalHolidayName = (holiday) => {
-  const name = holiday.toLowerCase()
-
-  return (
-    // Christmas Eve / Day
-    name.includes("christmas eve") ||
-    name.includes("christmas day") ||
-    (name.includes("christmas") && !name.includes("eve")) ||
-
-    // New Year's Eve / Day (all the apostrophe spellings)
-    name.includes("new year's eve") ||
-    name.includes("new years eve") ||
-    name.includes("new year’s eve") ||
-    name.includes("new year's day") ||
-    name.includes("new years day") ||
-    name.includes("new year’s day") ||
-    // catch generic "new year" but avoid lunar
-    (name.includes("new year") && !name.includes("lunar")) ||
-
-    // Saint Patrick's Day (fixed: Mar 17)
-    name.includes("patrick") ||
-
-    // Mean Girls Day (Oct 3)
-    name.includes("mean girls") ||
-
-    // Wine days
-    name.includes("red wine") ||
-    name.includes("white wine") ||
-
-    // National French Fry Day
-    name.includes("french fry") ||
-    name.includes("french fries") ||
-
-    // US fixed-date holidays
-    name.includes("independence") ||
-    name.includes("memorial day") ||
-    name.includes("labor day") ||
-
-    // Swift family birthdays (only when it's a birthday)
-    (name.includes("olivia") && name.includes("birthday")) ||
-    (name.includes("meredith") && name.includes("birthday")) ||
-    (name.includes("benjamin") && name.includes("birthday")) ||
-    (name.includes("scott swift") && name.includes("birthday")) ||
-    (name.includes("austin swift") && name.includes("birthday")) ||
-    (name.includes("andrea swift") && name.includes("birthday"))
-  )
+  if (!holiday) return false
+  const name = holiday.trim().toLowerCase()
+  return FIXED_HOLIDAYS.has(name)
 }
 
 // Map holiday names to emojis
