@@ -2,7 +2,7 @@
 
 import { ChevronLeft, ChevronRight, Calendar, Star, Zap, Clock, HelpCircle } from "lucide-react"
 import { Button } from "./ui/Button"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import { useEffect, useState } from "react"
 import axios from "axios"
 import "./timeline.css"
@@ -574,13 +574,6 @@ response.data.records?.forEach((record) => {
       e.preventDefault()
       e.stopPropagation()
       navigate(`/posts?keyword=${encodeURIComponent(keyword)}`)
-    }
-
-    const handleCardClick = () => {
-      if (!isSelectingText) {
-        navigate(`/post_details?id=${record.id}`)
-      }
-      setIsSelectingText(false)
     }
 
     const handleMouseDown = (e) => {
