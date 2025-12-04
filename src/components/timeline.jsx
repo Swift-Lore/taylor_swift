@@ -546,8 +546,8 @@ const handlePreviousDay = () => {
   </div>
 </div>
 
-    {/* DESKTOP: stays in top-right, but larger */}
-    <div className="hidden md:flex absolute top-3 right-5 flex-wrap gap-1 justify-end max-w-[55%]">
+        {/* DESKTOP: upper-left, a bit lower to avoid long titles */}
+    <div className="hidden md:flex absolute top-5 left-5 flex-wrap gap-1 justify-start max-w-[55%]">
       {holidayTags.map((holiday, index) => (
         <span
           key={index}
@@ -561,7 +561,7 @@ const handlePreviousDay = () => {
   </>
 )}
 
-                            <div className="flex flex-col gap-2.5 mt-1.5 timeline-card-text">
+                            <div className="flex flex-col gap-2.5 mt-2 md:mt-5 timeline-card-text">
 
                 <h3 className="text-[#8e3e3e] font-bold text-sm md:text-base leading-relaxed text-center">
                   {record?.fields?.EVENT || "Event description unavailable"}
