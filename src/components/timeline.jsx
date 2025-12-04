@@ -860,7 +860,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   </div>
 
   {/* TN box – mobile: stacked under nav */}
-<div className="mt-3 w-full max-w-xs mx-auto md:hidden">
+<div className="mt-3 w-full max-w-xs md:max-w-md mx-auto md:block lg:hidden">
   <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-3 sm:px-4 py-3">
     {/* Primary action on top – same style vibe as desktop */}
     <Button
