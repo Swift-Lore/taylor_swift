@@ -863,12 +863,10 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
     </Button>
   </div>
 
-  {/* TN box - Separate containers for desktop vs mobile for proper centering */}
-  
-  {/* Desktop TN box */}
+  {/* TN box - Desktop: positioned to right */}
   <div className="
     hidden
-    lg:block lg:absolute lg:right-[-30px] lg:top-0
+    lg:block lg:absolute lg:right-[-20px] lg:top-[10px]
   ">
     <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 w-56">
       <Button
@@ -921,13 +919,13 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
     </div>
   </div>
 
-  {/* Mobile/Tablet TN box - PROPERLY CENTERED */}
+  {/* Mobile TN box - PROPERLY CENTERED */}
   <div className="
-    mt-2
+    mt-2 w-full
     md:mt-3
     lg:hidden
   ">
-    <div className="flex justify-center">
+    <div className="w-full flex justify-center">
       <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 w-56">
         <Button
           variant="outline"
