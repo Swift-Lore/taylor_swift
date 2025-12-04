@@ -723,26 +723,36 @@ const TimelineCard = ({ record, index }) => {
   )
 }
 const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
-    // ===== JSX =====
+      // ===== JSX =====
   return (
     <section className="w-full bg-[#e8ecf7] py-2 px-2 md:px-6 flex flex-col min-h-0">
       <div className="container mx-auto flex flex-col min-h-0 flex-1">
-        {/* Homepage Intro for SEO / AdSense - COMPACT */}
-        <div className="max-w-3xl mx-auto mt-1 mb-2 px-3">
-          <div className="bg-white/70 border border-[#e3d5dd] rounded-xl shadow-sm px-3 py-2 text-center">
-            <h2 className="text-base md:text-lg font-semibold text-[#8e3e3e] mb-1">
-              Swift Lore: Taylor Swift's Career Timeline
+        {/* Homepage Intro for SEO / AdSense - WIDER but same height */}
+        <div className="max-w-4xl mx-auto mt-1 mb-3 px-3">
+          <div className="bg-white/70 border border-[#e3d5dd] rounded-xl shadow-sm px-4 py-3 md:px-6 md:py-3 text-center">
+            <h2 className="text-base md:text-lg font-semibold text-[#8e3e3e] mb-2">
+              Swift Lore: Taylor Swift's Complete Career Timeline
             </h2>
-            <p className="text-[#6b7db3] text-xs md:text-sm leading-relaxed">
-              A fan-run archive documenting Taylor Swift's career from early performances to present day.
-            </p>
+            <div className="text-[#6b7db3] text-sm md:text-base leading-relaxed space-y-2">
+              <p>
+                Swift Lore is an independent, fan-run research archive documenting Taylor
+                Swift's career from her earliest performances to the present day.
+                Each entry is tied to a specific date, with context notes and source links.
+              </p>
+              <p>
+                Browse by date, filter events, and follow her journey across albums and
+                eras — from releases and award shows to interviews, paparazzi spots, and
+                deep-cut easter eggs. The timeline currently tracks thousands of verified
+                moments and is updated regularly.
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* ON THIS DAY Section - COMPACT */}
-        <div className="text-center mb-1 flex-shrink-0">
-          {/* Glowy header card */}
-          <div className="relative w-full mb-1 md:mb-2 px-2">
+        {/* ON THIS DAY Section - FIXED overlapping */}
+        <div className="text-center mb-2 flex-shrink-0">
+          {/* Glowy header card - with extra margin for TN box */}
+          <div className="relative w-full mb-2 md:mb-3 px-2">
             <div
               className="
                 relative w-full px-3 py-2
@@ -784,10 +794,10 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
             </div>
           </div>
 
-          {/* Date navigation + Taylor Nation alternate timeline box - COMPACT */}
-          <div className="relative mt-0 md:mt-1 flex flex-col items-center md:min-h-[60px]">
-            {/* Main date navigation */}
-            <div className="flex items-center justify-center gap-1 md:gap-2">
+          {/* Date navigation - FIXED container with proper positioning */}
+          <div className="relative mt-0 md:mt-1 flex flex-col items-center">
+            {/* Main date navigation - Keep centered */}
+            <div className="flex items-center justify-center gap-1 md:gap-2 relative z-10">
               <Button
                 variant="secondary"
                 className="
@@ -853,8 +863,8 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               </Button>
             </div>
 
-            {/* TN box – mobile */}
-            <div className="mt-2 w-full max-w-xs mx-auto md:block lg:hidden">
+            {/* FIXED: TN box positioning - Mobile */}
+            <div className="mt-2 w-full max-w-xs mx-auto md:hidden">
               <div className="bg-white/80 border border-[#e6d2e1] rounded-xl shadow-sm px-2 py-1.5">
                 <Button
                   variant="outline"
@@ -916,8 +926,72 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               </div>
             </div>
 
-            {/* TN box – desktop */}
-            <div className="hidden lg:block absolute right-4 top-1/2 -translate-y-1/2">
+            {/* FIXED: TN box positioning - Desktop (tablet) */}
+            <div className="hidden md:block lg:hidden mt-2">
+              <div className="bg-white/80 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 max-w-md mx-auto">
+                <Button
+                  variant="outline"
+                  className="
+                    rounded-xl px-3 py-1
+                    text-xs font-medium
+                    border-[#b66b6b] text-[#8e3e3e]
+                    bg-white/90 hover:bg-[#fbeff7]
+                    w-full break-words whitespace-normal
+                  "
+                  onClick={() => {
+                    if (isTorontoMode) {
+                      const today = new Date()
+                      setCurrentYear(today.getFullYear())
+                      setCurrentMonth(today.getMonth() + 1)
+                      setCurrentDay(today.getDate())
+                      setIsTorontoMode(false)
+                    } else {
+                      setCurrentYear(torontoDate.getFullYear())
+                      setCurrentMonth(torontoDate.getMonth() + 1)
+                      setCurrentDay(torontoDate.getDate())
+                      setIsTorontoMode(true)
+                    }
+                  }}
+                >
+                  {isTorontoMode ? (
+                    <>
+                      <span className="font-semibold mr-1">← Return to Today:</span>
+                      {new Date().toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "2-digit",
+                        year: "numeric",
+                      })}
+                    </>
+                  ) : (
+                    <>
+                      <span className="font-semibold mr-1">Taylor Nation Timeline:</span>
+                      {torontoDate.toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "2-digit",
+                        year: "numeric",
+                      })}
+                    </>
+                  )}
+                </Button>
+
+                <p className="mt-1 text-xs text-[#5c678f] leading-snug">
+                  {isTorontoMode
+                    ? "TN Timeline Mode"
+                    : "Click to view events on this day on Taylor Nation's alternate timeline."}
+                  <button
+                    type="button"
+                    onClick={() => setShowTNInfo(true)}
+                    className="inline-flex items-center ml-1 text-[11px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
+                  >
+                    <HelpCircle size={10} className="mr-0.5" />
+                    What is this?
+                  </button>
+                </p>
+              </div>
+            </div>
+
+            {/* FIXED: TN box positioning - Desktop (large screens) */}
+            <div className="hidden lg:block absolute right-0 top-0 translate-y-0">
               <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 max-w-xs">
                 <Button
                   variant="outline"
@@ -980,11 +1054,11 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
             </div>
           </div>
 
-          {/* 🌟 Global fixed-date holiday badge + Event Counter - COMPACT */}
-          <div className="w-full">
+          {/* 🌟 Global fixed-date holiday badge + Event Counter */}
+          <div className="w-full mt-2">
             {/* MOBILE holiday pill */}
             {hasGlobalHoliday && (
-              <div className="md:hidden flex justify-center mt-1 mb-0">
+              <div className="md:hidden flex justify-center">
                 <span
                   className="
                     inline-flex items-center
@@ -1034,7 +1108,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               </div>
             )}
 
-            {/* Event Counter - COMPACT */}
+            {/* Event Counter */}
             <div className="flex justify-center mt-1 mb-1 flex-shrink-0">
               <div
                 className="
@@ -1106,7 +1180,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           </div>
         </div>
 
-        {/* View Full Timeline Button - COMPACT */}
+        {/* View Full Timeline Button */}
         <div className="flex justify-center mt-1 mb-1 flex-shrink-0">
           <Button
             variant="secondary"
