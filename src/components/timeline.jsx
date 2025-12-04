@@ -659,7 +659,7 @@ const handlePreviousDay = () => {
     </Button>
 
     {/* Date bubble with calendar button integrated */}
-    <div className="relative">
+    <div className="relative mr-6 sm:mr-0">
       <div className="bg-white rounded-full px-3 sm:px-5 md:px-6 py-1 md:py-1.5 min-w-[102px] sm:min-w-[136px] md:min-w-[170px] border border-[#b66b6b] flex items-center justify-center">
         <span className="text-[#8e3e3e] text-sm md:text-base font-medium">
           {displayDate.toLocaleDateString("en-US", {
