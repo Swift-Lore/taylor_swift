@@ -1082,15 +1082,17 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
     <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
   </div>
 
-  {/* Mobile Timeline Items */}
-  <div className="relative w-full max-w-xl space-y-6">
-    {records.map((record, index) => (
-      <TimelineCard
-        key={`mobile-${record.id}`}
-        record={record}
-        index={index}
-      />
-    ))}
+  {/* Mobile Timeline Items - Centered container */}
+  <div className="relative w-full flex justify-center">
+    <div className="w-full max-w-xl space-y-6">
+      {records.map((record, index) => (
+        <TimelineCard
+          key={`mobile-${record.id}`}
+          record={record}
+          index={index}
+        />
+      ))}
+    </div>
   </div>
 </div>
 
