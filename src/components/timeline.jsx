@@ -983,28 +983,29 @@ const hasHoliday = holidayTags.length > 0
 )}
 
         {/* Event Counter */}
-        <div className="flex justify-center mb-2 flex-shrink-0">
-          <div
-            className="
-              event-counter-pill
-              bg-white rounded-full px-2 sm:px-3 md:px-4 py-1
-              border border-[#b66b6b] shadow-sm
-            "
-          >
-            <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
+<div className="flex justify-center -mt-2 md:-mt-3 mb-2 flex-shrink-0">
+  <div
+    className="
+      event-counter-pill
+      bg-white rounded-full px-2 sm:px-3 md:px-4 py-1
+      border border-[#b66b6b] shadow-sm
+    "
+  >
+    <div className="flex items-center gap-1.5">
+      <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
 
-             <span className="event-counter-text text-[#8e3e3e] text-xs md:text-sm font-medium">
-  {isLoading
-    ? "Loading events..."
-    : `${records.length} ${
-        records.length === 1 ? "Event" : "Events"
-      } Found${isTorontoMode ? " (TN Timeline)" : ""}`}
-</span>
+      <span className="event-counter-text text-[#8e3e3e] text-xs md:text-sm font-medium">
+        {isLoading
+          ? "Loading events..."
+          : `${records.length} ${
+              records.length === 1 ? "Event" : "Events"
+            } Found${isTorontoMode ? " (TN Timeline)" : ""}`}
+      </span>
 
-              <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
-            </div>
-          </div>
+      <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
+    </div>
+  </div>
+</div>
         </div>
 
         {/* Timeline Section */}
