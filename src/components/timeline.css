@@ -1,3 +1,4 @@
+/* Your original CSS - keep this */
 /* Scroll hint styling - Only show on small screens */
 @media (max-width: 768px) {
   .scroll-hint {
@@ -147,65 +148,4 @@
 .event-counter-pill *::-moz-selection {
   background: transparent;
   color: inherit;
-}
-
-/* ===== TIMELINE CARD TEXT SELECTION FIX ===== */
-
-/* The entire card is a link but text should be selectable */
-a.timeline-card {
-  cursor: pointer;
-  text-decoration: none !important;
-  color: inherit !important;
-  display: block;
-  position: relative;
-}
-
-/* Make text content NOT trigger link dragging */
-.timeline-card-text {
-  /* This allows text selection but prevents link dragging */
-  user-select: text !important;
-  -webkit-user-select: text !important;
-  -moz-user-select: text !important;
-  -ms-user-select: text !important;
-  
-  /* Prevent link dragging behavior */
-  -webkit-user-drag: none !important;
-  -khtml-user-drag: none !important;
-  -moz-user-drag: none !important;
-  -o-user-drag: none !important;
-  user-drag: none !important;
-}
-
-/* Text elements should show text cursor */
-.timeline-card-text h3,
-.timeline-card-text div:not(.keyword-container) {
-  cursor: text !important;
-  pointer-events: auto !important;
-}
-
-/* Keywords are clickable buttons */
-.keyword-container {
-  pointer-events: auto !important;
-}
-
-.keyword-container button {
-  cursor: pointer !important;
-  user-select: none !important;
-  -webkit-user-select: none !important;
-}
-
-/* Fix for link dragging prevention */
-a.timeline-card * {
-  -webkit-user-drag: none !important;
-  -khtml-user-drag: none !important;
-  -moz-user-drag: none !important;
-  -o-user-drag: none !important;
-  user-drag: none !important;
-}
-
-/* Non-selectable elements (date, badges) */
-.no-text-highlight {
-  user-select: none !important;
-  -webkit-user-select: none !important;
-  pointer-events: auto !important;
 }
