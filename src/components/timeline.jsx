@@ -1109,7 +1109,6 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               </div>
             </div>
           </div>
-        </div>
 
         {/* View Full Timeline Button */}
         <div className="flex justify-center mt-2 mb-2 flex-shrink-0">
