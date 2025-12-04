@@ -610,19 +610,25 @@ const holidayTags = rawHolidayTags.filter((tag) => !isGlobalHolidayName(tag))
 const hasHoliday = holidayTags.length > 0
 
             return (
-      <div
-        className="block relative hover:opacity-95 transition-opacity timeline-card"
-        style={{ marginTop: index === 0 ? "17px" : "43px" }}
-        onClick={handleCardClick}
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-      >
-        <div className="relative">
-                    <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
-            <div className="bg-white/80 backdrop-blur-sm rounded-[10px] p-3 border border-[#f0d0d3] relative">
-              <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 -translate-y-1/4 border border-[#8e3e3e] bg-white rounded-full px-3 py-1 text-sm text-[#8e3e3e] font-semibold shadow-md z-10 min-w-[150px] text-center">
-                {formatDate(record?.fields?.DATE)}
-              </div>
+  <Link
+    to={`/post_details?id=${record.id}`}
+    className="block relative hover:opacity-95 transition-opacity timeline-card"
+    style={{ marginTop: index === 0 ? "17px" : "43px" }}
+    onClick={(e) => {
+      if (isSelectingText) {
+        e.preventDefault()
+        setIsSelectingText(false)
+      }
+    }}
+    onMouseDown={handleMouseDown}
+    onMouseUp={handleMouseUp}
+  >
+    <div className="relative">
+      <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
+        <div className="bg-white/80 backdrop-blur-sm rounded-[10px] p-3 border border-[#f0d0d3] relative">
+          <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 -translate-y-1/4 border border-[#8e3e3e] bg-white rounded-full px-3 py-1 text-sm text-[#8e3e3e] font-semibold shadow-md z-10 min-w-[150px] text-center">
+            {formatDate(record?.fields?.DATE)}
+          </div>
               {/* Holiday badges */}
 {holidayTags.length > 0 && (
   <>
