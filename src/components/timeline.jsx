@@ -833,23 +833,6 @@ const hasHoliday = holidayTags.length > 0
     </Button>
   </div>
 
-  {/* 🌟 Global fixed-date holiday badge – tight under date */}
-  {globalHolidayTagsForDay.length > 0 && (
-    <div className="mt-1 flex justify-center">
-      <div className="flex flex-wrap gap-2 justify-center">
-        {globalHolidayTagsForDay.slice(0, 1).map((holiday, index) => (
-          <span
-            key={index}
-            className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-[#fbeff7] text-[#8e3e3e] border border-[#e3b0b0] shadow-sm"
-          >
-            <span className="mr-1 text-sm">{getHolidayEmoji(holiday)}</span>
-            <span className="truncate max-w-[220px]">{holiday}</span>
-          </span>
-        ))}
-      </div>
-    </div>
-  )}
-
   {/* TN box – mobile: under the date nav + holiday pill */}
   <div className="mt-3 w-full max-w-xs md:hidden">
     <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-3 sm:px-4 py-3">
@@ -976,6 +959,28 @@ const hasHoliday = holidayTags.length > 0
     </div>
   </div>
 </div>
+{/* 🌟 Global fixed-date holiday badge – left side, bigger, below date header */}
+{globalHolidayTagsForDay.length > 0 && (
+  <div className="hidden md:flex mt-2 mb-1 w-full">
+    <div className="flex items-center">
+      <span
+        className="
+          inline-flex items-center
+          px-4 py-1.5
+          rounded-full
+          text-sm font-semibold
+          bg-[#fbeff7]
+          text-[#8e3e3e]
+          border border-[#e3b0b0]
+          shadow-sm
+        "
+      >
+        <span className="mr-2 text-base">{getHolidayEmoji(globalHolidayTagsForDay[0])}</span>
+        {globalHolidayTagsForDay[0]}
+      </span>
+    </div>
+  </div>
+)}
 
         {/* Event Counter */}
         <div className="flex justify-center mb-2 flex-shrink-0">
