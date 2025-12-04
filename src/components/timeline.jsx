@@ -491,7 +491,7 @@ const handlePreviousDay = () => {
             .map((tag) => tag.trim())
             .filter(Boolean)
         : []
-
+const hasHoliday = holidayTags.length > 0
     const getHolidayEmoji = (holiday) => {
   const name = holiday.toLowerCase();
 
@@ -600,7 +600,11 @@ const handlePreviousDay = () => {
   </>
 )}
 
-                            <div className="flex flex-col gap-2.5 mt-3 md:mt-8 timeline-card-text">
+                            <div
+  className={`flex flex-col gap-2.5 mt-3 ${
+    hasHoliday ? "md:mt-7" : "md:mt-3"
+  } timeline-card-text`}
+>
 
                 <h3 className="text-[#8e3e3e] font-bold text-sm md:text-base leading-relaxed text-center">
                   {record?.fields?.EVENT || "Event description unavailable"}
