@@ -926,8 +926,8 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               </div>
             </div>
 
-                        {/* FIXED: TN box positioning - Desktop (large screens) - BETTER POSITIONING */}
-<div className="hidden lg:block absolute right-[-50px] top-[-10px]">
+                        {/* TN box - Desktop (inline, next to Next button) */}
+<div className="hidden lg:block mt-1">
   <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 w-56">
     <Button
       variant="outline"
@@ -973,7 +973,6 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
       )}
     </Button>
 
-    {/* SINGLE LINE with What is this? */}
     <p className="mt-1 text-xs text-[#5c678f] leading-snug flex items-center">
       {isTorontoMode
         ? "TN Timeline Mode"
