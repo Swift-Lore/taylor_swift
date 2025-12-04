@@ -935,12 +935,25 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
         }
       }}
     >
-      <span className="font-semibold mr-1">Taylor Nation Timeline:</span>
-      {torontoDate.toLocaleDateString("en-US", {
-        month: "short",
-        day: "2-digit",
-        year: "numeric",
-      })}
+      {isTorontoMode ? (
+  <>
+    <span className="font-semibold mr-1">← Return to Today:</span>
+    {new Date().toLocaleDateString("en-US", {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+    })}
+  </>
+) : (
+  <>
+    <span className="font-semibold mr-1">Taylor Nation Timeline:</span>
+    {torontoDate.toLocaleDateString("en-US", {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+    })}
+  </>
+)}
     </Button>
 
     {/* Short, more readable helper text */}
