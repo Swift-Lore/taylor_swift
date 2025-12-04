@@ -671,7 +671,7 @@ const handlePreviousDay = () => {
       {/* Calendar button positioned inside the bubble */}
       <button
         onClick={() => setShowCalendar(true)}
-          className="absolute -right-1 sm:-right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-1 shadow-sm border border-[#b66b6b] hover:bg-[#f8d7da] transition-colors"
+          className="absolute -right-4 sm:-right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-1 shadow-sm border border-[#b66b6b] hover:bg-[#f8d7da] transition-colors"
         title="Open calendar"
       >
         <Calendar size={14} className="text-[#8e3e3e]" />
