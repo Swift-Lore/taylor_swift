@@ -771,7 +771,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
                 </h2>
 
                 <p className="mt-1 text-[#6b7db3] text-xs leading-relaxed px-1">
-                  Explore everything that happened on this day across years.
+                  Explore what happened on this day across the years.
                 </p>
               </div>
 
