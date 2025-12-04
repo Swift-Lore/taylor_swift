@@ -165,7 +165,6 @@ function getTorontoTimelineDate(date) {
 
 export default function Timeline() {
   const navigate = useNavigate()
-  const [showScrollHint, setShowScrollHint] = useState(true)
   const [records, setRecords] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [showCalendar, setShowCalendar] = useState(false)
