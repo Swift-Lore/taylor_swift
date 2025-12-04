@@ -458,6 +458,16 @@ const handlePreviousDay = () => {
       }
       return date.toLocaleDateString("en-US", options)
     }
+    // HOLIDAYS badges helper (supports array or text with multiple tags)
+    const holidayTagsRaw = record?.fields?.HOLIDAYS
+    const holidayTags = Array.isArray(holidayTagsRaw)
+      ? holidayTagsRaw
+      : typeof holidayTagsRaw === "string"
+        ? holidayTagsRaw
+            .split(/[;,|]/)        // supports comma, semicolon, or |
+            .map((tag) => tag.trim())
+            .filter(Boolean)
+        : []
 
     return (
       <div
@@ -474,10 +484,26 @@ const handlePreviousDay = () => {
                 {formatDate(record?.fields?.DATE)}
               </div>
 
-              <div className="flex flex-col gap-2.5 mt-1.5 timeline-card-text">
+                            <div className="flex flex-col gap-2.5 mt-1.5 timeline-card-text">
+
+                {/* Holiday badges row */}
+                {holidayTags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 justify-center mb-1">
+                    {holidayTags.map((holiday, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#fbeff7] text-[#8e3e3e] border border-[#e3b0b0]"
+                      >
+                        🎀 {holiday}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
                 <h3 className="text-[#8e3e3e] font-bold text-sm md:text-base leading-relaxed text-center">
                   {record?.fields?.EVENT || "Event description unavailable"}
                 </h3>
+
 
                 {record?.fields?.NOTES && (
                   <div className="text-xs md:text-sm text-center font-medium text-gray-700 leading-relaxed whitespace-pre-line">
