@@ -568,60 +568,29 @@ response.data.records?.forEach((record) => {
 
 // ===== Card component =====
 const TimelineCard = ({ record, index }) => {
-  const [isTextSelected, setIsTextSelected] = useState(false)
-  const selectionRef = useRef({ x: 0, y: 0 })
-
   const handleTagClick = (e, keyword) => {
     e.preventDefault()
     e.stopPropagation()
     navigate(`/posts?keyword=${encodeURIComponent(keyword)}`)
   }
 
-  const handleTextMouseDown = (e) => {
-    // Store the mouse position when selection starts
-    selectionRef.current = { x: e.clientX, y: e.clientY }
-    setIsTextSelected(false)
-  }
-
-  const handleTextMouseUp = (e) => {
-    // Check if mouse moved (text selection) vs click
-    const movedX = Math.abs(e.clientX - selectionRef.current.x)
-    const movedY = Math.abs(e.clientY - selectionRef.current.y)
-    
-    if (movedX > 3 || movedY > 3) {
-      setIsTextSelected(true)
-    }
-    
-    // Also check actual text selection
-    const sel = window.getSelection()
-    if (sel && sel.toString().length > 0) {
-      setIsTextSelected(true)
-    }
-  }
-
   const handleCardClick = (e) => {
-    // Don't navigate if:
-    // 1. User is selecting text (mouse moved)
-    // 2. Ctrl/Cmd key is pressed (open in new tab)
-    // 3. Middle mouse button
-    // 4. Click is on a keyword button
-    if (isTextSelected || 
-        e.metaKey || 
-        e.ctrlKey || 
-        e.button === 1 ||
-        e.target.closest('.keyword-container')) {
-      e.preventDefault()
-      setIsTextSelected(false)
+    // If click is on a keyword pill, let that handler do its thing
+    if (e.target.closest(".keyword-container")) {
       return
     }
-    
-    // Check for actual text selection
+
+    // If there is ANY selected text, don't navigate
     const sel = window.getSelection()
     if (sel && sel.toString().length > 0) {
       e.preventDefault()
-      setIsTextSelected(false)
       return
     }
+
+    // Otherwise:
+    // - normal left click → let <Link> navigate
+    // - Cmd/Ctrl+click → open in new tab (browser default)
+    // - middle click → open in new tab (browser default)
   }
 
   const formatDate = (dateString) => {
@@ -641,17 +610,14 @@ const TimelineCard = ({ record, index }) => {
   const hasHoliday = holidayTags.length > 0
 
   return (
-  <Link
-    to={`/post_details?id=${record.id}`}
-    className="block relative hover:opacity-95 transition-opacity timeline-card"
-    style={{ marginTop: index === 0 ? "17px" : "43px" }}
-    draggable={false}
-    onDragStart={(e) => e.preventDefault()}
-    onClick={handleCardClick}
-    onMouseDown={(e) => {
-      setIsTextSelected(false)
-    }}
-  >
+    <Link
+      to={`/post_details?id=${record.id}`}
+      className="block relative hover:opacity-95 transition-opacity timeline-card"
+      style={{ marginTop: index === 0 ? "17px" : "43px" }}
+      draggable={false}
+      onDragStart={(e) => e.preventDefault()}
+      onClick={handleCardClick}
+    >
       <div className="relative">
         <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
           <div className="bg-white/80 backdrop-blur-sm rounded-[10px] p-3 border border-[#f0d0d3] relative">
@@ -663,6 +629,7 @@ const TimelineCard = ({ record, index }) => {
             {/* Holiday badges - not selectable */}
             {holidayTags.length > 0 && (
               <>
+                {/* MOBILE */}
                 <div className="mt-2 mb-1 flex justify-center md:hidden">
                   <div className="flex flex-wrap gap-1 justify-center no-text-highlight">
                     {holidayTags.map((holiday, i) => (
@@ -681,6 +648,7 @@ const TimelineCard = ({ record, index }) => {
                   </div>
                 </div>
 
+                {/* DESKTOP */}
                 <div className="hidden md:flex absolute top-1 left-3 flex-wrap gap-1 justify-start max-w-[45%] no-text-highlight">
                   {holidayTags.map((holiday, i) => (
                     <span
@@ -699,14 +667,11 @@ const TimelineCard = ({ record, index }) => {
               </>
             )}
 
-            {/* Main text content - SELECTABLE AREA */}
+            {/* Main text content – this stays fully selectable */}
             <div
               className={`timeline-card-text flex flex-col gap-2.5 mt-3 ${
                 hasHoliday ? "md:mt-7" : "md:mt-3"
               }`}
-              onMouseDown={handleTextMouseDown}
-              onMouseUp={handleTextMouseUp}
-              onMouseLeave={() => setIsTextSelected(false)}
             >
               <h3 className="text-[#8e3e3e] font-bold text-sm md:text-base leading-relaxed text-center">
                 {record?.fields?.EVENT || "Event description unavailable"}
@@ -718,23 +683,16 @@ const TimelineCard = ({ record, index }) => {
                 </div>
               )}
 
-              {/* Keywords - clickable buttons */}
+              {/* Keywords – clickable buttons */}
               {record?.fields?.KEYWORDS &&
                 record.fields.KEYWORDS.length > 0 && (
-                  <div 
-                    className="flex flex-wrap gap-1 md:gap-1.5 justify-center keyword-container"
-                    onClick={(e) => e.stopPropagation()}
-                  >
+                  <div className="flex flex-wrap gap-1 md:gap-1.5 justify-center keyword-container">
                     {record.fields.KEYWORDS.slice(0, 4).map((tag, tagIndex) => (
                       <button
                         key={tagIndex}
                         type="button"
                         className="bg-[#8a9ac7] text-white font-medium text-xs px-2 py-0.5 rounded-full whitespace-nowrap shadow-sm hover:bg-[#6b7db3] transition-colors"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                          handleTagClick(e, tag)
-                        }}
+                        onClick={(e) => handleTagClick(e, tag)}
                       >
                         {tag}
                       </button>
