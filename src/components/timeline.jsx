@@ -447,27 +447,50 @@ const handlePreviousDay = () => {
       }
     }
 
-    const formatDate = (dateString) => {
+        const formatDate = (dateString) => {
       if (!dateString) return "Loading..."
       const date = new Date(dateString)
       const options = {
         month: "short",
-        day: "2-digit", 
+        day: "2-digit",
         year: "numeric",
         timeZone: "UTC",
       }
       return date.toLocaleDateString("en-US", options)
     }
+
     // HOLIDAYS badges helper (supports array or text with multiple tags)
     const holidayTagsRaw = record?.fields?.HOLIDAYS
     const holidayTags = Array.isArray(holidayTagsRaw)
       ? holidayTagsRaw
       : typeof holidayTagsRaw === "string"
         ? holidayTagsRaw
-            .split(/[;,|]/)        // supports comma, semicolon, or |
+            .split(/[;,|]/) // supports comma, semicolon, or |
             .map((tag) => tag.trim())
             .filter(Boolean)
         : []
+
+    // Map holiday names to emojis
+    const getHolidayEmoji = (holiday) => {
+      const name = holiday.toLowerCase()
+
+      if (name.includes("halloween")) return "🎃"
+      if (name.includes("christmas") || name.includes("xmas")) return "🎄"
+      if (name.includes("new year")) return "🎆"
+      if (name.includes("valentine")) return "💘"
+      if (name.includes("easter")) return "🐣"
+      if (name.includes("thanksgiving")) return "🦃"
+      if (
+        name.includes("independence") ||
+        name.includes("4th of july") ||
+        name.includes("fourth of july")
+      )
+        return "🎆"
+
+      // default
+      return "🎀"
+    }
+
 
     return (
       <div
@@ -478,27 +501,27 @@ const handlePreviousDay = () => {
         onMouseUp={handleMouseUp}
       >
         <div className="relative">
-          <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
-            <div className="bg-white/80 backdrop-blur-sm rounded-[10px] p-3 border border-[#f0d0d3]">
+                    <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
+            <div className="bg-white/80 backdrop-blur-sm rounded-[10px] p-3 border border-[#f0d0d3] relative">
               <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 -translate-y-1/4 border border-[#8e3e3e] bg-white rounded-full px-3 py-1 text-sm text-[#8e3e3e] font-semibold shadow-md z-10 min-w-[150px] text-center">
                 {formatDate(record?.fields?.DATE)}
               </div>
+              {/* Holiday badges – pinned to top-right */}
+              {holidayTags.length > 0 && (
+                <div className="absolute top-2 right-3 flex flex-wrap gap-1 justify-end max-w-[55%]">
+                  {holidayTags.map((holiday, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#fbeff7] text-[#8e3e3e] border border-[#e3b0b0] shadow-sm"
+                    >
+                      <span className="mr-1">{getHolidayEmoji(holiday)}</span>
+                      <span className="truncate max-w-[110px]">{holiday}</span>
+                    </span>
+                  ))}
+                </div>
+              )}
 
                             <div className="flex flex-col gap-2.5 mt-1.5 timeline-card-text">
-
-                {/* Holiday badges row */}
-                {holidayTags.length > 0 && (
-                  <div className="flex flex-wrap gap-1 justify-center mb-1">
-                    {holidayTags.map((holiday, index) => (
-                      <span
-                        key={index}
-                        className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#fbeff7] text-[#8e3e3e] border border-[#e3b0b0]"
-                      >
-                        🎀 {holiday}
-                      </span>
-                    ))}
-                  </div>
-                )}
 
                 <h3 className="text-[#8e3e3e] font-bold text-sm md:text-base leading-relaxed text-center">
                   {record?.fields?.EVENT || "Event description unavailable"}
