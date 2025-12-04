@@ -14,11 +14,31 @@ const REAL_ANCHOR_DATE = new Date(2024, 10, 22) // month is 0-based → 10 = Nov
 const ALT_ANCHOR_DATE  = new Date(2019, 3, 25)  // 3 = April
 
 function getTorontoTimelineDate(date) {
+  console.log("=== Toronto Date Calculation ===")
+  console.log("Input date:", date)
+  console.log("Input date string:", date.toDateString())
+  
   // Normalize to midnight to avoid timezone issues
   const base = new Date(date.getFullYear(), date.getMonth(), date.getDate())
-  const diffMs = base.getTime() - REAL_ANCHOR_DATE.getTime()
-  const altTime = ALT_ANCHOR_DATE.getTime() + diffMs
-  return new Date(altTime)
+  console.log("Normalized base:", base.toDateString())
+  
+  console.log("REAL_ANCHOR_DATE:", REAL_ANCHOR_DATE.toDateString())
+  console.log("ALT_ANCHOR_DATE:", ALT_ANCHOR_DATE.toDateString())
+  
+  // Calculate difference in DAYS (not milliseconds) to avoid floating point issues
+  const diffTime = base.getTime() - REAL_ANCHOR_DATE.getTime()
+  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24))
+  console.log("Difference in days:", diffDays)
+  
+  // Create result by adding days to ALT_ANCHOR_DATE
+  const result = new Date(ALT_ANCHOR_DATE)
+  result.setDate(result.getDate() + diffDays)
+  
+  console.log("Result date:", result.toDateString())
+  console.log("Result year:", result.getFullYear())
+  console.log("=== End Calculation ===")
+  
+  return result
 }
 
 export default function Timeline() {
@@ -68,12 +88,13 @@ export default function Timeline() {
   }
 
   const handleDateSelect = (day) => {
-    if (day) {
-      setCurrentMonth(calendarMonth + 1)
-      setCurrentDay(day)
-      setShowCalendar(false)
-    }
+  if (day) {
+    setCurrentYear(calendarYear)        // ADD THIS LINE
+    setCurrentMonth(calendarMonth + 1)
+    setCurrentDay(day)
+    setShowCalendar(false)
   }
+}
 
   const navigateCalendarMonth = (direction) => {
     if (direction === 'prev') {
@@ -94,13 +115,14 @@ export default function Timeline() {
   }
 
   const jumpToToday = () => {
-    const today = new Date()
-    setCurrentMonth(today.getMonth() + 1)
-    setCurrentDay(today.getDate())
-    setCalendarMonth(today.getMonth())
-    setCalendarYear(today.getFullYear())
-    setShowCalendar(false)
-  }
+  const today = new Date()
+  setCurrentYear(today.getFullYear())   // Make sure this is here
+  setCurrentMonth(today.getMonth() + 1)
+  setCurrentDay(today.getDate())
+  setCalendarMonth(today.getMonth())
+  setCalendarYear(today.getFullYear())
+  setShowCalendar(false)
+}
 
   const jumpToThisMonth = () => {
     const today = new Date()
@@ -447,17 +469,89 @@ const handlePreviousDay = () => {
       }
     }
 
-    const formatDate = (dateString) => {
+        const formatDate = (dateString) => {
       if (!dateString) return "Loading..."
       const date = new Date(dateString)
       const options = {
         month: "short",
-        day: "2-digit", 
+        day: "2-digit",
         year: "numeric",
         timeZone: "UTC",
       }
       return date.toLocaleDateString("en-US", options)
     }
+
+    // HOLIDAYS badges helper (supports array or text with multiple tags)
+    const holidayTagsRaw = record?.fields?.HOLIDAYS
+    const holidayTags = Array.isArray(holidayTagsRaw)
+      ? holidayTagsRaw
+      : typeof holidayTagsRaw === "string"
+        ? holidayTagsRaw
+            .split(/[;,|]/) // supports comma, semicolon, or |
+            .map((tag) => tag.trim())
+            .filter(Boolean)
+        : []
+const hasHoliday = holidayTags.length > 0
+    const getHolidayEmoji = (holiday) => {
+  const name = holiday.toLowerCase();
+
+  // 🐱🎂 Taylor's cats (Meredith, Olivia, Benjamin)
+  if (
+    name.includes("meredith") ||
+    name.includes("olivia") ||
+    name.includes("benjamin")
+  ) {
+    return "🐱🎂";
+  }
+
+  // 🌈 Saint Patrick's Day → Clover
+  if (name.includes("patrick")) return "☘️";
+
+  // 🍩 National Donut Day → Donut
+  if (name.includes("donut") || name.includes("doughnut")) return "🍩";
+
+  // 🎂 Any "birthday" → Birthday cake
+  if (name.includes("birthday")) return "🎂";
+
+  // 🇺🇸 American holidays
+  if (
+    name.includes("independence") ||
+    name.includes("memorial day") ||
+    name.includes("labor day")
+  ) {
+    return "🇺🇸";
+  }
+
+  // 🍷 Wine days
+  if (name.includes("red wine") || name.includes("white wine")) return "🍷";
+
+  // 🐍 “Mean Girls Cat” → Snake
+  if (name.includes("mean girls")) return "🐍";
+
+  // 🐱 Any holiday with “cat” in it
+  if (name.includes("cat")) return "🐱";
+
+  // 🎃 Halloween
+  if (name.includes("halloween")) return "🎃";
+
+  // 🎄 Christmas
+  if (name.includes("christmas") || name.includes("xmas")) return "🎄";
+
+  // 🎆 New Years
+  if (name.includes("new year")) return "🎆";
+
+  // 💘 Valentine’s Day
+  if (name.includes("valentine")) return "💘";
+
+  // 🐣 Easter
+  if (name.includes("easter")) return "🐣";
+
+  // 🦃 Thanksgiving
+  if (name.includes("thanksgiving")) return "🦃";
+
+  // 🎀 Default
+  return "🎀";
+};
 
     return (
       <div
@@ -468,16 +562,54 @@ const handlePreviousDay = () => {
         onMouseUp={handleMouseUp}
       >
         <div className="relative">
-          <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
-            <div className="bg-white/80 backdrop-blur-sm rounded-[10px] p-3 border border-[#f0d0d3]">
+                    <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
+            <div className="bg-white/80 backdrop-blur-sm rounded-[10px] p-3 border border-[#f0d0d3] relative">
               <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 -translate-y-1/4 border border-[#8e3e3e] bg-white rounded-full px-3 py-1 text-sm text-[#8e3e3e] font-semibold shadow-md z-10 min-w-[150px] text-center">
                 {formatDate(record?.fields?.DATE)}
               </div>
+              {/* Holiday badges */}
+{holidayTags.length > 0 && (
+  <>
+    {/* MOBILE: centered under the date, in normal flow */}
+<div className="mt-2 mb-1 flex justify-center md:hidden">
+  <div className="flex flex-wrap gap-1 justify-center">
+    {holidayTags.map((holiday, index) => (
+      <span
+        key={index}
+        className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#fbeff7] text-[#8e3e3e] border border-[#e3b0b0] shadow-sm"
+      >
+        <span className="mr-1">{getHolidayEmoji(holiday)}</span>
+        <span className="truncate max-w-[110px]">{holiday}</span>
+      </span>
+    ))}
+  </div>
+</div>
 
-              <div className="flex flex-col gap-2.5 mt-1.5 timeline-card-text">
+        {/* DESKTOP: upper-left, a bit lower to avoid long titles */}
+        <div className="hidden md:flex absolute top-1 left-3 flex-wrap gap-1 justify-start max-w-[45%]">
+      {holidayTags.map((holiday, index) => (
+        <span
+          key={index}
+          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-[#fbeff7] text-[#8e3e3e] border border-[#e3b0b0] shadow-sm"
+        >
+          <span className="mr-1 text-sm">{getHolidayEmoji(holiday)}</span>
+          <span className="truncate max-w-[140px]">{holiday}</span>
+        </span>
+      ))}
+    </div>
+  </>
+)}
+
+                            <div
+  className={`flex flex-col gap-2.5 mt-3 ${
+    hasHoliday ? "md:mt-7" : "md:mt-3"
+  } timeline-card-text`}
+>
+
                 <h3 className="text-[#8e3e3e] font-bold text-sm md:text-base leading-relaxed text-center">
                   {record?.fields?.EVENT || "Event description unavailable"}
                 </h3>
+
 
                 {record?.fields?.NOTES && (
                   <div className="text-xs md:text-sm text-center font-medium text-gray-700 leading-relaxed whitespace-pre-line">
@@ -592,7 +724,7 @@ const handlePreviousDay = () => {
     </Button>
 
     {/* Date bubble with calendar button integrated */}
-    <div className="relative">
+    <div className="relative mr-6 sm:mr-0">
       <div className="bg-white rounded-full px-3 sm:px-5 md:px-6 py-1 md:py-1.5 min-w-[102px] sm:min-w-[136px] md:min-w-[170px] border border-[#b66b6b] flex items-center justify-center">
         <span className="text-[#8e3e3e] text-sm md:text-base font-medium">
           {displayDate.toLocaleDateString("en-US", {
@@ -604,7 +736,7 @@ const handlePreviousDay = () => {
       {/* Calendar button positioned inside the bubble */}
       <button
         onClick={() => setShowCalendar(true)}
-        className="absolute -right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-1 shadow-sm border border-[#b66b6b] hover:bg-[#f8d7da] transition-colors"
+          className="absolute -right-4 sm:-right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-1 shadow-sm border border-[#b66b6b] hover:bg-[#f8d7da] transition-colors"
         title="Open calendar"
       >
         <Calendar size={14} className="text-[#8e3e3e]" />
@@ -650,19 +782,26 @@ const handlePreviousDay = () => {
           bg-white/90 hover:bg-[#fbeff7]
         "
         onClick={() => {
-          if (isTorontoMode) {
-            const today = new Date()
-            setCurrentYear(today.getFullYear())
-            setCurrentMonth(today.getMonth() + 1)
-            setCurrentDay(today.getDate())
-            setIsTorontoMode(false)
-          } else {
-            setCurrentYear(torontoDate.getFullYear())
-            setCurrentMonth(torontoDate.getMonth() + 1)
-            setCurrentDay(torontoDate.getDate())
-            setIsTorontoMode(true)
-          }
-        }}
+  console.log("=== Toronto Button Click (Mobile) ===")
+  console.log("displayDate:", displayDate)
+  console.log("displayDate year:", displayDate.getFullYear())
+  console.log("torontoDate:", torontoDate)
+  console.log("torontoDate year:", torontoDate.getFullYear())
+  console.log("=== End ===")
+  
+  if (isTorontoMode) {
+    const today = new Date()
+    setCurrentYear(today.getFullYear())
+    setCurrentMonth(today.getMonth() + 1)
+    setCurrentDay(today.getDate())
+    setIsTorontoMode(false)
+  } else {
+    setCurrentYear(torontoDate.getFullYear())
+    setCurrentMonth(torontoDate.getMonth() + 1)
+    setCurrentDay(torontoDate.getDate())
+    setIsTorontoMode(true)
+  }
+}}
       >
         {isTorontoMode ? (
           <>
@@ -713,19 +852,26 @@ const handlePreviousDay = () => {
         bg-white/90 hover:bg-[#fbeff7]
       "
       onClick={() => {
-        if (isTorontoMode) {
-          const today = new Date()
-          setCurrentYear(today.getFullYear())
-          setCurrentMonth(today.getMonth() + 1)
-          setCurrentDay(today.getDate())
-          setIsTorontoMode(false)
-        } else {
-          setCurrentYear(torontoDate.getFullYear())
-          setCurrentMonth(torontoDate.getMonth() + 1)
-          setCurrentDay(torontoDate.getDate())
-          setIsTorontoMode(true)
-        }
-      }}
+  console.log("=== Toronto Button Click (Mobile) ===")
+  console.log("displayDate:", displayDate)
+  console.log("displayDate year:", displayDate.getFullYear())
+  console.log("torontoDate:", torontoDate)
+  console.log("torontoDate year:", torontoDate.getFullYear())
+  console.log("=== End ===")
+  
+  if (isTorontoMode) {
+    const today = new Date()
+    setCurrentYear(today.getFullYear())
+    setCurrentMonth(today.getMonth() + 1)
+    setCurrentDay(today.getDate())
+    setIsTorontoMode(false)
+  } else {
+    setCurrentYear(torontoDate.getFullYear())
+    setCurrentMonth(torontoDate.getMonth() + 1)
+    setCurrentDay(torontoDate.getDate())
+    setIsTorontoMode(true)
+  }
+}}
     >
       {isTorontoMode ? (
         <>
