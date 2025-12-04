@@ -846,25 +846,12 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   {/* TN box – mobile: stacked under nav */}
 <div className="mt-3 w-full max-w-xs mx-auto md:hidden">
   <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-3 sm:px-4 py-3">
-    <p className="text-[11px] sm:text-xs text-[#6b7db3] leading-snug mb-2">
-      {isTorontoMode
-        ? "TN Timeline Mode"
-        : "Click to view events on this day on Taylor Nation's alternate timeline."}
-      <button
-        type="button"
-        onClick={() => setShowTNInfo(true)}
-        className="inline-flex items-center ml-1 text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
-      >
-        <HelpCircle size={12} className="mr-0.5" />
-        What is this?
-      </button>
-    </p>
-
+    {/* Primary action on top – same style vibe as desktop */}
     <Button
       variant="outline"
       className="
-        rounded-full px-3 sm:px-4 py-1.5
-        text-[11px] sm:text-xs
+        rounded-xl px-3 sm:px-4 py-1.5
+        text-xs sm:text-sm font-medium
         border-[#b66b6b] text-[#8e3e3e]
         bg-white/90 hover:bg-[#fbeff7]
         w-full break-words whitespace-normal
@@ -904,6 +891,21 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
         </>
       )}
     </Button>
+
+    {/* Helper text under the button, mirroring desktop copy */}
+    <p className="mt-2 text-[11px] sm:text-xs text-[#6b7db3] leading-snug">
+      {isTorontoMode
+        ? "TN Timeline Mode"
+        : "Click to view events on this day on Taylor Nation's alternate timeline."}
+      <button
+        type="button"
+        onClick={() => setShowTNInfo(true)}
+        className="inline-flex items-center ml-1 text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
+      >
+        <HelpCircle size={12} className="mr-0.5" />
+        What is this?
+      </button>
+    </p>
   </div>
 </div>
 
