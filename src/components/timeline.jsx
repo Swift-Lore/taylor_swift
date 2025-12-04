@@ -2,7 +2,7 @@
 
 import { ChevronLeft, ChevronRight, Calendar, Star, Zap, Clock, HelpCircle } from "lucide-react"
 import { Button } from "./ui/Button"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import { useEffect, useState, useRef } from "react"
 import axios from "axios"
 import "./timeline.css"
@@ -575,21 +575,33 @@ const TimelineCard = ({ record, index }) => {
   }
 
   const handleCardClick = (e) => {
-  // If click is on a keyword pill, let that handler do its thing
-  if (e.target.closest(".keyword-container")) {
-    return
+    // If click is on a keyword pill, let that handler do its thing
+    if (e.target.closest(".keyword-container")) {
+      return
+    }
+
+    // If there is ANY selected text, don't navigate
+    const sel = window.getSelection()
+    if (sel && sel.toString().length > 0) {
+      e.preventDefault()
+      return
+    }
+
+    // Otherwise, let the <Link> handle navigation normally
+    // (left-click, Cmd/Ctrl+click, middle-click, etc.)
   }
 
-  // If there is ANY selected text, don't navigate
-  const sel = window.getSelection()
-  if (sel && sel.toString().length > 0) {
+  const handleCardCopy = (e) => {
+    const selection = window.getSelection()
+    if (!selection) return
+
+    const text = selection.toString()
+    if (!text) return
+
+    // Prevent browser from adding the link URL to the copied text
     e.preventDefault()
-    return
+    e.clipboardData.setData("text/plain", text)
   }
-
-  // Otherwise, navigate programmatically
-  navigate(`/post_details?id=${record.id}`)
-}
 
   const formatDate = (dateString) => {
     if (!dateString) return "Loading..."
@@ -608,11 +620,15 @@ const TimelineCard = ({ record, index }) => {
   const hasHoliday = holidayTags.length > 0
 
   return (
-    <div
-  className="block relative hover:opacity-95 transition-opacity timeline-card"
-  style={{ marginTop: index === 0 ? "17px" : "43px" }}
-  onClick={handleCardClick}
->
+    <Link
+      to={`/post_details?id=${record.id}`}
+      className="block relative hover:opacity-95 transition-opacity timeline-card"
+      style={{ marginTop: index === 0 ? "17px" : "43px" }}
+      draggable={false}
+      onDragStart={(e) => e.preventDefault()}
+      onClick={handleCardClick}
+      onCopy={handleCardCopy}
+    >
       <div className="relative">
         <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
           <div className="bg-white/80 backdrop-blur-sm rounded-[10px] p-3 border border-[#f0d0d3] relative">
@@ -703,7 +719,7 @@ const TimelineCard = ({ record, index }) => {
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   )
 }
 const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
