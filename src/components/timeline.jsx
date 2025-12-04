@@ -725,10 +725,10 @@ const TimelineCard = ({ record, index }) => {
 const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
       // ===== JSX =====
   return (
-    <section className="w-full bg-[#e8ecf7] py-2 px-2 md:px-6 flex flex-col min-h-0">
+    <section className="w-full bg-[#e8ecf7] py-1 px-2 md:px-6 flex flex-col min-h-0">
       <div className="container mx-auto flex flex-col min-h-0 flex-1">
         {/* Homepage Intro for SEO / AdSense - WIDER but same height */}
-        <div className="max-w-4xl mx-auto mt-1 mb-3 px-3">
+        <div className="max-w-4xl mx-auto mt-1 mb-2 px-3">
           <div className="bg-white/70 border border-[#e3d5dd] rounded-xl shadow-sm px-4 py-3 md:px-6 md:py-3 text-center">
             <h2 className="text-base md:text-lg font-semibold text-[#8e3e3e] mb-2">
               Swift Lore: Taylor Swift's Complete Career Timeline
@@ -750,7 +750,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
         </div>
 
         {/* ON THIS DAY Section - FIXED overlapping */}
-        <div className="text-center mb-2 flex-shrink-0">
+        <div className="text-center mb-1 flex-shrink-0">
           {/* Glowy header card - with extra margin for TN box */}
           <div className="relative w-full mb-2 md:mb-3 px-2">
             <div
@@ -1046,7 +1046,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
             )}
 
             {/* Event Counter */}
-            <div className="flex justify-center mt-1 mb-1 flex-shrink-0">
+            <div className="flex justify-center mt-0.5 mb-1 flex-shrink-0">
               <div
                 className="
                   event-counter-pill
