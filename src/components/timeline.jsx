@@ -88,12 +88,13 @@ export default function Timeline() {
   }
 
   const handleDateSelect = (day) => {
-    if (day) {
-      setCurrentMonth(calendarMonth + 1)
-      setCurrentDay(day)
-      setShowCalendar(false)
-    }
+  if (day) {
+    setCurrentYear(calendarYear)        // ADD THIS LINE
+    setCurrentMonth(calendarMonth + 1)
+    setCurrentDay(day)
+    setShowCalendar(false)
   }
+
 
   const navigateCalendarMonth = (direction) => {
     if (direction === 'prev') {
