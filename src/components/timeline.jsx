@@ -794,7 +794,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
             </div>
           </div>
 
-                    {/* Date navigation container with absolute positioned TN box */}
+                    {/* Date navigation container with properly positioned TN box */}
 <div className="relative mt-0 md:mt-1 max-w-3xl mx-auto">
   {/* Main date navigation - CENTERED */}
   <div className="flex items-center justify-center gap-1 md:gap-2">
@@ -863,8 +863,12 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
     </Button>
   </div>
 
-  {/* TN box - ABSOLUTE POSITIONED on desktop, below on mobile */}
-  <div className="mt-2 lg:mt-0 lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2">
+  {/* TN box - Desktop: right side, Tablet/Mobile: centered below */}
+  <div className="
+    mt-2 
+    md:mt-3 md:mx-auto md:max-w-xs
+    lg:mt-0 lg:absolute lg:right-[-40px] lg:top-[calc(100%+10px)] lg:translate-y-0
+  ">
     <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 w-56">
       <Button
         variant="outline"
