@@ -1013,12 +1013,12 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
     </div>
   )}
 
-  {/* DESKTOP holiday pill – left-aligned with event cards */}
+  {/* DESKTOP holiday pill – positioned to match timeline cards */}
   {hasGlobalHoliday && (
-    <div className="hidden md:block mt-1 mb-0">
-      <div className="relative flex justify-center">
-        {/* This wrapper matches the timeline cards offset */}
-        <div className="relative left-[37.5%] -translate-x-1/4 w-3/4">
+    <div className="hidden md:block">
+      <div className="relative">
+        {/* Position badge to match timeline cards */}
+        <div className="absolute left-1/4 -translate-x-1/4">
           <span
             className="
               inline-flex items-center
@@ -1029,6 +1029,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               text-[#8e3e3e]
               border border-[#e3b0b0]
               shadow-sm
+              whitespace-nowrap
             "
           >
             <span className="mr-2 text-base">
@@ -1044,7 +1045,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   {/* Event Counter – tighter spacing */}
   <div
     className={`flex justify-center ${
-      hasGlobalHoliday ? "mt-2" : "-mt-2 md:-mt-3"
+      hasGlobalHoliday ? "mt-8 md:mt-1" : "-mt-2 md:-mt-3"
     } mb-2 flex-shrink-0`}
   >
     <div
