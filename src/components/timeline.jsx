@@ -958,7 +958,12 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
 
     {/* Short, more readable helper text */}
     <p className="mt-2 text-xs md:text-sm text-[#5c678f] leading-snug">
-  Click to view events on this day on Taylor Nation's alternate timeline.
+  {isTorontoMode ? (
+    <>TN Timeline Mode</>
+  ) : (
+    <>Click to view events on this day on Taylor Nation's alternate timeline.</>
+  )}
+
   <button
     type="button"
     onClick={() => setShowTNInfo(true)}
