@@ -1044,10 +1044,10 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
 
   {/* Event Counter – tighter spacing */}
   <div
-    className={`flex justify-center ${
-      hasGlobalHoliday ? "mt-8 md:mt-1" : "-mt-2 md:-mt-3"
-    } mb-2 flex-shrink-0`}
-  >
+  className={`flex justify-center ${
+    hasGlobalHoliday ? "mt-8 md:mt-1" : "mt-2 md:-mt-3"
+  } mb-2 flex-shrink-0`}
+>
     <div
       className="
         event-counter-pill
