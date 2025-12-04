@@ -1058,18 +1058,19 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
 </div>
         </div>
 
-        {/* Mobile Timeline */}
-<div className="md:hidden mt-2 min-h-0 relative flex justify-center mobile-timeline-container px-4">
-  {/* Center line + dots (same style as desktop, just full width) */}
-  <div className="absolute w-[2px] flex flex-col items-center h-full">
-    <div className="w-[5px] bg-[#8a9ad4] h-full"></div>
-    <div className="absolute left-1/2 -translate-x-1/2 top-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
-    <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
-  </div>
-
-  {/* Mobile Timeline Items - Centered container */}
-  <div className="relative w-full flex justify-center">
-    <div className="w-full max-w-xl space-y-6">
+        {/* Mobile Timeline - Simple version with vertical line */}
+<div className="md:hidden mt-2 min-h-0 px-4">
+  {/* Center line container - relative positioned */}
+  <div className="relative flex justify-center">
+    {/* Vertical line */}
+    <div className="absolute w-[2px] flex flex-col items-center h-full">
+      <div className="w-[5px] bg-[#8a9ad4] h-full"></div>
+      <div className="absolute left-1/2 -translate-x-1/2 top-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
+      <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
+    </div>
+    
+    {/* Cards - properly centered */}
+    <div className="relative z-10 w-full max-w-xl space-y-6">
       {records.map((record, index) => (
         <TimelineCard
           key={`mobile-${record.id}`}
