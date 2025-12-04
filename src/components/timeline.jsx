@@ -926,7 +926,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
 </div>
 
     {/* TN box – desktop: compact TN control */}
-<div className="hidden md:block absolute right-6 top-1/2 -translate-y-1/2">
+<div className="hidden lg:block absolute right-6 top-1/2 -translate-y-1/2">
   <div className="bg-white/90 border border-[#e6d2e1] rounded-2xl shadow-sm px-4 py-3 max-w-xs">
     {/* Primary action on top – shows TN date directly */}
     <Button
