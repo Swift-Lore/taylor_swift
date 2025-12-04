@@ -1061,8 +1061,18 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
         {/* Mobile Timeline - Vertical line behind cards */}
 <div className="md:hidden mt-2 px-4">
   <div className="relative">
-    {/* Vertical line + bottom bubble */}
+        {/* Vertical line + top & bottom bubbles */}
     <div className="pointer-events-none">
+      {/* Main vertical line */}
+      <div className="absolute left-1/2 -translate-x-1/2 w-[2px] h-full bg-[#8a9ad4]" />
+
+      {/* TOP bubble */}
+      <div className="absolute left-1/2 -translate-x-1/2 -top-3 w-7 h-7 rounded-full bg-[#6B78B4]" />
+
+      {/* BOTTOM bubble */}
+      <div className="absolute left-1/2 -translate-x-1/2 -bottom-3 w-7 h-7 rounded-full bg-[#6B78B4]" />
+    </div>
+
       {/* Main vertical line */}
       <div className="absolute left-1/2 -translate-x-1/2 w-[2px] h-full bg-[#8a9ad4]" />
       {/* Bottom bubble (global) */}
