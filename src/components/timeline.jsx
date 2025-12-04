@@ -789,12 +789,17 @@ const hasHoliday = holidayTags.length > 0
           </div>
 
           {/* Date navigation + Taylor Nation alternate timeline box */}
-<div className="mt-1 md:mt-2 relative flex flex-col items-center md:min-h-[70px]">
-  {/* Main date navigation (stays centered) */}
-  <div className="flex items-center justify-center gap-1 sm:gap-2 md:gap-3">
+<div className="relative mt-1 md:mt-2 flex flex-col items-center md:min-h-[82px]">
+  {/* Main date navigation (centered) */}
+  <div className="flex items-center justify-center gap-2 md:gap-3">
+    {/* PREVIOUS – same size as NEXT */}
     <Button
       variant="secondary"
-      className="rounded-full h-8 md:h-9 px-2 sm:px-3 md:px-4 text-[11px] sm:text-xs md:text-sm flex items-center gap-1 mr-1"
+      className="
+        rounded-full h-8 md:h-9 px-3 md:px-4
+        text-[11px] sm:text-xs md:text-sm
+        flex items-center justify-center gap-1 min-w-[96px]
+      "
       onClick={handlePreviousDay}
     >
       <ChevronLeft size={12} />
@@ -802,9 +807,19 @@ const hasHoliday = holidayTags.length > 0
       <span className="sm:hidden">Prev</span>
     </Button>
 
-    {/* Date bubble with calendar button integrated */}
-    <div className="relative mr-6 sm:mr-0">
-      <div className="bg-white rounded-full px-3 sm:px-5 md:px-6 py-1 md:py-1.5 min-w-[102px] sm:min-w-[136px] md:min-w-[170px] border border-[#b66b6b] flex items-center justify-center">
+    {/* Date bubble with calendar icon INSIDE, but still centered */}
+    <div className="relative">
+      <div
+        className="
+          bg-white rounded-full
+          pl-3 sm:pl-5 md:pl-6
+          pr-8 sm:pr-10 md:pr-11
+          py-1 md:py-1.5
+          min-w-[130px] sm:min-w-[160px] md:min-w-[190px]
+          border border-[#b66b6b]
+          flex items-center justify-center
+        "
+      >
         <span className="text-[#8e3e3e] text-sm md:text-base font-medium">
           {displayDate.toLocaleDateString("en-US", {
             month: "long",
@@ -812,19 +827,31 @@ const hasHoliday = holidayTags.length > 0
           })}
         </span>
       </div>
-      {/* Calendar button positioned inside the bubble */}
+
+      {/* calendar button stays in the bubble but no longer pushes it off-center */}
       <button
         onClick={() => setShowCalendar(true)}
-        className="absolute -right-4 sm:-right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-1 shadow-sm border border-[#b66b6b] hover:bg-[#f8d7da] transition-colors"
+        className="
+          absolute right-1.5 sm:right-2 md:right-2.5
+          top-1/2 -translate-y-1/2
+          bg-white rounded-full p-1
+          shadow-sm border border-[#b66b6b]
+          hover:bg-[#f8d7da] transition-colors
+        "
         title="Open calendar"
       >
         <Calendar size={14} className="text-[#8e3e3e]" />
       </button>
     </div>
 
+    {/* NEXT – same classes as PREVIOUS */}
     <Button
       variant="secondary"
-      className="rounded-full h-8 md:h-9 px-2 sm:px-3 md:px-4 text-[11px] sm:text-xs md:text-sm flex items-center gap-1 ml-1"
+      className="
+        rounded-full h-8 md:h-9 px-3 md:px-4
+        text-[11px] sm:text-xs md:text-sm
+        flex items-center justify-center gap-1 min-w-[96px]
+      "
       onClick={handleNextDay}
     >
       <span className="hidden sm:inline">Next</span>
@@ -833,7 +860,7 @@ const hasHoliday = holidayTags.length > 0
     </Button>
   </div>
 
-  {/* TN box – mobile: under the date nav + holiday pill */}
+  {/* TN box – mobile: stacked under nav */}
   <div className="mt-3 w-full max-w-xs md:hidden">
     <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-3 sm:px-4 py-3">
       <p className="text-[11px] sm:text-xs text-[#6b7db3] leading-snug mb-2">
@@ -895,9 +922,9 @@ const hasHoliday = holidayTags.length > 0
       </Button>
     </div>
   </div>
-</div>
-  {/* TN box – desktop: floated to the right, doesn’t push the center */}
-  <div className="hidden md:block md:absolute md:right-6 md:top-3">
+
+  {/* TN box – desktop: pinned to the right, but does NOT affect centering */}
+  <div className="hidden md:block absolute right-6 top-1/2 -translate-y-1/2">
     <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-5 py-3 md:max-w-lg">
       <p className="text-xs text-[#6b7db3] leading-snug mb-2 whitespace-nowrap">
         {isTorontoMode
@@ -959,31 +986,38 @@ const hasHoliday = holidayTags.length > 0
     </div>
   </div>
 </div>
-{/* 🌟 Global fixed-date holiday badge – left side, bigger, below date header */}
+
+{/* 🌟 Global fixed-date holiday badge – DESKTOP
+    Aligned with the LEFT EDGE of the event cards */}
 {globalHolidayTagsForDay.length > 0 && (
-  <div className="hidden md:flex mt-2 mb-1 w-full">
-    <div className="flex items-center">
-      <span
-        className="
-          inline-flex items-center
-          px-4 py-1.5
-          rounded-full
-          text-sm font-semibold
-          bg-[#fbeff7]
-          text-[#8e3e3e]
-          border border-[#e3b0b0]
-          shadow-sm
-        "
-      >
-        <span className="mr-2 text-base">{getHolidayEmoji(globalHolidayTagsForDay[0])}</span>
-        {globalHolidayTagsForDay[0]}
-      </span>
+  <div className="hidden md:block mt-1 mb-0 w-full">
+    <div className="relative flex justify-center">
+      {/* match the same offset container as the desktop cards */}
+      <div className="relative left-[37.5%] -translate-x-1/4 w-3/4">
+        <span
+          className="
+            inline-flex items-center
+            px-4 py-1.5
+            rounded-full
+            text-sm font-semibold
+            bg-[#fbeff7]
+            text-[#8e3e3e]
+            border border-[#e3b0b0]
+            shadow-sm
+          "
+        >
+          <span className="mr-2 text-base">
+            {getHolidayEmoji(globalHolidayTagsForDay[0])}
+          </span>
+          {globalHolidayTagsForDay[0]}
+        </span>
+      </div>
     </div>
   </div>
 )}
 
-        {/* Event Counter */}
-<div className="flex justify-center -mt-2 md:-mt-3 mb-2 flex-shrink-0">
+{/* Event Counter – pulled up closer to the header */}
+<div className="flex justify-center mt-1 md:mt-0 mb-2 flex-shrink-0">
   <div
     className="
       event-counter-pill
@@ -992,7 +1026,7 @@ const hasHoliday = holidayTags.length > 0
     "
   >
     <div className="flex items-center gap-1.5">
-      <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
+      <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse" />
 
       <span className="event-counter-text text-[#8e3e3e] text-xs md:text-sm font-medium">
         {isLoading
@@ -1002,7 +1036,7 @@ const hasHoliday = holidayTags.length > 0
             } Found${isTorontoMode ? " (TN Timeline)" : ""}`}
       </span>
 
-      <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse"></div>
+      <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse" />
     </div>
   </div>
 </div>
