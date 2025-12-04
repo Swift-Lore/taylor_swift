@@ -1073,18 +1073,26 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
 </div>
         </div>
 
-        {/* Timeline Section */}
-        <div className="flex-1 min-h-0 relative">
-          {/* Mobile Timeline */}
-          <div className="md:hidden mt-2 space-y-6">
-            {records.map((record, index) => (
-              <TimelineCard
-                key={`mobile-${record.id}`}
-                record={record}
-                index={index}
-              />
-            ))}
-          </div>
+        {/* Mobile Timeline */}
+<div className="md:hidden mt-2 min-h-0 relative flex justify-center mobile-timeline-container">
+  {/* Center line + dots (same style as desktop, just full width) */}
+  <div className="absolute w-[2px] flex flex-col items-center h-full">
+    <div className="w-[5px] bg-[#8a9ad4] h-full"></div>
+    <div className="absolute left-1/2 -translate-x-1/2 top-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
+    <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
+  </div>
+
+  {/* Mobile Timeline Items */}
+  <div className="relative w-full max-w-xl space-y-6">
+    {records.map((record, index) => (
+      <TimelineCard
+        key={`mobile-${record.id}`}
+        record={record}
+        index={index}
+      />
+    ))}
+  </div>
+</div>
 
           {/* Desktop Timeline */}
           <div className="hidden md:block min-h-0">
