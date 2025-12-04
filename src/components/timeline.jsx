@@ -165,6 +165,11 @@ export default function Timeline() {
   const [currentDay, setCurrentDay] = useState(today.getDate())
   const [currentYear, setCurrentYear] = useState(today.getFullYear())
   const displayDate = new Date(currentYear, currentMonth - 1, currentDay)
+  const todayLabel = today.toLocaleDateString("en-US", {
+  month: "short",
+  day: "2-digit",
+  year: "numeric",
+})
   const [showTNInfo, setShowTNInfo] = useState(false)
   // The mapped date for whatever "On This Day" you're currently viewing
   const torontoDate = getTorontoTimelineDate(displayDate)
