@@ -722,7 +722,7 @@ const hasHoliday = holidayTags.length > 0
       </div>
     )
   }
-
+const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   // ===== JSX =====
   return (
     <section className="w-full bg-[#e8ecf7] py-2 px-2 md:px-10 flex flex-col min-h-0">
@@ -987,56 +987,62 @@ const hasHoliday = holidayTags.length > 0
   </div>
 </div>
 
-{/* 🌟 Global fixed-date holiday badge – DESKTOP
-    Aligned with the LEFT EDGE of the event cards */}
-{globalHolidayTagsForDay.length > 0 && (
-  <div className="hidden md:block mt-1 mb-0 w-full">
-    <div className="relative flex justify-center">
-      {/* match the same offset container as the desktop cards */}
-      <div className="relative left-[37.5%] -translate-x-1/4 w-3/4">
-        <span
-          className="
-            inline-flex items-center
-            px-4 py-1.5
-            rounded-full
-            text-sm font-semibold
-            bg-[#fbeff7]
-            text-[#8e3e3e]
-            border border-[#e3b0b0]
-            shadow-sm
-          "
-        >
-          <span className="mr-2 text-base">
-            {getHolidayEmoji(globalHolidayTagsForDay[0])}
+{/* 🌟 Global fixed-date holiday badge + Event Counter */}
+<div className="w-full">
+  {/* DESKTOP holiday pill – aligned with LEFT EDGE of event cards */}
+  {hasGlobalHoliday && (
+    <div className="hidden md:block mt-1 mb-0">
+      <div className="relative flex justify-center">
+        {/* This wrapper uses the SAME offset as your desktop cards */}
+        <div className="relative left-[37.5%] -translate-x-1/4 w-3/4">
+          <span
+            className="
+              inline-flex items-center
+              px-4 py-1.5
+              rounded-full
+              text-sm font-semibold
+              bg-[#fbeff7]
+              text-[#8e3e3e]
+              border border-[#e3b0b0]
+              shadow-sm
+            "
+          >
+            <span className="mr-2 text-base">
+              {getHolidayEmoji(globalHolidayTagsForDay[0])}
+            </span>
+            {globalHolidayTagsForDay[0]}
           </span>
-          {globalHolidayTagsForDay[0]}
-        </span>
+        </div>
       </div>
     </div>
-  </div>
-)}
+  )}
 
-{/* Event Counter – pulled up closer to the header */}
-<div className="flex justify-center mt-1 md:mt-0 mb-2 flex-shrink-0">
+  {/* Event Counter – tighter to header when no holiday, not overlapping when there is */}
   <div
-    className="
-      event-counter-pill
-      bg-white rounded-full px-2 sm:px-3 md:px-4 py-1
-      border border-[#b66b6b] shadow-sm
-    "
+    className={`flex justify-center ${
+      hasGlobalHoliday ? "mt-1" : "-mt-2 md:-mt-3"
+    } mb-2 flex-shrink-0`}
   >
-    <div className="flex items-center gap-1.5">
-      <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse" />
+    <div
+      className="
+        event-counter-pill
+        bg-white rounded-full px-2 sm:px-3 md:px-4 py-1
+        border border-[#b66b6b] shadow-sm
+      "
+    >
+      <div className="flex items-center gap-1.5">
+        <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse" />
 
-      <span className="event-counter-text text-[#8e3e3e] text-xs md:text-sm font-medium">
-        {isLoading
-          ? "Loading events..."
-          : `${records.length} ${
-              records.length === 1 ? "Event" : "Events"
-            } Found${isTorontoMode ? " (TN Timeline)" : ""}`}
-      </span>
+        <span className="event-counter-text text-[#8e3e3e] text-xs md:text-sm font-medium">
+          {isLoading
+            ? "Loading events..."
+            : `${records.length} ${
+                records.length === 1 ? "Event" : "Events"
+              } Found${isTorontoMode ? " (TN Timeline)" : ""}`}
+        </span>
 
-      <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse" />
+        <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse" />
+      </div>
     </div>
   </div>
 </div>
