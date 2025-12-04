@@ -1061,15 +1061,11 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
         {/* Mobile Timeline - Vertical line behind cards */}
 <div className="md:hidden mt-2 px-4">
   <div className="relative">
-    {/* Vertical line + top/bottom bubbles */}
+    {/* Vertical line + bottom bubble */}
     <div className="pointer-events-none">
       {/* Main vertical line */}
       <div className="absolute left-1/2 -translate-x-1/2 w-[2px] h-full bg-[#8a9ad4]" />
-
-      {/* Top bubble */}
-      <div className="absolute left-1/2 -translate-x-1/2 -top-3 w-7 h-7 rounded-full bg-[#6B78B4]" />
-
-      {/* Bottom bubble */}
+      {/* Bottom bubble (global) */}
       <div className="absolute left-1/2 -translate-x-1/2 -bottom-3 w-7 h-7 rounded-full bg-[#6B78B4]" />
     </div>
 
@@ -1077,9 +1073,14 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
     <div className="relative w-full max-w-xl mx-auto">
       {records.map((record, index) => (
         <div key={`mobile-${record.id}`} className="relative mb-6">
+          {/* Top bubble for the FIRST card only */}
+          {index === 0 && (
+            <div className="pointer-events-none absolute left-1/2 -translate-x-1/2 -top-3 w-7 h-7 rounded-full bg-[#6B78B4]" />
+          )}
+
           {/* Connecting line from card to center line */}
           <div className="absolute left-1/2 top-6 w-6 h-[2px] bg-[#8a9ad4] -translate-x-1/2" />
-          
+
           <TimelineCard
             record={record}
             index={index}
