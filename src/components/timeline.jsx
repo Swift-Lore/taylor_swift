@@ -1061,17 +1061,20 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
         {/* Mobile Timeline - Vertical line behind cards */}
 <div className="md:hidden mt-2 px-4">
   <div className="relative">
-    {/* Vertical line in background */}
-    <div className="absolute left-1/2 -translate-x-1/2 w-[2px] h-full bg-[#8a9ad4]"></div>
-    {/* Top circle */}
-    <div className="absolute left-1/2 -translate-x-1/2 top-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
-    {/* Bottom circle */}
-    <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
+    {/* Vertical line with connecting dots */}
+    <div className="absolute left-1/2 -translate-x-1/2 w-[2px] flex flex-col items-center h-full">
+      <div className="w-[5px] bg-[#8a9ad4] h-full"></div>
+      <div className="absolute left-1/2 -translate-x-1/2 top-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
+      <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
+    </div>
     
-    {/* Cards centered over the line - remove space-y-6 since cards have their own spacing */}
+    {/* Cards centered over the line */}
     <div className="relative w-full max-w-xl mx-auto">
       {records.map((record, index) => (
-        <div key={`mobile-${record.id}`} className="relative">
+        <div key={`mobile-${record.id}`} className="relative mb-6">
+          {/* Connecting line from card to center line */}
+          <div className="absolute left-1/2 top-6 w-6 h-[2px] bg-[#8a9ad4] -translate-x-1/2"></div>
+          
           <TimelineCard
             record={record}
             index={index}
