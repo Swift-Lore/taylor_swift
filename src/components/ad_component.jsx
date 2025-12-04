@@ -1,35 +1,27 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
+import { useEffect } from "react";
 
 export default function AdComponent() {
   useEffect(() => {
-    if (typeof window === "undefined") return
+    if (typeof window === "undefined") return;
 
-    // Only inject the script once
-    if (!window.__adsenseLoaded) {
-      const script = document.createElement("script")
-      script.src =
-        "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4534610257929133"
-      script.async = true
-      script.crossOrigin = "anonymous"
-      document.body.appendChild(script)
-      window.__adsenseLoaded = true
-    }
-
+    // Only run adsbygoogle push when the script is already loaded
     try {
-      ;(window.adsbygoogle = window.adsbygoogle || []).push({})
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch (e) {
-      console.error("Ad error:", e)
+      console.error("AdSense error:", e);
     }
-  }, [])
+  }, []);
 
   return (
     <ins
-      className="adsbygoogle block"
-      style={{ display: "block", width: "100%", height: "90px" }}
-      data-ad-client="ca-pub-4534610257929133"
+      className="adsbygoogle"
+      style={{ display: "block", textAlign: "center", margin: "12px 0" }}
+      data-ad-client="ca-pub-9054923750158002"
       data-ad-slot="3327797457"
+      data-ad-format="auto"
+      data-full-width-responsive="true"
     ></ins>
-  )
+  );
 }
