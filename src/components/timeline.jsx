@@ -837,7 +837,7 @@ const hasHoliday = holidayTags.length > 0
   {globalHolidayTagsForDay.length > 0 && (
     <div className="mt-1 flex justify-center">
       <div className="flex flex-wrap gap-2 justify-center">
-        {globalHolidayTagsForDay.map((holiday, index) => (
+        {globalHolidayTagsForDay.slice(0, 1).map((holiday, index) => (
           <span
             key={index}
             className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-[#fbeff7] text-[#8e3e3e] border border-[#e3b0b0] shadow-sm"
@@ -976,24 +976,6 @@ const hasHoliday = holidayTags.length > 0
     </div>
   </div>
 </div>
-
-          {/* 🌟 Global fixed-date holiday badges (top-of-page, once per day) */}
-          {globalHolidayTagsForDay.length > 0 && (
-            <div className="mt-2 flex justify-center">
-              <div className="flex flex-wrap gap-2 justify-center">
-                {globalHolidayTagsForDay.map((holiday, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-[#fbeff7] text-[#8e3e3e] border border-[#e3b0b0] shadow-sm"
-                  >
-                    <span className="mr-1 text-sm">{getHolidayEmoji(holiday)}</span>
-                    <span className="truncate max-w-[220px]">{holiday}</span>
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
 
         {/* Event Counter */}
         <div className="flex justify-center mb-2 flex-shrink-0">
