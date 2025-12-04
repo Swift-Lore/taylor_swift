@@ -1059,15 +1059,14 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
         </div>
 
         {/* Mobile Timeline - Vertical line behind cards */}
-<div className="md:hidden mt-2 min-h-0 px-4">
+<div className="md:hidden mt-2 px-4">
   <div className="relative">
-    {/* Vertical line in background - positioned to align with cards */}
-    <div className="absolute left-1/2 -translate-x-1/2 w-[2px] flex flex-col items-center">
-      {/* Top circle - positioned where first card's date badge will be */}
-      <div className="w-7 h-7 rounded-full bg-[#6B78B4] mb-4"></div>
-      <div className="w-[5px] bg-[#8a9ad4] flex-grow"></div>
-      <div className="w-7 h-7 rounded-full bg-[#6B78B4] mt-4"></div>
-    </div>
+    {/* Vertical line in background */}
+    <div className="absolute left-1/2 -translate-x-1/2 w-[2px] h-full bg-[#8a9ad4]"></div>
+    {/* Top circle */}
+    <div className="absolute left-1/2 -translate-x-1/2 top-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
+    {/* Bottom circle */}
+    <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-7 h-7 rounded-full bg-[#6B78B4]"></div>
     
     {/* Cards centered over the line - remove space-y-6 since cards have their own spacing */}
     <div className="relative w-full max-w-xl mx-auto">
