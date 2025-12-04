@@ -912,7 +912,7 @@ const hasHoliday = holidayTags.length > 0
       </Button>
     </div>
   </div>
-
+</div>
   {/* TN box – desktop: floated to the right, doesn’t push the center */}
   <div className="hidden md:block md:absolute md:right-6 md:top-3">
     <div className="bg-white/80 border border-[#e6d2e1] rounded-2xl shadow-sm px-5 py-3 md:max-w-lg">
