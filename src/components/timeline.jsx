@@ -568,7 +568,8 @@ response.data.records?.forEach((record) => {
 
 // ===== Card component =====
 const TimelineCard = ({ record, index }) => {
-  const [isSelectingText, setIsSelectingText] = useState(false)
+  const [isTextSelected, setIsTextSelected] = useState(false)
+  const [clickTimer, setClickTimer] = useState(null)
 
   const handleTagClick = (e, keyword) => {
     e.preventDefault()
@@ -576,21 +577,39 @@ const TimelineCard = ({ record, index }) => {
     navigate(`/posts?keyword=${encodeURIComponent(keyword)}`)
   }
 
-  const handleMouseDown = (e) => {
-    const isTextElement =
-      e.target.closest(".timeline-card-text h3") ||
-      e.target.closest(".timeline-card-text div:not(.keyword-container)")
+  const handleTextMouseDown = (e) => {
+    // Start a timer to detect if this is a click vs selection
+    const timer = setTimeout(() => {
+      // If timer completes (250ms), user is selecting text
+      setIsTextSelected(true)
+    }, 250)
+    setClickTimer(timer)
+  }
 
-    if (isTextElement) {
-      setIsSelectingText(false)
+  const handleTextMouseUp = (e) => {
+    if (clickTimer) {
+      clearTimeout(clickTimer)
+      setClickTimer(null)
+    }
+    
+    // Check if text is actually selected
+    const selection = window.getSelection()
+    if (selection && selection.toString().length > 0) {
+      setIsTextSelected(true)
     }
   }
 
-  const handleMouseUp = () => {
-    const selection = window.getSelection()
-    if (selection && selection.toString().length > 0) {
-      setIsSelectingText(true)
+  const handleCardClick = (e) => {
+    // Only navigate if text isn't selected and click wasn't on a keyword
+    if (!isTextSelected && !e.target.closest('.keyword-container')) {
+      navigate(`/post_details?id=${record.id}`)
     }
+    setIsTextSelected(false)
+  }
+
+  const handleTextContextMenu = (e) => {
+    // Allow default right-click behavior for text selection context menu
+    e.stopPropagation()
   }
 
   const formatDate = (dateString) => {
@@ -605,27 +624,18 @@ const TimelineCard = ({ record, index }) => {
     return date.toLocaleDateString("en-US", options)
   }
 
-  // HOLIDAYS badges helper (supports array or text with multiple tags)
-  // Use shared helpers and remove global (top-of-page) holidays from cards
+  // HOLIDAYS badges helper
   const rawHolidayTags = parseHolidayTags(record?.fields?.HOLIDAYS)
   const holidayTags = rawHolidayTags.filter((tag) => !isGlobalHolidayName(tag))
   const hasHoliday = holidayTags.length > 0
 
   return (
-    <Link
-      to={`/post_details?id=${record.id}`}
-      className="block relative hover:opacity-95 transition-opacity timeline-card"
+    <div
+      className="block relative timeline-card"
       style={{ marginTop: index === 0 ? "17px" : "43px" }}
-      onClick={(e) => {
-        if (isSelectingText) {
-          e.preventDefault()
-          setIsSelectingText(false)
-        }
-      }}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
+      onClick={handleCardClick}
     >
-      <div className="relative">
+      <div className="relative cursor-pointer hover:opacity-95 transition-opacity">
         <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
           <div className="bg-white/80 backdrop-blur-sm rounded-[10px] p-3 border border-[#f0d0d3] relative">
             {/* Top date pill */}
@@ -674,47 +684,61 @@ const TimelineCard = ({ record, index }) => {
               </>
             )}
 
-            {/* Main card content */}
+            {/* Main card content - This area allows text selection */}
             <div
-              className={`flex flex-col gap-2.5 mt-3 ${
+              className={`select-text user-select-text ${
                 hasHoliday ? "md:mt-7" : "md:mt-3"
-              } timeline-card-text`}
+              }`}
+              onMouseDown={handleTextMouseDown}
+              onMouseUp={handleTextMouseUp}
+              onContextMenu={handleTextContextMenu}
+              style={{ 
+                cursor: 'text',
+                userSelect: 'text',
+                WebkitUserSelect: 'text'
+              }}
             >
-              <h3 className="text-[#8e3e3e] font-bold text-sm md:text-base leading-relaxed text-center">
-                {record?.fields?.EVENT || "Event description unavailable"}
-              </h3>
+              <div className="flex flex-col gap-2.5 mt-3 timeline-card-text">
+                <h3 className="text-[#8e3e3e] font-bold text-sm md:text-base leading-relaxed text-center select-text">
+                  {record?.fields?.EVENT || "Event description unavailable"}
+                </h3>
 
-              {record?.fields?.NOTES && (
-                <div className="text-xs md:text-sm text-center font-medium text-gray-700 leading-relaxed whitespace-pre-line">
-                  {record.fields.NOTES}
-                </div>
-              )}
-
-              {record?.fields?.KEYWORDS &&
-                record.fields.KEYWORDS.length > 0 && (
-                  <div className="flex flex-wrap gap-1 md:gap-1.5 justify-center keyword-container">
-                    {record.fields.KEYWORDS.slice(0, 4).map((tag, tagIndex) => (
-                      <button
-                        key={tagIndex}
-                        type="button"
-                        className="bg-[#8a9ac7] text-white font-medium text-xs px-2 py-0.5 rounded-full whitespace-nowrap shadow-sm hover:bg-[#6b7db3] transition-colors"
-                        onClick={(e) => handleTagClick(e, tag)}
-                      >
-                        {tag}
-                      </button>
-                    ))}
-                    {record.fields.KEYWORDS.length > 4 && (
-                      <div className="bg-[#b8c5e8] text-[#8e3e3e] font-medium text-xs px-2 py-0.5 rounded-full">
-                        +{record.fields.KEYWORDS.length - 4}
-                      </div>
-                    )}
+                {record?.fields?.NOTES && (
+                  <div className="text-xs md:text-sm text-center font-medium text-gray-700 leading-relaxed whitespace-pre-line select-text">
+                    {record.fields.NOTES}
                   </div>
                 )}
+
+                {/* Keywords - These are clickable buttons */}
+                {record?.fields?.KEYWORDS &&
+                  record.fields.KEYWORDS.length > 0 && (
+                    <div 
+                      className="flex flex-wrap gap-1 md:gap-1.5 justify-center keyword-container"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {record.fields.KEYWORDS.slice(0, 4).map((tag, tagIndex) => (
+                        <button
+                          key={tagIndex}
+                          type="button"
+                          className="bg-[#8a9ac7] text-white font-medium text-xs px-2 py-0.5 rounded-full whitespace-nowrap shadow-sm hover:bg-[#6b7db3] transition-colors cursor-pointer"
+                          onClick={(e) => handleTagClick(e, tag)}
+                        >
+                          {tag}
+                        </button>
+                      ))}
+                      {record.fields.KEYWORDS.length > 4 && (
+                        <div className="bg-[#b8c5e8] text-[#8e3e3e] font-medium text-xs px-2 py-0.5 rounded-full">
+                          +{record.fields.KEYWORDS.length - 4}
+                        </div>
+                      )}
+                    </div>
+                  )}
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   )
 }
 const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
