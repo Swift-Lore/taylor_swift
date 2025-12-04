@@ -799,8 +799,14 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               </div>
             </div>
           </div>
+          {/* Inline Ad – below ON THIS DAY header */}
+          <div className="my-3 flex justify-center">
+            <div className="w-full max-w-md px-3">
+              <AdComponent />
+            </div>
+          </div>
 
-                    {/* Date navigation container with properly positioned TN box */}
+          {/* Date navigation container with properly positioned TN box */}
 <div className="relative mt-0 md:mt-1 max-w-3xl mx-auto">
   {/* Main date navigation - CENTERED */}
   <div className="flex items-center justify-center gap-1 md:gap-2">
