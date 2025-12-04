@@ -566,120 +566,132 @@ response.data.records?.forEach((record) => {
     }
   }, [calendarMonth, calendarYear, showCalendar])
 
-  // ===== Card component =====
-  const TimelineCard = ({ record, index }) => {
-    const [isSelectingText, setIsSelectingText] = useState(false)
+// ===== Card component =====
+const TimelineCard = ({ record, index }) => {
+  const [isSelectingText, setIsSelectingText] = useState(false)
 
-    const handleTagClick = (e, keyword) => {
-      e.preventDefault()
-      e.stopPropagation()
-      navigate(`/posts?keyword=${encodeURIComponent(keyword)}`)
+  const handleTagClick = (e, keyword) => {
+    e.preventDefault()
+    e.stopPropagation()
+    navigate(`/posts?keyword=${encodeURIComponent(keyword)}`)
+  }
+
+  const handleMouseDown = (e) => {
+    const isTextElement =
+      e.target.closest(".timeline-card-text h3") ||
+      e.target.closest(".timeline-card-text div:not(.keyword-container)")
+
+    if (isTextElement) {
+      setIsSelectingText(false)
     }
+  }
 
-    const handleMouseDown = (e) => {
-      const isTextElement = e.target.closest('.timeline-card-text h3') || 
-                           e.target.closest('.timeline-card-text div:not(.keyword-container)')
-      if (isTextElement) {
-        setIsSelectingText(false)
-      }
+  const handleMouseUp = () => {
+    const selection = window.getSelection()
+    if (selection && selection.toString().length > 0) {
+      setIsSelectingText(true)
     }
+  }
 
-    const handleMouseUp = (e) => {
-      const selection = window.getSelection()
-      if (selection.toString().length > 0) {
-        setIsSelectingText(true)
-      }
+  const formatDate = (dateString) => {
+    if (!dateString) return "Loading..."
+    const date = new Date(dateString)
+    const options = {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+      timeZone: "UTC",
     }
+    return date.toLocaleDateString("en-US", options)
+  }
 
-        const formatDate = (dateString) => {
-      if (!dateString) return "Loading..."
-      const date = new Date(dateString)
-      const options = {
-        month: "short",
-        day: "2-digit",
-        year: "numeric",
-        timeZone: "UTC",
-      }
-      return date.toLocaleDateString("en-US", options)
-    }
+  // HOLIDAYS badges helper (supports array or text with multiple tags)
+  // Use shared helpers and remove global (top-of-page) holidays from cards
+  const rawHolidayTags = parseHolidayTags(record?.fields?.HOLIDAYS)
+  const holidayTags = rawHolidayTags.filter((tag) => !isGlobalHolidayName(tag))
+  const hasHoliday = holidayTags.length > 0
 
-    // HOLIDAYS badges helper (supports array or text with multiple tags)
-// Use shared helpers and remove global (top-of-page) holidays from cards
-const rawHolidayTags = parseHolidayTags(record?.fields?.HOLIDAYS)
-const holidayTags = rawHolidayTags.filter((tag) => !isGlobalHolidayName(tag))
-const hasHoliday = holidayTags.length > 0
+  return (
+    <Link
+      to={`/post_details?id=${record.id}`}
+      className="block relative hover:opacity-95 transition-opacity timeline-card"
+      style={{ marginTop: index === 0 ? "17px" : "43px" }}
+      onClick={(e) => {
+        if (isSelectingText) {
+          e.preventDefault()
+          setIsSelectingText(false)
+        }
+      }}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+    >
+      <div className="relative">
+        <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
+          <div className="bg-white/80 backdrop-blur-sm rounded-[10px] p-3 border border-[#f0d0d3] relative">
+            {/* Top date pill */}
+            <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 -translate-y-1/4 border border-[#8e3e3e] bg-white rounded-full px-3 py-1 text-sm text-[#8e3e3e] font-semibold shadow-md z-10 min-w-[150px] text-center">
+              {formatDate(record?.fields?.DATE)}
+            </div>
 
-            return (
-  <Link
-    to={`/post_details?id=${record.id}`}
-    className="block relative hover:opacity-95 transition-opacity timeline-card"
-    style={{ marginTop: index === 0 ? "17px" : "43px" }}
-    onClick={(e) => {
-      if (isSelectingText) {
-        e.preventDefault()
-        setIsSelectingText(false)
-      }
-    }}
-    onMouseDown={handleMouseDown}
-    onMouseUp={handleMouseUp}
-  >
-    <div className="relative">
-      <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
-        <div className="bg-white/80 backdrop-blur-sm rounded-[10px] p-3 border border-[#f0d0d3] relative">
-          <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 -translate-y-1/4 border border-[#8e3e3e] bg-white rounded-full px-3 py-1 text-sm text-[#8e3e3e] font-semibold shadow-md z-10 min-w-[150px] text-center">
-            {formatDate(record?.fields?.DATE)}
-          </div>
-              {/* Holiday badges */}
-{holidayTags.length > 0 && (
-  <>
-    {/* MOBILE: centered under the date, in normal flow */}
-<div className="mt-2 mb-1 flex justify-center md:hidden">
-  <div className="flex flex-wrap gap-1 justify-center">
-    {holidayTags.map((holiday, index) => (
-      <span
-        key={index}
-        className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#fbeff7] text-[#8e3e3e] border border-[#e3b0b0] shadow-sm"
-      >
-        <span className="mr-1">{getHolidayEmoji(holiday)}</span>
-        <span className="truncate max-w-[110px]">{holiday}</span>
-      </span>
-    ))}
-  </div>
-</div>
-
-        {/* DESKTOP: upper-left, a bit lower to avoid long titles */}
-        <div className="hidden md:flex absolute top-1 left-3 flex-wrap gap-1 justify-start max-w-[45%]">
-      {holidayTags.map((holiday, index) => (
-        <span
-          key={index}
-          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-[#fbeff7] text-[#8e3e3e] border border-[#e3b0b0] shadow-sm"
-        >
-          <span className="mr-1 text-sm">{getHolidayEmoji(holiday)}</span>
-          <span className="truncate max-w-[140px]">{holiday}</span>
-        </span>
-      ))}
-    </div>
-  </>
-)}
-
-                            <div
-  className={`flex flex-col gap-2.5 mt-3 ${
-    hasHoliday ? "md:mt-7" : "md:mt-3"
-  } timeline-card-text`}
->
-
-                <h3 className="text-[#8e3e3e] font-bold text-sm md:text-base leading-relaxed text-center">
-                  {record?.fields?.EVENT || "Event description unavailable"}
-                </h3>
-
-
-                {record?.fields?.NOTES && (
-                  <div className="text-xs md:text-sm text-center font-medium text-gray-700 leading-relaxed whitespace-pre-line">
-                    {record.fields.NOTES}
+            {/* Holiday badges */}
+            {holidayTags.length > 0 && (
+              <>
+                {/* MOBILE: centered under the date, in normal flow */}
+                <div className="mt-2 mb-1 flex justify-center md:hidden">
+                  <div className="flex flex-wrap gap-1 justify-center">
+                    {holidayTags.map((holiday, i) => (
+                      <span
+                        key={i}
+                        className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#fbeff7] text-[#8e3e3e] border border-[#e3b0b0] shadow-sm"
+                      >
+                        <span className="mr-1">
+                          {getHolidayEmoji(holiday)}
+                        </span>
+                        <span className="truncate max-w-[110px]">
+                          {holiday}
+                        </span>
+                      </span>
+                    ))}
                   </div>
-                )}
+                </div>
 
-                {record?.fields?.KEYWORDS && record.fields.KEYWORDS.length > 0 && (
+                {/* DESKTOP: upper-left, a bit lower to avoid long titles */}
+                <div className="hidden md:flex absolute top-1 left-3 flex-wrap gap-1 justify-start max-w-[45%]">
+                  {holidayTags.map((holiday, i) => (
+                    <span
+                      key={i}
+                      className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-[#fbeff7] text-[#8e3e3e] border border-[#e3b0b0] shadow-sm"
+                    >
+                      <span className="mr-1 text-sm">
+                        {getHolidayEmoji(holiday)}
+                      </span>
+                      <span className="truncate max-w-[140px]">
+                        {holiday}
+                      </span>
+                    </span>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* Main card content */}
+            <div
+              className={`flex flex-col gap-2.5 mt-3 ${
+                hasHoliday ? "md:mt-7" : "md:mt-3"
+              } timeline-card-text`}
+            >
+              <h3 className="text-[#8e3e3e] font-bold text-sm md:text-base leading-relaxed text-center">
+                {record?.fields?.EVENT || "Event description unavailable"}
+              </h3>
+
+              {record?.fields?.NOTES && (
+                <div className="text-xs md:text-sm text-center font-medium text-gray-700 leading-relaxed whitespace-pre-line">
+                  {record.fields.NOTES}
+                </div>
+              )}
+
+              {record?.fields?.KEYWORDS &&
+                record.fields.KEYWORDS.length > 0 && (
                   <div className="flex flex-wrap gap-1 md:gap-1.5 justify-center keyword-container">
                     {record.fields.KEYWORDS.slice(0, 4).map((tag, tagIndex) => (
                       <button
@@ -698,13 +710,13 @@ const hasHoliday = holidayTags.length > 0
                     )}
                   </div>
                 )}
-              </div>
             </div>
           </div>
         </div>
       </div>
-    )
-  }
+    </Link>
+  )
+}
 const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   // ===== JSX =====
   return (
