@@ -945,17 +945,16 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
 
     {/* Short, more readable helper text */}
     <p className="mt-2 text-xs md:text-sm text-[#5c678f] leading-snug">
-      See what Taylor was doing on this Taylor Nation “alternate timeline” date.
-      Click to toggle between the TN view and today.
-      <button
-        type="button"
-        onClick={() => setShowTNInfo(true)}
-        className="inline-flex items-center ml-1 text-[11px] md:text-xs text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
-      >
-        <HelpCircle size={12} className="mr-0.5" />
-        What is this?
-      </button>
-    </p>
+  Click to view events on this day on Taylor Nation's alternate timeline.
+  <button
+    type="button"
+    onClick={() => setShowTNInfo(true)}
+    className="inline-flex items-center ml-1 text-[11px] md:text-xs text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
+  >
+    <HelpCircle size={12} className="mr-0.5" />
+    What is this?
+  </button>
+</p>
   </div>
 </div>
 </div>
