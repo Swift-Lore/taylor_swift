@@ -1162,7 +1162,12 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   <span className="font-semibold">{SITE_UPDATES.totalEvents}+</span> Taylor Swift events
   from {SITE_UPDATES.firstYear} to present.
 </div>
-
+<div className="text-center text-[10px] text-[#6b7db3] mt-1 mb-3 px-4 leading-tight">
+  All event dates and information are collected from publicly available sources.
+  Swift Lore is a fan-created research project and may contain occasional inaccuracies.
+  If you spot an error, please contact us.
+</div>
+          
           {/* View Full Timeline Button */}
           <div className="flex justify-center mt-1 mb-1 flex-shrink-0">
             <Button
