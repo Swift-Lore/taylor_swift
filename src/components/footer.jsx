@@ -84,11 +84,11 @@ export default function Footer() {
   <div className="max-w-5xl mx-auto flex flex-wrap justify-center items-center gap-2 md:gap-3 text-[11px] md:text-sm">
     
     <a
-      href="/cookie_policy"
-      className="text-white hover:text-gray-200 underline"
-    >
-      Cookie Policy
-    </a>
+  href="/cookie-policy"
+  className="text-white hover:text-gray-200 underline"
+>
+  Cookie Policy
+</a>
 
     <span className="mx-1">•</span>
 
