@@ -53,7 +53,53 @@ function formatDate(dateStr) {
     year: "numeric",
   });
 }
+// Optional: prettier date display
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
 
+// 🔹 NEW: Getty embed helper
+function GettyEmbed({ html }) {
+  useEffect(() => {
+    if (!html) return;
+
+    // Check if the Getty script is already on the page
+    let script = document.querySelector('script[data-getty-widget="true"]');
+
+    if (!script) {
+      script = document.createElement("script");
+      script.src = "https://embed-cdn.gettyimages.com/widgets.js";
+      script.async = true;
+      script.dataset.gettyWidget = "true";
+      document.body.appendChild(script);
+    } else {
+      // If their widget API is available, ask it to re-scan
+      if (window.gettyimages && window.gettyimages.embed) {
+        try {
+          window.gettyimages.embed.render();
+        } catch (e) {
+          console.error("Getty render error", e);
+        }
+      }
+    }
+  }, [html]);
+
+  if (!html) return null;
+
+  return (
+    <div
+      className="w-full h-full"
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  );
+}
 export default function ErasTourShows() {
   const [shows, setShows] = useState([]);
   const [selectedShowId, setSelectedShowId] = useState("");
@@ -386,11 +432,9 @@ export default function ErasTourShows() {
                   className="bg-white/80 rounded-xl border border-[#f3d6d6] shadow-sm overflow-hidden flex flex-col"
                 >
                   <div className="w-full">
-                    <div
-                      className="w-full overflow-hidden"
-                      dangerouslySetInnerHTML={{ __html: outfit.gettyHtml }}
-                    />
-                  </div>
+  <GettyEmbed html={outfit.gettyHtml} />
+</div>
+
 
                   <div className="p-3 border-t border-[#f5e3e3]">
                     {outfit.eraSection && (
