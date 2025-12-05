@@ -1128,10 +1128,30 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               </div>
             </div>
           </div>
-          {/* Desktop Timeline */}
+                    {/* Desktop Timeline */}
           <div className="hidden md:block min-h-0">
             <div className="relative flex justify-center">
-              {/* ...your existing desktop timeline... */}
+              <div className="absolute w-[2px] flex flex-col items-center h-full">
+                <div className="w-[5px] bg-[#8a9ad4] h-full"></div>
+                <div className="absolute left-1/2 -translate-x-1/2 top-0 w-6 h-6 rounded-full bg-[#6B78B4]"></div>
+                <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-6 h-6 rounded-full bg-[#6B78B4]"></div>
+              </div>
+
+              <div className="relative left-[37.5%] -translate-x-1/4 w-3/4">
+                {records.map((record, index) => (
+                  <div
+                    key={`desktop-${record.id}`}
+                    className="relative transition-all duration-300"
+                    style={{
+                      marginTop: index === 0 ? "0" : "40px",
+                    }}
+                  >
+                    <div className="transform scale-[0.90] origin-top -translate-x-1/4">
+                      <TimelineCard record={record} index={index} />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -1145,9 +1165,6 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           {/* View Full Timeline Button */}
           <div className="flex justify-center mt-1 mb-1 flex-shrink-0">
             <Button
-          {/* View Full Timeline Button */}
-          <div className="flex justify-center mt-1 mb-1 flex-shrink-0">
-            <Button
               variant="secondary"
               className="rounded-full px-4 py-1 text-sm w-full max-w-xs sm:max-w-sm"
               onClick={() => {
@@ -1158,6 +1175,15 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               View Full Timeline
             </Button>
           </div>
+
+          {/* Modals */}
+          <CalendarModal />
+          <TNInfoModal />
+        </div>
+      </section>
+    </>
+  )
+}
 
           {/* Modals */}
           <CalendarModal />
