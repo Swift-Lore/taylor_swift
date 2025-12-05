@@ -17,7 +17,7 @@ export default function PrivacyPolicyPage() {
           {/* Introduction */}
           <div className="mb-8">
             <p className="text-[#6b7db3] leading-relaxed">
-              Swift-lore.com ("we", "us", or "our") is committed to protecting your privacy. This Privacy Policy outlines the types of personal information we collect, how we use and safeguard that information, and your rights regarding your data.
+              Swift-Lore.com ("we", "us", or "our") is committed to protecting your privacy. This Privacy Policy outlines the types of personal information we collect, how we use and safeguard that information, and your rights regarding your data.
             </p>
           </div>
 
@@ -223,7 +223,7 @@ export default function PrivacyPolicyPage() {
             <h2 className="text-xl font-semibold text-[#b91c1c] mb-4">9. Children's Privacy</h2>
             <div className="bg-[#fef2f2] border border-[#b91c1c] rounded-lg p-4">
               <p className="text-[#b91c1c] text-sm font-medium">
-                ⚠️ Swift-lore.com is <strong>not intended for children</strong> under the age of 13 (or 16 in the EU). We do not knowingly collect data from children. If you believe we have collected such data, please contact us immediately.
+                ⚠️ Swift-Lore.com is <strong>not intended for children</strong> under the age of 13 (or 16 in the EU). We do not knowingly collect data from children. If you believe we have collected such data, please contact us immediately.
               </p>
             </div>
           </div>
