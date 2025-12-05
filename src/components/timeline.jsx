@@ -6,7 +6,7 @@ import { useNavigate, Link } from "react-router-dom"
 import { useEffect, useState, useRef } from "react"
 import axios from "axios"
 import "./timeline.css"
-import { SITE_UPDATES } from "../config/site-updates";
+import { SITE_UPDATES } from "./site-updates";
 
 // ===== Toronto Theory Alternate Timeline (helper) =====
 // Anchor: REAL date  = Nov 22, 2024
