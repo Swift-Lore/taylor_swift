@@ -164,7 +164,7 @@ export default function Timeline() {
   // ===== SEO META TAGS UPDATE =====
   useEffect(() => {
     // Update page title
-    document.title = `Swift Lore - Taylor Swift Timeline | On This Day`
+    document.title = `Swift-Lore - Taylor Swift Timeline | On This Day`
     
     // Update or create meta description
     let metaDescription = document.querySelector('meta[name="description"]')
@@ -188,7 +188,7 @@ export default function Timeline() {
     script.textContent = JSON.stringify({
       "@context": "https://schema.org",
       "@type": "WebApplication",
-      "name": "Swift Lore - Taylor Swift Timeline",
+      "name": "Swift-Lore - Taylor Swift Timeline",
       "description": `Interactive archive of ${SITE_UPDATES.totalEvents}+ Taylor Swift events from 2003 to present.`,
       "url": window.location.origin,
       "applicationCategory": "EntertainmentApplication",
@@ -774,9 +774,9 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
         overflow: 'hidden',
         pointerEvents: 'none'
       }}>
-        <h1>Swift Lore - Taylor Swift Complete Career Timeline</h1>
+        <h1>Swift-Lore - Taylor Swift Complete Career Timeline</h1>
         <h2>Interactive Archive of Taylor Swift Events</h2>
-        <p>Swift Lore is a comprehensive interactive timeline documenting Taylor Alison Swift's complete career from her earliest performances in 2003 through the present day. This fan-run archive includes thousands of verified events including album releases, tour dates, award show appearances, interviews, music videos, public appearances, personal milestones, and cultural moments.</p>
+        <p>Swift-Lore is a comprehensive interactive timeline documenting Taylor Alison Swift's complete career from her earliest performances in 2003 through the present day. This fan-run archive includes thousands of verified events including album releases, tour dates, award show appearances, interviews, music videos, public appearances, personal milestones, and cultural moments.</p>
         <p>Browse Taylor Swift's career by specific dates, filter events by era (Debut, Fearless, Speak Now, Red, 1989, Reputation, Lover, Folklore, Evermore, Midnights, The Tortured Poets Department), search for specific keywords, or explore connections between different moments in her career.</p>
         <p>Each event includes detailed descriptions, contextual background information, source citations, and keyword tagging for easy navigation. The archive is regularly updated with new events and additional context.</p>
         <h3>Featured Content Areas:</h3>
@@ -809,11 +809,11 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           <div className="max-w-4xl mx-auto mt-1 mb-2 px-3">
             <div className="bg-white/70 border border-[#e3d5dd] rounded-xl shadow-sm px-4 py-3 md:px-6 md:py-3 text-center">
               <h2 className="text-base md:text-lg font-semibold text-[#8e3e3e] mb-2">
-                Swift Lore: Taylor Swift's Complete Career Timeline
+                Swift-Lore: Taylor Swift's Complete Career Timeline
               </h2>
               <div className="text-[#6b7db3] text-sm md:text-base leading-relaxed space-y-2">
                 <p>
-                  Swift Lore is an independent, fan-run research archive documenting Taylor
+                  Swift-Lore is an independent, fan-run research archive documenting Taylor
                   Swift's career from her earliest performances to the present day.
                   Each entry is tied to a specific date, with context notes and source links.
                 </p>
