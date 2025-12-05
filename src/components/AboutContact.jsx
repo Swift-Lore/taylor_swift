@@ -8,7 +8,7 @@ export default function AboutContact() {
         </h1>
 
         <p className="text-[#4b4b63] text-sm md:text-base leading-relaxed mb-4">
-          <strong>Swift Lore</strong> is an independent, fan-created research archive 
+          <strong>Swift-Lore</strong> is an independent, fan-created research archive 
           documenting Taylor Swift’s complete career history—from her earliest 
           performances in the early 2000s to the present day.
         </p>
