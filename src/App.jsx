@@ -93,6 +93,7 @@ function App() {
         <Route path="/post_details" element={<PostDetailPage />} />
         <Route path="/cookie_policy" element={<CookiePolicyPage />} />
         <Route path="/privacy_policy" element={<PrivacyPolicyPage />} />
+          <Route path="/eras-tour-shows" element={<ErasTourShowsPage />} />
 
         {/* 🔹 NEW ROUTE: this is what your header button navigates to */}
         <Route path="/eras-tour-shows" element={<ErasTourShowsPage />} />
