@@ -37,7 +37,7 @@ export default function AboutContact() {
         </h2>
 
         <p className="text-[#4b4b63] text-sm md:text-base leading-relaxed mb-4">
-          Swift Lore is an independent fan-run project and is 
+          Swift-Lore is an independent fan-run project and is 
           <strong>not affiliated with, endorsed by, or connected to Taylor Swift, Taylor 
           Nation, TAS Rights Management, Republic Records, Big Machine Records, or 
           any official entity.</strong>
@@ -68,7 +68,7 @@ export default function AboutContact() {
         </p>
 
         <div className="text-center mt-10 text-xs text-[#6b7db3]">
-          Swift Lore © 2025 — Fan-made, educational, research-focused.
+          Swift-Lore © 2025 — Fan-made, educational, research-focused.
         </div>
       </div>
     </div>
