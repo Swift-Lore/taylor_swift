@@ -1126,25 +1126,27 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   </div>
 </div>
             
-          {/* Mobile Timeline */}
-          <div className="md:hidden mt-1 px-3">
-            <div className="relative">
-              <div className="pointer-events-none absolute inset-0 flex justify-center z-0">
-                <div className="w-[2px] h-full bg-[#8a9ad4]" />
-                <div className="absolute left-1/2 -translate-x-1/2 top-0 w-6 h-6 rounded-full bg-[#6B78B4]" />
-                <div className="absolute left-1/2 -translate-x-1/2 -bottom-2 w-6 h-6 rounded-full bg-[#6B78B4]" />
-              </div>
+                    {/* Mobile Timeline – only show when there are events */}
+          {records.length > 0 && (
+            <div className="md:hidden mt-1 px-3">
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-0 flex justify-center z-0">
+                  <div className="w-[2px] h-full bg-[#8a9ad4]" />
+                  <div className="absolute left-1/2 -translate-x-1/2 top-0 w-6 h-6 rounded-full bg-[#6B78B4]" />
+                  <div className="absolute left-1/2 -translate-x-1/2 -bottom-2 w-6 h-6 rounded-full bg-[#6B78B4]" />
+                </div>
 
-              <div className="relative w-full max-w-xl mx-auto z-10 pt-2">
-                {records.map((record, index) => (
-                  <div key={`mobile-${record.id}`} className="relative mb-4">
-                    <div className="absolute left-1/2 top-4 w-6 h-[2px] bg-[#8a9ad4] -translate-x-1/2" />
-                    <TimelineCard record={record} index={index} />
-                  </div>
-                ))}
+                <div className="relative w-full max-w-xl mx-auto z-10 pt-2">
+                  {records.map((record, index) => (
+                    <div key={`mobile-${record.id}`} className="relative mb-4">
+                      <div className="absolute left-1/2 top-4 w-6 h-[2px] bg-[#8a9ad4] -translate-x-1/2" />
+                      <TimelineCard record={record} index={index} />
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Desktop Timeline */}
           <div className="hidden md:block min-h-0">
