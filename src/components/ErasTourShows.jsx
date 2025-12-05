@@ -69,43 +69,65 @@ export default function ErasTourShows() {
     window.scrollTo(0, 0);
   }, []);
 
-  // Load shows from Airtable
+   // Load shows (serverless endpoint first, Airtable as local fallback)
   useEffect(() => {
     async function loadShows() {
       try {
         setLoading(true);
         setError("");
 
-        let allRecords = [];
-        let offset = null;
+        let data;
 
-        do {
-          const filterFormula = encodeURIComponent(`NOT({Eras Show #} = '')`);
-
-          let url = `${AIRTABLE_URL}?filterByFormula=${filterFormula}&sort[0][field]=DATE&sort[0][direction]=asc&pageSize=100`;
-
-          if (offset) {
-            url += `&offset=${offset}`;
-          }
-
-          const res = await fetch(url, {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-            },
-          });
+        if (SERVER_EVENTS_ENDPOINT) {
+          // Primary path: Netlify / server endpoint
+          const res = await fetch(SERVER_EVENTS_ENDPOINT);
 
           if (!res.ok) {
             throw new Error(
-              `Airtable shows fetch failed: ${res.status} ${res.statusText}`
+              `Server shows fetch failed: ${res.status} ${res.statusText}`
             );
           }
 
-          const responseData = await res.json();
-          allRecords = allRecords.concat(responseData.records);
-          offset = responseData.offset;
-        } while (offset);
+          data = await res.json();
+        } else {
+          // Fallback: direct Airtable (mostly for local dev)
+          let allRecords = [];
+          let offset = null;
 
-        const rawArray = allRecords;
+          do {
+            const filterFormula = encodeURIComponent(`NOT({Eras Show #} = '')`);
+
+            let url = `${AIRTABLE_URL}?filterByFormula=${filterFormula}&sort[0][field]=DATE&sort[0][direction]=asc&pageSize=100`;
+
+            if (offset) {
+              url += `&offset=${offset}`;
+            }
+
+            const res = await fetch(url, {
+              headers: {
+                Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+              },
+            });
+
+            if (!res.ok) {
+              throw new Error(
+                `Airtable shows fetch failed: ${res.status} ${res.statusText}`
+              );
+            }
+
+            const responseData = await res.json();
+            allRecords = allRecords.concat(responseData.records);
+            offset = responseData.offset;
+          } while (offset);
+
+          data = { records: allRecords };
+        }
+
+        const rawArray = Array.isArray(data)
+          ? data
+          : Array.isArray(data.records)
+          ? data.records
+          : [];
 
         console.log("Raw Eras Tour shows:", rawArray.length, "records");
 
