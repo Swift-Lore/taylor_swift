@@ -30,14 +30,20 @@ function normalizeShow(raw) {
 
 function normalizeOutfit(raw) {
   const fields = raw.fields || raw;
+  const embed = fields["GETTY EMBED"] || "";
+
+  // Extract the Getty URL from the <a href="...">
+  const match = embed.match(/href=["']([^"']+)["']/i);
+  const gettyUrl = match ? match[1] : "";
 
   return {
     id: raw.id,
     name: fields["Outfit Name"],
     eraSection: fields["Outfit Era Section"] || "",
-    gettyHtml: fields["GETTY EMBED"] || "",
+    gettyUrl,          // NEW
+    gettyHtml: embed,  // Keep original
     timesWorn: fields["TIMES WORN"] || 0,
-    showIds: fields["SHOW DATES"] || [], // linked record IDs to your main table
+    showIds: fields["SHOW DATES"] || [],
   };
 }
 
@@ -426,9 +432,6 @@ export default function ErasTourShows() {
                   key={outfit.id}
                   className="bg-white/80 rounded-xl border border-[#f3d6d6] shadow-sm overflow-hidden flex flex-col"
                 >
-                  <div className="w-full">
-                    <GettyEmbed html={outfit.gettyHtml} />
-                  </div>
 
                   <div className="p-3 border-t border-[#f5e3e3]">
                     {outfit.eraSection && (
