@@ -172,7 +172,7 @@ export default function Timeline() {
   year: "numeric",
 })
   const [showTNInfo, setShowTNInfo] = useState(false)
-  // The mapped date for whatever "On This Day" you're currently viewing
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
   const torontoDate = getTorontoTimelineDate(displayDate)
 
     // Global (fixed-date) holidays for this day (shown once at top)
