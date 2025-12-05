@@ -3,7 +3,7 @@
 import { ChevronLeft, ChevronRight, Calendar, Star, Zap, Clock, HelpCircle } from "lucide-react"
 import { Button } from "./ui/Button"
 import { useNavigate, Link } from "react-router-dom"
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState } from "react"
 import axios from "axios"
 import "./timeline.css"
 import { SITE_UPDATES } from "./site-updates";
