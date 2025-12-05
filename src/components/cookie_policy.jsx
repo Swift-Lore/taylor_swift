@@ -148,7 +148,7 @@ export default function CookiePolicyPage() {
             </p>
             <div className="bg-[#ffe8e8] rounded-lg p-4 text-center">
               <p className="text-[#b91c1c] font-medium">
-                📧 <strong>privacy@swift-lore.com</strong>
+                📧 <strong>info@swift-lore.com</strong>
               </p>
             </div>
           </div>
