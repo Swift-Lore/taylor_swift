@@ -59,7 +59,16 @@ function GettyEmbed({ html }) {
     if (!html) return;
     if (typeof window === "undefined") return;
 
-    // Check if the Getty script is already on the page
+    const ensureRender = () => {
+      if (window.gettyimages && window.gettyimages.embed) {
+        try {
+          window.gettyimages.embed.render();
+        } catch (e) {
+          console.error("Getty render error", e);
+        }
+      }
+    };
+
     let script = document.querySelector('script[data-getty-widget="true"]');
 
     if (!script) {
@@ -67,14 +76,14 @@ function GettyEmbed({ html }) {
       script.src = "https://embed-cdn.gettyimages.com/widgets.js";
       script.async = true;
       script.dataset.gettyWidget = "true";
+      script.onload = () => {
+        // Call render after the script has actually loaded
+        ensureRender();
+      };
       document.body.appendChild(script);
-    } else if (window.gettyimages && window.gettyimages.embed) {
-      // Ask it to re-scan if available
-      try {
-        window.gettyimages.embed.render();
-      } catch (e) {
-        console.error("Getty render error", e);
-      }
+    } else {
+      // Script already present -> just re-render
+      ensureRender();
     }
   }, [html]);
 
