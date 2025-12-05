@@ -1070,13 +1070,25 @@ const CalendarModal = () => {
                 relative h-8 rounded-lg text-sm font-medium transition-all
                 transform hover:scale-105 active:scale-95
                 ${!day ? 'invisible' : ''}
-                ${
-                  day === parseInt(monthDay.split('/')[1]) && 
-                  monthDay.includes('/') &&
-                  (calendarMonth + 1) === parseInt(monthDay.split('/')[0])
-                    ? 'bg-[#8e3e3e] text-white shadow-md scale-105'
-                    : 'bg-white/80 text-[#8e3e3e] hover:bg-[#f8d7da]'
-                }
+                {
+  (() => {
+    if (!monthDay || !monthDay.includes("/")) {
+      return "bg-white/80 text-[#8e3e3e] hover:bg-[#f8d7da]"
+    }
+
+    const [selMonthStr, selDayStr] = monthDay.split("/")
+    const selMonth = parseInt(selMonthStr, 10)
+    const selDay = parseInt(selDayStr, 10)
+
+    const isSelected =
+      day === selDay && (calendarMonth + 1) === selMonth
+
+    return isSelected
+      ? "bg-[#8e3e3e] text-white shadow-md scale-105"
+      : "bg-white/80 text-[#8e3e3e] hover:bg-[#f8d7da]"
+  })()
+}
+
                 ${
                   hasEvents(day)
                     ? 'border-2 border-[#e3b0b0]'
