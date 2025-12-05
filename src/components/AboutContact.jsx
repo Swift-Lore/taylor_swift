@@ -58,7 +58,7 @@ export default function AboutContact() {
 
         <p className="text-[#8e3e3e] font-semibold text-sm md:text-base mb-6">
           ✉️ Email: <a href="mailto:swiftloreproject@gmail.com" className="underline">
-            swiftloreproject@gmail.com
+            swiftlore13@gmail.com
           </a>
         </p>
 
