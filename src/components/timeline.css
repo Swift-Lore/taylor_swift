@@ -1,4 +1,3 @@
-/* Your original CSS - keep this */
 /* Scroll hint styling - Only show on small screens */
 @media (max-width: 768px) {
   .scroll-hint {
@@ -148,4 +147,40 @@
 .event-counter-pill *::-moz-selection {
   background: transparent;
   color: inherit;
+}
+/* ===== ADD THESE 3 LINES AT THE BOTTOM ===== */
+
+/* Ensure ALL text in timeline is selectable for Google */
+.timeline-card *:not(.no-text-highlight):not(.event-counter-pill):not(.event-counter-pill *) {
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+}
+
+/* Fix for any global user-select: none styles */
+#root .timeline-card,
+#root .timeline-card * {
+  user-select: auto;
+}
+
+/* Make sure paragraphs and headings are always selectable */
+.timeline-card p,
+.timeline-card h3,
+.timeline-card div:not(.no-text-highlight):not(.keyword-container) {
+  user-select: text !important;
+}
+/* ===== ADD TO BOTTOM OF FILE ===== */
+
+/* Screen reader only class for SEO content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

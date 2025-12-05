@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Button } from "./ui/Button";
 // import AdComponent from "./ad_component"; // REMOVE THIS LINE
 
@@ -27,10 +26,10 @@ export default function Footer() {
           {/* About section - fixed height and spacing */}
           <div className="bg-white/70 rounded-3xl shadow-sm px-4 py-3 md:px-5 md:py-4 w-full md:w-1/2 flex flex-col">
             <h2 className="text-sm md:text-base font-semibold text-[#5a2b60] tracking-wide mb-2 logo-glow">
-              About Swift Lore
+              About Swift-Lore
             </h2>
             <p className="text-xs md:text-sm text-[#4b4b63] leading-relaxed flex-1">
-              Swift Lore is a fan-crafted, interactive timeline chronicling the
+              Swift-Lore is a fan-crafted, interactive timeline chronicling the
               epic life and career of Taylor Swift — from album releases and
               Easter Eggs to dating history and iconic moments.{" "}
               <span className="font-semibold">No era left behind.</span>
@@ -65,7 +64,7 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* REMOVE OR COMMENT OUT THE ENTIRE AD SECTION */}
+          {/* AD SECTION REMOVED WHILE AWAITING ADSENSE APPROVAL */}
           {/* {process.env.NODE_ENV === "production" && (
             <div className="w-full md:w-1/2 flex">
               <div className="relative bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-3 md:px-5 md:py-4 flex items-center justify-center card-soft glass-soft w-full aspect-square md:aspect-auto min-h-[200px]">
@@ -80,32 +79,41 @@ export default function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="bg-[#8a9ad4] py-2 px-4 text-center text-white mt-0">
-        <div className="max-w-5xl mx-auto flex flex-wrap justify-center items-center gap-2 md:gap-3 text-[11px] md:text-sm">
-          <a
-            href="/cookie_policy"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-white hover:text-gray-200 underline"
-          >
-            Cookie Policy
-          </a>
+<div className="bg-[#8a9ad4] py-2 px-4 text-center text-white mt-0">
+  <div className="max-w-5xl mx-auto flex flex-wrap justify-center items-center gap-2 md:gap-3 text-[11px] md:text-sm">
+    
+    <a
+  href="/cookie-policy"
+  className="text-white hover:text-gray-200 underline"
+>
+  Cookie Policy
+</a>
 
-          <p className="mx-1">
-            Copyright © 2025 Swift Lore · Fan-made, not affiliated with Taylor
-            Swift.
-          </p>
+    <span className="mx-1">•</span>
 
-          <a
-            href="/privacy_policy"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-white hover:text-gray-200 underline"
-          >
-            Privacy Policy
-          </a>
-        </div>
-      </div>
+    <a
+      href="/about"
+      className="text-white hover:text-gray-200 underline"
+    >
+      About / Contact
+    </a>
+
+    <span className="mx-1">•</span>
+
+    <a
+      href="/privacy_policy"
+      className="text-white hover:text-gray-200 underline"
+    >
+      Privacy Policy
+    </a>
+
+    <span className="mx-1">•</span>
+
+    <p className="mx-1">
+      Copyright © 2025 Swift-Lore · Fan-made, not affiliated with Taylor Swift.
+    </p>
+  </div>
+</div>
     </footer>
   );
 }

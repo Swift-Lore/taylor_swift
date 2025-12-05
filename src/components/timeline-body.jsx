@@ -42,7 +42,21 @@ const isCompleteMonthDay = (value) => {
 export default function TimelineBody() {
   const navigate = useNavigate()
   const location = useLocation()
- 
+   useEffect(() => {
+    document.title = "Swift-Lore - Full Taylor Swift Timeline Archive"
+
+    let metaDescription = document.querySelector('meta[name="description"]')
+    if (!metaDescription) {
+      metaDescription = document.createElement("meta")
+      metaDescription.name = "description"
+      document.head.appendChild(metaDescription)
+    }
+
+    metaDescription.content =
+      "Browse the full Swift-Lore Taylor Swift timeline: thousands of dated events with filters for albums, tours, Taylor sightings, and other characters within the Taylor Swift Cinematic Universe :)."
+
+  }, [])
+  
   // Helper: Update URL params when filters change
   const updateURLParams = () => {
   const params = new URLSearchParams()
@@ -1118,14 +1132,24 @@ const CalendarModal = () => {
 
   return (
        <div className="bg-[#e6edf7] py-8 overflow-x-hidden">
+               {/* SEO helper for crawlers, hidden visually */}
+      <div className="sr-only" aria-hidden="true">
+        <h1>Taylor Swift Full Timeline Archive</h1>
+        <p>
+          Browse the complete Swift-Lore archive of Taylor Swift events with
+          filters for dates, keywords, albums, tours, locations, and deep-cut
+          easter eggs.
+        </p>
+      </div>
+         
       {/* ADD INTRODUCTORY TEXT HERE - New Section */}
       <div className="max-w-6xl mx-auto px-4 mb-6">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-serif text-[#8e3e3e] mb-4">
-            Swift Lore
+            Swift-Lore
           </h1>
           <p className="text-[#6b7db3] text-lg max-w-2xl mx-auto">
-            Welcome to Swift Lore — a fan-made interactive timeline exploring 
+            Welcome to Swift-Lore, a fan-made interactive timeline exploring 
             Taylor Swift's career history, releases, Easter eggs, and more. 
             Browse events, filter by keywords, or search for specific moments.
           </p>
@@ -1361,7 +1385,7 @@ const CalendarModal = () => {
               className={`px-3 py-1 text-xs rounded-full border ${
                 viewMode === "compact"
                   ? "bg-[#c25e5e] text-white border-[#c25e5e]"
-                  : "bg.white text-[#6b7db3] border-[#6b7db3] bg-white"
+                  : "bg-white text-[#6b7db3] border-[#6b7db3] bg-white"
               }`}
               onClick={() => setViewMode("compact")}
             >
@@ -1526,7 +1550,7 @@ const CalendarModal = () => {
             {/* View On This Day Button */}
       <div className="max-w-6xl mx-auto px-4 mt-16">
         <button
-          className="w-full bg-[#c25e5e] text.white py-3 rounded-full font-medium text-white"
+          className="w-full bg-[#c25e5e] text-white py-3 rounded-full font-medium text-white"
           onClick={() => {
             navigate("/timeline")
             window.scrollTo(0, 0)

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from "react-router-dom";
 
 export default function PrivacyPolicyPage() {
   return (
@@ -17,7 +18,7 @@ export default function PrivacyPolicyPage() {
           {/* Introduction */}
           <div className="mb-8">
             <p className="text-[#6b7db3] leading-relaxed">
-              Swift-lore.com ("we", "us", or "our") is committed to protecting your privacy. This Privacy Policy outlines the types of personal information we collect, how we use and safeguard that information, and your rights regarding your data.
+              Swift-Lore.com ("we", "us", or "our") is committed to protecting your privacy. This Privacy Policy outlines the types of personal information we collect, how we use and safeguard that information, and your rights regarding your data.
             </p>
           </div>
 
@@ -125,28 +126,38 @@ export default function PrivacyPolicyPage() {
               You can manage your cookie preferences via our cookie consent banner. Non-essential cookies are only set with your prior consent (required in the EU and other regions). You can change or withdraw your consent at any time by clicking "Cookie Settings" in the site footer.
             </p>
             <div className="bg-[#ffe8e8] rounded-lg p-4 text-center">
-              <p className="text-[#b91c1c] font-medium">
-                📋 For more information, refer to our <strong>Cookie Policy</strong>
-              </p>
-            </div>
+  <p className="text-[#b91c1c] font-medium">
+    📋 For more information, refer to our{" "}
+    <Link
+      to="/cookie-policy"
+      className="underline text-[#b91c1c] font-semibold"
+    >
+      Cookie Policy
+    </Link>
+  </p>
+</div>
+            
             {/* Google AdSense Disclosure (Required by Google) */}
 <div className="bg-[#fef2f2] border border-[#b91c1c] rounded-lg p-4 mt-6">
   <h3 className="font-semibold text-[#b91c1c] mb-2">Google AdSense & Advertising Partners</h3>
   <p className="text-[#6b7db3] text-sm leading-relaxed">
-    Google and its advertising partners may use cookies, web beacons, or similar 
-    technologies to serve ads based on your prior visits to this or other websites. 
-    Google’s use of advertising cookies enables it and its partners to serve 
-    personalized or non-personalized ads to you based on your browsing activity. 
-    You can opt out of personalized advertising by visiting{" "}
-    <a
-      href="https://www.google.com/settings/ads"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-[#b91c1c] underline font-medium"
-    >
-      Google’s Ads Settings page
-    </a>.
-  </p>
+  Third-party vendors, including Google, use cookies to serve ads based on a user's 
+  previous visits to this and other websites. Google and its advertising partners 
+  may use cookies, web beacons, or similar technologies to serve ads based on your 
+  prior visits to this or other sites. Google’s use of advertising cookies enables it 
+  and its partners to deliver personalized or non-personalized ads depending on your 
+  preferences and consent.
+  <br /><br />
+  You can opt out of personalized advertising by visiting{" "}
+  <a
+    href="https://www.google.com/settings/ads"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-[#b91c1c] underline font-medium"
+  >
+    Google’s Ads Settings page
+  </a>.
+</p>
 </div>
           </div>
 
@@ -202,7 +213,7 @@ export default function PrivacyPolicyPage() {
             </ul>
             <div className="bg-[#ffe8e8] rounded-lg p-4 text-center">
               <p className="text-[#b91c1c] font-medium">
-                📧 To exercise any of these rights, please contact us at <strong>privacy@swift-lore.com</strong>
+                📧 To exercise any of these rights, please contact us at <strong>info@swift-lore.com</strong>
               </p>
             </div>
           </div>
@@ -214,7 +225,7 @@ export default function PrivacyPolicyPage() {
               If you are a California resident, you have the right to opt out of the sale or sharing of your personal information. Although we do not sell your data, we may share certain information with ad networks that could be considered "sharing" under CPRA.
             </p>
             <p className="text-[#6b7db3] leading-relaxed">
-              To opt out, click on the "Do Not Sell or Share My Personal Information" link in the footer or email us at privacy@swift-lore.com.
+              To opt out, click on the "Do Not Sell or Share My Personal Information" link in the footer or email us at info@swift-lore.com.
             </p>
           </div>
 
@@ -223,7 +234,7 @@ export default function PrivacyPolicyPage() {
             <h2 className="text-xl font-semibold text-[#b91c1c] mb-4">9. Children's Privacy</h2>
             <div className="bg-[#fef2f2] border border-[#b91c1c] rounded-lg p-4">
               <p className="text-[#b91c1c] text-sm font-medium">
-                ⚠️ Swift-lore.com is <strong>not intended for children</strong> under the age of 13 (or 16 in the EU). We do not knowingly collect data from children. If you believe we have collected such data, please contact us immediately.
+                ⚠️ Swift-Lore.com is <strong>not intended for children</strong> under the age of 13 (or 16 in the EU). We do not knowingly collect data from children. If you believe we have collected such data, please contact us immediately.
               </p>
             </div>
           </div>
@@ -244,7 +255,7 @@ export default function PrivacyPolicyPage() {
             </p>
             <div className="bg-[#ffe8e8] rounded-lg p-4 text-center">
               <p className="text-[#b91c1c] font-medium">
-                📧 <strong>privacy@swift-lore.com</strong>
+                📧 <strong>info@swift-lore.com</strong>
               </p>
             </div>
           </div>
