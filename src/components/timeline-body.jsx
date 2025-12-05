@@ -1149,7 +1149,7 @@ const CalendarModal = () => {
             Swift-Lore
           </h1>
           <p className="text-[#6b7db3] text-lg max-w-2xl mx-auto">
-            Welcome to Swift-Lore — a fan-made interactive timeline exploring 
+            Welcome to Swift-Lore, a fan-made interactive timeline exploring 
             Taylor Swift's career history, releases, Easter eggs, and more. 
             Browse events, filter by keywords, or search for specific moments.
           </p>
