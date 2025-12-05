@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
-import Select from 'react-select'; // ADD THIS IMPORT
+import Select from "react-select"; // ADD THIS IMPORT
 
 const SERVER_EVENTS_ENDPOINT = import.meta.env.VITE_EVENTS_ENDPOINT || "";
 
 // Direct Airtable fallback (same base/table as Timeline)
 const AIRTABLE_URL =
   "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker";
+
+// NEW: Outfits table URL (TOP-LEVEL, not inside a function)
+const AIRTABLE_OUTFITS_URL =
+  "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/ERAS%20TOUR%20OUTFITS"; 
+// ^ change to whatever Airtable calls that table in the API
 
 // Normalize any record shape into a flat "show" object
 function normalizeShow(raw) {
@@ -24,6 +29,20 @@ function normalizeShow(raw) {
   };
 }
 
+// 🔻 INSERT normalizeOutfit RIGHT HERE, after normalizeShow:
+function normalizeOutfit(raw) {
+  const fields = raw.fields || raw;
+
+  return {
+    id: raw.id,
+    name: fields["Outfit Name"],
+    eraSection: fields["Outfit Era Section"] || "",
+    gettyHtml: fields["GETTY EMBED"] || "",
+    timesWorn: fields["TIMES WORN"] || 0,
+    showIds: fields["SHOW DATES"] || [], // linked record IDs to your main table
+  };
+}
+
 // Optional: prettier date display
 function formatDate(dateStr) {
   if (!dateStr) return "";
@@ -36,12 +55,16 @@ function formatDate(dateStr) {
   });
 }
 
+// ⬇️ component starts AFTER all helpers
 export default function ErasTourShows() {
   const [shows, setShows] = useState([]);
   const [selectedShowId, setSelectedShowId] = useState("");
   const [selectedShow, setSelectedShow] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const [outfits, setOutfits] = useState([]);
+  const [loadingOutfits, setLoadingOutfits] = useState(true);
 
   // (Scroll to top is fine but not required for the blank issue)
   useEffect(() => {
