@@ -328,29 +328,32 @@ export default function Header() {
 
                 {/* More compact CTA row */}
                 <div className="flex flex-col sm:flex-row gap-1.5 sm:gap-2">
-                  <button
-                    className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-4 py-1.5 font-semibold text-xs w-full sm:w-auto shadow-sm transition-colors whitespace-nowrap"
-                    onClick={() => navigate("/posts")}
-                  >
-                    View Full Timeline
-                  </button>
+  {/* Home button – always available on these hero pages */}
+  <button
+    className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-4 py-1.5 font-semibold text-xs w-full sm:w-auto shadow-sm transition-colors whitespace-nowrap"
+    onClick={() => navigate("/")}
+  >
+    Home
+  </button>
 
-                  {!isErasPage ? (
-                    <button
-                      className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-4 py-1.5 font-semibold text-xs w-full sm:w-auto shadow-sm transition-colors whitespace-nowrap"
-                      onClick={() => navigate("/eras-tour-shows")}
-                    >
-                      Eras Tour Shows
-                    </button>
-                  ) : (
-                    <button
-                      className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-4 py-1.5 font-semibold text-xs w-full sm:w-auto shadow-sm transition-colors whitespace-nowrap"
-                      onClick={() => navigate("/")}
-                    >
-                      Home
-                    </button>
-                  )}
-                </div>
+  {/* Full Timeline */}
+  <button
+    className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-4 py-1.5 font-semibold text-xs w-full sm:w-auto shadow-sm transition-colors whitespace-nowrap"
+    onClick={() => navigate("/posts")}
+  >
+    View Full Timeline
+  </button>
+
+  {/* Eras Tour Shows – hide on the Eras page itself */}
+  {!isErasPage && (
+    <button
+      className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-4 py-1.5 font-semibold text-xs w-full sm:w-auto shadow-sm transition-colors whitespace-nowrap"
+      onClick={() => navigate("/eras-tour-shows")}
+    >
+      Eras Tour Shows
+    </button>
+  )}
+</div>
               </div>
             )}
           </>
