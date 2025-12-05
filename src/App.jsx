@@ -87,17 +87,24 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/timeline" element={<HomePage />} />
-        <Route path="/posts" element={<PostsPage />} />
-        <Route path="/post_details" element={<PostDetailPage />} />
-        <Route path="/cookie_policy" element={<CookiePolicyPage />} />
-        <Route path="/privacy_policy" element={<PrivacyPolicyPage />} />
-          <Route path="/eras-tour-shows" element={<ErasTourShowsPage />} />
+  <Route path="/" element={<HomePage />} />
+  <Route path="/timeline" element={<HomePage />} />
+  <Route path="/posts" element={<PostsPage />} />
+  <Route path="/post_details" element={<PostDetailPage />} />
+  <Route path="/cookie_policy" element={<CookiePolicyPage />} />
+  <Route path="/privacy_policy" element={<PrivacyPolicyPage />} />
 
-        {/* 🔹 NEW ROUTE: this is what your header button navigates to */}
-        <Route path="/eras-tour-shows" element={<ErasTourShowsPage />} />
-      </Routes>
+  <Route
+    path="/about"
+    element={
+      <Layout showHero={false}>
+        <AboutContact />
+      </Layout>
+    }
+  />
+
+  <Route path="/eras-tour-shows" element={<ErasTourShowsPage />} />
+</Routes>
 
       {/* Cookie banner stays once at the very bottom */}
       <CookieConsent
