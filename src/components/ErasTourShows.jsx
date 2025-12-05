@@ -229,23 +229,24 @@ export default function ErasTourShows() {
         let offset = null;
 
         do {
-          let url = `${AIRTABLE_OUTFITS_URL}?pageSize=100`;
-          if (offset) url += `&offset=${offset}`;
+  // Use a specific view so Airtable returns outfits in that view's order
+  let url = `${AIRTABLE_OUTFITS_URL}?view=Grid%20view&pageSize=100`;
+  if (offset) url += `&offset=${offset}`;
 
-          const res = await fetch(url, {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-            },
-          });
+  const res = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+    },
+  });
 
-          if (!res.ok) {
-            throw new Error(`Failed to fetch outfits: ${res.status}`);
-          }
+  if (!res.ok) {
+    throw new Error(`Failed to fetch outfits: ${res.status}`);
+  }
 
-          const json = await res.json();
-          allRecords = allRecords.concat(json.records);
-          offset = json.offset;
-        } while (offset);
+  const json = await res.json();
+  allRecords = allRecords.concat(json.records);
+  offset = json.offset;
+} while (offset);
 
         const normalized = allRecords.map((r) => normalizeOutfit(r));
         console.log("Loaded outfits:", normalized.length);
