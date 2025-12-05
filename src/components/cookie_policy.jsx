@@ -17,7 +17,7 @@ export default function CookiePolicyPage() {
           {/* Introduction */}
           <div className="mb-8">
             <p className="text-[#6b7db3] leading-relaxed">
-              This Cookie Policy explains how Swift-lore.com ("we", "us", or "our") uses cookies and similar technologies to recognize you when you visit our website. It explains what these technologies are and why we use them, as well as your rights to control their use.
+              This Cookie Policy explains how Swift-Lore.com ("we", "us", or "our") uses cookies and similar technologies to recognize you when you visit our website. It explains what these technologies are and why we use them, as well as your rights to control their use.
             </p>
           </div>
 
@@ -33,7 +33,7 @@ export default function CookiePolicyPage() {
           <div className="mb-8">
             <h2 className="text-xl font-semibold text-[#b91c1c] mb-4">2. Types of Cookies We Use</h2>
             <p className="text-[#6b7db3] leading-relaxed mb-4">
-              We use the following categories of cookies on Swift-lore.com:
+              We use the following categories of cookies on Swift-Lore.com:
             </p>
 
             {/* Essential Cookies */}
@@ -95,7 +95,7 @@ export default function CookiePolicyPage() {
           <div className="mb-8">
             <h2 className="text-xl font-semibold text-[#b91c1c] mb-4">3. How to Control Cookies</h2>
             <p className="text-[#6b7db3] leading-relaxed mb-4">
-              When you first visit Swift-lore.com, you will see a <strong>cookie consent banner</strong>. You can:
+              When you first visit Swift-Lore.com, you will see a <strong>cookie consent banner</strong>. You can:
             </p>
             <ul className="text-[#6b7db3] mb-4 space-y-1">
               <li>• Accept all cookies</li>
