@@ -125,10 +125,17 @@ export default function PrivacyPolicyPage() {
               You can manage your cookie preferences via our cookie consent banner. Non-essential cookies are only set with your prior consent (required in the EU and other regions). You can change or withdraw your consent at any time by clicking "Cookie Settings" in the site footer.
             </p>
             <div className="bg-[#ffe8e8] rounded-lg p-4 text-center">
-              <p className="text-[#b91c1c] font-medium">
-                📋 For more information, refer to our <strong>Cookie Policy</strong>
-              </p>
-            </div>
+  <p className="text-[#b91c1c] font-medium">
+    📋 For more information, refer to our{" "}
+    <a
+      href="/cookie-policy"
+      className="underline text-[#b91c1c] font-semibold"
+    >
+      Cookie Policy
+    </a>
+  </p>
+</div>
+            
             {/* Google AdSense Disclosure (Required by Google) */}
 <div className="bg-[#fef2f2] border border-[#b91c1c] rounded-lg p-4 mt-6">
   <h3 className="font-semibold text-[#b91c1c] mb-2">Google AdSense & Advertising Partners</h3>
