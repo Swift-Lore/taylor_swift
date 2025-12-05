@@ -42,7 +42,21 @@ const isCompleteMonthDay = (value) => {
 export default function TimelineBody() {
   const navigate = useNavigate()
   const location = useLocation()
- 
+   useEffect(() => {
+    document.title = "Swift Lore - Full Taylor Swift Timeline Archive"
+
+    let metaDescription = document.querySelector('meta[name="description"]')
+    if (!metaDescription) {
+      metaDescription = document.createElement("meta")
+      metaDescription.name = "description"
+      document.head.appendChild(metaDescription)
+    }
+
+    metaDescription.content =
+      "Browse the full Swift Lore Taylor Swift timeline: thousands of dated events with filters for albums, eras, locations, and easter eggs."
+
+  }, [])
+  
   // Helper: Update URL params when filters change
   const updateURLParams = () => {
   const params = new URLSearchParams()
