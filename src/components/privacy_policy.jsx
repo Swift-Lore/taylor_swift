@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from "react-router-dom";
 
 export default function PrivacyPolicyPage() {
   return (
@@ -127,12 +128,12 @@ export default function PrivacyPolicyPage() {
             <div className="bg-[#ffe8e8] rounded-lg p-4 text-center">
   <p className="text-[#b91c1c] font-medium">
     📋 For more information, refer to our{" "}
-    <a
-      href="/cookie-policy"
+    <Link
+      to="/cookie-policy"
       className="underline text-[#b91c1c] font-semibold"
     >
       Cookie Policy
-    </a>
+    </Link>
   </p>
 </div>
             
