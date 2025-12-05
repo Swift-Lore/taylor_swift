@@ -4,7 +4,7 @@ export default function AboutContact() {
       <div className="max-w-3xl mx-auto bg-white/80 border border-[#e3d5dd] rounded-2xl shadow-md p-6 md:p-10">
         
         <h1 className="text-2xl md:text-3xl font-semibold text-[#8e3e3e] mb-4 text-center">
-          About Swift Lore
+          About Swift-Lore
         </h1>
 
         <p className="text-[#4b4b63] text-sm md:text-base leading-relaxed mb-4">
