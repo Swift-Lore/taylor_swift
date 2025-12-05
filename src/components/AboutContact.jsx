@@ -28,7 +28,7 @@ export default function AboutContact() {
 
         <p className="text-[#4b4b63] text-sm md:text-base leading-relaxed mb-6">
           Swift-Lore is continuously updated and maintained as a passion project 
-          by a edicated fan for the purpose of research, education, and historical 
+          by a dedicated fan for the purpose of research, education, and historical 
           preservation.
         </p>
 
@@ -57,19 +57,27 @@ export default function AboutContact() {
         </p>
 
         <p className="text-[#8e3e3e] font-semibold text-sm md:text-base mb-6">
-          ✉️ Email: <a href="mailto:swiftloreproject@gmail.com" className="underline">
+          ✉️ Email: <a href="mailto:swiftlore13@gmail.com" className="underline">
             swiftlore13@gmail.com
           </a>
         </p>
 
         <p className="text-[#4b4b63] text-sm md:text-base leading-relaxed mb-6">
           You can also submit event corrections or suggestions using our 
-         Google Form by clicking Submit a Suggestion at the bottom of the page.
+          Google Form by clicking Submit a Suggestion at the bottom of the page.
         </p>
+
+        {/* ⭐ CONTENT DISCLAIMER (required by AdSense) */}
+        <div className="text-[10px] text-[#6b7db3] leading-tight mt-8">
+          All event dates and information are collected from publicly available sources.
+          Swift-Lore is a fan-created research project and may contain occasional inaccuracies.
+          If you spot an error, please contact us.
+        </div>
 
         <div className="text-center mt-10 text-xs text-[#6b7db3]">
           Swift-Lore © 2025 — Fan-made, educational, research-focused.
         </div>
+
       </div>
     </div>
   );
