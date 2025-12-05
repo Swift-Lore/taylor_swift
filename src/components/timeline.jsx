@@ -173,8 +173,6 @@ export default function Timeline() {
 })
   const [showTNInfo, setShowTNInfo] = useState(false)
   const [isInitialLoad, setIsInitialLoad] = useState(true)
-    const [showTNInfo, setShowTNInfo] = useState(false)
-  const [isInitialLoad, setIsInitialLoad] = useState(true)
   
   // ===== SEO META TAGS UPDATE =====
   useEffect(() => {
@@ -808,6 +806,13 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           <li>Charity and Philanthropy</li>
         </ul>
         <p>This independent research project is maintained by dedicated fans and serves as a comprehensive resource for understanding the timeline and context of Taylor Swift's career evolution.</p>
+      </div>
+            {/* ===== VISIBLE TO CRAWLERS, HIDDEN FROM USERS ===== */}
+      <div className="sr-only" aria-hidden="true">
+        <h1>Taylor Swift Timeline Archive</h1>
+        <p>Browse {SITE_UPDATES.totalEvents}+ events from Taylor Swift's career including album releases, tour dates, awards, interviews, and personal milestones.</p>
+        <p>Current date: {displayDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+        <p>Archive last updated: {SITE_UPDATES.lastUpdated}</p>
       </div>
       
       {/* Your existing visible timeline JSX */}
