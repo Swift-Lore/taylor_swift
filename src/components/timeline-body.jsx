@@ -43,7 +43,7 @@ export default function TimelineBody() {
   const navigate = useNavigate()
   const location = useLocation()
    useEffect(() => {
-    document.title = "Swift Lore - Full Taylor Swift Timeline Archive"
+    document.title = "Swift-Lore - Full Taylor Swift Timeline Archive"
 
     let metaDescription = document.querySelector('meta[name="description"]')
     if (!metaDescription) {
@@ -1136,7 +1136,7 @@ const CalendarModal = () => {
       <div className="sr-only" aria-hidden="true">
         <h1>Taylor Swift Full Timeline Archive</h1>
         <p>
-          Browse the complete Swift Lore archive of Taylor Swift events with
+          Browse the complete Swift-Lore archive of Taylor Swift events with
           filters for dates, keywords, albums, tours, locations, and deep-cut
           easter eggs.
         </p>
@@ -1146,10 +1146,10 @@ const CalendarModal = () => {
       <div className="max-w-6xl mx-auto px-4 mb-6">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-serif text-[#8e3e3e] mb-4">
-            Swift Lore
+            Swift-Lore
           </h1>
           <p className="text-[#6b7db3] text-lg max-w-2xl mx-auto">
-            Welcome to Swift Lore — a fan-made interactive timeline exploring 
+            Welcome to Swift-Lore — a fan-made interactive timeline exploring 
             Taylor Swift's career history, releases, Easter eggs, and more. 
             Browse events, filter by keywords, or search for specific moments.
           </p>
