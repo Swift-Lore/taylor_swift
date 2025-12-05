@@ -213,7 +213,7 @@ export default function PrivacyPolicyPage() {
             </ul>
             <div className="bg-[#ffe8e8] rounded-lg p-4 text-center">
               <p className="text-[#b91c1c] font-medium">
-                📧 To exercise any of these rights, please contact us at <strong>privacy@swift-lore.com</strong>
+                📧 To exercise any of these rights, please contact us at <strong>info@swift-lore.com</strong>
               </p>
             </div>
           </div>
