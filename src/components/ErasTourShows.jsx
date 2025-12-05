@@ -432,6 +432,20 @@ export default function ErasTourShows() {
                   key={outfit.id}
                   className="bg-white/80 rounded-xl border border-[#f3d6d6] shadow-sm overflow-hidden flex flex-col"
                 >
+<div className="p-4 flex-1 flex items-center justify-center text-center text-xs text-[#6b7db3]">
+  {outfit.gettyUrl ? (
+    <a
+      href={outfit.gettyUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="underline hover:no-underline"
+    >
+      View image on Getty Images
+    </a>
+  ) : (
+    <span className="italic">Getty image link unavailable</span>
+  )}
+</div>
 
                   <div className="p-3 border-t border-[#f5e3e3]">
                     {outfit.eraSection && (
