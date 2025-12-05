@@ -122,7 +122,7 @@ export default function Header() {
               >
                 <img
                   src="/images/swift_lore.png"
-                  alt="Swift Lore"
+                  alt="Swift-Lore"
                   className="h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow"
                   style={{ maxWidth: "220px" }}
                 />
@@ -164,7 +164,7 @@ export default function Header() {
                 >
                   <img
                     src="/images/swift_lore.png"
-                    alt="Swift Lore"
+                    alt="Swift-Lore"
                     className="h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow"
                     style={{ maxWidth: "220px" }}
                   />
@@ -201,7 +201,7 @@ export default function Header() {
               >
                 <img
                   src="/images/swift_lore.png"
-                  alt="Swift Lore"
+                  alt="Swift-Lore"
                   className="h-auto object-contain max-h-[80px] logo-glow"
                   style={{ maxWidth: "160px" }}
                 />
@@ -255,7 +255,7 @@ export default function Header() {
                 >
                   <img
                     src="/images/swift_lore.png"
-                    alt="Swift Lore"
+                    alt="Swift-Lore"
                     className="h-auto object-contain max-h-[80px] md:max-h-[100px] logo-glow"
                     style={{ maxWidth: "180px" }}
                   />
@@ -304,7 +304,7 @@ export default function Header() {
                 {/* Smaller logo */}
                 <img
                   src="/images/swift_lore.png"
-                  alt="Swift Lore"
+                  alt="Swift-Lore"
                   className="w-full h-auto object-contain max-h-[140px] md:max-h-[160px] logo-glow"
                 />
               </button>
