@@ -1176,7 +1176,12 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               </div>
             </div>
           )}
-
+          {/* Empty state when no events for this date */}
+          {!isLoading && !isInitialLoad && records.length === 0 && (
+            <div className="text-center text-xs md:text-sm text-[#6b7db3] mt-3 mb-2 px-4">
+              No events are logged for this date yet. The archive is still growing, so check back soon.
+            </div>
+          )}
           {/* Timeline meta / last updated */}
 <div className="text-center text-[11px] md:text-xs text-[#6b7db3] mt-2 mb-2 px-4">
   Last updated: {SITE_UPDATES.lastUpdated} · Currently tracking{" "}
