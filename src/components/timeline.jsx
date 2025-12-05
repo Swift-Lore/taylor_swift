@@ -204,7 +204,7 @@ export default function Timeline() {
         script.remove()
       }
     }
-  }, [SITE_UPDATES.totalEvents, SITE_UPDATES.lastUpdated])
+  }}, [])
   const torontoDate = getTorontoTimelineDate(displayDate)
 
     // Global (fixed-date) holidays for this day (shown once at top)
