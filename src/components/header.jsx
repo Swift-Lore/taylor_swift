@@ -327,14 +327,16 @@ export default function Header() {
                 </div>
 
                 {/* More compact CTA row */}
-                <div className="flex flex-col sm:flex-row gap-1.5 sm:gap-2">
-  {/* Home button – always available on these hero pages */}
-  <button
-    className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-4 py-1.5 font-semibold text-xs w-full sm:w-auto shadow-sm transition-colors whitespace-nowrap"
-    onClick={() => navigate("/")}
-  >
-    Home
-  </button>
+<div className="flex flex-col sm:flex-row gap-1.5 sm:gap-2">
+  {/* Home button – show on About/Eras/etc, NOT on actual home page */}
+  {!isHomePage && (
+    <button
+      className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-4 py-1.5 font-semibold text-xs w-full sm:w-auto shadow-sm transition-colors whitespace-nowrap"
+      onClick={() => navigate("/")}
+    >
+      Home
+    </button>
+  )}
 
   {/* Full Timeline */}
   <button
