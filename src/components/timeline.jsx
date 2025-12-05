@@ -1184,12 +1184,3 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
     </>
   )
 }
-
-          {/* Modals */}
-          <CalendarModal />
-          <TNInfoModal />
-        </div>
-      </section>
-    </>
-  )
-}
