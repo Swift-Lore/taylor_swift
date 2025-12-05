@@ -65,7 +65,7 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* REMOVE OR COMMENT OUT THE ENTIRE AD SECTION */}
+          {/* AD SECTION REMOVED WHILE AWAITING ADSENSE APPROVAL */}
           {/* {process.env.NODE_ENV === "production" && (
             <div className="w-full md:w-1/2 flex">
               <div className="relative bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-3 md:px-5 md:py-4 flex items-center justify-center card-soft glass-soft w-full aspect-square md:aspect-auto min-h-[200px]">
@@ -92,8 +92,7 @@ export default function Footer() {
           </a>
 
           <p className="mx-1">
-            Copyright © 2025 Swift Lore · Fan-made, not affiliated with Taylor
-            Swift.
+            Copyright © 2025 Swift Lore. All rights reserved.
           </p>
 
           <a
@@ -104,6 +103,15 @@ export default function Footer() {
           >
             Privacy Policy
           </a>
+
+          {/* Non-affiliation + fair-use disclaimer */}
+          <p className="w-full mt-1 text-[10px] md:text-[11px] leading-snug opacity-95">
+            Swift Lore is an independent fan-run project and is not affiliated
+            with or endorsed by Taylor Swift, Taylor Nation, TAS Rights
+            Management, or any record label. All content is presented for
+            research, commentary, and historical documentation under fair-use
+            guidelines.
+          </p>
         </div>
       </div>
     </footer>
