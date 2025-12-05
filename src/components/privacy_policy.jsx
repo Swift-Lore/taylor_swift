@@ -225,7 +225,7 @@ export default function PrivacyPolicyPage() {
               If you are a California resident, you have the right to opt out of the sale or sharing of your personal information. Although we do not sell your data, we may share certain information with ad networks that could be considered "sharing" under CPRA.
             </p>
             <p className="text-[#6b7db3] leading-relaxed">
-              To opt out, click on the "Do Not Sell or Share My Personal Information" link in the footer or email us at privacy@swift-lore.com.
+              To opt out, click on the "Do Not Sell or Share My Personal Information" link in the footer or email us at info@swift-lore.com.
             </p>
           </div>
 
