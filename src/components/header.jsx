@@ -8,11 +8,11 @@ export default function Header() {
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [eventData, setEventData] = useState(null);
-
   const isFullTimelinePage = location.pathname === "/posts";
   const isEventPage = location.pathname === "/post_details";
   const isErasPage = location.pathname === "/eras-tour-shows";
   const showHero = !isFullTimelinePage && !isEventPage;
+  const isHomePage = location.pathname === "/";
 
   // Sync search box with ?q=
   useEffect(() => {
