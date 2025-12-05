@@ -30,7 +30,7 @@ export default function Footer() {
               About Swift-Lore
             </h2>
             <p className="text-xs md:text-sm text-[#4b4b63] leading-relaxed flex-1">
-              Swift Lore is a fan-crafted, interactive timeline chronicling the
+              Swift-Lore is a fan-crafted, interactive timeline chronicling the
               epic life and career of Taylor Swift — from album releases and
               Easter Eggs to dating history and iconic moments.{" "}
               <span className="font-semibold">No era left behind.</span>
@@ -111,7 +111,7 @@ export default function Footer() {
     <span className="mx-1">•</span>
 
     <p className="mx-1">
-      Copyright © 2025 Swift Lore · Fan-made, not affiliated with Taylor Swift.
+      Copyright © 2025 Swift-Lore · Fan-made, not affiliated with Taylor Swift.
     </p>
   </div>
 </div>
