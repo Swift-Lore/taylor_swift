@@ -1385,7 +1385,7 @@ const CalendarModal = () => {
               className={`px-3 py-1 text-xs rounded-full border ${
                 viewMode === "compact"
                   ? "bg-[#c25e5e] text-white border-[#c25e5e]"
-                  : "bg.white text-[#6b7db3] border-[#6b7db3] bg-white"
+                  : "bg-white text-[#6b7db3] border-[#6b7db3] bg-white"
               }`}
               onClick={() => setViewMode("compact")}
             >
@@ -1550,7 +1550,7 @@ const CalendarModal = () => {
             {/* View On This Day Button */}
       <div className="max-w-6xl mx-auto px-4 mt-16">
         <button
-          className="w-full bg-[#c25e5e] text.white py-3 rounded-full font-medium text-white"
+          className="w-full bg-[#c25e5e] text-white py-3 rounded-full font-medium text-white"
           onClick={() => {
             navigate("/timeline")
             window.scrollTo(0, 0)
