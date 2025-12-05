@@ -508,13 +508,15 @@ const handlePreviousDay = () => {
         return response.data.records || []
       }
 
-      try {
+            try {
         setIsLoading(true)
         const fetched = await fetchByDate()
         setRecords(fetched)
+        setIsInitialLoad(false) // ← ADD THIS LINE
       } catch (error) {
         console.error("Error fetching records:", error)
         setRecords([])
+        setIsInitialLoad(false) // ← ADD THIS LINE
       } finally {
         setIsLoading(false)
       }
