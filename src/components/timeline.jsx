@@ -173,6 +173,53 @@ export default function Timeline() {
 })
   const [showTNInfo, setShowTNInfo] = useState(false)
   const [isInitialLoad, setIsInitialLoad] = useState(true)
+    const [showTNInfo, setShowTNInfo] = useState(false)
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
+  
+  // ===== SEO META TAGS UPDATE =====
+  useEffect(() => {
+    // Update page title
+    document.title = `Swift Lore - Taylor Swift Timeline | On This Day`
+    
+    // Update or create meta description
+    let metaDescription = document.querySelector('meta[name="description"]')
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta')
+      metaDescription.name = "description"
+      document.head.appendChild(metaDescription)
+    }
+    metaDescription.content = `Explore Taylor Swift events on this day across all eras. Interactive timeline with ${SITE_UPDATES.totalEvents}+ verified events, updated ${SITE_UPDATES.lastUpdated}.`
+    
+    // Add structured data for Google
+    const scriptId = "structured-data-script"
+    let existingScript = document.getElementById(scriptId)
+    if (existingScript) {
+      existingScript.remove()
+    }
+    
+    const script = document.createElement('script')
+    script.id = scriptId
+    script.type = "application/ld+json"
+    script.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Swift Lore - Taylor Swift Timeline",
+      "description": `Interactive archive of ${SITE_UPDATES.totalEvents}+ Taylor Swift events from 2003 to present.`,
+      "url": window.location.origin,
+      "applicationCategory": "EntertainmentApplication",
+      "operatingSystem": "Any",
+      "datePublished": "2024-01-01",
+      "dateModified": new Date().toISOString().split('T')[0]
+    })
+    document.head.appendChild(script)
+    
+    // Cleanup on component unmount
+    return () => {
+      if (script.parentNode) {
+        script.remove()
+      }
+    }
+  }, [SITE_UPDATES.totalEvents, SITE_UPDATES.lastUpdated])
   const torontoDate = getTorontoTimelineDate(displayDate)
 
     // Global (fixed-date) holidays for this day (shown once at top)
