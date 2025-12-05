@@ -27,7 +27,7 @@ export default function Footer() {
           {/* About section - fixed height and spacing */}
           <div className="bg-white/70 rounded-3xl shadow-sm px-4 py-3 md:px-5 md:py-4 w-full md:w-1/2 flex flex-col">
             <h2 className="text-sm md:text-base font-semibold text-[#5a2b60] tracking-wide mb-2 logo-glow">
-              About Swift Lore
+              About Swift-Lore
             </h2>
             <p className="text-xs md:text-sm text-[#4b4b63] leading-relaxed flex-1">
               Swift Lore is a fan-crafted, interactive timeline chronicling the
