@@ -27,7 +27,7 @@ export default function AboutContact() {
         </ul>
 
         <p className="text-[#4b4b63] text-sm md:text-base leading-relaxed mb-6">
-          Swift Lore is continuously updated and maintained as a passion project 
+          Swift-Lore is continuously updated and maintained as a passion project 
           by dedicated fans for the purpose of research, education, and historical 
           preservation.
         </p>
