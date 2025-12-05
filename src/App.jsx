@@ -9,6 +9,7 @@ import CookiePolicy from "./components/cookie_policy";
 import PrivacyPolicy from "./components/privacy_policy";
 import CookieConsent from "react-cookie-consent";
 import ErasTourShows from "./components/ErasTourShows";
+import AboutContact from "./components/AboutContact";
 
 /* ------------ Shared layout ------------ */
 
