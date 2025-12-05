@@ -1130,7 +1130,23 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               </div>
             </div>
           </div>
+          {/* Desktop Timeline */}
+          <div className="hidden md:block min-h-0">
+            <div className="relative flex justify-center">
+              {/* ...your existing desktop timeline... */}
+            </div>
+          </div>
 
+          {/* Timeline meta / last updated */}
+          <div className="text-center text-[11px] md:text-xs text-[#6b7db3] mt-2 mb-2 px-4">
+            Last updated: December 2025 · Currently tracking{" "}
+            <span className="font-semibold">5,629+</span> Taylor Swift events
+            from 2003 to present.
+          </div>
+
+          {/* View Full Timeline Button */}
+          <div className="flex justify-center mt-1 mb-1 flex-shrink-0">
+            <Button
           {/* View Full Timeline Button */}
           <div className="flex justify-center mt-1 mb-1 flex-shrink-0">
             <Button
