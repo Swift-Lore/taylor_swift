@@ -5,6 +5,23 @@ import { useNavigate, useSearchParams } from "react-router-dom"
 import axios from "axios"
 import { Button } from "./ui/Button"
 
+// Helper: format Airtable date in UTC so it doesn't shift a day
+const formatAirtableDate = (isoDate) => {
+  if (!isoDate) return "No date"
+
+  try {
+    const d = new Date(isoDate)
+    return d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+      timeZone: "UTC", // <<< key line
+    })
+  } catch {
+    return "No date"
+  }
+}
+
 export default function SearchResults() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -195,13 +212,7 @@ export default function SearchResults() {
                 <div className="relative pt-1 h-48 flex flex-col">
                   {/* Date Badge */}
                   <div className="absolute -top-0.1 left-1/2 transform -translate-x-1/2 bg-white text-[#b91c1c] text-xs font-medium px-2 py-1 rounded-full z-10 min-w-[102px] text-center">
-                    {record?.fields?.DATE
-                      ? new Date(record.fields.DATE).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: '2-digit',
-                        year: 'numeric'
-                      })
-                      : 'No date'}
+                    {formatAirtableDate(record?.fields?.DATE)}
                   </div>
 
                   {/* Title */}
