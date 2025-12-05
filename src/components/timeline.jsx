@@ -1071,8 +1071,10 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
       >
         <div className="flex items-center gap-1">
           <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse" />
-          <span className="event-counter-text text-[#8e3e3e] text-xs font-medium">
-            {isLoading
+                    <span className="event-counter-text text-[#8e3e3e] text-xs font-medium">
+            {isInitialLoad
+              ? `Loading ${SITE_UPDATES.totalEvents}+ events...`
+              : isLoading
               ? "Loading events..."
               : `${records.length} ${
                   records.length === 1 ? "Event" : "Events"
