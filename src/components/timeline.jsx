@@ -127,30 +127,17 @@ const getHolidayEmoji = (holiday) => {
 }
 
 function getTorontoTimelineDate(date) {
-  console.log("=== Toronto Date Calculation ===")
-  console.log("Input date:", date)
-  console.log("Input date string:", date.toDateString())
-  
   // Normalize to midnight to avoid timezone issues
   const base = new Date(date.getFullYear(), date.getMonth(), date.getDate())
-  console.log("Normalized base:", base.toDateString())
-  
-  console.log("REAL_ANCHOR_DATE:", REAL_ANCHOR_DATE.toDateString())
-  console.log("ALT_ANCHOR_DATE:", ALT_ANCHOR_DATE.toDateString())
-  
-  // Calculate difference in DAYS (not milliseconds) to avoid floating point issues
+
+  // Calculate difference in DAYS between real anchor and selected date
   const diffTime = base.getTime() - REAL_ANCHOR_DATE.getTime()
   const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24))
-  console.log("Difference in days:", diffDays)
-  
+
   // Create result by adding days to ALT_ANCHOR_DATE
   const result = new Date(ALT_ANCHOR_DATE)
   result.setDate(result.getDate() + diffDays)
-  
-  console.log("Result date:", result.toDateString())
-  console.log("Result year:", result.getFullYear())
-  console.log("=== End Calculation ===")
-  
+
   return result
 }
 
