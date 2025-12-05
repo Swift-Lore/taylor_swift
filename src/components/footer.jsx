@@ -80,40 +80,41 @@ export default function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="bg-[#8a9ad4] py-2 px-4 text-center text-white mt-0">
-        <div className="max-w-5xl mx-auto flex flex-wrap justify-center items-center gap-2 md:gap-3 text-[11px] md:text-sm">
-          <a
-            href="/cookie_policy"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-white hover:text-gray-200 underline"
-          >
-            Cookie Policy
-          </a>
+<div className="bg-[#8a9ad4] py-2 px-4 text-center text-white mt-0">
+  <div className="max-w-5xl mx-auto flex flex-wrap justify-center items-center gap-2 md:gap-3 text-[11px] md:text-sm">
+    
+    <a
+      href="/cookie_policy"
+      className="text-white hover:text-gray-200 underline"
+    >
+      Cookie Policy
+    </a>
 
-          <p className="mx-1">
-            Copyright © 2025 Swift Lore. All rights reserved.
-          </p>
+    <span className="mx-1">•</span>
 
-          <a
-            href="/privacy_policy"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-white hover:text-gray-200 underline"
-          >
-            Privacy Policy
-          </a>
+    <a
+      href="/about"
+      className="text-white hover:text-gray-200 underline"
+    >
+      About / Contact
+    </a>
 
-          {/* Non-affiliation + fair-use disclaimer */}
-          <p className="w-full mt-1 text-[10px] md:text-[11px] leading-snug opacity-95">
-            Swift Lore is an independent fan-run project and is not affiliated
-            with or endorsed by Taylor Swift, Taylor Nation, TAS Rights
-            Management, or any record label. All content is presented for
-            research, commentary, and historical documentation under fair-use
-            guidelines.
-          </p>
-        </div>
-      </div>
+    <span className="mx-1">•</span>
+
+    <a
+      href="/privacy_policy"
+      className="text-white hover:text-gray-200 underline"
+    >
+      Privacy Policy
+    </a>
+
+    <span className="mx-1">•</span>
+
+    <p className="mx-1">
+      Copyright © 2025 Swift Lore · Fan-made, not affiliated with Taylor Swift.
+    </p>
+  </div>
+</div>
     </footer>
   );
 }
