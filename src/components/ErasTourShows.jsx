@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-import Select from "react-select"; // ADD THIS IMPORT
+import Select from "react-select";
 
+// (You can delete this if you’re not using the server endpoint anymore)
 const SERVER_EVENTS_ENDPOINT = import.meta.env.VITE_EVENTS_ENDPOINT || "";
 
 // Direct Airtable fallback (same base/table as Timeline)
 const AIRTABLE_URL =
   "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker";
 
-// NEW: Outfits table URL (TOP-LEVEL, not inside a function)
+// Outfits table URL
 const AIRTABLE_OUTFITS_URL =
-  "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/ERAS%20TOUR%20OUTFITS"; 
-// ^ change to whatever Airtable calls that table in the API
+  "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/ERAS%20TOUR%20OUTFITS";
 
 // Normalize any record shape into a flat "show" object
 function normalizeShow(raw) {
@@ -29,7 +29,6 @@ function normalizeShow(raw) {
   };
 }
 
-// 🔻 INSERT normalizeOutfit RIGHT HERE, after normalizeShow:
 function normalizeOutfit(raw) {
   const fields = raw.fields || raw;
 
@@ -55,7 +54,6 @@ function formatDate(dateStr) {
   });
 }
 
-// ⬇️ component starts AFTER all helpers
 export default function ErasTourShows() {
   const [shows, setShows] = useState([]);
   const [selectedShowId, setSelectedShowId] = useState("");
@@ -71,88 +69,47 @@ export default function ErasTourShows() {
     window.scrollTo(0, 0);
   }, []);
 
-  // Load shows (your existing logic, just dropped in here)
+  // Load shows from Airtable
   useEffect(() => {
-  async function loadShows() {
-    try {
-      setLoading(true);
-      setError("");
+    async function loadShows() {
+      try {
+        setLoading(true);
+        setError("");
 
-      // Always hit Airtable directly for now
-      let allRecords = [];
-      let offset = null;
+        let allRecords = [];
+        let offset = null;
 
-      do {
-        const filterFormula = encodeURIComponent(`NOT({Eras Show #} = '')`);
+        do {
+          const filterFormula = encodeURIComponent(`NOT({Eras Show #} = '')`);
 
-        let url = `${AIRTABLE_URL}?filterByFormula=${filterFormula}&sort[0][field]=DATE&sort[0][direction]=asc&pageSize=100`;
+          let url = `${AIRTABLE_URL}?filterByFormula=${filterFormula}&sort[0][field]=DATE&sort[0][direction]=asc&pageSize=100`;
 
-        if (offset) {
-          url += `&offset=${offset}`;
-        }
+          if (offset) {
+            url += `&offset=${offset}`;
+          }
 
-        const res = await fetch(url, {
-          headers: {
-            Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-          },
-        });
+          const res = await fetch(url, {
+            headers: {
+              Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+            },
+          });
 
-        if (!res.ok) {
-          throw new Error(
-            `Airtable shows fetch failed: ${res.status} ${res.statusText}`
-          );
-        }
+          if (!res.ok) {
+            throw new Error(
+              `Airtable shows fetch failed: ${res.status} ${res.statusText}`
+            );
+          }
 
-        const responseData = await res.json();
-        allRecords = allRecords.concat(responseData.records);
-        offset = responseData.offset;
-      } while (offset);
+          const responseData = await res.json();
+          allRecords = allRecords.concat(responseData.records);
+          offset = responseData.offset;
+        } while (offset);
 
-      const rawArray = allRecords;
-
-      console.log("Raw Eras Tour shows:", rawArray.length, "records");
-
-      const normalized = rawArray
-        .map((item) => normalizeShow(item))
-        .sort((a, b) => {
-          const da = new Date(a.date);
-          const db = new Date(b.date);
-          if (Number.isNaN(da.getTime()) || Number.isNaN(db.getTime()))
-            return 0;
-          return da - db;
-        });
-
-      console.log("Final normalized shows:", normalized);
-
-      setShows(normalized);
-
-      if (normalized.length > 0) {
-        const first = normalized[0];
-        setSelectedShowId(first.id);
-        setSelectedShow(first);
-      } else {
-        setSelectedShowId("");
-        setSelectedShow(null);
-      }
-    } catch (err) {
-      console.error("ErasTourShows loadShows error:", err);
-      setError(
-        `There was a problem loading Eras Tour shows. (${err.message})`
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  loadShows();
-}, []);
+        const rawArray = allRecords;
 
         console.log("Raw Eras Tour shows:", rawArray.length, "records");
 
-        // No additional filtering needed since Airtable already filtered by "Eras Show #"
-        const erasOnly = rawArray;
-
-        const normalized = erasOnly
+        const normalized = rawArray
           .map((item) => normalizeShow(item))
           .sort((a, b) => {
             const da = new Date(a.date);
@@ -175,8 +132,10 @@ export default function ErasTourShows() {
           setSelectedShow(null);
         }
       } catch (err) {
-        console.error(err);
-        setError("There was a problem loading Eras Tour shows.");
+        console.error("ErasTourShows loadShows error:", err);
+        setError(
+          `There was a problem loading Eras Tour shows. (${err.message})`
+        );
       } finally {
         setLoading(false);
       }
@@ -217,7 +176,7 @@ export default function ErasTourShows() {
         console.log("Loaded outfits:", normalized.length);
         setOutfits(normalized);
       } catch (err) {
-        console.error(err);
+        console.error("ErasTourShows loadOutfits error:", err);
       } finally {
         setLoadingOutfits(false);
       }
@@ -232,7 +191,7 @@ export default function ErasTourShows() {
     label: show.showDisplayName,
   }));
 
-  // When the dropdown changes
+  // Dropdown handler
   const handleSelectChange = (selectedOption) => {
     if (selectedOption) {
       setSelectedShowId(selectedOption.value);
@@ -244,7 +203,7 @@ export default function ErasTourShows() {
     }
   };
 
-  // Outfits linked to the currently selected show
+  // Outfits linked to the selected show
   const outfitsForSelectedShow = selectedShow
     ? outfits.filter(
         (o) => Array.isArray(o.showIds) && o.showIds.includes(selectedShow.id)
@@ -405,7 +364,6 @@ export default function ErasTourShows() {
                   className="bg-white/80 rounded-xl border border-[#f3d6d6] shadow-sm overflow-hidden flex flex-col"
                 >
                   <div className="w-full">
-                    {/* TEMP: simple render of the embed HTML */}
                     <div
                       className="w-full overflow-hidden"
                       dangerouslySetInnerHTML={{ __html: outfit.gettyHtml }}
@@ -438,7 +396,8 @@ export default function ErasTourShows() {
       {!loading &&
         selectedShow &&
         !loadingOutfits &&
-        outfitsForSelectedShow.length === 0 && !error && (
+        outfitsForSelectedShow.length === 0 &&
+        !error && (
           <p className="mt-6 text-sm text-[#6b7db3] italic">
             No outfits are linked to this show yet.
           </p>
