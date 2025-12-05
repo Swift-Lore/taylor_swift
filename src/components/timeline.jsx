@@ -1164,7 +1164,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
 </div>
 <div className="text-center text-[10px] text-[#6b7db3] mt-1 mb-3 px-4 leading-tight">
   All event dates and information are collected from publicly available sources.
-  Swift Lore is a fan-created research project and may contain occasional inaccuracies.
+  Swift-Lore is a fan-created research project and may contain occasional inaccuracies.
   If you spot an error, please contact us.
 </div>
           
