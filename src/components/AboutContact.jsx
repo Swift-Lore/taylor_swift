@@ -64,7 +64,7 @@ export default function AboutContact() {
 
         <p className="text-[#4b4b63] text-sm md:text-base leading-relaxed mb-6">
           You can also submit event corrections or suggestions using our 
-          public Google Form linked in the footer.
+         Google Form by clicking Submit Suggestion at the bottom of the page.
         </p>
 
         <div className="text-center mt-10 text-xs text-[#6b7db3]">
