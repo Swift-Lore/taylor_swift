@@ -91,7 +91,7 @@ function App() {
   <Route path="/timeline" element={<HomePage />} />
   <Route path="/posts" element={<PostsPage />} />
   <Route path="/post_details" element={<PostDetailPage />} />
-  <Route path="/cookie_policy" element={<CookiePolicyPage />} />
+  <Route path="/cookie-policy" element={<CookiePolicyPage />} />
   <Route path="/privacy_policy" element={<PrivacyPolicyPage />} />
 
   <Route
