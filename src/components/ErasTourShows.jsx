@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Select from "react-select";
 
 const SERVER_EVENTS_ENDPOINT = import.meta.env.VITE_EVENTS_ENDPOINT || "";
@@ -59,48 +59,54 @@ function formatDate(dateStr) {
   });
 }
 
-// Getty embed helper
+// Getty embed helper – parses the embed HTML and runs the scripts
 function GettyEmbed({ html }) {
+  const containerRef = useRef(null);
+
   useEffect(() => {
-    if (!html) return;
-    if (typeof window === "undefined") return;
+    const container = containerRef.current;
+    if (!container || !html) return;
 
-    const ensureRender = () => {
-      if (window.gettyimages && window.gettyimages.embed) {
-        try {
-          window.gettyimages.embed.render();
-        } catch (e) {
-          console.error("Getty render error", e);
+    // Clear old embed
+    container.innerHTML = "";
+
+    // Parse the HTML string
+    const temp = document.createElement("div");
+    temp.innerHTML = html;
+
+    Array.from(temp.childNodes).forEach((node) => {
+      if (node.tagName === "SCRIPT") {
+        // Recreate <script> so it actually executes
+        const script = document.createElement("script");
+
+        // Copy attributes (including src)
+        Array.from(node.attributes || []).forEach((attr) => {
+          if (attr.name === "src") {
+            const src = attr.value.startsWith("//")
+              ? window.location.protocol + attr.value
+              : attr.value;
+            script.src = src;
+          } else {
+            script.setAttribute(attr.name, attr.value);
+          }
+        });
+
+        // Inline JS content
+        if (!script.src) {
+          script.text = node.text || node.textContent || "";
         }
+
+        container.appendChild(script);
+      } else {
+        // Normal nodes (<a>, text, etc.)
+        container.appendChild(node);
       }
-    };
-
-    let script = document.querySelector('script[data-getty-widget="true"]');
-
-    if (!script) {
-      script = document.createElement("script");
-      script.src = "https://embed-cdn.gettyimages.com/widgets.js";
-      script.async = true;
-      script.dataset.gettyWidget = "true";
-      script.onload = () => {
-        // Call render after the script has actually loaded
-        ensureRender();
-      };
-      document.body.appendChild(script);
-    } else {
-      // Script already present -> just re-render
-      ensureRender();
-    }
+    });
   }, [html]);
 
   if (!html) return null;
 
-  return (
-    <div
-      className="w-full h-full"
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
-  );
+  return <div ref={containerRef} className="w-full h-full" />;
 }
 
 export default function ErasTourShows() {
