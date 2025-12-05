@@ -53,7 +53,7 @@ export default function TimelineBody() {
     }
 
     metaDescription.content =
-      "Browse the full Swift Lore Taylor Swift timeline: thousands of dated events with filters for albums, eras, locations, and easter eggs."
+      "Browse the full Swift-Lore Taylor Swift timeline: thousands of dated events with filters for albums, tours, Taylor sightings, and other characters within the Taylor Swift Cinematic Universe :)."
 
   }, [])
   
@@ -1132,6 +1132,16 @@ const CalendarModal = () => {
 
   return (
        <div className="bg-[#e6edf7] py-8 overflow-x-hidden">
+               {/* SEO helper for crawlers, hidden visually */}
+      <div className="sr-only" aria-hidden="true">
+        <h1>Taylor Swift Full Timeline Archive</h1>
+        <p>
+          Browse the complete Swift Lore archive of Taylor Swift events with
+          filters for dates, keywords, albums, tours, locations, and deep-cut
+          easter eggs.
+        </p>
+      </div>
+         
       {/* ADD INTRODUCTORY TEXT HERE - New Section */}
       <div className="max-w-6xl mx-auto px-4 mb-6">
         <div className="text-center mb-8">
