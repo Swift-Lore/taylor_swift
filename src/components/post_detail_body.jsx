@@ -486,9 +486,18 @@ useEffect(() => {
       )}
 
 {/* Inline AdSense slot for Post Detail page */}
-<div className="max-w-4xl mx-auto px-4 mb-8">
-  <AdComponent />
-</div>
+{import.meta.env.PROD && (
+  <div
+    style={{
+      display: "block",
+      width: "100%",
+      height: "0px",
+      overflow: "hidden",
+    }}
+  >
+    <AdComponent />
+  </div>
+)}
       
       {/* Main image */}
       {event.IMAGE && event.IMAGE.length > 0 && (
