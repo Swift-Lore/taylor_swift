@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Microlink from "@microlink/react";
 import "./post_detail_body.css";
+import AdComponent from "./ad_component";
 
 // YouTube video ID extractor
 const getYouTubeVideoId = (url) => {
