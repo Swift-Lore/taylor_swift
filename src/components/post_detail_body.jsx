@@ -510,40 +510,63 @@ useEffect(() => {
       )}
 
       {/* YouTube */}
-      {hasVideos && (
-        <section className="max-w-4xl mx-auto px-4 mb-10">
-          <div
-            className={`mt-2 ${
-              event.YOUTUBE?.split(/,\s*|\s*\|\|\s*/).length > 1
-                ? "grid grid-cols-1 md:grid-cols-2 gap-6"
-                : "flex flex-col items-center gap-6"
-            }`}
-          >
-            {event.YOUTUBE?.split(/,\s*|\s*\|\|\s*/).map((url, index) => {
-              const trimmedUrl = url.trim();
-              const videoId = getYouTubeVideoId(trimmedUrl);
+{hasVideos && (
+  <section className="max-w-4xl mx-auto px-4 mb-10">
+    <div
+      className={`mt-2 ${
+        event.YOUTUBE?.split(/,\s*|\s*\|\|\s*/).length > 1
+          ? "grid grid-cols-1 md:grid-cols-2 gap-6"
+          : "flex flex-col items-center gap-6"
+      }`}
+    >
+      {event.YOUTUBE?.split(/,\s*|\s*\|\|\s*/).map((rawUrl, index) => {
+        const url = rawUrl.trim();
 
-              return videoId ? (
-                <div key={index} className="w-full">
-                  <div
-                    className="relative"
-                    style={{ paddingBottom: "56.25%" }}
-                  >
-                    <iframe
-                      src={`https://www.youtube.com/embed/${videoId}`}
-                      title={`YouTube Video ${index + 1}`}
-                      className="absolute top-0 left-0 w-full h-full rounded-xl"
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    ></iframe>
-                  </div>
-                </div>
-              ) : null;
-            })}
+        // 🔥 Robust YouTube ID extractor — works for ALL formats
+        const getId = (input) => {
+          if (!input) return null;
+
+          // youtu.be short links
+          let m = input.match(/youtu\.be\/([^?&]+)/);
+          if (m) return m[1];
+
+          // standard watch URL
+          m = input.match(/[?&]v=([^?&]+)/);
+          if (m) return m[1];
+
+          // shorts
+          m = input.match(/shorts\/([^?&/]+)/);
+          if (m) return m[1];
+
+          // embed
+          m = input.match(/embed\/([^?&/]+)/);
+          if (m) return m[1];
+
+          return null;
+        };
+
+        const videoId = getId(url);
+        if (!videoId) return null;
+
+        return (
+          <div key={index} className="w-full">
+            <div className="relative" style={{ paddingBottom: "56.25%" }}>
+              <iframe
+                src={`https://www.youtube.com/embed/${videoId}`}
+                title={`YouTube Video ${index + 1}`}
+                className="absolute top-0 left-0 w-full h-full rounded-xl"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
           </div>
-        </section>
-      )}
+        );
+      })}
+    </div>
+  </section>
+)}
+
 
       {/* Instagram */}
       {event.INSTAGRAM && (
