@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import Select from "react-select";
+import AdComponent from "./ad_component";
 
 const SERVER_EVENTS_ENDPOINT = import.meta.env.VITE_EVENTS_ENDPOINT || "";
 
