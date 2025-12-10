@@ -829,7 +829,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           </div>
           
 {/* AD: Top of Page (under intro block) */}
-<div className="max-w-4xl mx-auto mb-3 px-3">
+<div className="max-w-4xl mx-auto mt-1 mb-2 px-3">
   <AdComponent />
 </div>
 
