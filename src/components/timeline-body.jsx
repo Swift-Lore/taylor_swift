@@ -4,8 +4,8 @@ import { useState, useEffect } from "react"
 import axios from "axios"
 import { useNavigate, useLocation, Link } from "react-router-dom"
 import { ChevronLeft, ChevronRight, Calendar, Star, Zap, Clock } from "lucide-react"
-import { Button } from "./ui/Button" // Adjust path as needed
-// import AdComponent from "./ad_component" // COMMENT OUT FOR NOW
+import { Button } from "./ui/Button"
+import AdComponent from "./ad_component"
 
 // helper: convert "MM/DD/YYYY" -> "YYYY-MM-DD" for Airtable
 const parseMMDDYYYYToISO = (value) => {
@@ -1431,8 +1431,9 @@ const CalendarModal = () => {
           )}
         </div>
       </div>
-            {/* Ad block - COMMENT OUT FOR NOW (ONLY SHOW IN PRODUCTION AFTER APPROVAL) */}
-      {/* {process.env.NODE_ENV === "production" && (
+         
+                  {/* Ad block – mid-page sponsored card (full timeline) */}
+      {import.meta.env.PROD && (
         <div className="w-full max-w-4xl mx-auto px-4 mb-6">
           <div className="relative rounded-2xl border border-[#f8dada] bg-gradient-to-b from-[#fff8f8] to-[#fdeeee] shadow-sm px-4 py-6 min-h-[110px] flex items-center justify-center">
             <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.12em] text-[#9ca3af]">
@@ -1441,7 +1442,8 @@ const CalendarModal = () => {
             <AdComponent />
           </div>
         </div>
-      )} */}
+      )}
+         
       {/* Selected keywords chips */}
       {filterKeywords.length > 0 && (
         <div className="max-w-6xl mx-auto px-4 mb-4">
