@@ -6,7 +6,8 @@ import { useNavigate, Link } from "react-router-dom"
 import { useEffect, useState } from "react"
 import axios from "axios"
 import "./timeline.css"
-import { SITE_UPDATES } from "./site-updates";
+import { SITE_UPDATES } from "./site-updates"
+import AdComponent from "./ad_component";
 
 // ===== Toronto Theory Alternate Timeline (helper) =====
 // Anchor: REAL date  = Nov 22, 2024
@@ -826,6 +827,13 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               </div>
             </div>
           </div>
+          
+{/* AD: Top of Page (under intro block) */}
+{import.meta.env.PROD && (
+  <div className="max-w-4xl mx-auto mt-1 mb-2 px-3">
+    <AdComponent />
+  </div>
+)}
 
           {/* ON THIS DAY Section */}
 <div className="text-center mb-1 flex-shrink-0">

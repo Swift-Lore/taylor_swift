@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Microlink from "@microlink/react";
 import "./post_detail_body.css";
+import AdComponent from "./ad_component";
 
 // YouTube video ID extractor
 const getYouTubeVideoId = (url) => {
@@ -484,6 +485,11 @@ useEffect(() => {
         </section>
       )}
 
+{/* Inline AdSense slot for Post Detail page */}
+<div className="max-w-4xl mx-auto px-4 mb-8">
+  <AdComponent />
+</div>
+      
       {/* Main image */}
       {event.IMAGE && event.IMAGE.length > 0 && (
         <section className="max-w-4xl mx-auto px-4 mb-10">

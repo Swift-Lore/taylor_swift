@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import Select from "react-select";
+import AdComponent from "./ad_component";
 
 const SERVER_EVENTS_ENDPOINT = import.meta.env.VITE_EVENTS_ENDPOINT || "";
 
@@ -420,6 +421,13 @@ export default function ErasTourShows() {
               </p>
             </div>
           )}
+        </div>
+      )}
+
+                        {/* Inline ad between show details and outfits */}
+      {import.meta.env.PROD && !loading && selectedShow && (
+        <div className="my-6">
+          <AdComponent />
         </div>
       )}
 
