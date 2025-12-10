@@ -6,11 +6,29 @@ export default function Footer() {
   {/* AD SECTION – footer sponsored card */}
 {import.meta.env.PROD && (
   <div className="w-full md:w-1/2 flex">
-    <div className="relative bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-3 md:px-5 md:py-4 flex items-center justify-center card-soft glass-soft w-full aspect-square md:aspect-auto min-h-[200px]">
+    <div
+      className="relative bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-3 md:px-5 md:py-4 flex items-center justify-center card-soft glass-soft w-full"
+      style={{
+        minHeight: "0px",
+        height: "auto",
+        overflow: "hidden",
+      }}
+    >
       <span className="absolute top-3 left-4 text-[10px] uppercase tracking-[0.16em] text-[#9ca3af]">
         Sponsored
       </span>
-      <AdComponent />
+
+      {/* The ad itself should render with no forced size */}
+      <div
+        style={{
+          display: "block",
+          width: "100%",
+          height: "0px",     // ← prevents blank space in footer
+          overflow: "hidden",
+        }}
+      >
+        <AdComponent />
+      </div>
     </div>
   </div>
 )}
