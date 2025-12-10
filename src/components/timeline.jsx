@@ -828,9 +828,16 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
             </div>
           </div>
           
-{/* AD: Top of Page (under intro block) */}
+{/* AD: Top of Page (completely invisible placeholder) */}
 {import.meta.env.PROD && (
-  <div className="max-w-4xl mx-auto mt-1 mb-2 px-3">
+  <div
+    style={{
+      display: "block",
+      width: "100%",
+      height: "0px",
+      overflow: "hidden",
+    }}
+  >
     <AdComponent />
   </div>
 )}

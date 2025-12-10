@@ -424,12 +424,19 @@ export default function ErasTourShows() {
         </div>
       )}
 
-                        {/* Inline ad between show details and outfits */}
-      {import.meta.env.PROD && !loading && selectedShow && (
-        <div className="my-6">
-          <AdComponent />
-        </div>
-      )}
+                        {/* Inline ad – invisible unless Google serves an ad */}
+{import.meta.env.PROD && !loading && selectedShow && (
+  <div
+    style={{
+      display: "block",
+      width: "100%",
+      height: "0px",
+      overflow: "hidden",
+    }}
+  >
+    <AdComponent />
+  </div>
+)}
 
       {/* Outfits grid for this show */}
       {!loading &&
