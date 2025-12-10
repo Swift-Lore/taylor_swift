@@ -1432,17 +1432,19 @@ const CalendarModal = () => {
         </div>
       </div>
          
-                  {/* Ad block – mid-page sponsored card (full timeline) */}
-      {import.meta.env.PROD && (
-        <div className="w-full max-w-4xl mx-auto px-4 mb-6">
-          <div className="relative rounded-2xl border border-[#f8dada] bg-gradient-to-b from-[#fff8f8] to-[#fdeeee] shadow-sm px-4 py-6 min-h-[110px] flex items-center justify-center">
-            <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.12em] text-[#9ca3af]">
-              Sponsored
-            </span>
-            <AdComponent />
-          </div>
-        </div>
-      )}
+                  {/* Ad block – invisible until Google serves an ad */}
+{import.meta.env.PROD && (
+  <div
+    style={{
+      display: "block",
+      width: "100%",
+      height: "0px",
+      overflow: "hidden",
+    }}
+  >
+    <AdComponent />
+  </div>
+)}
          
       {/* Selected keywords chips */}
       {filterKeywords.length > 0 && (
