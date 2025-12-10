@@ -424,6 +424,18 @@ export default function ErasTourShows() {
         </div>
       )}
 
+            {/* Inline ad between show details and outfits */}
+      {!loading && selectedShow && (
+        <div className="my-6">
+          <div className="relative rounded-2xl border border-[#f8dada] bg-gradient-to-b from-[#fff8f8] to-[#fdeeee] shadow-sm px-4 py-6 flex items-center justify-center min-h-[110px]">
+            <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.12em] text-[#9ca3af]">
+              Sponsored
+            </span>
+            <AdComponent />
+          </div>
+        </div>
+      )}
+
       {/* Outfits grid for this show */}
       {!loading &&
         selectedShow &&
