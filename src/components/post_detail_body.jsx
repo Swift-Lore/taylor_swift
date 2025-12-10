@@ -484,6 +484,11 @@ useEffect(() => {
         </section>
       )}
 
+{/* Inline AdSense slot for Post Detail page */}
+<div className="max-w-4xl mx-auto px-4 mb-8">
+  <AdComponent />
+</div>
+      
       {/* Main image */}
       {event.IMAGE && event.IMAGE.length > 0 && (
         <section className="max-w-4xl mx-auto px-4 mb-10">
