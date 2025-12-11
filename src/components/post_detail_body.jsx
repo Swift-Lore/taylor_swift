@@ -57,28 +57,28 @@ const formatEventDate = (isoDate) => {
 
   return `${month}-${day}-${year}`;
 };
+
 // Normalize Instagram URLs so embed.js is happy
 const normalizeInstagramUrl = (raw) => {
   if (!raw) return "";
 
-  // strip query params
+  // Remove query params
   const clean = raw.trim().split("?")[0];
 
-  // Match:
-  // - instagram.com/p/SHORTCODE/
-  // - instagram.com/reel/SHORTCODE/
-  // - instagram.com/tv/SHORTCODE/
-  // - instagram.com/USERNAME/p/SHORTCODE/
+  // Try to extract shortcode + type
+  // Matches ALL of these:
+  // - instagram.com/p/SHORT/
+  // - instagram.com/reel/SHORT/
+  // - instagram.com/tv/SHORT/
+  // - instagram.com/user/p/SHORT/
   const match = clean.match(
-    /instagram\.com\/(?:[^/]+\/)?(reel|p|tv)\/([^/?#]+)/i
+    /instagram\.com\/(?:[^/]+\/)?(p|reel|tv)\/([^/?#]+)/i
   );
 
-  if (!match) {
-    return clean; // fallback: use whatever we got
-  }
+  if (!match) return ""; // bad URL
 
-  const type = match[1];      // p | reel | tv
-  const shortcode = match[2]; // CP-xHUvn_Ve
+  const type = match[1].toLowerCase();      // p | reel | tv
+  const shortcode = match[2];               // CP-xHUvn_Ve
 
   // Canonical embed URL
   return `https://www.instagram.com/${type}/${shortcode}/`;
