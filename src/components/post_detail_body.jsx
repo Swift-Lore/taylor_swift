@@ -57,6 +57,32 @@ const formatEventDate = (isoDate) => {
 
   return `${month}-${day}-${year}`;
 };
+// Normalize Instagram URLs so embed.js is happy
+const normalizeInstagramUrl = (raw) => {
+  if (!raw) return "";
+
+  // strip query params
+  const clean = raw.trim().split("?")[0];
+
+  // Match:
+  // - instagram.com/p/SHORTCODE/
+  // - instagram.com/reel/SHORTCODE/
+  // - instagram.com/tv/SHORTCODE/
+  // - instagram.com/USERNAME/p/SHORTCODE/
+  const match = clean.match(
+    /instagram\.com\/(?:[^/]+\/)?(reel|p|tv)\/([^/?#]+)/i
+  );
+
+  if (!match) {
+    return clean; // fallback: use whatever we got
+  }
+
+  const type = match[1];      // p | reel | tv
+  const shortcode = match[2]; // CP-xHUvn_Ve
+
+  // Canonical embed URL
+  return `https://www.instagram.com/${type}/${shortcode}/`;
+};
 
 export default function PostDetailBody() {
   const navigate = useNavigate();
