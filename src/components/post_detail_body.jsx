@@ -58,6 +58,32 @@ const formatEventDate = (isoDate) => {
   return `${month}-${day}-${year}`;
 };
 
+// Normalize Instagram URLs so embed.js is happy
+const normalizeInstagramUrl = (raw) => {
+  if (!raw) return "";
+
+  // Remove query params
+  const clean = raw.trim().split("?")[0];
+
+  // Try to extract shortcode + type
+  // Matches ALL of these:
+  // - instagram.com/p/SHORT/
+  // - instagram.com/reel/SHORT/
+  // - instagram.com/tv/SHORT/
+  // - instagram.com/user/p/SHORT/
+  const match = clean.match(
+    /instagram\.com\/(?:[^/]+\/)?(p|reel|tv)\/([^/?#]+)/i
+  );
+
+  if (!match) return ""; // bad URL
+
+  const type = match[1].toLowerCase();      // p | reel | tv
+  const shortcode = match[2];               // CP-xHUvn_Ve
+
+  // Canonical embed URL
+  return `https://www.instagram.com/${type}/${shortcode}/`;
+};
+
 export default function PostDetailBody() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -588,7 +614,7 @@ useEffect(() => {
         <section className="w-full px-4 mb-10">
           <div className="flex flex-wrap justify-center gap-6 mt-2">
             {event.INSTAGRAM.split(" || ").map((rawUrl, index) => {
-              const url = rawUrl.trim().split("?")[0];
+              const url = normalizeInstagramUrl(rawUrl);
               return url ? (
                 <div
                   key={index}
