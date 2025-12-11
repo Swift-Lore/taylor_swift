@@ -614,7 +614,7 @@ useEffect(() => {
         <section className="w-full px-4 mb-10">
           <div className="flex flex-wrap justify-center gap-6 mt-2">
             {event.INSTAGRAM.split(" || ").map((rawUrl, index) => {
-              const url = rawUrl.trim().split("?")[0];
+              const url = normalizeInstagramUrl(rawUrl);
               return url ? (
                 <div
                   key={index}
