@@ -202,9 +202,10 @@ export default function TimelineBody() {
   }
 
   const hasEvents = (day) => {
-    const dateKey = `${calendarYear}-${calendarMonth + 1}-${day}`
-    return dateEventsMap[dateKey]
-  }
+  if (!day) return false
+  const dateKey = `${calendarYear}-${calendarMonth + 1}-${day}`
+  return !!dateEventsMap[dateKey]
+}
 
   const monthNames = [
     "January", "February", "March", "April", "May", "June",
@@ -383,23 +384,25 @@ useEffect(() => {
             Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
           },
           params: {
-            filterByFormula: `AND(MONTH(DATE) = ${month}, YEAR(DATE) = ${year})`,
-            fields: ["DATE"],
-          },
+  filterByFormula: `AND(MONTH({DATE}) = ${month}, YEAR({DATE}) = ${year})`,
+  fields: ["DATE"],
+},
         }
       )
       
-      // Create a map of dates that have events
-      const eventsMap = {}
-      response.data.records?.forEach(record => {
-        if (record.fields.DATE) {
-          const date = new Date(record.fields.DATE)
-          const dateKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
-          eventsMap[dateKey] = true
-        }
-      })
-      
-      setDateEventsMap(prev => ({ ...prev, ...eventsMap }))
+      // Create a map of dates that have events (no timezone conversion)
+const eventsMap = {}
+response.data.records?.forEach(record => {
+  const raw = record.fields.DATE
+  if (typeof raw === "string") {
+    // Airtable date-only fields come back as "YYYY-MM-DD"
+    const [y, m, d] = raw.split("-").map(Number)
+    const dateKey = `${y}-${m}-${d}` // e.g. 2019-6-30
+    eventsMap[dateKey] = true
+  }
+})
+
+setDateEventsMap(prev => ({ ...prev, ...eventsMap }))
     } catch (error) {
       console.error("Error fetching calendar events:", error)
     }
@@ -411,6 +414,7 @@ useEffect(() => {
 }, [calendarMonth, calendarYear, showCalendar])
 useEffect(() => {
   const timer = setTimeout(() => {
+    
     // Only trigger filter when cleared or when MM/DD is valid
     if (monthDay === "" || isCompleteMonthDay(monthDay)) {
       resetPagination()
