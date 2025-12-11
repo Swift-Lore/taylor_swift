@@ -1060,50 +1060,54 @@ const CalendarModal = () => {
         </div>
 
         {/* Calendar Grid */}
-        <div className="grid grid-cols-7 gap-1">
-          {calendarDays.map((day, index) => (
-            <button
-              key={index}
-              onClick={() => handleDateSelect(day)}
-              disabled={!day}
-              className={`
-                relative h-8 rounded-lg text-sm font-medium transition-all
-                transform hover:scale-105 active:scale-95
-                ${!day ? 'invisible' : ''}
-                {
-  (() => {
-    if (!monthDay || !monthDay.includes("/")) {
-      return "bg-white/80 text-[#8e3e3e] hover:bg-[#f8d7da]"
+<div className="grid grid-cols-7 gap-1">
+  {calendarDays.map((day, index) => {
+    const isEmpty = !day
+
+    // figure out if this day is the selected MM/DD
+    let isSelected = false
+    if (!isEmpty && monthDay && monthDay.includes("/")) {
+      const [selMonthStr, selDayStr] = monthDay.split("/")
+      const selMonth = parseInt(selMonthStr, 10)
+      const selDay = parseInt(selDayStr, 10)
+      isSelected = day === selDay && (calendarMonth + 1) === selMonth
     }
 
-    const [selMonthStr, selDayStr] = monthDay.split("/")
-    const selMonth = parseInt(selMonthStr, 10)
-    const selDay = parseInt(selDayStr, 10)
+    const baseClasses =
+      "relative h-8 rounded-lg text-sm font-medium transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center"
 
-    const isSelected =
-      day === selDay && (calendarMonth + 1) === selMonth
+    const visibilityClasses = isEmpty ? "invisible" : ""
 
-    return isSelected
+    const stateClasses = isSelected
       ? "bg-[#8e3e3e] text-white shadow-md scale-105"
       : "bg-white/80 text-[#8e3e3e] hover:bg-[#f8d7da]"
-  })()
-}
 
-                ${
-                  hasEvents(day)
-                    ? 'border-2 border-[#e3b0b0]'
-                    : 'border border-transparent'
-                }
-              `}
-            >
-              {day}
-              {/* Event indicator dot */}
-              {hasEvents(day) && (
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#8e3e3e] rounded-full"></div>
-              )}
-            </button>
-          ))}
-        </div>
+    const borderClasses = hasEvents(day)
+      ? "border-2 border-[#e3b0b0]"
+      : "border border-transparent"
+
+    return (
+      <button
+        key={index}
+        onClick={() => handleDateSelect(day)}
+        disabled={isEmpty}
+        className={`${baseClasses} ${visibilityClasses} ${stateClasses} ${borderClasses}`}
+      >
+        {/* Day number */}
+        {!isEmpty && (
+          <span className="relative z-10">
+            {day}
+          </span>
+        )}
+
+        {/* Event indicator dot */}
+        {hasEvents(day) && !isEmpty && (
+          <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#8e3e3e] rounded-full" />
+        )}
+      </button>
+    )
+  })}
+</div>
 
         {/* Action Buttons */}
         <div className="flex gap-2 justify-center mt-4">
@@ -1125,22 +1129,6 @@ const CalendarModal = () => {
     </div>
   )
 }
-
-    // AdSense init - COMMENT OUT FOR NOW
-    // AdSense init - COMMENT OUT FOR NOW
-  // useEffect(() => {
-  //   if (
-  //     typeof window !== "undefined" &&
-  //     window.adsbygoogle &&
-  //     process.env.NODE_ENV === "production"
-  //   ) {
-  //     try {
-  //       ;(window.adsbygoogle = window.adsbygoogle || []).push({})
-  //     } catch (e) {
-  //       console.error("AdSense error:", e)
-  //     }
-  //   }
-  // }, [])
 
   return (
        <div className="bg-[#e6edf7] py-8 overflow-x-hidden">
