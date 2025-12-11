@@ -1024,31 +1024,63 @@ const CalendarModal = () => {
         </div>
 
         {/* Calendar Header */}
-        <div className="flex items-center justify-between mb-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigateCalendarMonth('prev')}
-            className="p-2 hover:bg-[#f8d7da] transition-colors"
-          >
-            <ChevronLeft size={18} className="text-[#8e3e3e]" />
-          </Button>
-          
-          <div className="text-lg font-semibold text-[#8e3e3e] flex items-center gap-2">
-            <Star size={16} className="text-[#ffd700]" fill="#ffd700" />
-            {monthNames[calendarMonth]} {calendarYear}
-            <Star size={16} className="text-[#ffd700]" fill="#ffd700" />
-          </div>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigateCalendarMonth('next')}
-            className="p-2 hover:bg-[#f8d7da] transition-colors"
-          >
-            <ChevronRight size={18} className="text-[#8e3e3e]" />
-          </Button>
-        </div>
+<div className="flex items-center justify-between mb-2">
+  <Button
+    variant="ghost"
+    size="sm"
+    onClick={() => navigateCalendarMonth("prev")}
+    className="p-2 hover:bg-[#f8d7da] transition-colors"
+  >
+    <ChevronLeft size={18} className="text-[#8e3e3e]" />
+  </Button>
+
+  <div className="text-lg font-semibold text-[#8e3e3e] flex items-center gap-2">
+    <Star size={16} className="text-[#ffd700]" fill="#ffd700" />
+    {monthNames[calendarMonth]} {calendarYear}
+    <Star size={16} className="text-[#ffd700]" fill="#ffd700" />
+  </div>
+
+  <Button
+    variant="ghost"
+    size="sm"
+    onClick={() => navigateCalendarMonth("next")}
+    className="p-2 hover:bg-[#f8d7da] transition-colors"
+  >
+    <ChevronRight size={18} className="text-[#8e3e3e]" />
+  </Button>
+</div>
+
+{/* Month / Year dropdowns */}
+<div className="flex items-center justify-center gap-2 mb-4">
+  {/* Month select */}
+  <select
+    className="border border-[#e3b0b0] rounded-full px-3 py-1 text-xs text-[#8e3e3e] bg-white"
+    value={calendarMonth}
+    onChange={(e) => setCalendarMonth(Number(e.target.value))}
+  >
+    {monthNames.map((name, idx) => (
+      <option key={name} value={idx}>
+        {name}
+      </option>
+    ))}
+  </select>
+
+  {/* Year select */}
+  <select
+    className="border border-[#e3b0b0] rounded-full px-3 py-1 text-xs text-[#8e3e3e] bg-white"
+    value={calendarYear}
+    onChange={(e) => setCalendarYear(Number(e.target.value))}
+  >
+    {Array.from(
+      { length: new Date().getFullYear() + 5 - 2006 + 1 },
+      (_, i) => 2006 + i
+    ).map((year) => (
+      <option key={year} value={year}>
+        {year}
+      </option>
+    ))}
+  </select>
+</div>
 
         {/* Day Headers */}
         <div className="grid grid-cols-7 gap-1 mb-2">
