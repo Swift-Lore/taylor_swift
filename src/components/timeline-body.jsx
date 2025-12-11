@@ -134,22 +134,27 @@ export default function TimelineBody() {
   }
 
   const generateCalendar = () => {
-    const daysInMonth = getDaysInMonth(calendarMonth, calendarYear)
-    const firstDay = getFirstDayOfMonth(calendarMonth, calendarYear)
-    const calendar = []
+  const daysInMonth = getDaysInMonth(calendarMonth, calendarYear)
+  const firstDay = getFirstDayOfMonth(calendarMonth, calendarYear)
+  const calendar = []
 
-    // Add empty cells for days before the first day of month
-    for (let i = 0; i < firstDay; i++) {
-      calendar.push(null)
-    }
-
-    // Add days of the month
-    for (let i = 1; i <= daysInMonth; i++) {
-      calendar.push(i)
-    }
-
-    return calendar
+  // Add empty cells for days before the first day of month
+  for (let i = 0; i < firstDay; i++) {
+    calendar.push(null)
   }
+
+  // Add days of the month
+  for (let i = 1; i <= daysInMonth; i++) {
+    calendar.push(i)
+  }
+
+  // 🔒 Pad out to a full 6-week (42 cell) grid
+  while (calendar.length < 42) {
+    calendar.push(null)
+  }
+
+  return calendar
+}
 
   const handleDateSelect = (day) => {
     if (day) {
