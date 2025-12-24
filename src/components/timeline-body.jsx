@@ -644,7 +644,7 @@ const handleEndDateChange = (value) => {
 };
 
   // Search
-  const handleSearch = async (e) => {
+  const handleSearch = async (e, { reset = true } = {}) => {
     e.preventDefault()
     if (searchQuery.trim()) {
       try {
