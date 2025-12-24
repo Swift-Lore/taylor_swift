@@ -234,10 +234,12 @@ const [searchOffsetIndex, setSearchOffsetIndex] = useState(0)
     e.preventDefault()
     e.stopPropagation()
 
-    if (!filterKeywords.includes(keyword)) {
-      setFilterKeywords([...filterKeywords, keyword])
-    }
-    resetPagination()
+    userInteractedRef.current = true
+
+if (!filterKeywords.includes(keyword)) {
+  setFilterKeywords([...filterKeywords, keyword])
+}
+resetPagination()
   }
   // On first mount, restore filters from sessionStorage (per user / per tab)
   useEffect(() => {
