@@ -576,7 +576,7 @@ const handlePreviousDay = () => {
       
         if (isTorontoMode) {
           // In Toronto mode: show ONLY this specific year
-          filterFormula = `AND(MONTH(DATE) = ${month}, DAY(DATE) = ${day}, YEAR(DATE) = ${year})`
+          filterFormula = `AND(MONTH({DATE}) = ${month}, DAY({DATE}) = ${day}, YEAR({DATE}) = ${year})`
         } else {
           // Normal mode: show this day across all years
           filterFormula = `AND(MONTH(DATE) = ${month}, DAY(DATE) = ${day})`
