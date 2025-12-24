@@ -205,11 +205,16 @@ const [searchOffsetIndex, setSearchOffsetIndex] = useState(0)
   const monthStr = (today.getMonth() + 1).toString().padStart(2, '0')
   const dayStr = today.getDate().toString().padStart(2, '0')
   
+  // Batch state updates
   setMonthDay(`${monthStr}/${dayStr}`)
   setCalendarMonth(today.getMonth())
   setCalendarYear(today.getFullYear())
   setShowCalendar(false)
-  resetPagination()
+  
+  // Small delay to prevent double render
+  setTimeout(() => {
+    resetPagination()
+  }, 10)
 }
 
   const jumpToThisMonth = () => {
@@ -438,15 +443,15 @@ setDateEventsMap(prev => ({ ...prev, ...eventsMap }))
   }
 }, [calendarMonth, calendarYear, showCalendar])
 useEffect(() => {
-  const timer = setTimeout(() => {
-    
-    // Only trigger filter when cleared or when MM/DD is valid
-    if (monthDay === "" || isCompleteMonthDay(monthDay)) {
+  // Only trigger filter when cleared or when MM/DD is valid
+  if (monthDay === "" || isCompleteMonthDay(monthDay)) {
+    // Small delay to batch state updates
+    const timer = setTimeout(() => {
       resetPagination()
-    }
-  }, 500)
-
-  return () => clearTimeout(timer)
+    }, 10)
+    
+    return () => clearTimeout(timer)
+  }
 }, [monthDay])
 
 // filter keywords list (using dynamic list from Airtable)
