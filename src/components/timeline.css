@@ -170,7 +170,60 @@
 .timeline-card div:not(.no-text-highlight):not(.keyword-container) {
   user-select: text !important;
 }
-/* ===== ADD TO BOTTOM OF FILE ===== */
+
+/* ===== AD STYLING FIXES - PREVENT SKINNY ADS ===== */
+/* Add this section BEFORE the sr-only class */
+
+.ad-slot-container {
+  width: 100%;
+  min-width: 300px;
+}
+
+.google-ad-wrapper {
+  width: 100% !important;
+  min-width: 300px !important;
+}
+
+/* Force Google Ads to respect container dimensions */
+ins.adsbygoogle[data-ad-status="unfilled"] {
+  display: none !important;
+}
+
+ins.adsbygoogle {
+  display: block !important;
+  width: 100% !important;
+  min-width: 300px !important;
+  height: auto !important;
+  min-height: 90px !important;
+  max-height: 600px !important;
+  background: transparent !important;
+}
+
+/* Fix for iframe rendering */
+ins.adsbygoogle iframe {
+  min-width: 300px !important;
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* Prevent ad from being too skinny on mobile */
+@media (max-width: 640px) {
+  .ad-slot-container {
+    min-width: 280px !important;
+  }
+  
+  ins.adsbygoogle {
+    min-width: 280px !important;
+  }
+}
+
+/* Hide ad container when empty */
+.ad-slot-container:empty,
+.ad-slot-container:has(ins.adsbygoogle[data-ad-status="unfilled"]) {
+  display: none !important;
+}
+
+/* ===== END AD FIXES ===== */
 
 /* Screen reader only class for SEO content */
 .sr-only {
