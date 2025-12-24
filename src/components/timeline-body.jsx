@@ -611,7 +611,7 @@ useEffect(() => {
   if (!searchQuery.trim()) return
 
   // run the same search logic as submit, but using updated offset
-  handleSearch(new Event("submit"))
+  handleSearch(new Event("submit"), { reset: false })
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [searchOffsetIndex, sortOrder])
 
