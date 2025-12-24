@@ -38,6 +38,7 @@ const isCompleteMonthDay = (value) => {
 
   return true
 }
+const pad2 = (n) => String(n).padStart(2, "0")
 
 export default function TimelineBody() {
   const navigate = useNavigate()
