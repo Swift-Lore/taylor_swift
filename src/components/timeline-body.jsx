@@ -547,11 +547,11 @@ const response = await axios.get(
       Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
     },
     params: {
-      pageSize: recordsPerPage,
-      offset: currentOffset || undefined,
-      filterByFormula: filterFormula || undefined,
-      sort: [{ field: "DATE", direction: sortOrder }],
-    },
+  pageSize: clauses.length > 0 ? filterRecordsPerPage : recordsPerPage,
+  offset: currentOffset || undefined,
+  filterByFormula: filterFormula || undefined,
+  sort: [{ field: "DATE", direction: sortOrder }],
+},
   }
 )
 
