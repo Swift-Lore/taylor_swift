@@ -50,7 +50,7 @@ export default function AdComponent() {
   display: "block",
   width: "100%",
   margin: "0",
-  minHeight: "110px", // small reserve so it doesn't look broken while ads ramp up
+  minHeight: "90px", // small reserve so it doesn't look broken while ads ramp up
 }}
       data-ad-client="ca-pub-9054923750158002"
       data-ad-slot="3327797457"
