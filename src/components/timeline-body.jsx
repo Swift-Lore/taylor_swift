@@ -773,14 +773,17 @@ const handleSearchNextPage = () => {
 
 // pagination helpers
 const resetPagination = () => {
+  // timeline paging
   setPage(1)
   setCurrentOffsetIndex(0)
   setOffsetHistory([null])
+
+  // search paging
+  setSearchPage(1)
+  setSearchOffsetIndex(0)
+  setSearchOffsetHistory([null])
+  setSearchHasMore(false)
 }
-    setPage(1)
-    setCurrentOffsetIndex(0)
-    setOffsetHistory([null])
-  }
 
   const handlePreviousPage = () => {
     if (currentOffsetIndex > 0) {
