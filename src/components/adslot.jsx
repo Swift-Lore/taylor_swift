@@ -1,65 +1,86 @@
-// ad_component.jsx - Updated with resize observer
+// adslot.jsx - COMPLETE UPDATED VERSION
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
+import AdComponent from "./ad_component";
 
-export default function AdComponent({ onFilledChange, adUnitPath }) {
-  const adRef = useRef(null);
-  const adLoaded = useRef(false);
+export default function AdSlot({
+  maxWidthClass = "max-w-4xl",
+  minHeight = 90,
+  className = "",
+}) {
+  const [filled, setFilled] = useState(false);
+  const [showAd, setShowAd] = useState(false);
+  const containerRef = useRef(null);
 
+  // Delay showing ad to ensure container is properly sized
   useEffect(() => {
-    // Only run on client side
-    if (typeof window === "undefined") return;
+    const timer = setTimeout(() => {
+      setShowAd(true);
+    }, 100); // Small delay to ensure DOM is ready
 
-    const loadAd = () => {
-      if (adLoaded.current) return;
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Handle ad fill state changes
+  const handleFilledChange = (isFilled) => {
+    setFilled(isFilled);
+    
+    // If ad fails to load after 5 seconds, hide the container
+    if (!isFilled) {
+      const timeout = setTimeout(() => {
+        if (containerRef.current) {
+          containerRef.current.style.display = 'none';
+        }
+      }, 5000);
       
-      try {
-        // Set a timeout to handle ad loading
-        const timeoutId = setTimeout(() => {
-          if (adRef.current && adRef.current.innerHTML.trim() === "") {
-            // Ad didn't load, mark as filled to hide container
-            onFilledChange(false);
-          }
-        }, 3000);
-
-        // Load Google Ad
-        (window.adsbygoogle = window.adsbygoogle || []).push({
-          google_ad_client: "ca-pub-YOUR_PUBLISHER_ID",
-          enable_page_level_ads: false,
-          overlays: false,
-        });
-
-        adLoaded.current = true;
-        onFilledChange(true);
-        
-        return () => clearTimeout(timeoutId);
-      } catch (error) {
-        console.error("Ad loading error:", error);
-        onFilledChange(false);
-      }
-    };
-
-    // Load ad when component mounts
-    loadAd();
-  }, [onFilledChange, adUnitPath]);
+      return () => clearTimeout(timeout);
+    }
+  };
 
   return (
-    <div ref={adRef} className="ad-container w-full">
-      <ins
-        className="adsbygoogle"
-        style={{
-          display: "block",
-          width: "100%",
-          minWidth: "300px",
-          minHeight: "90px",
-          maxHeight: "600px",
+    <div 
+      ref={containerRef}
+      className={`${maxWidthClass} mx-auto px-4 my-6 ad-slot-container`}
+    >
+      {/* Always visible container with proper dimensions */}
+      <div
+        className={`relative rounded-2xl border border-[#f8dada] 
+          bg-gradient-to-b from-[#fff8f8] to-[#fdeeee] 
+          shadow-sm flex items-center justify-center ${className}`}
+        style={{ 
+          minHeight: `${minHeight}px`,
+          width: '100%',
+          minWidth: '300px', // Prevent skinny loading
+          maxWidth: '100%',
+          overflow: 'hidden',
+          position: 'relative'
         }}
-        data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
-        data-ad-slot="YOUR_AD_SLOT_ID"
-        data-ad-format="auto"
-        data-full-width-responsive="true"
-      />
+      >
+        {/* "Sponsored" label - always show */}
+        <span className="absolute top-2 left-4 text-[10px] uppercase tracking-[0.12em] text-[#9ca3af] z-10">
+          Sponsored
+        </span>
+
+        {/* Ad Content */}
+        <div className="w-full h-full flex items-center justify-center">
+          {showAd && (
+            <AdComponent 
+              minHeight={minHeight} 
+              onFilledChange={handleFilledChange} 
+            />
+          )}
+        </div>
+
+        {/* Loading placeholder - shows while ad loads */}
+        {!filled && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white/90 z-20">
+            <div className="text-sm text-gray-400 animate-pulse">
+              Loading advertisement...
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
