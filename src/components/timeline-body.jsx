@@ -243,7 +243,9 @@ resetPagination()
   }
   // On first mount, restore filters from sessionStorage (per user / per tab)
   useEffect(() => {
-    if (typeof window === "undefined") return
+  if (typeof window === "undefined") return
+  if (didRestoreRef.current) return
+  if (userInteractedRef.current) return
 
     const saved = window.sessionStorage.getItem(TIMELINE_FILTERS_KEY)
     if (!saved) return
