@@ -660,19 +660,29 @@ const handleEndDateChange = (value) => {
             ? `AND(${searchConditions.join(", ")})`
             : searchConditions[0]
 
-        const response = await axios.get(
-          "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-            },
-            params: {
-              maxRecords: 100,
-              filterByFormula: filterFormula,
-              sort: [{ field: "DATE", direction: "desc" }],
-            },
-          }
-        )
+        const currentSearchOffset = searchOffsetHistory[searchOffsetIndex]
+
+const response = await axios.get(
+  "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+  {
+    headers: {
+      Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+    },
+    params: {
+      pageSize: recordsPerPage,
+      offset: currentSearchOffset || undefined,
+      filterByFormula: filterFormula,
+      sort: [{ field: "DATE", direction: sortOrder }],
+    },
+  }
+)
+
+const hasMore = !!response.data.offset
+setSearchHasMore(hasMore)
+
+if (hasMore && searchOffsetIndex === searchOffsetHistory.length - 1) {
+  setSearchOffsetHistory((prev) => [...prev, response.data.offset])
+}
 
         const formattedResults = response.data.records.map((record) => ({
           id: record.id,
