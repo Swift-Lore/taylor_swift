@@ -688,7 +688,7 @@ const response = await axios.get(
       Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
     },
     params: {
-      pageSize: recordsPerPage,
+      pageSize: searchRecordsPerPage,
       offset: currentSearchOffset || undefined,
       filterByFormula: filterFormula,
       sort: [{ field: "DATE", direction: sortOrder }],
