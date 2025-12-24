@@ -511,19 +511,21 @@ useEffect(() => {
         </section>
       )}
 
-{/* Inline AdSense slot for Post Detail page */}
+{/* AdSense: Post Detail (inline) */}
 {import.meta.env.PROD && (
-  <div
-    style={{
-      display: "block",
-      width: "100%",
-      height: "0px",
-      overflow: "hidden",
-    }}
-  >
-    <AdComponent />
+  <div className="max-w-4xl mx-auto px-4 mb-10">
+    <div
+      className="bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-3 md:px-5 md:py-4 card-soft glass-soft"
+      style={{ minHeight: "250px" }}
+    >
+      <span className="block text-[10px] uppercase tracking-[0.16em] text-[#9ca3af] mb-2">
+        Sponsored
+      </span>
+      <AdComponent />
+    </div>
   </div>
 )}
+
       
       {/* Main image */}
       {event.IMAGE && event.IMAGE.length > 0 && (
@@ -647,7 +649,7 @@ useEffect(() => {
       {event.TWITTER && (
         <section className="w-full px-4 mb-10">
           <div className="flex flex-wrap justify-center gap-6 mt-2">
-            {event.TWITTER.split(/ \|\| |\s+/).map((url, index) => {
+            {event.TWITTER.split(" || ").map((url, index) => {
               const cleanUrl = url.trim().replace("x.com", "twitter.com");
               const isValid =
                 /^https:\/\/twitter\.com\/[^/]+\/status\/\d+/.test(cleanUrl);
