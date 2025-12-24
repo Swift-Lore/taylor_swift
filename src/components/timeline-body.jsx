@@ -109,8 +109,14 @@ export default function TimelineBody() {
   const [currentOffsetIndex, setCurrentOffsetIndex] = useState(0)
 
   // search mode
-  const [isSearchMode, setIsSearchMode] = useState(false)
-  const [searchResults, setSearchResults] = useState([])
+const [isSearchMode, setIsSearchMode] = useState(false)
+const [searchResults, setSearchResults] = useState([])
+
+// search pagination (separate from normal timeline pagination)
+const [searchPage, setSearchPage] = useState(1)
+const [searchHasMore, setSearchHasMore] = useState(false)
+const [searchOffsetHistory, setSearchOffsetHistory] = useState([null])
+const [searchOffsetIndex, setSearchOffsetIndex] = useState(0)
 
     const [isFilterMode, setIsFilterMode] = useState(false)
 
