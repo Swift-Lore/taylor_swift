@@ -654,7 +654,7 @@ useEffect(() => {
       {/* Twitter / X */}
       {event.TWITTER && (
         <section className="w-full px-4 mb-10">
-          <div className="flex flex-wrap justify-center gap-6 mt-2">
+  <div className="flex flex-wrap justify-start gap-6 mt-2">
             {event.TWITTER.split(" || ").map((url, index) => {
               const cleanUrl = url.trim().replace("x.com", "twitter.com");
               const isValid =
