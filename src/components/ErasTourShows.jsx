@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import Select from "react-select";
-import AdComponent from "./ad_component";
+import AdSlot from "./adslot";
 
 const SERVER_EVENTS_ENDPOINT = import.meta.env.VITE_EVENTS_ENDPOINT || "";
 
@@ -424,18 +424,13 @@ export default function ErasTourShows() {
         </div>
       )}
 
-                        {/* Inline ad – invisible unless Google serves an ad */}
+                        {/* Inline ad */}
 {import.meta.env.PROD && !loading && selectedShow && (
-  <div
-    style={{
-      display: "block",
-      width: "100%",
-      height: "0px",
-      overflow: "hidden",
-    }}
-  >
-    <AdComponent />
-  </div>
+  <AdSlot
+    maxWidthClass="max-w-5xl"
+    minHeight={90}
+    className="my-6"
+  />
 )}
 
       {/* Outfits grid for this show */}

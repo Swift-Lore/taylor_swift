@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Microlink from "@microlink/react";
 import "./post_detail_body.css";
-import AdComponent from "./ad_component";
+import AdSlot from "./adslot";
 
 // YouTube video ID extractor
 const getYouTubeVideoId = (url) => {
@@ -520,14 +520,11 @@ useEffect(() => {
 
 {/* AdSense: Post Detail (inline) */}
 {import.meta.env.PROD && (
-  <div className="max-w-4xl mx-auto px-4 mb-8">
-    <div className="bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-2 md:px-5 md:py-3 card-soft glass-soft overflow-hidden">
-      <span className="block text-[10px] uppercase tracking-[0.16em] text-[#9ca3af] mb-1">
-        Sponsored
-      </span>
-      <AdComponent />
-    </div>
-  </div>
+  <AdSlot
+    maxWidthClass="max-w-4xl"
+    minHeight={90}
+    className="mb-8"
+  />
 )}
       
       {/* Main image */}

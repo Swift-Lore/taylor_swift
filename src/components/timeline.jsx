@@ -7,7 +7,7 @@ import { useEffect, useState } from "react"
 import axios from "axios"
 import "./timeline.css"
 import { SITE_UPDATES } from "./site-updates"
-import AdComponent from "./ad_component";
+import AdSlot from "./adslot";
 
 // ===== Toronto Theory Alternate Timeline (helper) =====
 // Anchor: REAL date  = Nov 22, 2024
@@ -902,20 +902,13 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
             </div>
           </div>
           
-{/* AD SECTION – top sponsored card */}
+{/* Ad block */}
 {import.meta.env.PROD && (
-  <div className="max-w-4xl mx-auto px-3 mb-2">
-    <div className="relative bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-3 md:px-5 md:py-4 card-soft glass-soft w-full">
-      <span className="absolute top-3 left-4 text-[10px] uppercase tracking-[0.16em] text-[#9ca3af]">
-        Sponsored
-      </span>
-
-      {/* Let the ad stretch full width; keep a SMALL reserved height */}
-      <div className="w-full pt-6 min-h-[110px]">
-        <AdComponent />
-      </div>
-    </div>
-  </div>
+  <AdSlot
+    maxWidthClass="max-w-6xl"
+    minHeight={90}
+    className="mb-2"
+  />
 )}
 
           {/* ON THIS DAY Section */}
