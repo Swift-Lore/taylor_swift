@@ -140,7 +140,7 @@ export default function AdSlot({
               data-ad-slot="3327797457" // Your Ad Slot ID from AdSense
               data-ad-format="auto"
               data-full-width-responsive="true"
-              data-adtest={process.env.NODE_ENV === 'development' ? 'on' : 'off'}
+              data-adtest="on"  // Force test ads in all environments
             />
           </div>
         </div>
