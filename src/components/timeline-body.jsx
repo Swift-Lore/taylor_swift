@@ -744,8 +744,29 @@ if (hasMore && searchOffsetIndex === searchOffsetHistory.length - 1) {
     }
   }
 
-  // pagination helpers
-  const resetPagination = () => {
+  // pagination helpers (timeline)
+const handleSearchPreviousPage = () => {
+  if (searchOffsetIndex > 0) {
+    setSearchOffsetIndex((prev) => prev - 1)
+    setSearchPage((prev) => prev - 1)
+    window.scrollTo(0, 0)
+  }
+}
+
+const handleSearchNextPage = () => {
+  if (searchHasMore) {
+    setSearchOffsetIndex((prev) => prev + 1)
+    setSearchPage((prev) => prev + 1)
+    window.scrollTo(0, 0)
+  }
+}
+
+// pagination helpers
+const resetPagination = () => {
+  setPage(1)
+  setCurrentOffsetIndex(0)
+  setOffsetHistory([null])
+}
     setPage(1)
     setCurrentOffsetIndex(0)
     setOffsetHistory([null])
