@@ -314,12 +314,10 @@ const matchingRealLabel = matchingRealDate.toLocaleDateString("en-US", {
 
   const jumpToToday = () => {
   const today = new Date()
-  setCurrentYear(today.getFullYear())   // Make sure this is here
-  setCurrentMonth(today.getMonth() + 1)
-  setCurrentDay(today.getDate())
-  setCalendarMonth(today.getMonth())
-  setCalendarYear(today.getFullYear())
-  setShowCalendar(false)
+  setCurrentYear(matchingRealDate.getFullYear())
+setCurrentMonth(matchingRealDate.getMonth() + 1)
+setCurrentDay(matchingRealDate.getDate())
+setIsTorontoMode(false)
 }
 
   const jumpToThisMonth = () => {
