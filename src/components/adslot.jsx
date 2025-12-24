@@ -1,4 +1,4 @@
-// adslot.jsx - USE THE ID FROM YOUR SCRIPT TAG
+// adslot.jsx - FINAL VERSION WITH YOUR CORRECT IDs
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -49,9 +49,9 @@ export default function AdSlot({
           }
         }, 5000);
 
-        // Push the ad configuration WITH THE ID FROM YOUR SCRIPT TAG
+        // Push the ad configuration WITH YOUR CORRECT IDs
         window.adsbygoogle.push({
-          google_ad_client: "ca-pub-4534610257929133", // ← USE THIS ID FROM SCRIPT
+          google_ad_client: "ca-pub-4534610257929133", // Your Publisher ID from script tag
           enable_page_level_ads: false,
           overlays: false,
         });
@@ -136,8 +136,8 @@ export default function AdSlot({
                 overflow: 'hidden',
                 textAlign: 'center'
               }}
-              data-ad-client="ca-pub-4534610257929133" // ← USE THIS ID FROM SCRIPT
-              data-ad-slot="3327797457" // Your Ad Slot ID
+              data-ad-client="ca-pub-4534610257929133" // Your Publisher ID from script tag
+              data-ad-slot="3327797457" // Your Ad Slot ID from AdSense
               data-ad-format="auto"
               data-full-width-responsive="true"
               data-adtest={process.env.NODE_ENV === 'development' ? 'on' : 'off'}
