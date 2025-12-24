@@ -221,6 +221,12 @@ export default function Timeline() {
     }
   }, [])
   const torontoDate = getTorontoTimelineDate(displayDate)
+const matchingRealDate = getRealDateFromTorontoDate(displayDate)
+const matchingRealLabel = matchingRealDate.toLocaleDateString("en-US", {
+  month: "short",
+  day: "2-digit",
+  year: "numeric",
+})
 
     // Global (fixed-date) holidays for this day (shown once at top)
   const globalHolidayTagsForDay = (() => {
