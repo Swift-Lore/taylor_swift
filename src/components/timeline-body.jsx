@@ -205,19 +205,9 @@ const [searchOffsetIndex, setSearchOffsetIndex] = useState(0)
   const monthStr = (today.getMonth() + 1).toString().padStart(2, '0')
   const dayStr = today.getDate().toString().padStart(2, '0')
   
-  // Update the main date state (for filtering)
-  setCurrentYear(today.getFullYear())
-  setCurrentMonth(today.getMonth() + 1)
-  setCurrentDay(today.getDate())
-  
-  // Update monthDay input for display
   setMonthDay(`${monthStr}/${dayStr}`)
-  
-  // Update calendar state
   setCalendarMonth(today.getMonth())
   setCalendarYear(today.getFullYear())
-  
-  // Close calendar and reset
   setShowCalendar(false)
   resetPagination()
 }
