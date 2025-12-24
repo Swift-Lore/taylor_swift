@@ -639,8 +639,9 @@ useEffect(() => {
 }
 
   const handleMonthDayChange = (value) => {
-  setMonthDay(value);
-};
+  userInteractedRef.current = true
+  setMonthDay(value)
+}
 
 const handleStartDateChange = (value) => {
   setStartDateInput(value);
