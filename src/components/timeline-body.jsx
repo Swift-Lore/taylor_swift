@@ -42,6 +42,9 @@ const isCompleteMonthDay = (value) => {
 export default function TimelineBody() {
   const navigate = useNavigate()
   const location = useLocation()
+  // prevent "restore effects" from overwriting fast user input
+const didRestoreRef = useRef(false)
+const userInteractedRef = useRef(false)
    useEffect(() => {
     document.title = "Swift-Lore - Full Taylor Swift Timeline Archive"
 
