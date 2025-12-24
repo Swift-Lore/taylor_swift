@@ -461,18 +461,25 @@ useEffect(() => {
                               if (fallback) fallback.style.display = "flex";
                             }}
                             fallback={{
-                              image: `https://logo.clearbit.com/${new URL(
-                                url
-                              ).hostname}`,
-                              title: url
-                                .split("/")
-                                .slice(-1)[0]
-                                .replace(/[-_]/g, " "),
-                              description: new URL(url).hostname.replace(
-                                "www.",
-                                ""
-                              ),
-                            }}
+  image: (() => {
+    try {
+      return `https://logo.clearbit.com/${new URL(url).hostname}`
+    } catch {
+      return ""
+    }
+  })(),
+  title: url
+    .split("/")
+    .slice(-1)[0]
+    .replace(/[-_]/g, " "),
+  description: (() => {
+    try {
+      return new URL(url).hostname.replace("www.", "")
+    } catch {
+      return ""
+    }
+  })(),
+}}
                           />
                         </div>
 
