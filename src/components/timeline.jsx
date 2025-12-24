@@ -7,7 +7,7 @@ import { useEffect, useState } from "react"
 import axios from "axios"
 import "./timeline.css"
 import { SITE_UPDATES } from "./site-updates"
-import AdSlot from "./AdSlot";
+import AdSlot from "./adslot";
 
 // ===== Toronto Theory Alternate Timeline (helper) =====
 // Anchor: REAL date  = Nov 22, 2024
