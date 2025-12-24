@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import axios from "axios"
 import { useNavigate, useLocation, Link } from "react-router-dom"
 import { ChevronLeft, ChevronRight, Calendar, Star, Zap, Clock } from "lucide-react"
