@@ -644,9 +644,10 @@ useEffect(() => {
 }
 
 const handleStartDateChange = (value) => {
-  setStartDateInput(value);
-  resetPagination();
-};
+  userInteractedRef.current = true
+  setStartDateInput(value)
+  resetPagination()
+}
 
 const handleEndDateChange = (value) => {
   setEndDateInput(value);
