@@ -1108,19 +1108,19 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               flex items-center justify-center text-center
             "
             onClick={() => {
-              if (isTorontoMode) {
-                const today = new Date()
-                setCurrentYear(today.getFullYear())
-                setCurrentMonth(today.getMonth() + 1)
-                setCurrentDay(today.getDate())
-                setIsTorontoMode(false)
-              } else {
-                setCurrentYear(torontoDate.getFullYear())
-                setCurrentMonth(torontoDate.getMonth() + 1)
-                setCurrentDay(torontoDate.getDate())
-                setIsTorontoMode(true)
-              }
-            }}
+  if (isTorontoMode) {
+    // FIXED: Go to the matching real date shown on the button, not today
+    setCurrentYear(matchingRealDate.getFullYear())
+    setCurrentMonth(matchingRealDate.getMonth() + 1)
+    setCurrentDay(matchingRealDate.getDate())
+    setIsTorontoMode(false)
+  } else {
+    setCurrentYear(torontoDate.getFullYear())
+    setCurrentMonth(torontoDate.getMonth() + 1)
+    setCurrentDay(torontoDate.getDate())
+    setIsTorontoMode(true)
+  }
+}}
           >
             {isTorontoMode ? (
               <span className="font-semibold flex items-center">
