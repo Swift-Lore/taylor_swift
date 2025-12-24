@@ -627,12 +627,15 @@ useEffect(() => {
   }
 
   const handleKeywordFilter = (keyword) => {
-    if (filterKeywords.includes(keyword)) {
-      setFilterKeywords(filterKeywords.filter((k) => k !== keyword))
-    } else {
-      setFilterKeywords([...filterKeywords, keyword])
-    }
+  userInteractedRef.current = true
+
+  if (filterKeywords.includes(keyword)) {
+    setFilterKeywords(filterKeywords.filter((k) => k !== keyword))
+  } else {
+    setFilterKeywords([...filterKeywords, keyword])
   }
+  resetPagination()
+}
 
   const handleMonthDayChange = (value) => {
   setMonthDay(value);
