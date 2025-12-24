@@ -1,5 +1,5 @@
 import { Button } from "./ui/Button";
-import AdComponent from "./ad_component";
+import AdComponent from "./adslot";
 
 export default function Footer() {
 
