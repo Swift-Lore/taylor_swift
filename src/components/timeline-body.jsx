@@ -766,8 +766,9 @@ if (hasMore && searchOffsetIndex === searchOffsetHistory.length - 1) {
   }
 
   const handleSearchInputChange = (e) => {
-    setSearchQuery(e.target.value)
-  }
+  userInteractedRef.current = true
+  setSearchQuery(e.target.value)
+}
 
   const handleSearchKeyPress = (e) => {
   if (e.key === "Enter") {
