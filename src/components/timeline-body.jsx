@@ -751,10 +751,11 @@ if (hasMore && searchOffsetIndex === searchOffsetHistory.length - 1) {
   }
 
   const handleSearchKeyPress = (e) => {
-    if (e.key === "Enter") {
-      handleSearch(e)
-    }
+  if (e.key === "Enter") {
+    // let the form onSubmit handle it
+    // (prevents double-trigger)
   }
+}
 
   // pagination helpers (timeline)
 const handleSearchPreviousPage = () => {
