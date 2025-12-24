@@ -5,7 +5,7 @@ import axios from "axios"
 import { useNavigate, useLocation, Link } from "react-router-dom"
 import { ChevronLeft, ChevronRight, Calendar, Star, Zap, Clock } from "lucide-react"
 import { Button } from "./ui/Button"
-import AdComponent from "./ad_component"
+import AdSlot from "./adslot"
 
 // helper: convert "MM/DD/YYYY" -> "YYYY-MM-DD" for Airtable
 const parseMMDDYYYYToISO = (value) => {
