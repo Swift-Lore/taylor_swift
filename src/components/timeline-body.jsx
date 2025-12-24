@@ -1402,7 +1402,7 @@ const CalendarModal = () => {
                 className="w-full rounded-full py-1.5 pl-10 pr-4 text-sm bg-white border border-[#6b7db3] text-[#6b7db3]"
                 value={searchQuery}
                 onChange={handleSearchInputChange}
-                onKeyPress={handleSearchKeyPress}
+                onKeyDown={handleSearchKeyPress}
               />
               <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                 <svg
