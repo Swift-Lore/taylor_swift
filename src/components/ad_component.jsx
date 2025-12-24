@@ -47,11 +47,11 @@ export default function AdComponent() {
       ref={adRef}
       className="adsbygoogle"
       style={{
-        display: "block",
-        textAlign: "center",
-        margin: "0",
-        minHeight: "250px", // gives it some visible space
-      }}
+  display: "block",
+  width: "100%",
+  margin: "0",
+  minHeight: "110px", // small reserve so it doesn't look broken while ads ramp up
+}}
       data-ad-client="ca-pub-9054923750158002"
       data-ad-slot="3327797457"
       data-ad-format="auto"
