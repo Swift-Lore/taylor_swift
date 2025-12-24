@@ -1532,14 +1532,65 @@ const CalendarModal = () => {
 
               {/* Search results list */}
               {searchResults.length === 0 ? (
-                <div className="text-center py-12 text-[#b91c1c]">
-                  No results found for "{searchQuery}"
-                </div>
-              ) : viewMode === "grid" ? (
-                renderGridCards(searchResults)
-              ) : (
-                renderCompactArchive(searchResults)
-              )}
+  <div className="text-center py-12 text-[#b91c1c]">
+    No results found for "{searchQuery}"
+  </div>
+) : (
+  <>
+    {viewMode === "grid"
+      ? renderGridCards(searchResults)
+      : renderCompactArchive(searchResults)}
+
+    {(searchResults.length > recordsPerPage || searchHasMore || searchOffsetIndex > 0) && (
+      <div className="max-w-6xl mx-auto px-4 my-8 flex justify-center items-center gap-2">
+        <span
+          className={`text-sm ${
+            searchPage > 1 ? "text-[#bb6d6d] cursor-pointer" : "text-[#bb6d6d]/50"
+          }`}
+          onClick={searchPage > 1 ? handleSearchPreviousPage : undefined}
+        >
+          Previous Page
+        </span>
+
+        <button
+          className={`w-8 h-8 flex items-center justify-center rounded-full border border-[#bb6d6d] ${
+            searchPage > 1
+              ? "bg-[#e6edf7] text-[#bb6d6d]"
+              : "bg-[#e6edf7]/50 text-[#bb6d6d]/50"
+          }`}
+          onClick={searchPage > 1 ? handleSearchPreviousPage : undefined}
+          disabled={searchPage <= 1}
+        >
+          &lt;
+        </button>
+
+        <div className="mx-2 text-[#bb6d6d]">Page {searchPage}</div>
+
+        <button
+          className={`w-8 h-8 flex items-center justify-center rounded-full border border-[#bb6d6d] ${
+            searchHasMore
+              ? "bg-[#e6edf7] text-[#bb6d6d]"
+              : "bg-[#e6edf7]/50 text-[#bb6d6d]/50"
+          }`}
+          onClick={searchHasMore ? handleSearchNextPage : undefined}
+          disabled={!searchHasMore}
+        >
+          &gt;
+        </button>
+
+        <span
+          className={`text-sm ${
+            searchHasMore ? "text-[#bb6d6d] cursor-pointer" : "text-[#bb6d6d]/50"
+          }`}
+          onClick={searchHasMore ? handleSearchNextPage : undefined}
+        >
+          Next Page
+        </span>
+      </div>
+    )}
+  </>
+)}
+
             </>
           ) : posts.length === 0 ? (
             <div className="text-center py-12 text-[#b91c1c]">
