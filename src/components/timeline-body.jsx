@@ -422,7 +422,7 @@ response.data.records?.forEach(record => {
   if (typeof raw === "string") {
     // Airtable date-only fields come back as "YYYY-MM-DD"
     const [y, m, d] = raw.split("-").map(Number)
-    const dateKey = `${y}-${m}-${d}` // e.g. 2019-6-30
+    const dateKey = `${y}-${pad2(m)}-${pad2(d)}` // e.g. 2019-06-30
     eventsMap[dateKey] = true
   }
 })
