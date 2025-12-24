@@ -82,6 +82,7 @@ export default function TimelineBody() {
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
   const recordsPerPage = 12
+const filterRecordsPerPage = 100
 const searchRecordsPerPage = 100
 
   // Filter states
