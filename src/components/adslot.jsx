@@ -1,8 +1,7 @@
-// adslot.jsx - COMPLETE UPDATED VERSION
+// adslot.jsx - USE THE ID FROM YOUR SCRIPT TAG
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import AdComponent from "./ad_component";
+import { useEffect, useRef, useState } from "react";
 
 export default function AdSlot({
   maxWidthClass = "max-w-4xl",
@@ -12,31 +11,83 @@ export default function AdSlot({
   const [filled, setFilled] = useState(false);
   const [showAd, setShowAd] = useState(false);
   const containerRef = useRef(null);
+  const adRef = useRef(null);
+  const adInitialized = useRef(false);
 
   // Delay showing ad to ensure container is properly sized
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowAd(true);
-    }, 100); // Small delay to ensure DOM is ready
+    }, 100);
 
     return () => clearTimeout(timer);
   }, []);
 
-  // Handle ad fill state changes
-  const handleFilledChange = (isFilled) => {
-    setFilled(isFilled);
+  // Initialize Google Ad
+  useEffect(() => {
+    if (!showAd || adInitialized.current || typeof window === "undefined") return;
+
+    const initializeAd = () => {
+      try {
+        // Ensure Google Ads script is loaded
+        if (!window.adsbygoogle) {
+          window.adsbygoogle = [];
+        }
+
+        // Set a timeout to detect if ad fails to load
+        const loadTimeout = setTimeout(() => {
+          if (adRef.current && !adRef.current.querySelector('iframe')) {
+            console.log("Ad failed to load within timeout");
+            setFilled(false);
+            
+            // Hide container after 5 seconds if ad fails
+            setTimeout(() => {
+              if (containerRef.current) {
+                containerRef.current.style.display = 'none';
+              }
+            }, 2000);
+          }
+        }, 5000);
+
+        // Push the ad configuration WITH THE ID FROM YOUR SCRIPT TAG
+        window.adsbygoogle.push({
+          google_ad_client: "ca-pub-4534610257929133", // ← USE THIS ID FROM SCRIPT
+          enable_page_level_ads: false,
+          overlays: false,
+        });
+
+        adInitialized.current = true;
+        setFilled(true);
+
+        // Cleanup timeout
+        return () => clearTimeout(loadTimeout);
+      } catch (error) {
+        console.error("Ad initialization error:", error);
+        setFilled(false);
+      }
+    };
+
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(initializeAd, 50);
     
-    // If ad fails to load after 5 seconds, hide the container
-    if (!isFilled) {
+    return () => {
+      clearTimeout(timer);
+      adInitialized.current = false;
+    };
+  }, [showAd]);
+
+  // Handle ad fill state changes
+  useEffect(() => {
+    if (!filled && containerRef.current) {
       const timeout = setTimeout(() => {
-        if (containerRef.current) {
+        if (containerRef.current && !filled) {
           containerRef.current.style.display = 'none';
         }
-      }, 5000);
+      }, 7000); // Hide after 7 seconds if ad never loads
       
       return () => clearTimeout(timeout);
     }
-  };
+  }, [filled]);
 
   return (
     <div 
@@ -64,12 +115,34 @@ export default function AdSlot({
 
         {/* Ad Content */}
         <div className="w-full h-full flex items-center justify-center">
-          {showAd && (
-            <AdComponent 
-              minHeight={minHeight} 
-              onFilledChange={handleFilledChange} 
+          <div 
+            ref={adRef}
+            className="google-ad-wrapper w-full h-full"
+            style={{
+              minHeight: `${minHeight}px`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <ins
+              className="adsbygoogle"
+              style={{
+                display: 'block',
+                width: '100%',
+                minWidth: '300px',
+                minHeight: `${minHeight}px`,
+                maxHeight: '600px',
+                overflow: 'hidden',
+                textAlign: 'center'
+              }}
+              data-ad-client="ca-pub-4534610257929133" // ← USE THIS ID FROM SCRIPT
+              data-ad-slot="3327797457" // Your Ad Slot ID
+              data-ad-format="auto"
+              data-full-width-responsive="true"
+              data-adtest={process.env.NODE_ENV === 'development' ? 'on' : 'off'}
             />
-          )}
+          </div>
         </div>
 
         {/* Loading placeholder - shows while ad loads */}
