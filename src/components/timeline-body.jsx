@@ -268,7 +268,9 @@ resetPagination()
   }, [])
   // On first mount, if the URL has filters (shared link), apply them
   useEffect(() => {
-    if (typeof window === "undefined") return
+  if (typeof window === "undefined") return
+  if (didRestoreRef.current) return
+  if (userInteractedRef.current) return
 
     const urlParams = new URLSearchParams(window.location.search)
 
