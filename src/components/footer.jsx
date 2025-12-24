@@ -1,5 +1,5 @@
 import { Button } from "./ui/Button";
-import AdSlot from "./adslot"; // Changed to AdSlot for consistency
+import AdSlot from "./adslot";
 
 export default function Footer() {
   return (
