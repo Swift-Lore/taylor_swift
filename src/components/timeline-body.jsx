@@ -530,103 +530,54 @@ if (isCompleteMonthDay(monthDay)) {
 
         console.log("Airtable filter formula:", filterFormula || "(none)")
 
-        // Filter mode fetch (no pagination)
-        if (isFilterActive) {
-          const response = await axios.get(
-            "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
-            {
-              headers: {
-                Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-              },
-              params: {
-                maxRecords: 100,
-                filterByFormula: filterFormula || undefined,
-                sort: [{ field: "DATE", direction: sortOrder }],
-              },
-            }
-          )
+        const currentOffset = offsetHistory[currentOffsetIndex]
 
-          const formattedPosts = response.data.records.map((record) => ({
-            id: record.id,
-            date: record.fields.DATE
-              ? (() => {
-                  const date = new Date(record.fields.DATE)
-                  const options = {
-                    month: "short",
-                    day: "2-digit",
-                    year: "numeric",
-                    timeZone: "UTC",
-                  }
-                  return date.toLocaleDateString("en-US", options)
-                })()
-              : "No date",
-            category: record.fields.CATEGORY || "Uncategorized",
-            title: record.fields.EVENT || "Untitled Event",
-            location: record.fields.LOCATION || "",
-            image: record.fields.IMAGE?.[0]?.url || null,
-            year: record.fields.DATE
-              ? new Date(record.fields.DATE).getFullYear()
-              : "",
-            keywords: record.fields.KEYWORDS || [],
-            notes: record.fields.NOTES || null,
-          }))
+const response = await axios.get(
+  "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+  {
+    headers: {
+      Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+    },
+    params: {
+      pageSize: recordsPerPage,
+      offset: currentOffset || undefined,
+      filterByFormula: filterFormula || undefined,
+      sort: [{ field: "DATE", direction: sortOrder }],
+    },
+  }
+)
 
-          setPosts(formattedPosts)
-          setHasMore(false)
-        } else {
-          // normal paginated mode
-          const currentOffset = offsetHistory[currentOffsetIndex]
-          const response = await axios.get(
-            "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
-            {
-              headers: {
-                Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-              },
-              params: {
-                pageSize: recordsPerPage,
-                offset: currentOffset,
-                filterByFormula: filterFormula || undefined,
-                sort: [{ field: "DATE", direction: sortOrder }],
-              },
-            }
-          )
+const hasMoreRecords = !!response.data.offset
+setHasMore(hasMoreRecords)
 
-          const hasMoreRecords = !!response.data.offset
-          setHasMore(hasMoreRecords)
+if (hasMoreRecords && currentOffsetIndex === offsetHistory.length - 1) {
+  setOffsetHistory((prev) => [...prev, response.data.offset])
+}
 
-          if (hasMoreRecords) {
-            if (currentOffsetIndex === offsetHistory.length - 1) {
-              setOffsetHistory((prev) => [...prev, response.data.offset])
-            }
-          }
-
-          const formattedPosts = response.data.records.map((record) => ({
-            id: record.id,
-            date: record.fields.DATE
-              ? (() => {
-                  const date = new Date(record.fields.DATE)
-                  const options = {
-                    month: "short",
-                    day: "2-digit",
-                    year: "numeric",
-                    timeZone: "UTC",
-                  }
-                  return date.toLocaleDateString("en-US", options)
-                })()
-              : "No date",
-            category: record.fields.CATEGORY || "Uncategorized",
-            title: record.fields.EVENT || "Untitled Event",
-            location: record.fields.LOCATION || "",
-            image: record.fields.IMAGE?.[0]?.url || null,
-            year: record.fields.DATE
-              ? new Date(record.fields.DATE).getFullYear()
-              : "",
-            keywords: record.fields.KEYWORDS || [],
-            notes: record.fields.NOTES || null,
-          }))
-
-          setPosts(formattedPosts)
+const formattedPosts = response.data.records.map((record) => ({
+  id: record.id,
+  date: record.fields.DATE
+    ? (() => {
+        const date = new Date(record.fields.DATE)
+        const options = {
+          month: "short",
+          day: "2-digit",
+          year: "numeric",
+          timeZone: "UTC",
         }
+        return date.toLocaleDateString("en-US", options)
+      })()
+    : "No date",
+  category: record.fields.CATEGORY || "Uncategorized",
+  title: record.fields.EVENT || "Untitled Event",
+  location: record.fields.LOCATION || "",
+  image: record.fields.IMAGE?.[0]?.url || null,
+  year: record.fields.DATE ? new Date(record.fields.DATE).getFullYear() : "",
+  keywords: record.fields.KEYWORDS || [],
+  notes: record.fields.NOTES || null,
+}))
+
+setPosts(formattedPosts)
       } catch (error) {
         console.error("Error fetching records:", error)
       } finally {
