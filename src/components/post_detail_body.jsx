@@ -519,11 +519,13 @@ useEffect(() => {
       )}
 
 {/* AdSense: Post Detail (inline) */}
-<AdSlot
-  maxWidthClass="max-w-4xl"
-  minHeight={90}
-  className="mb-2"
-/>
+{import.meta.env.PROD && (
+  <AdSlot
+    maxWidthClass="max-w-4xl"
+    minHeight={90}
+    className="mb-8"
+  />
+)}
       
       {/* Main image */}
       {event.IMAGE && event.IMAGE.length > 0 && (
