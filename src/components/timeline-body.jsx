@@ -651,11 +651,13 @@ const handleEndDateChange = (value) => {
         setLoading(true)
 setIsSearchMode(true)
 
-// reset search pagination for a fresh search
-setSearchPage(1)
-setSearchHasMore(false)
-setSearchOffsetHistory([null])
-setSearchOffsetIndex(0)
+// reset search pagination ONLY for a fresh search
+if (reset) {
+  setSearchPage(1)
+  setSearchHasMore(false)
+  setSearchOffsetHistory([null])
+  setSearchOffsetIndex(0)
+}
 
         const searchTerms = searchQuery
           .trim()
