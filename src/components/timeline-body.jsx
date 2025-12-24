@@ -1543,7 +1543,8 @@ const CalendarModal = () => {
       ? renderGridCards(searchResults)
       : renderCompactArchive(searchResults)}
 
-    {(searchResults.length > recordsPerPage || searchHasMore || searchOffsetIndex > 0) && (
+    {(searchResults.length > searchRecordsPerPage || searchHasMore || searchOffsetIndex > 0)
+&& (
       <div className="max-w-6xl mx-auto px-4 my-8 flex justify-center items-center gap-2">
         <span
           className={`text-sm ${
