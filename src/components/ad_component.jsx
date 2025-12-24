@@ -23,13 +23,16 @@ export default function AdComponent() {
       }
 
       try {
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-      } catch (e) {
-        // In dev, you'll still see this sometimes, but it's safe to ignore
-        if (import.meta.env.DEV) {
-          console.warn("AdSense (dev) warning:", e);
-        }
-      }
+  // Prevent double-push (React 18 StrictMode / rerenders)
+  if (el.getAttribute("data-adsbygoogle-status") === "done") return;
+
+  (window.adsbygoogle = window.adsbygoogle || []).push({});
+} catch (e) {
+  // In dev, you'll still see this sometimes, but it's safe to ignore
+  if (import.meta.env.DEV) {
+    console.warn("AdSense (dev) warning:", e);
+  }
+}
     }
 
     tryPush();
