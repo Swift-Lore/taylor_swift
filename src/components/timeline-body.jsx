@@ -220,7 +220,7 @@ const [searchOffsetIndex, setSearchOffsetIndex] = useState(0)
 
   const hasEvents = (day) => {
   if (!day) return false
-  const dateKey = `${calendarYear}-${calendarMonth + 1}-${day}`
+  const dateKey = `${calendarYear}-${pad2(calendarMonth + 1)}-${pad2(day)}`
   return !!dateEventsMap[dateKey]
 }
 
