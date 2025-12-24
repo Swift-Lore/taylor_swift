@@ -265,6 +265,7 @@ resetPagination()
     } catch (e) {
       console.error("Error parsing saved timeline filters:", e)
     }
+    didRestoreRef.current = true
   }, [])
   // On first mount, if the URL has filters (shared link), apply them
   useEffect(() => {
