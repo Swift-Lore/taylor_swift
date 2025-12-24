@@ -201,16 +201,26 @@ const [searchOffsetIndex, setSearchOffsetIndex] = useState(0)
   }
 
   const jumpToToday = () => {
-    const today = new Date()
-    const monthStr = (today.getMonth() + 1).toString().padStart(2, '0')
-    const dayStr = today.getDate().toString().padStart(2, '0')
-    
-    setMonthDay(`${monthStr}/${dayStr}`)
-    setCalendarMonth(today.getMonth())
-    setCalendarYear(today.getFullYear())
-    setShowCalendar(false)
-    resetPagination()
-  }
+  const today = new Date()
+  const monthStr = (today.getMonth() + 1).toString().padStart(2, '0')
+  const dayStr = today.getDate().toString().padStart(2, '0')
+  
+  // Update the main date state (for filtering)
+  setCurrentYear(today.getFullYear())
+  setCurrentMonth(today.getMonth() + 1)
+  setCurrentDay(today.getDate())
+  
+  // Update monthDay input for display
+  setMonthDay(`${monthStr}/${dayStr}`)
+  
+  // Update calendar state
+  setCalendarMonth(today.getMonth())
+  setCalendarYear(today.getFullYear())
+  
+  // Close calendar and reset
+  setShowCalendar(false)
+  resetPagination()
+}
 
   const jumpToThisMonth = () => {
     const today = new Date()
