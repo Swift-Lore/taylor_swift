@@ -902,10 +902,10 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
             </div>
           </div>
           
-{/* AD SECTION – top sponsored card (auto-hides until filled) */}
+{/* Ad block */}
 {import.meta.env.PROD && (
   <AdSlot
-    maxWidthClass="max-w-4xl"
+    maxWidthClass="max-w-6xl"
     minHeight={90}
     className="mb-2"
   />
