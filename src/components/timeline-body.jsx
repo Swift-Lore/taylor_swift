@@ -650,9 +650,10 @@ const handleStartDateChange = (value) => {
 }
 
 const handleEndDateChange = (value) => {
-  setEndDateInput(value);
-  resetPagination();
-};
+  userInteractedRef.current = true
+  setEndDateInput(value)
+  resetPagination()
+}
 
   // Search
   const handleSearch = async (e, { reset = true } = {}) => {
