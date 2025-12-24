@@ -532,7 +532,6 @@ useEffect(() => {
     </div>
   </div>
 )}
-
       
       {/* Main image */}
       {event.IMAGE && event.IMAGE.length > 0 && (
