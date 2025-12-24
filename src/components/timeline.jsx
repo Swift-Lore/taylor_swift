@@ -884,17 +884,15 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
             </div>
           </div>
           
-{/* AD: Top of Page (completely invisible placeholder) */}
+{/* AD SECTION – top sponsored card */}
 {import.meta.env.PROD && (
-  <div
-    style={{
-      display: "block",
-      width: "100%",
-      height: "0px",
-      overflow: "hidden",
-    }}
-  >
-    <AdComponent />
+  <div className="max-w-4xl mx-auto px-3 mb-2">
+    <div className="relative bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-3 md:px-5 md:py-4 flex items-center justify-center card-soft glass-soft w-full min-h-[250px]">
+      <span className="absolute top-3 left-4 text-[10px] uppercase tracking-[0.16em] text-[#9ca3af]">
+        Sponsored
+      </span>
+      <AdComponent />
+    </div>
   </div>
 )}
 
