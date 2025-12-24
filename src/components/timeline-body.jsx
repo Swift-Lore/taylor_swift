@@ -622,9 +622,10 @@ useEffect(() => {
 
   // filter helpers
   const handleSortChange = (order) => {
-    setSortOrder(order)
-    resetPagination()
-  }
+  userInteractedRef.current = true
+  setSortOrder(order)
+  resetPagination()
+}
 
   const handleKeywordFilter = (keyword) => {
   userInteractedRef.current = true
