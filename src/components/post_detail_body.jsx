@@ -620,7 +620,7 @@ useEffect(() => {
       {/* Instagram */}
       {event.INSTAGRAM && (
         <section className="w-full px-4 mb-10">
-  <div className="flex flex-wrap justify-start gap-6 mt-2">
+  <div className="flex flex-wrap justify-start gap-6 mt-2 max-w-4xl mx-auto">
             {event.INSTAGRAM.split(" || ").map((rawUrl, index) => {
               const url = normalizeInstagramUrl(rawUrl);
               return url ? (
@@ -654,7 +654,7 @@ useEffect(() => {
       {/* Twitter / X */}
       {event.TWITTER && (
         <section className="w-full px-4 mb-10">
-  <div className="flex flex-wrap justify-start gap-6 mt-2">
+  <div className="flex flex-wrap justify-start gap-6 mt-2 max-w-4xl mx-auto">
             {event.TWITTER.split(" || ").map((url, index) => {
               const cleanUrl = url.trim().replace("x.com", "twitter.com");
               const isValid =
