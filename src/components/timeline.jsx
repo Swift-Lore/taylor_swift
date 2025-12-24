@@ -1066,7 +1066,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           {isTorontoMode ? (
             <span className="font-semibold flex items-center">
               <ChevronLeft size={12} className="mr-1" />
-              Return to Today: {todayLabel}
+              Return to: {matchingRealLabel}
             </span>
           ) : (
             <span className="font-semibold flex flex-col leading-snug">
@@ -1130,7 +1130,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
             {isTorontoMode ? (
               <span className="font-semibold flex items-center">
                 <ChevronLeft size={12} className="mr-1" />
-                Return to Today: {todayLabel}
+                Return to: {matchingRealLabel}
               </span>
             ) : (
               <span className="font-semibold flex flex-col leading-snug">
