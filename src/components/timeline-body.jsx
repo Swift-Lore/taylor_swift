@@ -605,6 +605,16 @@ setPosts(formattedPosts)
     isSearchMode,
   ])
 
+  // when paging search results, re-run the search fetch using the current offset
+useEffect(() => {
+  if (!isSearchMode) return
+  if (!searchQuery.trim()) return
+
+  // run the same search logic as submit, but using updated offset
+  handleSearch(new Event("submit"))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [searchOffsetIndex, sortOrder])
+
   // filter helpers
   const handleSortChange = (order) => {
     setSortOrder(order)
