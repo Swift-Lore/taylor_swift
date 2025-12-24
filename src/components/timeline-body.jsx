@@ -261,6 +261,7 @@ resetPagination()
       if (typeof parsed.searchQuery === "string") setSearchQuery(parsed.searchQuery)
       if (parsed.keywordMatchType) setKeywordMatchType(parsed.keywordMatchType)
       if (parsed.viewMode) setViewMode(parsed.viewMode)
+      didRestoreRef.current = true
     } catch (e) {
       console.error("Error parsing saved timeline filters:", e)
     }
