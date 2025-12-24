@@ -141,6 +141,20 @@ function getTorontoTimelineDate(date) {
 
   return result
 }
+function getRealDateFromTorontoDate(tnDate) {
+  // Normalize to midnight to avoid timezone issues
+  const base = new Date(tnDate.getFullYear(), tnDate.getMonth(), tnDate.getDate())
+
+  // Difference in DAYS between selected TN date and ALT anchor
+  const diffTime = base.getTime() - ALT_ANCHOR_DATE.getTime()
+  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24))
+
+  // Apply that to REAL anchor to get the matching real timeline date
+  const result = new Date(REAL_ANCHOR_DATE)
+  result.setDate(result.getDate() + diffDays)
+
+  return result
+}
 
 export default function Timeline() {
   const navigate = useNavigate()
