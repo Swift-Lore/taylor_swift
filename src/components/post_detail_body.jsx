@@ -520,12 +520,9 @@ useEffect(() => {
 
 {/* AdSense: Post Detail (inline) */}
 {import.meta.env.PROD && (
-  <div className="max-w-4xl mx-auto px-4 mb-10">
-    <div
-      className="bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-3 md:px-5 md:py-4 card-soft glass-soft"
-      style={{ minHeight: "250px" }}
-    >
-      <span className="block text-[10px] uppercase tracking-[0.16em] text-[#9ca3af] mb-2">
+  <div className="max-w-4xl mx-auto px-4 mb-8">
+    <div className="bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-2 md:px-5 md:py-3 card-soft glass-soft overflow-hidden">
+      <span className="block text-[10px] uppercase tracking-[0.16em] text-[#9ca3af] mb-1">
         Sponsored
       </span>
       <AdComponent />
