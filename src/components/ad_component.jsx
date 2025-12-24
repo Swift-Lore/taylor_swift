@@ -46,8 +46,8 @@ export default function AdComponent() {
       style={{
         display: "block",
         textAlign: "center",
-        margin: "12px 0",
-        minHeight: "90px", // gives it some visible space
+        margin: "0",
+        minHeight: "250px", // gives it some visible space
       }}
       data-ad-client="ca-pub-9054923750158002"
       data-ad-slot="3327797457"
