@@ -1493,14 +1493,14 @@ const CalendarModal = () => {
                   {/* Ad block – invisible until Google serves an ad */}
 {import.meta.env.PROD && (
   <div className="w-full my-6">
-    <div
-      className="bg-white/60 rounded-3xl border border-[#f8dada] px-4 py-3 card-soft glass-soft w-full"
-      style={{ minHeight: 250 }}
-    >
+    <div className="bg-white/60 rounded-3xl border border-[#f8dada] px-4 py-3 card-soft glass-soft w-full">
       <span className="text-[10px] uppercase tracking-[0.16em] text-[#9ca3af]">
         Sponsored
       </span>
-      <AdComponent />
+
+      <div style={{ minHeight: 250 }}>
+        <AdComponent />
+      </div>
     </div>
   </div>
 )}
