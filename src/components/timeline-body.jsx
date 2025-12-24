@@ -1497,9 +1497,8 @@ const CalendarModal = () => {
 
       {/* Pagination */}
       {!loading &&
-        !isFilterMode &&
-        !isSearchMode &&
-        (posts.length > recordsPerPage || hasMore) && (
+  !isSearchMode &&
+  (posts.length > recordsPerPage || hasMore) && (
           <div className="max-w-6xl mx-auto px-4 my-8 flex justify-center items-center gap-2">
             <span
               className={`text-sm ${
