@@ -1493,19 +1493,13 @@ const CalendarModal = () => {
         </div>
       </div>
          
-                  {/* Ad block – compact placeholder */}
+                  {/* Ad block */}
 {import.meta.env.PROD && (
-  <div className="max-w-6xl mx-auto px-4 my-6">
-    <div className="bg-white/60 rounded-3xl border border-[#f8dada] px-4 py-2 card-soft glass-soft overflow-hidden">
-      <span className="block text-[10px] uppercase tracking-[0.16em] text-[#9ca3af] mb-1">
-        Sponsored
-      </span>
-
-      <div style={{ minHeight: 90 }}>
-        <AdComponent />
-      </div>
-    </div>
-  </div>
+  <AdSlot
+    maxWidthClass="max-w-6xl"
+    minHeight={90}
+    className="mb-2"
+  />
 )}
          
       {/* Selected keywords chips */}
