@@ -23,13 +23,16 @@ export default function AdComponent() {
       }
 
       try {
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-      } catch (e) {
-        // In dev, you'll still see this sometimes, but it's safe to ignore
-        if (import.meta.env.DEV) {
-          console.warn("AdSense (dev) warning:", e);
-        }
-      }
+  // Prevent double-push (React 18 StrictMode / rerenders)
+  if (el.getAttribute("data-adsbygoogle-status") === "done") return;
+
+  (window.adsbygoogle = window.adsbygoogle || []).push({});
+} catch (e) {
+  // In dev, you'll still see this sometimes, but it's safe to ignore
+  if (import.meta.env.DEV) {
+    console.warn("AdSense (dev) warning:", e);
+  }
+}
     }
 
     tryPush();
@@ -46,8 +49,8 @@ export default function AdComponent() {
       style={{
         display: "block",
         textAlign: "center",
-        margin: "12px 0",
-        minHeight: "90px", // gives it some visible space
+        margin: "0",
+        minHeight: "250px", // gives it some visible space
       }}
       data-ad-client="ca-pub-9054923750158002"
       data-ad-slot="3327797457"

@@ -141,6 +141,20 @@ function getTorontoTimelineDate(date) {
 
   return result
 }
+function getRealDateFromTorontoDate(tnDate) {
+  // Normalize to midnight to avoid timezone issues
+  const base = new Date(tnDate.getFullYear(), tnDate.getMonth(), tnDate.getDate())
+
+  // Difference in DAYS between selected TN date and ALT anchor
+  const diffTime = base.getTime() - ALT_ANCHOR_DATE.getTime()
+  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24))
+
+  // Apply that to REAL anchor to get the matching real timeline date
+  const result = new Date(REAL_ANCHOR_DATE)
+  result.setDate(result.getDate() + diffDays)
+
+  return result
+}
 
 export default function Timeline() {
   const navigate = useNavigate()
@@ -207,6 +221,12 @@ export default function Timeline() {
     }
   }, [])
   const torontoDate = getTorontoTimelineDate(displayDate)
+const matchingRealDate = getRealDateFromTorontoDate(displayDate)
+const matchingRealLabel = matchingRealDate.toLocaleDateString("en-US", {
+  month: "short",
+  day: "2-digit",
+  year: "numeric",
+})
 
     // Global (fixed-date) holidays for this day (shown once at top)
   const globalHolidayTagsForDay = (() => {
@@ -294,12 +314,10 @@ export default function Timeline() {
 
   const jumpToToday = () => {
   const today = new Date()
-  setCurrentYear(today.getFullYear())   // Make sure this is here
-  setCurrentMonth(today.getMonth() + 1)
-  setCurrentDay(today.getDate())
-  setCalendarMonth(today.getMonth())
-  setCalendarYear(today.getFullYear())
-  setShowCalendar(false)
+  setCurrentYear(matchingRealDate.getFullYear())
+setCurrentMonth(matchingRealDate.getMonth() + 1)
+setCurrentDay(matchingRealDate.getDate())
+setIsTorontoMode(false)
 }
 
   const jumpToThisMonth = () => {
@@ -576,10 +594,10 @@ const handlePreviousDay = () => {
       
         if (isTorontoMode) {
           // In Toronto mode: show ONLY this specific year
-          filterFormula = `AND(MONTH(DATE) = ${month}, DAY(DATE) = ${day}, YEAR(DATE) = ${year})`
+          filterFormula = `AND(MONTH({DATE}) = ${month}, DAY({DATE}) = ${day}, YEAR({DATE}) = ${year})`
         } else {
           // Normal mode: show this day across all years
-          filterFormula = `AND(MONTH(DATE) = ${month}, DAY(DATE) = ${day})`
+          filterFormula = `AND(MONTH({DATE}) = ${month}, DAY({DATE}) = ${day})`
         }
       
         const response = await axios.get(
@@ -884,17 +902,15 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
             </div>
           </div>
           
-{/* AD: Top of Page (completely invisible placeholder) */}
+{/* AD SECTION – top sponsored card */}
 {import.meta.env.PROD && (
-  <div
-    style={{
-      display: "block",
-      width: "100%",
-      height: "0px",
-      overflow: "hidden",
-    }}
-  >
-    <AdComponent />
+  <div className="max-w-4xl mx-auto px-3 mb-2">
+    <div className="relative bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-3 md:px-5 md:py-4 flex items-center justify-center card-soft glass-soft w-full min-h-[250px]">
+      <span className="absolute top-3 left-4 text-[10px] uppercase tracking-[0.16em] text-[#9ca3af]">
+        Sponsored
+      </span>
+      <AdComponent />
+    </div>
   </div>
 )}
 
@@ -1048,7 +1064,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           {isTorontoMode ? (
             <span className="font-semibold flex items-center">
               <ChevronLeft size={12} className="mr-1" />
-              Return to Today: {todayLabel}
+              Return to: {matchingRealLabel}
             </span>
           ) : (
             <span className="font-semibold flex flex-col leading-snug">
@@ -1112,7 +1128,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
             {isTorontoMode ? (
               <span className="font-semibold flex items-center">
                 <ChevronLeft size={12} className="mr-1" />
-                Return to Today: {todayLabel}
+                Return to: {matchingRealLabel}
               </span>
             ) : (
               <span className="font-semibold flex flex-col leading-snug">

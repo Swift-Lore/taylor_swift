@@ -461,18 +461,25 @@ useEffect(() => {
                               if (fallback) fallback.style.display = "flex";
                             }}
                             fallback={{
-                              image: `https://logo.clearbit.com/${new URL(
-                                url
-                              ).hostname}`,
-                              title: url
-                                .split("/")
-                                .slice(-1)[0]
-                                .replace(/[-_]/g, " "),
-                              description: new URL(url).hostname.replace(
-                                "www.",
-                                ""
-                              ),
-                            }}
+  image: (() => {
+    try {
+      return `https://logo.clearbit.com/${new URL(url).hostname}`
+    } catch {
+      return ""
+    }
+  })(),
+  title: url
+    .split("/")
+    .slice(-1)[0]
+    .replace(/[-_]/g, " "),
+  description: (() => {
+    try {
+      return new URL(url).hostname.replace("www.", "")
+    } catch {
+      return ""
+    }
+  })(),
+}}
                           />
                         </div>
 
@@ -511,17 +518,18 @@ useEffect(() => {
         </section>
       )}
 
-{/* Inline AdSense slot for Post Detail page */}
+{/* AdSense: Post Detail (inline) */}
 {import.meta.env.PROD && (
-  <div
-    style={{
-      display: "block",
-      width: "100%",
-      height: "0px",
-      overflow: "hidden",
-    }}
-  >
-    <AdComponent />
+  <div className="max-w-4xl mx-auto px-4 mb-10">
+    <div
+      className="bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-3 md:px-5 md:py-4 card-soft glass-soft"
+      style={{ minHeight: "250px" }}
+    >
+      <span className="block text-[10px] uppercase tracking-[0.16em] text-[#9ca3af] mb-2">
+        Sponsored
+      </span>
+      <AdComponent />
+    </div>
   </div>
 )}
       
@@ -612,7 +620,7 @@ useEffect(() => {
       {/* Instagram */}
       {event.INSTAGRAM && (
         <section className="w-full px-4 mb-10">
-          <div className="flex flex-wrap justify-center gap-6 mt-2">
+  <div className="flex flex-wrap justify-start gap-6 mt-2 max-w-4xl mx-auto">
             {event.INSTAGRAM.split(" || ").map((rawUrl, index) => {
               const url = normalizeInstagramUrl(rawUrl);
               return url ? (
@@ -646,8 +654,8 @@ useEffect(() => {
       {/* Twitter / X */}
       {event.TWITTER && (
         <section className="w-full px-4 mb-10">
-          <div className="flex flex-wrap justify-center gap-6 mt-2">
-            {event.TWITTER.split(/ \|\| |\s+/).map((url, index) => {
+  <div className="flex flex-wrap justify-start gap-6 mt-2 max-w-4xl mx-auto">
+            {event.TWITTER.split(" || ").map((url, index) => {
               const cleanUrl = url.trim().replace("x.com", "twitter.com");
               const isValid =
                 /^https:\/\/twitter\.com\/[^/]+\/status\/\d+/.test(cleanUrl);

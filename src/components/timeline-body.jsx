@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import axios from "axios"
 import { useNavigate, useLocation, Link } from "react-router-dom"
 import { ChevronLeft, ChevronRight, Calendar, Star, Zap, Clock } from "lucide-react"
@@ -38,10 +38,14 @@ const isCompleteMonthDay = (value) => {
 
   return true
 }
+const pad2 = (n) => String(n).padStart(2, "0")
 
 export default function TimelineBody() {
   const navigate = useNavigate()
   const location = useLocation()
+  // prevent "restore effects" from overwriting fast user input
+const didRestoreRef = useRef(false)
+const userInteractedRef = useRef(false)
    useEffect(() => {
     document.title = "Swift-Lore - Full Taylor Swift Timeline Archive"
 
@@ -82,6 +86,8 @@ export default function TimelineBody() {
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
   const recordsPerPage = 12
+const filterRecordsPerPage = 100
+const searchRecordsPerPage = 100
 
   // Filter states
   const [sortOrder, setSortOrder] = useState("desc")
@@ -109,8 +115,14 @@ export default function TimelineBody() {
   const [currentOffsetIndex, setCurrentOffsetIndex] = useState(0)
 
   // search mode
-  const [isSearchMode, setIsSearchMode] = useState(false)
-  const [searchResults, setSearchResults] = useState([])
+const [isSearchMode, setIsSearchMode] = useState(false)
+const [searchResults, setSearchResults] = useState([])
+
+// search pagination (separate from normal timeline pagination)
+const [searchPage, setSearchPage] = useState(1)
+const [searchHasMore, setSearchHasMore] = useState(false)
+const [searchOffsetHistory, setSearchOffsetHistory] = useState([null])
+const [searchOffsetIndex, setSearchOffsetIndex] = useState(0)
 
     const [isFilterMode, setIsFilterMode] = useState(false)
 
@@ -208,7 +220,7 @@ export default function TimelineBody() {
 
   const hasEvents = (day) => {
   if (!day) return false
-  const dateKey = `${calendarYear}-${calendarMonth + 1}-${day}`
+  const dateKey = `${calendarYear}-${pad2(calendarMonth + 1)}-${pad2(day)}`
   return !!dateEventsMap[dateKey]
 }
 
@@ -223,14 +235,18 @@ export default function TimelineBody() {
     e.preventDefault()
     e.stopPropagation()
 
-    if (!filterKeywords.includes(keyword)) {
-      setFilterKeywords([...filterKeywords, keyword])
-    }
-    resetPagination()
+    userInteractedRef.current = true
+
+if (!filterKeywords.includes(keyword)) {
+  setFilterKeywords([...filterKeywords, keyword])
+}
+resetPagination()
   }
   // On first mount, restore filters from sessionStorage (per user / per tab)
   useEffect(() => {
-    if (typeof window === "undefined") return
+  if (typeof window === "undefined") return
+  if (didRestoreRef.current) return
+  if (userInteractedRef.current) return
 
     const saved = window.sessionStorage.getItem(TIMELINE_FILTERS_KEY)
     if (!saved) return
@@ -246,13 +262,17 @@ export default function TimelineBody() {
       if (typeof parsed.searchQuery === "string") setSearchQuery(parsed.searchQuery)
       if (parsed.keywordMatchType) setKeywordMatchType(parsed.keywordMatchType)
       if (parsed.viewMode) setViewMode(parsed.viewMode)
+      didRestoreRef.current = true
     } catch (e) {
       console.error("Error parsing saved timeline filters:", e)
     }
+    didRestoreRef.current = true
   }, [])
   // On first mount, if the URL has filters (shared link), apply them
   useEffect(() => {
-    if (typeof window === "undefined") return
+  if (typeof window === "undefined") return
+  if (didRestoreRef.current) return
+  if (userInteractedRef.current) return
 
     const urlParams = new URLSearchParams(window.location.search)
 
@@ -402,7 +422,7 @@ response.data.records?.forEach(record => {
   if (typeof raw === "string") {
     // Airtable date-only fields come back as "YYYY-MM-DD"
     const [y, m, d] = raw.split("-").map(Number)
-    const dateKey = `${y}-${m}-${d}` // e.g. 2019-6-30
+    const dateKey = `${y}-${pad2(m)}-${pad2(d)}` // e.g. 2019-06-30
     eventsMap[dateKey] = true
   }
 })
@@ -530,103 +550,54 @@ if (isCompleteMonthDay(monthDay)) {
 
         console.log("Airtable filter formula:", filterFormula || "(none)")
 
-        // Filter mode fetch (no pagination)
-        if (isFilterActive) {
-          const response = await axios.get(
-            "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
-            {
-              headers: {
-                Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-              },
-              params: {
-                maxRecords: 100,
-                filterByFormula: filterFormula || undefined,
-                sort: [{ field: "DATE", direction: sortOrder }],
-              },
-            }
-          )
+        const currentOffset = offsetHistory[currentOffsetIndex]
 
-          const formattedPosts = response.data.records.map((record) => ({
-            id: record.id,
-            date: record.fields.DATE
-              ? (() => {
-                  const date = new Date(record.fields.DATE)
-                  const options = {
-                    month: "short",
-                    day: "2-digit",
-                    year: "numeric",
-                    timeZone: "UTC",
-                  }
-                  return date.toLocaleDateString("en-US", options)
-                })()
-              : "No date",
-            category: record.fields.CATEGORY || "Uncategorized",
-            title: record.fields.EVENT || "Untitled Event",
-            location: record.fields.LOCATION || "",
-            image: record.fields.IMAGE?.[0]?.url || null,
-            year: record.fields.DATE
-              ? new Date(record.fields.DATE).getFullYear()
-              : "",
-            keywords: record.fields.KEYWORDS || [],
-            notes: record.fields.NOTES || null,
-          }))
+const response = await axios.get(
+  "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+  {
+    headers: {
+      Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+    },
+    params: {
+  pageSize: clauses.length > 0 ? filterRecordsPerPage : recordsPerPage,
+  offset: currentOffset || undefined,
+  filterByFormula: filterFormula || undefined,
+  sort: [{ field: "DATE", direction: sortOrder }],
+},
+  }
+)
 
-          setPosts(formattedPosts)
-          setHasMore(false)
-        } else {
-          // normal paginated mode
-          const currentOffset = offsetHistory[currentOffsetIndex]
-          const response = await axios.get(
-            "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
-            {
-              headers: {
-                Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-              },
-              params: {
-                pageSize: recordsPerPage,
-                offset: currentOffset,
-                filterByFormula: filterFormula || undefined,
-                sort: [{ field: "DATE", direction: sortOrder }],
-              },
-            }
-          )
+const hasMoreRecords = !!response.data.offset
+setHasMore(hasMoreRecords)
 
-          const hasMoreRecords = !!response.data.offset
-          setHasMore(hasMoreRecords)
+if (hasMoreRecords && currentOffsetIndex === offsetHistory.length - 1) {
+  setOffsetHistory((prev) => [...prev, response.data.offset])
+}
 
-          if (hasMoreRecords) {
-            if (currentOffsetIndex === offsetHistory.length - 1) {
-              setOffsetHistory((prev) => [...prev, response.data.offset])
-            }
-          }
-
-          const formattedPosts = response.data.records.map((record) => ({
-            id: record.id,
-            date: record.fields.DATE
-              ? (() => {
-                  const date = new Date(record.fields.DATE)
-                  const options = {
-                    month: "short",
-                    day: "2-digit",
-                    year: "numeric",
-                    timeZone: "UTC",
-                  }
-                  return date.toLocaleDateString("en-US", options)
-                })()
-              : "No date",
-            category: record.fields.CATEGORY || "Uncategorized",
-            title: record.fields.EVENT || "Untitled Event",
-            location: record.fields.LOCATION || "",
-            image: record.fields.IMAGE?.[0]?.url || null,
-            year: record.fields.DATE
-              ? new Date(record.fields.DATE).getFullYear()
-              : "",
-            keywords: record.fields.KEYWORDS || [],
-            notes: record.fields.NOTES || null,
-          }))
-
-          setPosts(formattedPosts)
+const formattedPosts = response.data.records.map((record) => ({
+  id: record.id,
+  date: record.fields.DATE
+    ? (() => {
+        const date = new Date(record.fields.DATE)
+        const options = {
+          month: "short",
+          day: "2-digit",
+          year: "numeric",
+          timeZone: "UTC",
         }
+        return date.toLocaleDateString("en-US", options)
+      })()
+    : "No date",
+  category: record.fields.CATEGORY || "Uncategorized",
+  title: record.fields.EVENT || "Untitled Event",
+  location: record.fields.LOCATION || "",
+  image: record.fields.IMAGE?.[0]?.url || null,
+  year: record.fields.DATE ? new Date(record.fields.DATE).getFullYear() : "",
+  keywords: record.fields.KEYWORDS || [],
+  notes: record.fields.NOTES || null,
+}))
+
+setPosts(formattedPosts)
       } catch (error) {
         console.error("Error fetching records:", error)
       } finally {
@@ -648,41 +619,66 @@ if (isCompleteMonthDay(monthDay)) {
     isSearchMode,
   ])
 
+  // when paging search results, re-run the search fetch using the current offset
+useEffect(() => {
+  if (!isSearchMode) return
+  if (!searchQuery.trim()) return
+
+  // run the same search logic as submit, but using updated offset
+  handleSearch(new Event("submit"), { reset: false })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [searchOffsetIndex, sortOrder])
+
   // filter helpers
   const handleSortChange = (order) => {
-    setSortOrder(order)
-    resetPagination()
-  }
+  userInteractedRef.current = true
+  setSortOrder(order)
+  resetPagination()
+}
 
   const handleKeywordFilter = (keyword) => {
-    if (filterKeywords.includes(keyword)) {
-      setFilterKeywords(filterKeywords.filter((k) => k !== keyword))
-    } else {
-      setFilterKeywords([...filterKeywords, keyword])
-    }
+  userInteractedRef.current = true
+
+  if (filterKeywords.includes(keyword)) {
+    setFilterKeywords(filterKeywords.filter((k) => k !== keyword))
+  } else {
+    setFilterKeywords([...filterKeywords, keyword])
   }
+  resetPagination()
+}
 
   const handleMonthDayChange = (value) => {
-  setMonthDay(value);
-};
+  userInteractedRef.current = true
+  setMonthDay(value)
+}
 
 const handleStartDateChange = (value) => {
-  setStartDateInput(value);
-  resetPagination();
-};
+  userInteractedRef.current = true
+  setStartDateInput(value)
+  resetPagination()
+}
 
 const handleEndDateChange = (value) => {
-  setEndDateInput(value);
-  resetPagination();
-};
+  userInteractedRef.current = true
+  setEndDateInput(value)
+  resetPagination()
+}
 
   // Search
-  const handleSearch = async (e) => {
+  const handleSearch = async (e, { reset = true } = {}) => {
     e.preventDefault()
     if (searchQuery.trim()) {
       try {
         setLoading(true)
-        setIsSearchMode(true)
+setIsSearchMode(true)
+
+// reset search pagination ONLY for a fresh search
+if (reset) {
+  setSearchPage(1)
+  setSearchHasMore(false)
+  setSearchOffsetHistory([null])
+  setSearchOffsetIndex(0)
+}
 
         const searchTerms = searchQuery
           .trim()
@@ -703,19 +699,29 @@ const handleEndDateChange = (value) => {
             ? `AND(${searchConditions.join(", ")})`
             : searchConditions[0]
 
-        const response = await axios.get(
-          "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-            },
-            params: {
-              maxRecords: 100,
-              filterByFormula: filterFormula,
-              sort: [{ field: "DATE", direction: "desc" }],
-            },
-          }
-        )
+        const currentSearchOffset = searchOffsetHistory[searchOffsetIndex]
+
+const response = await axios.get(
+  "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+  {
+    headers: {
+      Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+    },
+    params: {
+      pageSize: searchRecordsPerPage,
+      offset: currentSearchOffset || undefined,
+      filterByFormula: filterFormula,
+      sort: [{ field: "DATE", direction: sortOrder }],
+    },
+  }
+)
+
+const hasMore = !!response.data.offset
+setSearchHasMore(hasMore)
+
+if (hasMore && searchOffsetIndex === searchOffsetHistory.length - 1) {
+  setSearchOffsetHistory((prev) => [...prev, response.data.offset])
+}
 
         const formattedResults = response.data.records.map((record) => ({
           id: record.id,
@@ -762,21 +768,47 @@ const handleEndDateChange = (value) => {
   }
 
   const handleSearchInputChange = (e) => {
-    setSearchQuery(e.target.value)
-  }
+  userInteractedRef.current = true
+  setSearchQuery(e.target.value)
+}
 
   const handleSearchKeyPress = (e) => {
-    if (e.key === "Enter") {
-      handleSearch(e)
-    }
+  if (e.key === "Enter") {
+    // let the form onSubmit handle it
+    // (prevents double-trigger)
   }
+}
 
-  // pagination helpers
-  const resetPagination = () => {
-    setPage(1)
-    setCurrentOffsetIndex(0)
-    setOffsetHistory([null])
+  // pagination helpers (timeline)
+const handleSearchPreviousPage = () => {
+  if (searchOffsetIndex > 0) {
+    setSearchOffsetIndex((prev) => prev - 1)
+    setSearchPage((prev) => prev - 1)
+    window.scrollTo(0, 0)
   }
+}
+
+const handleSearchNextPage = () => {
+  if (searchHasMore) {
+    setSearchOffsetIndex((prev) => prev + 1)
+    setSearchPage((prev) => prev + 1)
+    window.scrollTo(0, 0)
+  }
+}
+
+// pagination helpers
+const resetPagination = () => {
+  // timeline paging
+  setPage(1)
+  setCurrentOffsetIndex(0)
+  setOffsetHistory([null])
+
+  // search paging
+  setSearchPage(1)
+  setSearchOffsetIndex(0)
+  setSearchOffsetHistory([null])
+  setSearchHasMore(false)
+}
 
   const handlePreviousPage = () => {
     if (currentOffsetIndex > 0) {
@@ -1393,7 +1425,7 @@ const CalendarModal = () => {
                 className="w-full rounded-full py-1.5 pl-10 pr-4 text-sm bg-white border border-[#6b7db3] text-[#6b7db3]"
                 value={searchQuery}
                 onChange={handleSearchInputChange}
-                onKeyPress={handleSearchKeyPress}
+                onKeyDown={handleSearchKeyPress}
               />
               <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                 <svg
@@ -1463,15 +1495,16 @@ const CalendarModal = () => {
          
                   {/* Ad block – invisible until Google serves an ad */}
 {import.meta.env.PROD && (
-  <div
-    style={{
-      display: "block",
-      width: "100%",
-      height: "0px",
-      overflow: "hidden",
-    }}
-  >
-    <AdComponent />
+  <div className="w-full my-6">
+    <div className="bg-white/60 rounded-3xl border border-[#f8dada] px-4 py-3 card-soft glass-soft w-full">
+      <span className="text-[10px] uppercase tracking-[0.16em] text-[#9ca3af]">
+        Sponsored
+      </span>
+
+      <div style={{ minHeight: 250 }}>
+        <AdComponent />
+      </div>
+    </div>
   </div>
 )}
          
@@ -1523,14 +1556,66 @@ const CalendarModal = () => {
 
               {/* Search results list */}
               {searchResults.length === 0 ? (
-                <div className="text-center py-12 text-[#b91c1c]">
-                  No results found for "{searchQuery}"
-                </div>
-              ) : viewMode === "grid" ? (
-                renderGridCards(searchResults)
-              ) : (
-                renderCompactArchive(searchResults)
-              )}
+  <div className="text-center py-12 text-[#b91c1c]">
+    No results found for "{searchQuery}"
+  </div>
+) : (
+  <>
+    {viewMode === "grid"
+      ? renderGridCards(searchResults)
+      : renderCompactArchive(searchResults)}
+
+    {(searchResults.length > searchRecordsPerPage || searchHasMore || searchOffsetIndex > 0)
+&& (
+      <div className="max-w-6xl mx-auto px-4 my-8 flex justify-center items-center gap-2">
+        <span
+          className={`text-sm ${
+            searchPage > 1 ? "text-[#bb6d6d] cursor-pointer" : "text-[#bb6d6d]/50"
+          }`}
+          onClick={searchPage > 1 ? handleSearchPreviousPage : undefined}
+        >
+          Previous Page
+        </span>
+
+        <button
+          className={`w-8 h-8 flex items-center justify-center rounded-full border border-[#bb6d6d] ${
+            searchPage > 1
+              ? "bg-[#e6edf7] text-[#bb6d6d]"
+              : "bg-[#e6edf7]/50 text-[#bb6d6d]/50"
+          }`}
+          onClick={searchPage > 1 ? handleSearchPreviousPage : undefined}
+          disabled={searchPage <= 1}
+        >
+          &lt;
+        </button>
+
+        <div className="mx-2 text-[#bb6d6d]">Page {searchPage}</div>
+
+        <button
+          className={`w-8 h-8 flex items-center justify-center rounded-full border border-[#bb6d6d] ${
+            searchHasMore
+              ? "bg-[#e6edf7] text-[#bb6d6d]"
+              : "bg-[#e6edf7]/50 text-[#bb6d6d]/50"
+          }`}
+          onClick={searchHasMore ? handleSearchNextPage : undefined}
+          disabled={!searchHasMore}
+        >
+          &gt;
+        </button>
+
+        <span
+          className={`text-sm ${
+            searchHasMore ? "text-[#bb6d6d] cursor-pointer" : "text-[#bb6d6d]/50"
+          }`}
+          onClick={searchHasMore ? handleSearchNextPage : undefined}
+        >
+          Next Page
+        </span>
+      </div>
+    )}
+  </>
+)}
+
             </>
           ) : posts.length === 0 ? (
             <div className="text-center py-12 text-[#b91c1c]">
@@ -1546,9 +1631,8 @@ const CalendarModal = () => {
 
       {/* Pagination */}
       {!loading &&
-        !isFilterMode &&
-        !isSearchMode &&
-        (posts.length > recordsPerPage || hasMore) && (
+  !isSearchMode &&
+  (posts.length > (isFilterMode ? filterRecordsPerPage : recordsPerPage) || hasMore) && (
           <div className="max-w-6xl mx-auto px-4 my-8 flex justify-center items-center gap-2">
             <span
               className={`text-sm ${
