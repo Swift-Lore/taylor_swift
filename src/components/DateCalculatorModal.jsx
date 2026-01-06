@@ -105,39 +105,60 @@ export default function DateCalculatorModal({ onClose }) {
     const end = toDateUTC(endBetween)
     if (!start || !end) return null
 
-    const forward = end.getTime() >= start.getTime()
-    const a = forward ? start : end
-    const b = forward ? end : start
+    // Check if end comes before start (negative days)
+    const isReversed = end.getTime() < start.getTime()
+    
+    // Always calculate from earlier to later date
+    const earlier = isReversed ? end : start
+    const later = isReversed ? start : end
 
-    const totalDaysExclusive = diffDaysUTC(a, b)
+    const totalDaysExclusive = diffDaysUTC(earlier, later)
     const totalDays = totalDaysExclusive + (includeEndDate ? 1 : 0)
+    
+    // Apply negative sign if dates are reversed
+    const finalTotalDays = isReversed ? -totalDays : totalDays
 
-    // Build Years / Months / Days by stepping forward
-    let cursor = new Date(a.getTime())
+    // Build Years / Months / Days by stepping forward (always from earlier to later)
+    let cursor = new Date(earlier.getTime())
 
     let years = 0
-    while (addYearsUTC(cursor, 1).getTime() <= b.getTime()) {
+    while (addYearsUTC(cursor, 1).getTime() <= later.getTime()) {
       cursor = addYearsUTC(cursor, 1)
       years += 1
     }
 
     let months = 0
-    while (addMonthsUTC(cursor, 1).getTime() <= b.getTime()) {
+    while (addMonthsUTC(cursor, 1).getTime() <= later.getTime()) {
       cursor = addMonthsUTC(cursor, 1)
       months += 1
     }
 
-    const days = diffDaysUTC(cursor, b)
+    const days = diffDaysUTC(cursor, later)
+    
+    // Apply negative sign to all components if dates are reversed
+    const finalYears = isReversed ? -years : years
+    const finalMonths = isReversed ? -months : months
+    const finalDays = isReversed ? -days : days
     const totalMonths = years * 12 + months
+    const finalTotalMonths = isReversed ? -totalMonths : totalMonths
 
     return {
       start,
       end,
-      forward,
-      totalDays,
-      ymd: { years, months, days },
-      md: { months: totalMonths, days },
+      isReversed,
+      earlier,
+      later,
+      totalDays: finalTotalDays,
+      ymd: { years: finalYears, months: finalMonths, days: finalDays },
+      md: { months: finalTotalMonths, days: finalDays },
     }
+  }
+
+  // Function to swap start and end dates
+  const swapDates = () => {
+    const temp = startBetween
+    setStartBetween(endBetween)
+    setEndBetween(temp)
   }
 
   const addRes = tab === "add" ? calcAddSubtract() : null
@@ -392,6 +413,35 @@ export default function DateCalculatorModal({ onClose }) {
                 </div>
               </div>
 
+              {/* Swap Dates Button - Only show when both dates are entered */}
+              {(startBetween && endBetween) && (
+                <div className="flex justify-center mt-3">
+                  <button
+                    type="button"
+                    onClick={swapDates}
+                    className="flex items-center gap-2 rounded-full px-4 py-2 text-sm border border-[#6b7db3] text-[#6b7db3] bg-white hover:bg-[#e6edf7] transition-colors"
+                  >
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      width="16" 
+                      height="16" 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                    >
+                      <path d="m18 4 4 4-4 4"/>
+                      <path d="M2 8h20"/>
+                      <path d="m6 20-4-4 4-4"/>
+                      <path d="M22 16H2"/>
+                    </svg>
+                    Swap Dates
+                  </button>
+                </div>
+              )}
+
               <label className="flex items-center gap-2 mt-3 text-sm text-[#6b7db3] select-none">
                 <input
                   type="checkbox"
@@ -443,26 +493,32 @@ export default function DateCalculatorModal({ onClose }) {
                     <span className="font-semibold text-[#8e3e3e]">
                       {formatMMDDYYYY(betweenRes.end)}
                     </span>
+                    {betweenRes.isReversed && (
+                      <span className="text-xs text-red-500 ml-2">
+                        (Note: End date is earlier than start date)
+                      </span>
+                    )}
                   </div>
 
                   <div className="text-[#6b7db3]">
                     Total days:{" "}
-                    <span className="font-semibold text-[#8e3e3e]">
-                      {betweenRes.totalDays}
+                    <span className={`font-semibold ${betweenRes.totalDays < 0 ? 'text-red-500' : 'text-[#8e3e3e]'}`}>
+                      {betweenRes.totalDays} days
+                      {betweenRes.isReversed && betweenRes.totalDays > 0 ? ' (negative shown)' : ''}
                     </span>
                   </div>
 
                   {/* ✅ label change */}
                   <div className="text-[#6b7db3]">
                     Years + months + days:{" "}
-                    <span className="font-semibold text-[#8e3e3e]">
+                    <span className={`font-semibold ${betweenRes.isReversed ? 'text-red-500' : 'text-[#8e3e3e]'}`}>
                       {betweenRes.ymd.years} years, {betweenRes.ymd.months} months, {betweenRes.ymd.days} days
                     </span>
                   </div>
 
                   <div className="text-[#6b7db3]">
                     Months + days:{" "}
-                    <span className="font-semibold text-[#8e3e3e]">
+                    <span className={`font-semibold ${betweenRes.isReversed ? 'text-red-500' : 'text-[#8e3e3e]'}`}>
                       {betweenRes.md.months} months, {betweenRes.md.days} days
                     </span>
                   </div>
