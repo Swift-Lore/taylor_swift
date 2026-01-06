@@ -1344,7 +1344,7 @@ const totalDays = totalDaysExclusive + (includeEndDate ? 1 : 0)
   end,
   forward,
   totalDaysExclusive,
-  totalDaysInclusive,
+  totalDays,
   ymd: { years, months, days },
   md: { months: totalMonths, days },
 }
