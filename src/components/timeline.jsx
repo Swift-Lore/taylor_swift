@@ -973,6 +973,20 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   <div className="relative mt-0 md:mt-1 max-w-3xl mx-auto">
     {/* Main date navigation - CENTERED */}
     <div className="flex items-center justify-center gap-1 md:gap-2">
+      {/* NEW: Date Calc button */}
+  <Button
+    variant="secondary"
+    className="
+      rounded-full h-7 md:h-8 px-2 md:px-3
+      text-[10px] sm:text-xs
+      flex items-center justify-center gap-1 min-w-[70px]
+    "
+    onClick={() => setShowDateCalc(true)}
+    title="Open date calculator"
+  >
+    Date Calc
+  </Button>
+      {/* Existing: Previous */}
       <Button
         variant="secondary"
         className="
