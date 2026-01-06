@@ -1213,6 +1213,9 @@ const CalendarModal = () => {
 const DateCalculatorModal = () => {
     // --- Tabs ---
   const [tab, setTab] = useState("add") // "add" | "between"
+
+// Days Between option: include end date (+1 day)
+const [includeEndDate, setIncludeEndDate] = useState(false)
   // --- Between dates state ---
   const [startBetween, setStartBetween] = useState("")
   const [endBetween, setEndBetween] = useState("")
@@ -1315,7 +1318,7 @@ const DateCalculatorModal = () => {
     const b = forward ? end : start
 
     const totalDaysExclusive = diffDaysUTC(a, b)
-const totalDaysInclusive = totalDaysExclusive + 1
+const totalDays = totalDaysExclusive + (includeEndDate ? 1 : 0)
 
     // Build Years / Months / Days by stepping forward (UTC-safe)
     let cursor = new Date(a.getTime())
