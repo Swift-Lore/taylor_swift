@@ -191,7 +191,7 @@ export default function DateCalculatorModal({ onClose }) {
                 </label>
                 <input
                   type="date"
-                  className="w-full min-w-0 max-w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm"
+                  className="block w-full min-w-0 max-w-full box-border appearance-none bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm"
                   value={baseDate}
                   onChange={(e) => setBaseDate(e.target.value)}
                 />
@@ -335,7 +335,7 @@ export default function DateCalculatorModal({ onClose }) {
                   </label>
                   <input
   type="date"
-  className="w-full min-w-0 max-w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm"
+  className="block w-full min-w-0 max-w-full box-border appearance-none bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm"
   value={startBetween}
   onChange={(e) => setStartBetween(e.target.value)}
 />
@@ -347,7 +347,7 @@ export default function DateCalculatorModal({ onClose }) {
                   </label>
                   <input
   type="date"
-  className="w-full min-w-0 max-w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm"
+  className="block w-full min-w-0 max-w-full box-border appearance-none bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm"
   value={endBetween}
   onChange={(e) => setEndBetween(e.target.value)}
 />
