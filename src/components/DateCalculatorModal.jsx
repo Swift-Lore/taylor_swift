@@ -184,14 +184,14 @@ export default function DateCalculatorModal({ onClose }) {
         {/* Add/Subtract tab */}
         {tab === "add" && (
           <>
-            <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4">
-              <div className="mb-3">
+            <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4 overflow-hidden">
+              <div className="mb-3 min-w-0">
                 <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
                   Base date
                 </label>
                 <input
                   type="date"
-                  className="w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm"
+                  className="w-full min-w-0 max-w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm"
                   value={baseDate}
                   onChange={(e) => setBaseDate(e.target.value)}
                 />
@@ -327,30 +327,30 @@ export default function DateCalculatorModal({ onClose }) {
         {/* Between tab */}
         {tab === "between" && (
           <>
-            <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4">
+            <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4 overflow-hidden">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
+                <div className="min-w-0">
                   <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
                     Start date
                   </label>
                   <input
-                    type="date"
-                    className="w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm"
-                    value={startBetween}
-                    onChange={(e) => setStartBetween(e.target.value)}
-                  />
+  type="date"
+  className="w-full min-w-0 max-w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm"
+  value={startBetween}
+  onChange={(e) => setStartBetween(e.target.value)}
+/>
                 </div>
 
-                <div>
+                <div className="min-w-0">
                   <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
                     End date
                   </label>
                   <input
-                    type="date"
-                    className="w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm"
-                    value={endBetween}
-                    onChange={(e) => setEndBetween(e.target.value)}
-                  />
+  type="date"
+  className="w-full min-w-0 max-w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm"
+  value={endBetween}
+  onChange={(e) => setEndBetween(e.target.value)}
+/>
                 </div>
               </div>
 
