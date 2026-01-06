@@ -276,11 +276,12 @@ export default function DateCalculatorModal({ onClose }) {
                 <button
                   type="button"
                   onClick={() => {
-                    setDeltaYears("0")
-                    setDeltaMonths("0")
-                    setDeltaDays("0")
-                    setSign(1)
-                  }}
+  setBaseDate("")          
+  setDeltaYears("0")
+  setDeltaMonths("0")
+  setDeltaDays("0")
+  setSign(1)
+}}
                   className="rounded-full px-4 py-2 text-sm border border-[#b91c1c] text-[#b91c1c] bg-white hover:bg-[#ffe8e8] transition-colors"
                 >
                   Reset
