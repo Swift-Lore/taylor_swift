@@ -6,6 +6,7 @@ import { useNavigate, useLocation, Link } from "react-router-dom"
 import { ChevronLeft, ChevronRight, Calendar, Star, Zap, Clock } from "lucide-react"
 import { Button } from "./ui/Button"
 import AdSlot from "./adslot"
+import DateCalculatorModal from "./DateCalculatorModal"
 
 // helper: convert "MM/DD/YYYY" -> "YYYY-MM-DD" for Airtable
 const parseMMDDYYYYToISO = (value) => {
@@ -128,6 +129,7 @@ const [searchOffsetIndex, setSearchOffsetIndex] = useState(0)
 
   // Calendar state
   const [showCalendar, setShowCalendar] = useState(false)
+  const [showDateCalc, setShowDateCalc] = useState(false)
   const [dateEventsMap, setDateEventsMap] = useState({})
   const [calendarMonth, setCalendarMonth] = useState(new Date().getMonth())
   const [calendarYear, setCalendarYear] = useState(new Date().getFullYear())
@@ -1207,7 +1209,7 @@ const CalendarModal = () => {
     </div>
   )
 }
-
+  
   return (
        <div className="bg-[#e6edf7] py-8 overflow-x-hidden">
                {/* SEO helper for crawlers, hidden visually */}
@@ -1421,6 +1423,18 @@ const CalendarModal = () => {
   </button>
 </div>
 
+{/* ✅ ADD THIS: Date Calculator Button */}
+<div className="relative">
+  <button
+    onClick={() => setShowDateCalc(true)}
+    className="flex items-center gap-2 bg-white text-[#8e3e3e] border border-[#8e3e3e] rounded-full px-4 py-1.5 text-sm hover:bg-[#f8d7da] transition-colors"
+    type="button"
+  >
+    <Clock size={16} />
+    <span>Date Calc</span>
+  </button>
+</div>
+          
           {/* Search */}
           <div className="relative flex-grow min-w-[200px]">
             <form onSubmit={handleSearch} className="relative ml-2">
@@ -1689,7 +1703,12 @@ const CalendarModal = () => {
       </div>
       
       {/* Calendar Modal */}
-      <CalendarModal />
+<CalendarModal />
+
+{/* Date Calculator Modal */}
+{showDateCalc && (
+  <DateCalculatorModal onClose={() => setShowDateCalc(false)} />
+)}
       
       <br />
     </div>
