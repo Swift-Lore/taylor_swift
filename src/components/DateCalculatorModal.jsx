@@ -156,30 +156,30 @@ export default function DateCalculatorModal({ onClose }) {
 
         {/* Tabs */}
         <div className="flex gap-2 mb-4 min-w-0">
-  <button
-    type="button"
-    onClick={() => setTab("between")}
-    className={`flex-1 min-w-0 rounded-full px-3 sm:px-4 py-2 text-xs sm:text-sm border transition-colors whitespace-nowrap ${
-      tab === "between"
-        ? "bg-[#8e3e3e] text-white border-[#8e3e3e]"
-        : "bg-white text-[#6b7db3] border-[#6b7db3] hover:bg-[#e6edf7]"
-    }`}
-  >
-    Days Between
-  </button>
+          <button
+            type="button"
+            onClick={() => setTab("between")}
+            className={`flex-1 min-w-0 rounded-full px-3 sm:px-4 py-2 text-xs sm:text-sm border transition-colors whitespace-nowrap ${
+              tab === "between"
+                ? "bg-[#8e3e3e] text-white border-[#8e3e3e]"
+                : "bg-white text-[#6b7db3] border-[#6b7db3] hover:bg-[#e6edf7]"
+            }`}
+          >
+            Days Between
+          </button>
 
-  <button
-    type="button"
-    onClick={() => setTab("add")}
-    className={`flex-1 min-w-0 rounded-full px-3 sm:px-4 py-2 text-xs sm:text-sm border transition-colors whitespace-nowrap ${
-      tab === "add"
-        ? "bg-[#8e3e3e] text-white border-[#8e3e3e]"
-        : "bg-white text-[#6b7db3] border-[#6b7db3] hover:bg-[#e6edf7]"
-    }`}
-  >
-    Add / Subtract
-  </button>
-</div>
+          <button
+            type="button"
+            onClick={() => setTab("add")}
+            className={`flex-1 min-w-0 rounded-full px-3 sm:px-4 py-2 text-xs sm:text-sm border transition-colors whitespace-nowrap ${
+              tab === "add"
+                ? "bg-[#8e3e3e] text-white border-[#8e3e3e]"
+                : "bg-white text-[#6b7db3] border-[#6b7db3] hover:bg-[#e6edf7]"
+            }`}
+          >
+            Add / Subtract
+          </button>
+        </div>
 
         {/* Add/Subtract tab */}
         {tab === "add" && (
@@ -189,11 +189,24 @@ export default function DateCalculatorModal({ onClose }) {
                 <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
                   Base date
                 </label>
+                {/* Fix for date bubble cut-off - Add padding on the right */}
                 <input
                   type="date"
-                  className="block w-full min-w-0 max-w-full box-border bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm"
+                  className="block w-full min-w-0 max-w-full box-border bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm
+                    /* Fix for date picker icon cut-off */
+                    pr-10
+                    /* Force WebKit to show full date input */
+                    min-h-[44px] /* iOS tap target */
+                    min-w-[130px] /* Ensure minimum width */
+                  "
                   value={baseDate}
                   onChange={(e) => setBaseDate(e.target.value)}
+                  style={{
+                    // Force WebKit browsers to show proper date input width
+                    WebkitAppearance: 'none',
+                    // Additional iOS fixes
+                    fontSize: '16px', // Prevent iOS zoom
+                  }}
                 />
               </div>
 
@@ -276,12 +289,12 @@ export default function DateCalculatorModal({ onClose }) {
                 <button
                   type="button"
                   onClick={() => {
-  setBaseDate("")          
-  setDeltaYears("0")
-  setDeltaMonths("0")
-  setDeltaDays("0")
-  setSign(1)
-}}
+                    setBaseDate("")
+                    setDeltaYears("0")
+                    setDeltaMonths("0")
+                    setDeltaDays("0")
+                    setSign(1)
+                  }}
                   className="rounded-full px-4 py-2 text-sm border border-[#b91c1c] text-[#b91c1c] bg-white hover:bg-[#ffe8e8] transition-colors"
                 >
                   Reset
@@ -335,11 +348,23 @@ export default function DateCalculatorModal({ onClose }) {
                     Start date
                   </label>
                   <input
-  type="date"
-  className="block w-full min-w-0 max-w-full box-border appearance-none bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm overflow-hidden"
-  value={startBetween}
-  onChange={(e) => setStartBetween(e.target.value)}
-/>
+                    type="date"
+                    className="block w-full min-w-0 max-w-full box-border appearance-none bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm
+                      /* Fix for date picker icon cut-off */
+                      pr-10
+                      /* Force WebKit to show full date input */
+                      min-h-[44px] /* iOS tap target */
+                      min-w-[130px] /* Ensure minimum width */
+                    "
+                    value={startBetween}
+                    onChange={(e) => setStartBetween(e.target.value)}
+                    style={{
+                      // Force WebKit browsers to show proper date input width
+                      WebkitAppearance: 'none',
+                      // Additional iOS fixes
+                      fontSize: '16px', // Prevent iOS zoom
+                    }}
+                  />
                 </div>
 
                 <div className="min-w-0">
@@ -347,11 +372,23 @@ export default function DateCalculatorModal({ onClose }) {
                     End date
                   </label>
                   <input
-  type="date"
-  className="block w-full min-w-0 max-w-full box-border appearance-none bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm overflow-hidden"
-  value={endBetween}
-  onChange={(e) => setEndBetween(e.target.value)}
-/>
+                    type="date"
+                    className="block w-full min-w-0 max-w-full box-border appearance-none bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm
+                      /* Fix for date picker icon cut-off */
+                      pr-10
+                      /* Force WebKit to show full date input */
+                      min-h-[44px] /* iOS tap target */
+                      min-w-[130px] /* Ensure minimum width */
+                    "
+                    value={endBetween}
+                    onChange={(e) => setEndBetween(e.target.value)}
+                    style={{
+                      // Force WebKit browsers to show proper date input width
+                      WebkitAppearance: 'none',
+                      // Additional iOS fixes
+                      fontSize: '16px', // Prevent iOS zoom
+                    }}
+                  />
                 </div>
               </div>
 
