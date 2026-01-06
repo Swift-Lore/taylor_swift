@@ -1322,6 +1322,9 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           {/* Modals */}
           <CalendarModal />
           <TNInfoModal />
+          {showDateCalc && (
+  <DateCalculatorModal onClose={() => setShowDateCalc(false)} />
+)}
         </div>
       </section>
     </>
