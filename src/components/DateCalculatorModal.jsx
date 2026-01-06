@@ -184,7 +184,7 @@ export default function DateCalculatorModal({ onClose }) {
         {/* Add/Subtract tab */}
         {tab === "add" && (
           <>
-            <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4">
+            <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4 overflow-hidden">
               <div className="mb-3">
                 <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
                   Base date
@@ -327,7 +327,7 @@ export default function DateCalculatorModal({ onClose }) {
         {/* Between tab */}
         {tab === "between" && (
           <>
-            <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4">
+            <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4 overflow-hidden">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
