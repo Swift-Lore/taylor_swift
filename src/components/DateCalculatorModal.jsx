@@ -185,7 +185,7 @@ export default function DateCalculatorModal({ onClose }) {
         {tab === "add" && (
           <>
             <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4 overflow-hidden">
-              <div className="mb-3">
+              <div className="mb-3 min-w-0">
                 <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
                   Base date
                 </label>
