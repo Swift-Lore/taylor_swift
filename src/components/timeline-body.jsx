@@ -1579,33 +1579,44 @@ const totalDays = totalDaysExclusive + (includeEndDate ? 1 : 0)
         </div>
       </div>
 
-      {/* Quick actions */}
-      <div className="flex flex-wrap gap-2 mt-3">
-        <button
-          type="button"
-          onClick={() => {
-            const t = new Date()
-            const v = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(
-              t.getDate()
-            ).padStart(2, "0")}`
-            setStartBetween(v)
-          }}
-          className="rounded-full px-4 py-2 text-sm border border-[#8e3e3e] text-[#8e3e3e] bg-white hover:bg-[#f8d7da] transition-colors"
-        >
-          Start = Today
-        </button>
+      {/* Include end date toggle */}
+<label className="flex items-center gap-2 mt-3 text-sm text-[#6b7db3] select-none">
+  <input
+    type="checkbox"
+    checked={includeEndDate}
+    onChange={(e) => setIncludeEndDate(e.target.checked)}
+    className="w-4 h-4 accent-[#8e3e3e]"
+  />
+  Include end date in calculation (1 day is added)
+</label>
 
-        <button
-          type="button"
-          onClick={() => {
-            setStartBetween("")
-            setEndBetween("")
-          }}
-          className="rounded-full px-4 py-2 text-sm border border-[#b91c1c] text-[#b91c1c] bg-white hover:bg-[#ffe8e8] transition-colors"
-        >
-          Reset
-        </button>
-      </div>
+{/* Quick actions */}
+<div className="flex flex-wrap gap-2 mt-3">
+  <button
+    type="button"
+    onClick={() => {
+      const t = new Date()
+      const v = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(
+        t.getDate()
+      ).padStart(2, "0")}`
+      setStartBetween(v)
+    }}
+    className="rounded-full px-4 py-2 text-sm border border-[#8e3e3e] text-[#8e3e3e] bg-white hover:bg-[#f8d7da] transition-colors"
+  >
+    Start = Today
+  </button>
+
+  <button
+    type="button"
+    onClick={() => {
+      setStartBetween("")
+      setEndBetween("")
+    }}
+    className="rounded-full px-4 py-2 text-sm border border-[#b91c1c] text-[#b91c1c] bg-white hover:bg-[#ffe8e8] transition-colors"
+  >
+    Reset
+  </button>
+</div>
     </div>
 
     {/* Result */}
