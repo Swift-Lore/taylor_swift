@@ -23,9 +23,9 @@ export default function DateCalculatorModal({ onClose }) {
   })
 
   const [sign, setSign] = useState(1) // 1 add, -1 subtract
-  const [deltaYears, setDeltaYears] = useState("0")
-  const [deltaMonths, setDeltaMonths] = useState("0")
-  const [deltaDays, setDeltaDays] = useState("0")
+  const [deltaYears, setDeltaYears] = useState("")
+const [deltaMonths, setDeltaMonths] = useState("")
+const [deltaDays, setDeltaDays] = useState("")
 
   // --- helpers (UTC-safe to prevent off-by-one bugs) ---
   const toDateUTC = (yyyyMMdd) => {
