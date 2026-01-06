@@ -155,11 +155,11 @@ export default function DateCalculatorModal({ onClose }) {
         <h2 className="text-xl font-semibold text-[#8e3e3e] mb-3">Date Calculator</h2>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-4">
+        <div className="flex gap-2 mb-4 min-w-0">
   <button
     type="button"
     onClick={() => setTab("between")}
-    className={`flex-1 rounded-full px-4 py-2 text-sm border transition-colors ${
+    className={`flex-1 min-w-0 rounded-full px-3 sm:px-4 py-2 text-xs sm:text-sm border transition-colors whitespace-nowrap ${
       tab === "between"
         ? "bg-[#8e3e3e] text-white border-[#8e3e3e]"
         : "bg-white text-[#6b7db3] border-[#6b7db3] hover:bg-[#e6edf7]"
@@ -171,7 +171,7 @@ export default function DateCalculatorModal({ onClose }) {
   <button
     type="button"
     onClick={() => setTab("add")}
-    className={`flex-1 rounded-full px-4 py-2 text-sm border transition-colors ${
+    className={`flex-1 min-w-0 rounded-full px-3 sm:px-4 py-2 text-xs sm:text-sm border transition-colors whitespace-nowrap ${
       tab === "add"
         ? "bg-[#8e3e3e] text-white border-[#8e3e3e]"
         : "bg-white text-[#6b7db3] border-[#6b7db3] hover:bg-[#e6edf7]"
