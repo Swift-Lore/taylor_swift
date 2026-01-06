@@ -1314,7 +1314,8 @@ const DateCalculatorModal = () => {
     const a = forward ? start : end
     const b = forward ? end : start
 
-    const totalDays = diffDaysUTC(a, b)
+    const totalDaysExclusive = diffDaysUTC(a, b)
+const totalDaysInclusive = totalDaysExclusive + 1
 
     // Build Years / Months / Days by stepping forward (UTC-safe)
     let cursor = new Date(a.getTime())
@@ -1336,13 +1337,14 @@ const DateCalculatorModal = () => {
     const totalMonths = years * 12 + months
 
     return {
-      start,
-      end,
-      forward,
-      totalDays,
-      ymd: { years, months, days },
-      md: { months: totalMonths, days },
-    }
+  start,
+  end,
+  forward,
+  totalDaysExclusive,
+  totalDaysInclusive,
+  ymd: { years, months, days },
+  md: { months: totalMonths, days },
+}
   }
 
   const addRes = tab === "add" ? calcAddSubtract() : null
