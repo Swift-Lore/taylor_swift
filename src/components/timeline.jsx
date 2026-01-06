@@ -346,7 +346,17 @@ const matchingRealLabel = matchingRealDate.toLocaleDateString("en-US", {
 
   // ===== Calendar Modal Component =====
   const CalendarModal = () => {
-    if (!showCalendar) return null
+    useEffect(() => {
+    if (showCalendar) {
+      const originalStyle = window.getComputedStyle(document.body).overflow
+      document.body.style.overflow = 'hidden'
+      return () => {
+        document.body.style.overflow = originalStyle
+      }
+    }
+  }, [showCalendar])
+
+  if (!showCalendar) return null
 
     const calendarDays = generateCalendar()
 
