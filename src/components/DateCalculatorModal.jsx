@@ -4,165 +4,435 @@ import { useState, useEffect } from "react"
 import { Button } from "./ui/Button"
 
 export default function DateCalculatorModal({ onClose }) {
-  const [tab, setTab] = useState("add")
+  // --- Tabs ---
+  const [tab, setTab] = useState("add") // "add" | "between"
 
-  const todayISO = () => {
+  // Days Between option: include end date (+1 day)
+  const [includeEndDate, setIncludeEndDate] = useState(false)
+
+  // --- Between dates state ---
+  const [startBetween, setStartBetween] = useState("")
+  const [endBetween, setEndBetween] = useState("")
+
+  // --- Add/Subtract state ---
+  const [baseDate, setBaseDate] = useState(() => {
     const t = new Date()
     return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(
       t.getDate()
     ).padStart(2, "0")}`
-  }
+  })
 
-  // ===== Add / Subtract =====
-  const [baseDate, setBaseDate] = useState(todayISO())
+  const [sign, setSign] = useState(1) // 1 add, -1 subtract
   const [deltaYears, setDeltaYears] = useState("0")
   const [deltaMonths, setDeltaMonths] = useState("0")
   const [deltaDays, setDeltaDays] = useState("0")
-  const [sign, setSign] = useState(1)
-  const [addRes, setAddRes] = useState(null)
 
-  // ===== Between =====
-  const [startBetween, setStartBetween] = useState(todayISO())
-  const [endBetween, setEndBetween] = useState(todayISO())
-  const [includeEnd, setIncludeEnd] = useState(false)
-  const [betweenRes, setBetweenRes] = useState(null)
+  // --- helpers (UTC-safe to prevent off-by-one bugs) ---
+  const toDateUTC = (yyyyMMdd) => {
+    if (!yyyyMMdd) return null
+    const [y, m, d] = yyyyMMdd.split("-").map(Number)
+    if (!y || !m || !d) return null
+    return new Date(Date.UTC(y, m - 1, d))
+  }
 
-  const formatMMDDYYYY = (date) =>
-    date.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" })
+  const formatMMDDYYYY = (dateObj) => {
+    if (!dateObj) return ""
+    const m = String(dateObj.getUTCMonth() + 1).padStart(2, "0")
+    const d = String(dateObj.getUTCDate()).padStart(2, "0")
+    const y = dateObj.getUTCFullYear()
+    return `${m}/${d}/${y}`
+  }
 
-  // ===== CALCULATIONS =====
-  useEffect(() => {
-    if (!baseDate) return
+  const lastDayOfMonthUTC = (year, monthIndex0) =>
+    new Date(Date.UTC(year, monthIndex0 + 1, 0)).getUTCDate()
 
-    const d = new Date(baseDate)
-    if (isNaN(d)) return
+  const addYearsUTC = (dateObj, yearsToAdd) => {
+    const y = dateObj.getUTCFullYear()
+    const m = dateObj.getUTCMonth()
+    const d = dateObj.getUTCDate()
+    const newY = y + yearsToAdd
+    const maxD = lastDayOfMonthUTC(newY, m)
+    return new Date(Date.UTC(newY, m, Math.min(d, maxD)))
+  }
 
-    const out = new Date(d)
-    out.setFullYear(out.getFullYear() + sign * Number(deltaYears || 0))
-    out.setMonth(out.getMonth() + sign * Number(deltaMonths || 0))
-    out.setDate(out.getDate() + sign * Number(deltaDays || 0))
+  const addMonthsUTC = (dateObj, monthsToAdd) => {
+    const y = dateObj.getUTCFullYear()
+    const m = dateObj.getUTCMonth()
+    const d = dateObj.getUTCDate()
 
-    const diff =
-      Math.round((out.getTime() - d.getTime()) / (1000 * 60 * 60 * 24)) || 0
+    const total = m + monthsToAdd
+    const newY = y + Math.floor(total / 12)
+    const newM = ((total % 12) + 12) % 12
 
-    setAddRes({
-      base: d,
-      out,
-      totalDayShift: Math.abs(diff),
-    })
-  }, [baseDate, deltaYears, deltaMonths, deltaDays, sign])
+    const maxD = lastDayOfMonthUTC(newY, newM)
+    return new Date(Date.UTC(newY, newM, Math.min(d, maxD)))
+  }
 
-  useEffect(() => {
-    if (!startBetween || !endBetween) {
-      setBetweenRes(null)
-      return
+  const addDaysUTC = (dateObj, daysToAdd) =>
+    new Date(dateObj.getTime() + daysToAdd * 24 * 60 * 60 * 1000)
+
+  const diffDaysUTC = (a, b) => {
+    const msPerDay = 24 * 60 * 60 * 1000
+    return Math.round((b.getTime() - a.getTime()) / msPerDay)
+  }
+
+  const calcAddSubtract = () => {
+    const base = toDateUTC(baseDate)
+    if (!base) return null
+
+    const y = parseInt(deltaYears || "0", 10) * sign
+    const mo = parseInt(deltaMonths || "0", 10) * sign
+    const da = parseInt(deltaDays || "0", 10) * sign
+
+    if (Number.isNaN(y) || Number.isNaN(mo) || Number.isNaN(da)) return null
+
+    let out = addYearsUTC(base, y)
+    out = addMonthsUTC(out, mo)
+    out = addDaysUTC(out, da)
+
+    return { base, out, totalDayShift: diffDaysUTC(base, out) }
+  }
+
+  const calcBetween = () => {
+    const start = toDateUTC(startBetween)
+    const end = toDateUTC(endBetween)
+    if (!start || !end) return null
+
+    const forward = end.getTime() >= start.getTime()
+    const a = forward ? start : end
+    const b = forward ? end : start
+
+    const totalDaysExclusive = diffDaysUTC(a, b)
+    const totalDays = totalDaysExclusive + (includeEndDate ? 1 : 0)
+
+    // Build Years / Months / Days by stepping forward
+    let cursor = new Date(a.getTime())
+
+    let years = 0
+    while (addYearsUTC(cursor, 1).getTime() <= b.getTime()) {
+      cursor = addYearsUTC(cursor, 1)
+      years += 1
     }
 
-    const start = new Date(startBetween)
-    const end = new Date(endBetween)
-    if (isNaN(start) || isNaN(end)) return
+    let months = 0
+    while (addMonthsUTC(cursor, 1).getTime() <= b.getTime()) {
+      cursor = addMonthsUTC(cursor, 1)
+      months += 1
+    }
 
-    let totalDays = Math.round((end - start) / (1000 * 60 * 60 * 24))
-    if (includeEnd) totalDays += 1
+    const days = diffDaysUTC(cursor, b)
+    const totalMonths = years * 12 + months
 
-    setBetweenRes({
+    return {
       start,
       end,
+      forward,
       totalDays,
-    })
-  }, [startBetween, endBetween, includeEnd])
+      ymd: { years, months, days },
+      md: { months: totalMonths, days },
+    }
+  }
+
+  const addRes = tab === "add" ? calcAddSubtract() : null
+  const betweenRes = tab === "between" ? calcBetween() : null
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <div
         className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-xl font-semibold text-[#8e3e3e] mb-4">
+        <h2 className="text-xl font-semibold text-[#8e3e3e] mb-3">
           Date Calculator
         </h2>
 
         {/* Tabs */}
         <div className="flex gap-2 mb-4">
-          <Button
-            variant={tab === "add" ? "default" : "outline"}
-            className="flex-1"
+          <button
+            type="button"
             onClick={() => setTab("add")}
+            className={`flex-1 rounded-full px-4 py-2 text-sm border transition-colors ${
+              tab === "add"
+                ? "bg-[#8e3e3e] text-white border-[#8e3e3e]"
+                : "bg-white text-[#6b7db3] border-[#6b7db3] hover:bg-[#e6edf7]"
+            }`}
           >
             Add / Subtract
-          </Button>
-          <Button
-            variant={tab === "between" ? "default" : "outline"}
-            className="flex-1"
+          </button>
+
+          <button
+            type="button"
             onClick={() => setTab("between")}
+            className={`flex-1 rounded-full px-4 py-2 text-sm border transition-colors ${
+              tab === "between"
+                ? "bg-[#8e3e3e] text-white border-[#8e3e3e]"
+                : "bg-white text-[#6b7db3] border-[#6b7db3] hover:bg-[#e6edf7]"
+            }`}
           >
             Days Between
-          </Button>
+          </button>
         </div>
 
+        {/* ✅ Add/Subtract tab */}
         {tab === "add" && (
           <>
-            <label className="block text-sm mb-1">Base date</label>
-            <input
-              type="date"
-              value={baseDate}
-              onChange={(e) => setBaseDate(e.target.value)}
-              className="w-full mb-2"
-            />
+            <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4">
+              <div className="mb-3">
+                <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
+                  Base date
+                </label>
+                <input
+                  type="date"
+                  className="w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm"
+                  value={baseDate}
+                  onChange={(e) => setBaseDate(e.target.value)}
+                />
+              </div>
 
-            <div className="grid grid-cols-3 gap-2 mb-2">
-              <input value={deltaYears} onChange={(e) => setDeltaYears(e.target.value)} />
-              <input value={deltaMonths} onChange={(e) => setDeltaMonths(e.target.value)} />
-              <input value={deltaDays} onChange={(e) => setDeltaDays(e.target.value)} />
+              <div className="flex gap-2 mb-3">
+                <button
+                  type="button"
+                  onClick={() => setSign(1)}
+                  className={`flex-1 rounded-full px-4 py-2 text-sm border transition-colors ${
+                    sign === 1
+                      ? "bg-[#c25e5e] text-white border-[#c25e5e]"
+                      : "bg-white text-[#6b7db3] border-[#6b7db3] hover:bg-white/70"
+                  }`}
+                >
+                  Add
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSign(-1)}
+                  className={`flex-1 rounded-full px-4 py-2 text-sm border transition-colors ${
+                    sign === -1
+                      ? "bg-[#c25e5e] text-white border-[#c25e5e]"
+                      : "bg-white text-[#6b7db3] border-[#6b7db3] hover:bg-white/70"
+                  }`}
+                >
+                  Subtract
+                </button>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
+                    Years
+                  </label>
+                  <input
+                    inputMode="numeric"
+                    className="w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-3 py-2 text-sm"
+                    value={deltaYears}
+                    onChange={(e) => setDeltaYears(e.target.value.replace(/[^\d]/g, ""))}
+                    placeholder="0"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
+                    Months
+                  </label>
+                  <input
+                    inputMode="numeric"
+                    className="w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-3 py-2 text-sm"
+                    value={deltaMonths}
+                    onChange={(e) => setDeltaMonths(e.target.value.replace(/[^\d]/g, ""))}
+                    placeholder="0"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
+                    Days
+                  </label>
+                  <input
+                    inputMode="numeric"
+                    className="w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-3 py-2 text-sm"
+                    value={deltaDays}
+                    onChange={(e) => setDeltaDays(e.target.value.replace(/[^\d]/g, ""))}
+                    placeholder="0"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2 mt-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const t = new Date()
+                    const v = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(
+                      t.getDate()
+                    ).padStart(2, "0")}`
+                    setBaseDate(v)
+                  }}
+                  className="rounded-full px-4 py-2 text-sm border border-[#8e3e3e] text-[#8e3e3e] bg-white hover:bg-[#f8d7da] transition-colors"
+                >
+                  Use Today
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDeltaYears("0")
+                    setDeltaMonths("0")
+                    setDeltaDays("0")
+                    setSign(1)
+                  }}
+                  className="rounded-full px-4 py-2 text-sm border border-[#b91c1c] text-[#b91c1c] bg-white hover:bg-[#ffe8e8] transition-colors"
+                >
+                  Reset
+                </button>
+              </div>
             </div>
 
-            {addRes && (
-              <div className="text-sm mt-2">
-                New date: <strong>{formatMMDDYYYY(addRes.out)}</strong>
-              </div>
-            )}
+            <div className="bg-white rounded-2xl border border-[#e3b0b0] p-4 mb-4">
+              <div className="text-sm font-semibold text-[#8e3e3e] mb-2">Result</div>
+
+              {addRes ? (
+                <div className="space-y-2 text-sm">
+                  <div className="text-[#6b7db3]">
+                    Base:{" "}
+                    <span className="font-semibold text-[#8e3e3e]">
+                      {formatMMDDYYYY(addRes.base)}
+                    </span>
+                  </div>
+
+                  <div className="text-[#6b7db3]">
+                    New date:{" "}
+                    <span className="font-semibold text-[#8e3e3e]">
+                      {formatMMDDYYYY(addRes.out)}
+                    </span>
+                  </div>
+
+                  <div className="text-[#6b7db3]">
+                    Net shift:{" "}
+                    <span className="font-semibold text-[#8e3e3e]">
+                      {addRes.totalDayShift}
+                    </span>{" "}
+                    days
+                  </div>
+                </div>
+              ) : (
+                <div className="text-sm text-[#6b7db3]">
+                  Pick a base date and enter values to see the result.
+                </div>
+              )}
+            </div>
           </>
         )}
 
+        {/* ✅ Between tab */}
         {tab === "between" && (
           <>
-            <label className="block text-sm mb-1">Start date</label>
-            <input
-              type="date"
-              value={startBetween}
-              onChange={(e) => setStartBetween(e.target.value)}
-              className="w-full mb-2"
-            />
+            <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
+                    Start date
+                  </label>
+                  <input
+                    type="date"
+                    className="w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm"
+                    value={startBetween}
+                    onChange={(e) => setStartBetween(e.target.value)}
+                  />
+                </div>
 
-            <label className="block text-sm mb-1">End date</label>
-            <input
-              type="date"
-              value={endBetween}
-              onChange={(e) => setEndBetween(e.target.value)}
-              className="w-full mb-2"
-            />
-
-            <label className="flex items-center gap-2 text-sm mt-2">
-              <input
-                type="checkbox"
-                checked={includeEnd}
-                onChange={(e) => setIncludeEnd(e.target.checked)}
-              />
-              Include end date
-            </label>
-
-            {betweenRes && (
-              <div className="text-sm mt-2">
-                Total days: <strong>{betweenRes.totalDays}</strong>
+                <div>
+                  <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
+                    End date
+                  </label>
+                  <input
+                    type="date"
+                    className="w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm"
+                    value={endBetween}
+                    onChange={(e) => setEndBetween(e.target.value)}
+                  />
+                </div>
               </div>
-            )}
+
+              <label className="flex items-center gap-2 mt-3 text-sm text-[#6b7db3] select-none">
+                <input
+                  type="checkbox"
+                  checked={includeEndDate}
+                  onChange={(e) => setIncludeEndDate(e.target.checked)}
+                  className="h-5 w-5 rounded border border-[#6b7db3] accent-[#8e3e3e]"
+                />
+                Include end date in calculation (1 day is added)
+              </label>
+
+              <div className="flex flex-wrap gap-2 mt-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStartBetween("")
+                    setEndBetween("")
+                    setIncludeEndDate(false)
+                  }}
+                  className="rounded-full px-4 py-2 text-sm border border-[#b91c1c] text-[#b91c1c] bg-white hover:bg-[#ffe8e8] transition-colors"
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-[#e3b0b0] p-4 mb-4">
+              <div className="text-sm font-semibold text-[#8e3e3e] mb-2">Result</div>
+
+              {betweenRes ? (
+                <div className="space-y-2 text-sm">
+                  <div className="text-[#6b7db3]">
+                    From:{" "}
+                    <span className="font-semibold text-[#8e3e3e]">
+                      {formatMMDDYYYY(betweenRes.start)}
+                    </span>
+                  </div>
+
+                  <div className="text-[#6b7db3]">
+                    To:{" "}
+                    <span className="font-semibold text-[#8e3e3e]">
+                      {formatMMDDYYYY(betweenRes.end)}
+                    </span>
+                  </div>
+
+                  <div className="text-[#6b7db3]">
+                    Total days:{" "}
+                    <span className="font-semibold text-[#8e3e3e]">
+                      {betweenRes.totalDays}
+                    </span>
+                  </div>
+
+                  <div className="text-[#6b7db3]">
+                    Breakdown (Y/M/D):{" "}
+                    <span className="font-semibold text-[#8e3e3e]">
+                      {betweenRes.ymd.years}y {betweenRes.ymd.months}m {betweenRes.ymd.days}d
+                    </span>
+                  </div>
+
+                  <div className="text-[#6b7db3]">
+                    Months + days:{" "}
+                    <span className="font-semibold text-[#8e3e3e]">
+                      {betweenRes.md.months} months, {betweenRes.md.days} days
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-sm text-[#6b7db3]">
+                  Pick a start and end date to see the result.
+                </div>
+              )}
+            </div>
           </>
         )}
 
-        <Button onClick={onClose} className="w-full mt-4">
+        <Button
+          onClick={onClose}
+          className="w-full bg-[#8e3e3e] hover:bg-[#7a3434]"
+        >
           Close
         </Button>
       </div>
