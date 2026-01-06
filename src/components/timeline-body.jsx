@@ -1626,11 +1626,18 @@ const totalDaysInclusive = totalDaysExclusive + 1
           </div>
 
           <div className="text-[#6b7db3]">
-            Total days:{" "}
-            <span className="font-semibold text-[#8e3e3e]">
-              {betweenRes.totalDays}
-            </span>
-          </div>
+  Total days (exclude start date):{" "}
+  <span className="font-semibold text-[#8e3e3e]">
+    {betweenRes.totalDaysExclusive}
+  </span>
+</div>
+
+<div className="text-[#6b7db3]">
+  Total days (include both start + end):{" "}
+  <span className="font-semibold text-[#8e3e3e]">
+    {betweenRes.totalDaysInclusive}
+  </span>
+</div>
 
           <div className="text-[#6b7db3]">
             Breakdown (Y/M/D):{" "}
