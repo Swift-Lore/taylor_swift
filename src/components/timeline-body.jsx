@@ -1217,8 +1217,8 @@ const DateCalculatorModal = () => {
 // Days Between option: include end date (+1 day)
 const [includeEndDate, setIncludeEndDate] = useState(false)
   // --- Between dates state ---
-  const [startBetween, setStartBetween] = useState("")
-  const [endBetween, setEndBetween] = useState("")
+const [startBetween, setStartBetween] = useState("")
+const [endBetween, setEndBetween] = useState("")
     // --- Add/Subtract state ---
   const [baseDate, setBaseDate] = useState(() => {
     const t = new Date()
@@ -1640,16 +1640,9 @@ const totalDays = totalDaysExclusive + (includeEndDate ? 1 : 0)
           </div>
 
           <div className="text-[#6b7db3]">
-  Total days (exclude start date):{" "}
+  Total days:{" "}
   <span className="font-semibold text-[#8e3e3e]">
-    {betweenRes.totalDaysExclusive}
-  </span>
-</div>
-
-<div className="text-[#6b7db3]">
-  Total days (include both start + end):{" "}
-  <span className="font-semibold text-[#8e3e3e]">
-    {betweenRes.totalDaysInclusive}
+    {betweenRes.totalDays}
   </span>
 </div>
 
