@@ -971,86 +971,109 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
 
   {/* Date navigation container with properly positioned TN box */}
   <div className="relative mt-0 md:mt-1 max-w-3xl mx-auto">
-    {/* Main date navigation - CENTERED */}
-    <div className="flex items-center justify-center gap-1 md:gap-2">
-      {/* NEW: Date Calc button */}
-  <Button
-    variant="secondary"
-    className="
-      rounded-full h-7 md:h-8 px-2 md:px-3
-      text-[10px] sm:text-xs
-      flex items-center justify-center gap-1 min-w-[70px]
-    "
-    onClick={() => setShowDateCalc(true)}
-    title="Open date calculator"
-  >
-    Date Calc
-  </Button>
-      {/* Existing: Previous */}
-      <Button
-        variant="secondary"
+    {/* Main date navigation - CENTERED (Date Calc does NOT affect centering) */}
+<div className="relative w-full">
+  {/* Mobile: Date Calc on its own row */}
+  <div className="flex justify-center mb-2 sm:hidden">
+    <Button
+      variant="secondary"
+      className="
+        rounded-full h-7 px-3
+        text-[10px]
+        flex items-center justify-center
+        min-w-[90px]
+      "
+      onClick={() => setShowDateCalc(true)}
+      title="Open date calculator"
+    >
+      Date Calc
+    </Button>
+  </div>
+
+  {/* Desktop/tablet: Date Calc pinned left, doesn't push center */}
+  <div className="hidden sm:block absolute left-0 top-1/2 -translate-y-1/2">
+    <Button
+      variant="secondary"
+      className="
+        rounded-full h-7 md:h-8 px-2 md:px-3
+        text-[10px] sm:text-xs
+        flex items-center justify-center
+        min-w-[90px]
+      "
+      onClick={() => setShowDateCalc(true)}
+      title="Open date calculator"
+    >
+      Date Calc
+    </Button>
+  </div>
+
+  {/* TRUE centered row */}
+  <div className="flex items-center justify-center gap-1 md:gap-2">
+    <Button
+      variant="secondary"
+      className="
+        rounded-full h-7 md:h-8 px-2 md:px-3
+        text-[10px] sm:text-xs
+        flex items-center justify-center gap-1 min-w-[80px]
+      "
+      onClick={handlePreviousDay}
+    >
+      <ChevronLeft size={10} />
+      <span className="hidden sm:inline">Previous</span>
+      <span className="sm:hidden">Prev</span>
+    </Button>
+
+    {/* Date bubble */}
+    <div className="relative">
+      <div
         className="
-          rounded-full h-7 md:h-8 px-2 md:px-3
-          text-[10px] sm:text-xs
-          flex items-center justify-center gap-1 min-w-[80px]
+          bg-white rounded-full
+          pl-3 sm:pl-4
+          pr-7 sm:pr-8
+          py-0.5
+          min-w-[120px] sm:min-w-[140px]
+          border border-[#b66b6b]
+          flex items-center justify-center
         "
-        onClick={handlePreviousDay}
       >
-        <ChevronLeft size={10} />
-        <span className="hidden sm:inline">Previous</span>
-        <span className="sm:hidden">Prev</span>
-      </Button>
-
-      {/* Date bubble */}
-      <div className="relative">
-        <div
-          className="
-            bg-white rounded-full
-            pl-3 sm:pl-4
-            pr-7 sm:pr-8
-            py-0.5
-            min-w-[120px] sm:min-w-[140px]
-            border border-[#b66b6b]
-            flex items-center justify-center
-          "
-        >
-          <span className="text-[#8e3e3e] text-sm font-medium">
-            {displayDate.toLocaleDateString("en-US", {
-              month: "long",
-              day: "numeric",
-            })}
-          </span>
-        </div>
-
-        <button
-          onClick={() => setShowCalendar(true)}
-          className="
-            absolute right-1 sm:right-1.5
-            top-1/2 -translate-y-1/2
-            bg-white rounded-full p-0.5
-            shadow-sm border border-[#b66b6b]
-            hover:bg-[#f8d7da] transition-colors
-          "
-          title="Open calendar"
-        >
-          <Calendar size={12} className="text-[#8e3e3e]" />
-        </button>
+        <span className="text-[#8e3e3e] text-sm font-medium">
+          {displayDate.toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+          })}
+        </span>
       </div>
 
-      <Button
-        variant="secondary"
+      <button
+        onClick={() => setShowCalendar(true)}
         className="
-          rounded-full h-7 md:h-8 px-2 md:px-3
-          text-[10px] sm:text-xs
-          flex items-center justify-center gap-1 min-w-[80px]
+          absolute right-1 sm:right-1.5
+          top-1/2 -translate-y-1/2
+          bg-white rounded-full p-0.5
+          shadow-sm border border-[#b66b6b]
+          hover:bg-[#f8d7da] transition-colors
         "
-        onClick={handleNextDay}
+        title="Open calendar"
       >
-        <span className="hidden sm:inline">Next</span>
-        <span className="sm:hidden">Next</span>
-        <ChevronRight size={10} />
-      </Button>
+        <Calendar size={12} className="text-[#8e3e3e]" />
+      </button>
     </div>
+
+    <Button
+      variant="secondary"
+      className="
+        rounded-full h-7 md:h-8 px-2 md:px-3
+        text-[10px] sm:text-xs
+        flex items-center justify-center gap-1 min-w-[80px]
+      "
+      onClick={handleNextDay}
+    >
+      <span className="hidden sm:inline">Next</span>
+      <span className="sm:hidden">Next</span>
+      <ChevronRight size={10} />
+    </Button>
+  </div>
+</div>
 
     {/* TN box - Desktop: positioned to right */}
     <div
