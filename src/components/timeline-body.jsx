@@ -128,6 +128,7 @@ const [searchOffsetIndex, setSearchOffsetIndex] = useState(0)
 
   // Calendar state
   const [showCalendar, setShowCalendar] = useState(false)
+  const [showDateCalc, setShowDateCalc] = useState(false)
   const [dateEventsMap, setDateEventsMap] = useState({})
   const [calendarMonth, setCalendarMonth] = useState(new Date().getMonth())
   const [calendarYear, setCalendarYear] = useState(new Date().getFullYear())
@@ -1208,6 +1209,39 @@ const CalendarModal = () => {
   )
 }
 
+  // ===== Date Calculator Modal =====
+const DateCalculatorModal = () => {
+  if (!showDateCalc) return null
+
+  return (
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      onClick={() => setShowDateCalc(false)}
+    >
+      <div
+        className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 className="text-xl font-semibold text-[#8e3e3e] mb-4">
+          Date Calculator
+        </h2>
+
+        <p className="text-sm text-[#6b7db3] mb-4">
+          (You will add logic here next — for now this just confirms placement.)
+        </p>
+
+        <Button
+          onClick={() => setShowDateCalc(false)}
+          className="w-full bg-[#8e3e3e] hover:bg-[#7a3434]"
+        >
+          Close
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+  
   return (
        <div className="bg-[#e6edf7] py-8 overflow-x-hidden">
                {/* SEO helper for crawlers, hidden visually */}
@@ -1421,6 +1455,18 @@ const CalendarModal = () => {
   </button>
 </div>
 
+{/* ✅ ADD THIS: Date Calculator Button */}
+<div className="relative">
+  <button
+    onClick={() => setShowDateCalc(true)}
+    className="flex items-center gap-2 bg-white text-[#8e3e3e] border border-[#8e3e3e] rounded-full px-4 py-1.5 text-sm hover:bg-[#f8d7da] transition-colors"
+    type="button"
+  >
+    <Clock size={16} />
+    <span>Date Calc</span>
+  </button>
+</div>
+          
           {/* Search */}
           <div className="relative flex-grow min-w-[200px]">
             <form onSubmit={handleSearch} className="relative ml-2">
@@ -1689,7 +1735,10 @@ const CalendarModal = () => {
       </div>
       
       {/* Calendar Modal */}
-      <CalendarModal />
+<CalendarModal />
+
+{/* Date Calculator Modal */}
+<DateCalculatorModal />
       
       <br />
     </div>
