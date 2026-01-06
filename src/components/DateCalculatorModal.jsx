@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Button } from "./ui/Button"
 
 export default function DateCalculatorModal({ onClose }) {
@@ -41,6 +41,13 @@ export default function DateCalculatorModal({ onClose }) {
     const d = String(dateObj.getUTCDate()).padStart(2, "0")
     const y = dateObj.getUTCFullYear()
     return `${m}/${d}/${y}`
+  }
+
+  const todayISO = () => {
+    const t = new Date()
+    return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(
+      t.getDate()
+    ).padStart(2, "0")}`
   }
 
   const lastDayOfMonthUTC = (year, monthIndex0) =>
@@ -145,9 +152,7 @@ export default function DateCalculatorModal({ onClose }) {
         className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-xl font-semibold text-[#8e3e3e] mb-3">
-          Date Calculator
-        </h2>
+        <h2 className="text-xl font-semibold text-[#8e3e3e] mb-3">Date Calculator</h2>
 
         {/* Tabs */}
         <div className="flex gap-2 mb-4">
@@ -176,7 +181,7 @@ export default function DateCalculatorModal({ onClose }) {
           </button>
         </div>
 
-        {/* ✅ Add/Subtract tab */}
+        {/* Add/Subtract tab */}
         {tab === "add" && (
           <>
             <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4">
@@ -262,13 +267,7 @@ export default function DateCalculatorModal({ onClose }) {
               <div className="flex flex-wrap gap-2 mt-3">
                 <button
                   type="button"
-                  onClick={() => {
-                    const t = new Date()
-                    const v = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(
-                      t.getDate()
-                    ).padStart(2, "0")}`
-                    setBaseDate(v)
-                  }}
+                  onClick={() => setBaseDate(todayISO())}
                   className="rounded-full px-4 py-2 text-sm border border-[#8e3e3e] text-[#8e3e3e] bg-white hover:bg-[#f8d7da] transition-colors"
                 >
                   Use Today
@@ -325,7 +324,7 @@ export default function DateCalculatorModal({ onClose }) {
           </>
         )}
 
-        {/* ✅ Between tab */}
+        {/* Between tab */}
         {tab === "between" && (
           <>
             <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4">
@@ -365,7 +364,16 @@ export default function DateCalculatorModal({ onClose }) {
                 Include end date in calculation (1 day is added)
               </label>
 
+              {/* ✅ Quick actions (matches your good screenshot) */}
               <div className="flex flex-wrap gap-2 mt-3">
+                <button
+                  type="button"
+                  onClick={() => setStartBetween(todayISO())}
+                  className="rounded-full px-4 py-2 text-sm border border-[#8e3e3e] text-[#8e3e3e] bg-white hover:bg-[#f8d7da] transition-colors"
+                >
+                  Start = Today
+                </button>
+
                 <button
                   type="button"
                   onClick={() => {
@@ -406,10 +414,11 @@ export default function DateCalculatorModal({ onClose }) {
                     </span>
                   </div>
 
+                  {/* ✅ label change */}
                   <div className="text-[#6b7db3]">
-                    Breakdown (Y/M/D):{" "}
+                    Years + months + days:{" "}
                     <span className="font-semibold text-[#8e3e3e]">
-                      {betweenRes.ymd.years}y {betweenRes.ymd.months}m {betweenRes.ymd.days}d
+                      {betweenRes.ymd.years} years, {betweenRes.ymd.months} months, {betweenRes.ymd.days} days
                     </span>
                   </div>
 
@@ -429,10 +438,7 @@ export default function DateCalculatorModal({ onClose }) {
           </>
         )}
 
-        <Button
-          onClick={onClose}
-          className="w-full bg-[#8e3e3e] hover:bg-[#7a3434]"
-        >
+        <Button onClick={onClose} className="w-full bg-[#8e3e3e] hover:bg-[#7a3434]">
           Close
         </Button>
       </div>
