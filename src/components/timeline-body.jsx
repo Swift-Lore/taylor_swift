@@ -1585,7 +1585,7 @@ const totalDays = totalDaysExclusive + (includeEndDate ? 1 : 0)
     type="checkbox"
     checked={includeEndDate}
     onChange={(e) => setIncludeEndDate(e.target.checked)}
-    className="w-4 h-4 accent-[#8e3e3e]"
+    className="h-5 w-5 rounded border border-[#6b7db3] accent-[#8e3e3e]"
   />
   Include end date in calculation (1 day is added)
 </label>
