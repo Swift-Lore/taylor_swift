@@ -1659,6 +1659,10 @@ const DateCalculatorModal = () => {
 >
   Close
 </Button>
+      </div>
+    </div>
+  )
+}
   
   return (
        <div className="bg-[#e6edf7] py-8 overflow-x-hidden">
