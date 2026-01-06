@@ -4,6 +4,18 @@ import { useState, useEffect } from "react"
 import { Button } from "./ui/Button"
 
 export default function DateCalculatorModal({ onClose }) {
+  useEffect(() => {
+    // Store original overflow value
+    const originalStyle = window.getComputedStyle(document.body).overflow
+    
+    // Prevent scrolling on body
+    document.body.style.overflow = 'hidden'
+    
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = originalStyle
+    }
+  }, [])
   // --- Tabs ---
   const [tab, setTab] = useState("between")
 
