@@ -1609,9 +1609,10 @@ const totalDays = totalDaysExclusive + (includeEndDate ? 1 : 0)
   <button
     type="button"
     onClick={() => {
-      setStartBetween("")
-      setEndBetween("")
-    }}
+  setStartBetween("")
+  setEndBetween("")
+  setIncludeEndDate(false)
+}}
     className="rounded-full px-4 py-2 text-sm border border-[#b91c1c] text-[#b91c1c] bg-white hover:bg-[#ffe8e8] transition-colors"
   >
     Reset
