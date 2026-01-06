@@ -308,18 +308,18 @@ const [deltaDays, setDeltaDays] = useState("")
                 </button>
 
                 <button
-                  type="button"
-                  onClick={() => {
-                    setBaseDate("")
-                    setDeltaYears("0")
-                    setDeltaMonths("0")
-                    setDeltaDays("0")
-                    setSign(1)
-                  }}
-                  className="rounded-full px-4 py-2 text-sm border border-[#b91c1c] text-[#b91c1c] bg-white hover:bg-[#ffe8e8] transition-colors"
-                >
-                  Reset
-                </button>
+  type="button"
+  onClick={() => {
+    setBaseDate("")
+    setDeltaYears("")
+    setDeltaMonths("")
+    setDeltaDays("")
+    setSign(1)
+  }}
+  className="rounded-full px-4 py-2 text-sm border border-[#b91c1c] text-[#b91c1c] bg-white hover:bg-[#ffe8e8] transition-colors"
+>
+  Reset
+</button>
               </div>
             </div>
 
