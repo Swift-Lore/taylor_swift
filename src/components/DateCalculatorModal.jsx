@@ -349,7 +349,7 @@ export default function DateCalculatorModal({ onClose }) {
   type="date"
   className="w-full min-w-0 max-w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm"
   value={startBetween}
-  onChange={(e) => setStartBetween(e.target.value)}
+  onChange={(e) => setEndBetween(e.target.value)}
 />
                 </div>
               </div>
