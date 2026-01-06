@@ -5,7 +5,7 @@ import { Button } from "./ui/Button"
 
 export default function DateCalculatorModal({ onClose }) {
   // --- Tabs ---
-  const [tab, setTab] = useState("add") // "add" | "between"
+  const [tab, setTab] = useState("between")
 
   // Days Between option: include end date (+1 day)
   const [includeEndDate, setIncludeEndDate] = useState(false)
@@ -156,30 +156,30 @@ export default function DateCalculatorModal({ onClose }) {
 
         {/* Tabs */}
         <div className="flex gap-2 mb-4">
-          <button
-            type="button"
-            onClick={() => setTab("add")}
-            className={`flex-1 rounded-full px-4 py-2 text-sm border transition-colors ${
-              tab === "add"
-                ? "bg-[#8e3e3e] text-white border-[#8e3e3e]"
-                : "bg-white text-[#6b7db3] border-[#6b7db3] hover:bg-[#e6edf7]"
-            }`}
-          >
-            Add / Subtract
-          </button>
+  <button
+    type="button"
+    onClick={() => setTab("between")}
+    className={`flex-1 rounded-full px-4 py-2 text-sm border transition-colors ${
+      tab === "between"
+        ? "bg-[#8e3e3e] text-white border-[#8e3e3e]"
+        : "bg-white text-[#6b7db3] border-[#6b7db3] hover:bg-[#e6edf7]"
+    }`}
+  >
+    Days Between
+  </button>
 
-          <button
-            type="button"
-            onClick={() => setTab("between")}
-            className={`flex-1 rounded-full px-4 py-2 text-sm border transition-colors ${
-              tab === "between"
-                ? "bg-[#8e3e3e] text-white border-[#8e3e3e]"
-                : "bg-white text-[#6b7db3] border-[#6b7db3] hover:bg-[#e6edf7]"
-            }`}
-          >
-            Days Between
-          </button>
-        </div>
+  <button
+    type="button"
+    onClick={() => setTab("add")}
+    className={`flex-1 rounded-full px-4 py-2 text-sm border transition-colors ${
+      tab === "add"
+        ? "bg-[#8e3e3e] text-white border-[#8e3e3e]"
+        : "bg-white text-[#6b7db3] border-[#6b7db3] hover:bg-[#e6edf7]"
+    }`}
+  >
+    Add / Subtract
+  </button>
+</div>
 
         {/* Add/Subtract tab */}
         {tab === "add" && (
@@ -191,7 +191,7 @@ export default function DateCalculatorModal({ onClose }) {
                 </label>
                 <input
                   type="date"
-                  className="block w-full min-w-0 max-w-full box-border appearance-none bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm"
+                  className="block w-full min-w-0 max-w-full box-border bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm"
                   value={baseDate}
                   onChange={(e) => setBaseDate(e.target.value)}
                 />
@@ -276,11 +276,12 @@ export default function DateCalculatorModal({ onClose }) {
                 <button
                   type="button"
                   onClick={() => {
-                    setDeltaYears("0")
-                    setDeltaMonths("0")
-                    setDeltaDays("0")
-                    setSign(1)
-                  }}
+  setBaseDate("")          
+  setDeltaYears("0")
+  setDeltaMonths("0")
+  setDeltaDays("0")
+  setSign(1)
+}}
                   className="rounded-full px-4 py-2 text-sm border border-[#b91c1c] text-[#b91c1c] bg-white hover:bg-[#ffe8e8] transition-colors"
                 >
                   Reset
@@ -335,7 +336,7 @@ export default function DateCalculatorModal({ onClose }) {
                   </label>
                   <input
   type="date"
-  className="block w-full min-w-0 max-w-full box-border appearance-none bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm"
+  className="block w-full min-w-0 max-w-full box-border bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm"
   value={startBetween}
   onChange={(e) => setStartBetween(e.target.value)}
 />
@@ -347,7 +348,7 @@ export default function DateCalculatorModal({ onClose }) {
                   </label>
                   <input
   type="date"
-  className="block w-full min-w-0 max-w-full box-border appearance-none bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm"
+  className="block w-full min-w-0 max-w-full box-border bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm"
   value={endBetween}
   onChange={(e) => setEndBetween(e.target.value)}
 />
