@@ -346,195 +346,199 @@ const matchingRealLabel = matchingRealDate.toLocaleDateString("en-US", {
 
   // ===== Calendar Modal Component =====
   const CalendarModal = () => {
-    if (!showCalendar) return null
+    useEffect(() => {
+    if (showCalendar) {
+      const originalStyle = window.getComputedStyle(document.body).overflow
+      document.body.style.overflow = 'hidden'
+      return () => {
+        document.body.style.overflow = originalStyle
+      }
+    }
+  }, [showCalendar])
+
+  if (!showCalendar) return null
 
     const calendarDays = generateCalendar()
 
-    return (
-      <div
-        className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-        onClick={() => setShowCalendar(false)}   // click outside closes
-      >
-        <div
-          className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in fade-in-zoom-in-95"
-          onClick={(e) => e.stopPropagation()}   // clicks inside don't close
-        >
-          {/* Quick Actions Bar */}
-          <div className="flex gap-2 mb-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={jumpToToday}
-              className="flex-1 text-xs py-1 h-auto"
-            >
-              <Clock size={12} className="mr-1" />
-              Today
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={jumpToThisMonth}
-              className="flex-1 text-xs py-1 h-auto"
-            >
-              <Zap size={12} className="mr-1" />
-              This Month
-            </Button>
-          </div>
+            return (
+      <>
+        <div 
+          className="fixed inset-0 bg-black/50 z-[9998]" 
+          onClick={() => setShowCalendar(false)} 
+        />
+        <div className="fixed inset-0 flex items-center justify-center z-[9999] p-4 pointer-events-none">
+          <div
+            className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in fade-in-zoom-in-95 pointer-events-auto max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Keep all the existing CalendarModal content here - it's the same */}
+            {/* Quick Actions Bar */}
+            <div className="flex gap-2 mb-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={jumpToToday}
+                className="flex-1 text-xs py-1 h-auto"
+              >
+                <Clock size={12} className="mr-1" />
+                Today
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={jumpToThisMonth}
+                className="flex-1 text-xs py-1 h-auto"
+              >
+                <Zap size={12} className="mr-1" />
+                This Month
+              </Button>
+            </div>
 
-          {/* Calendar Header */}
-<div className="flex items-center justify-between mb-2">
-  <Button
-    variant="ghost"
-    size="sm"
-    onClick={() => navigateCalendarMonth("prev")}
-    className="p-2 hover:bg-[#f8d7da] transition-colors"
-  >
-    <ChevronLeft size={18} className="text-[#8e3e3e]" />
-  </Button>
+            {/* Calendar Header */}
+            <div className="flex items-center justify-between mb-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigateCalendarMonth("prev")}
+                className="p-2 hover:bg-[#f8d7da] transition-colors"
+              >
+                <ChevronLeft size={18} className="text-[#8e3e3e]" />
+              </Button>
 
-  <div className="text-lg font-semibold text-[#8e3e3e] flex items-center gap-2">
-    <Star size={16} className="text-[#ffd700]" fill="#ffd700" />
-    {monthNames[calendarMonth]} {calendarYear}
-    <Star size={16} className="text-[#ffd700]" fill="#ffd700" />
-  </div>
-
-  <Button
-    variant="ghost"
-    size="sm"
-    onClick={() => navigateCalendarMonth("next")}
-    className="p-2 hover:bg-[#f8d7da] transition-colors"
-  >
-    <ChevronRight size={18} className="text-[#8e3e3e]" />
-  </Button>
-</div>
-
-{/* Month / Year dropdowns */}
-<div className="flex items-center justify-center gap-2 mb-4">
-  {/* Month select */}
-  <select
-    className="border border-[#e3b0b0] rounded-full px-3 py-1 text-xs text-[#8e3e3e] bg-white"
-    value={calendarMonth}
-    onChange={(e) => setCalendarMonth(Number(e.target.value))}
-  >
-    {monthNames.map((name, idx) => (
-      <option key={name} value={idx}>
-        {name}
-      </option>
-    ))}
-  </select>
-
-  {/* Year select */}
-  <select
-    className="border border-[#e3b0b0] rounded-full px-3 py-1 text-xs text-[#8e3e3e] bg-white"
-    value={calendarYear}
-    onChange={(e) => setCalendarYear(Number(e.target.value))}
-  >
-    {Array.from(
-      { length: new Date().getFullYear() + 5 - 2006 + 1 },
-      (_, i) => 2006 + i
-    ).map((year) => (
-      <option key={year} value={year}>
-        {year}
-      </option>
-    ))}
-  </select>
-</div>
-
-          {/* Day Headers */}
-          <div className="grid grid-cols-7 gap-1 mb-2">
-            {dayNames.map(day => (
-              <div key={day} className="text-center text-xs font-semibold text-[#6b7db3] py-1">
-                {day}
+              <div className="text-lg font-semibold text-[#8e3e3e] flex items-center gap-2">
+                <Star size={16} className="text-[#ffd700]" fill="#ffd700" />
+                {monthNames[calendarMonth]} {calendarYear}
+                <Star size={16} className="text-[#ffd700]" fill="#ffd700" />
               </div>
-            ))}
-          </div>
 
-          {/* Calendar Grid */}
-<div className="grid grid-cols-7 gap-1">
-  {calendarDays.map((day, index) => {
-    const isEmpty = !day
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigateCalendarMonth("next")}
+                className="p-2 hover:bg-[#f8d7da] transition-colors"
+              >
+                <ChevronRight size={18} className="text-[#8e3e3e]" />
+              </Button>
+            </div>
 
-    // is this the currently selected date?
-    let isSelected = false
-    if (!isEmpty) {
-      isSelected =
-        day === currentDay &&
-        calendarMonth + 1 === currentMonth &&
-        calendarYear === currentYear
-    }
+            {/* Month / Year dropdowns */}
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <select
+                className="border border-[#e3b0b0] rounded-full px-3 py-1 text-xs text-[#8e3e3e] bg-white"
+                value={calendarMonth}
+                onChange={(e) => setCalendarMonth(Number(e.target.value))}
+              >
+                {monthNames.map((name, idx) => (
+                  <option key={name} value={idx}>
+                    {name}
+                  </option>
+                ))}
+              </select>
 
-    const baseClasses =
-      "relative h-8 rounded-lg text-sm font-medium transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center"
+              <select
+                className="border border-[#e3b0b0] rounded-full px-3 py-1 text-xs text-[#8e3e3e] bg-white"
+                value={calendarYear}
+                onChange={(e) => setCalendarYear(Number(e.target.value))}
+              >
+                {Array.from(
+                  { length: new Date().getFullYear() + 5 - 2006 + 1 },
+                  (_, i) => 2006 + i
+                ).map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-    const visibilityClasses = isEmpty ? "invisible" : ""
+            {/* Day Headers */}
+            <div className="grid grid-cols-7 gap-1 mb-2">
+              {dayNames.map(day => (
+                <div key={day} className="text-center text-xs font-semibold text-[#6b7db3] py-1">
+                  {day}
+                </div>
+              ))}
+            </div>
 
-    const stateClasses = isSelected
-      ? "bg-[#8e3e3e] text-white shadow-md scale-105"
-      : "bg-white/80 text-[#8e3e3e] hover:bg-[#f8d7da]"
+            {/* Calendar Grid */}
+            <div className="grid grid-cols-7 gap-1">
+              {calendarDays.map((day, index) => {
+                const isEmpty = !day
+                let isSelected = false
+                if (!isEmpty) {
+                  isSelected =
+                    day === currentDay &&
+                    calendarMonth + 1 === currentMonth &&
+                    calendarYear === currentYear
+                }
 
-    const borderClasses = hasEvents(day)
-      ? "border-2 border-[#e3b0b0]"
-      : "border border-transparent"
+                const baseClasses =
+                  "relative h-8 rounded-lg text-sm font-medium transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center"
 
-    return (
-      <button
-        key={index}
-        onClick={() => handleDateSelect(day)}
-        disabled={isEmpty}
-        className={`${baseClasses} ${visibilityClasses} ${stateClasses} ${borderClasses}`}
-      >
-        {/* Day number */}
-        {!isEmpty && (
-          <span className="relative z-10">
-            {day}
-          </span>
-        )}
+                const visibilityClasses = isEmpty ? "invisible" : ""
+                const stateClasses = isSelected
+                  ? "bg-[#8e3e3e] text-white shadow-md scale-105"
+                  : "bg-white/80 text-[#8e3e3e] hover:bg-[#f8d7da]"
+                const borderClasses = hasEvents(day)
+                  ? "border-2 border-[#e3b0b0]"
+                  : "border border-transparent"
 
-        {/* Event indicator dot */}
-        {hasEvents(day) && !isEmpty && (
-          <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#8e3e3e] rounded-full" />
-        )}
-      </button>
-    )
-  })}
-</div>
+                return (
+                  <button
+                    key={index}
+                    onClick={() => handleDateSelect(day)}
+                    disabled={isEmpty}
+                    className={`${baseClasses} ${visibilityClasses} ${stateClasses} ${borderClasses}`}
+                  >
+                    {!isEmpty && (
+                      <span className="relative z-10">
+                        {day}
+                      </span>
+                    )}
+                    {hasEvents(day) && !isEmpty && (
+                      <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#8e3e3e] rounded-full" />
+                    )}
+                  </button>
+                )
+              })}
+            </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-2 justify-center mt-4">
-            <Button
-              variant="secondary"
-              onClick={() => setShowCalendar(false)}
-              className="rounded-full px-6 flex-1"
-            >
-              Close
-            </Button>
-            <Button
-  onClick={() => {
-    const today = new Date()
-    setCurrentYear(today.getFullYear())
-    setCurrentMonth(today.getMonth() + 1)
-    setCurrentDay(today.getDate())
-    setIsTorontoMode(false)
-    setShowCalendar(false)
-    resetPagination()
-  }}
-  className="rounded-full px-6 flex-1 bg-[#8e3e3e] hover:bg-[#7a3434]"
->
-  Go to Today
-</Button>
+            {/* Action Buttons */}
+            <div className="flex gap-2 justify-center mt-4">
+              <Button
+                variant="secondary"
+                onClick={() => setShowCalendar(false)}
+                className="rounded-full px-6 flex-1"
+              >
+                Close
+              </Button>
+              <Button
+                onClick={() => {
+                  const today = new Date()
+                  setCurrentYear(today.getFullYear())
+                  setCurrentMonth(today.getMonth() + 1)
+                  setCurrentDay(today.getDate())
+                  setIsTorontoMode(false)
+                  setShowCalendar(false)
+                }}
+                className="rounded-full px-6 flex-1 bg-[#8e3e3e] hover:bg-[#7a3434]"
+              >
+                Go to Today
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
+      </>
     )
-  }
+    }
   const TNInfoModal = () => {
     if (!showTNInfo) return null
 
     return (
       <div
-        className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-        onClick={() => setShowTNInfo(false)}
-      >
+  className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4"
+  onClick={() => setShowTNInfo(false)}
+>
         <div
           className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4"
           onClick={(e) => e.stopPropagation()}

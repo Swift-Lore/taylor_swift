@@ -1,9 +1,22 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "./ui/Button"
 
 export default function DateCalculatorModal({ onClose }) {
+  useEffect(() => {
+    // Store original overflow value
+    const originalStyle = window.getComputedStyle(document.body).overflow
+    
+    // Prevent scrolling on body
+    document.body.style.overflow = 'hidden'
+    
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = originalStyle
+    }
+  }, [])
+  
   // --- Tabs ---
   const [tab, setTab] = useState("between")
 
@@ -23,9 +36,9 @@ export default function DateCalculatorModal({ onClose }) {
   })
 
   const [sign, setSign] = useState(1) // 1 add, -1 subtract
-  const [deltaYears, setDeltaYears] = useState("0")
-  const [deltaMonths, setDeltaMonths] = useState("0")
-  const [deltaDays, setDeltaDays] = useState("0")
+  const [deltaYears, setDeltaYears] = useState("")
+  const [deltaMonths, setDeltaMonths] = useState("")
+  const [deltaDays, setDeltaDays] = useState("")
 
   // --- helpers (UTC-safe to prevent off-by-one bugs) ---
   const toDateUTC = (yyyyMMdd) => {
@@ -105,381 +118,413 @@ export default function DateCalculatorModal({ onClose }) {
     const end = toDateUTC(endBetween)
     if (!start || !end) return null
 
-    const forward = end.getTime() >= start.getTime()
-    const a = forward ? start : end
-    const b = forward ? end : start
+    // Check if end comes before start (negative days)
+    const isReversed = end.getTime() < start.getTime()
+    
+    // Always calculate from earlier to later date
+    const earlier = isReversed ? end : start
+    const later = isReversed ? start : end
 
-    const totalDaysExclusive = diffDaysUTC(a, b)
+    const totalDaysExclusive = diffDaysUTC(earlier, later)
     const totalDays = totalDaysExclusive + (includeEndDate ? 1 : 0)
+    
+    // Apply negative sign if dates are reversed
+    const finalTotalDays = isReversed ? -totalDays : totalDays
 
-    // Build Years / Months / Days by stepping forward
-    let cursor = new Date(a.getTime())
+    // Build Years / Months / Days by stepping forward (always from earlier to later)
+    let cursor = new Date(earlier.getTime())
 
     let years = 0
-    while (addYearsUTC(cursor, 1).getTime() <= b.getTime()) {
+    while (addYearsUTC(cursor, 1).getTime() <= later.getTime()) {
       cursor = addYearsUTC(cursor, 1)
       years += 1
     }
 
     let months = 0
-    while (addMonthsUTC(cursor, 1).getTime() <= b.getTime()) {
+    while (addMonthsUTC(cursor, 1).getTime() <= later.getTime()) {
       cursor = addMonthsUTC(cursor, 1)
       months += 1
     }
 
-    const days = diffDaysUTC(cursor, b)
+    const days = diffDaysUTC(cursor, later)
+    
+    // Apply negative sign to all components if dates are reversed
+    const finalYears = isReversed ? -years : years
+    const finalMonths = isReversed ? -months : months
+    const finalDays = isReversed ? -days : days
     const totalMonths = years * 12 + months
+    const finalTotalMonths = isReversed ? -totalMonths : totalMonths
 
     return {
       start,
       end,
-      forward,
-      totalDays,
-      ymd: { years, months, days },
-      md: { months: totalMonths, days },
+      isReversed,
+      earlier,
+      later,
+      totalDays: finalTotalDays,
+      ymd: { years: finalYears, months: finalMonths, days: finalDays },
+      md: { months: finalTotalMonths, days: finalDays },
     }
+  }
+
+  // Function to swap start and end dates
+  const swapDates = () => {
+    const temp = startBetween
+    setStartBetween(endBetween)
+    setEndBetween(temp)
   }
 
   const addRes = tab === "add" ? calcAddSubtract() : null
   const betweenRes = tab === "between" ? calcBetween() : null
 
   return (
-    <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h2 className="text-xl font-semibold text-[#8e3e3e] mb-3">Date Calculator</h2>
+    <>
+      <div 
+        className="fixed inset-0 bg-black/50 z-[9998]" 
+        onClick={onClose} 
+      />
+      <div className="fixed inset-0 flex items-center justify-center z-[9999] p-4 pointer-events-none">
+        <div
+          className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 pointer-events-auto max-h-[90vh] overflow-y-auto"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <h2 className="text-xl font-semibold text-[#8e3e3e] mb-3">Date Calculator</h2>
 
-        {/* Tabs */}
-        <div className="flex gap-2 mb-4 min-w-0">
-          <button
-            type="button"
-            onClick={() => setTab("between")}
-            className={`flex-1 min-w-0 rounded-full px-3 sm:px-4 py-2 text-xs sm:text-sm border transition-colors whitespace-nowrap ${
-              tab === "between"
-                ? "bg-[#8e3e3e] text-white border-[#8e3e3e]"
-                : "bg-white text-[#6b7db3] border-[#6b7db3] hover:bg-[#e6edf7]"
-            }`}
-          >
-            Days Between
-          </button>
+          {/* Tabs */}
+          <div className="flex gap-2 mb-4 min-w-0">
+            <button
+              type="button"
+              onClick={() => setTab("between")}
+              className={`flex-1 min-w-0 rounded-full px-3 sm:px-4 py-2 text-xs sm:text-sm border transition-colors whitespace-nowrap ${
+                tab === "between"
+                  ? "bg-[#8e3e3e] text-white border-[#8e3e3e]"
+                  : "bg-white text-[#6b7db3] border-[#6b7db3] hover:bg-[#e6edf7]"
+              }`}
+            >
+              Days Between
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setTab("add")}
-            className={`flex-1 min-w-0 rounded-full px-3 sm:px-4 py-2 text-xs sm:text-sm border transition-colors whitespace-nowrap ${
-              tab === "add"
-                ? "bg-[#8e3e3e] text-white border-[#8e3e3e]"
-                : "bg-white text-[#6b7db3] border-[#6b7db3] hover:bg-[#e6edf7]"
-            }`}
-          >
-            Add / Subtract
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={() => setTab("add")}
+              className={`flex-1 min-w-0 rounded-full px-3 sm:px-4 py-2 text-xs sm:text-sm border transition-colors whitespace-nowrap ${
+                tab === "add"
+                  ? "bg-[#8e3e3e] text-white border-[#8e3e3e]"
+                  : "bg-white text-[#6b7db3] border-[#6b7db3] hover:bg-[#e6edf7]"
+              }`}
+            >
+              Add / Subtract
+            </button>
+          </div>
 
-        {/* Add/Subtract tab */}
-        {tab === "add" && (
-          <>
-            <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4 overflow-hidden">
-              <div className="mb-3 min-w-0">
-                <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
-                  Base date
+          {/* Add/Subtract tab */}
+          {tab === "add" && (
+            <>
+              <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4 overflow-hidden">
+                <div className="mb-3 min-w-0">
+                  <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
+                    Base date
+                  </label>
+                  <input
+                    type="date"
+                    className="block w-full min-w-0 max-w-full box-border bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm pr-10 min-h-[44px] min-w-[130px]"
+                    value={baseDate}
+                    onChange={(e) => setBaseDate(e.target.value)}
+                    style={{
+                      WebkitAppearance: 'none',
+                      fontSize: '16px',
+                    }}
+                  />
+                </div>
+
+                <div className="flex gap-2 mb-3">
+                  <button
+                    type="button"
+                    onClick={() => setSign(1)}
+                    className={`flex-1 rounded-full px-4 py-2 text-sm border transition-colors ${
+                      sign === 1
+                        ? "bg-[#c25e5e] text-white border-[#c25e5e]"
+                        : "bg-white text-[#6b7db3] border-[#6b7db3] hover:bg-white/70"
+                    }`}
+                  >
+                    Add
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setSign(-1)}
+                    className={`flex-1 rounded-full px-4 py-2 text-sm border transition-colors ${
+                      sign === -1
+                        ? "bg-[#c25e5e] text-white border-[#c25e5e]"
+                        : "bg-white text-[#6b7db3] border-[#6b7db3] hover:bg-white/70"
+                    }`}
+                  >
+                    Subtract
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2">
+                  <div>
+                    <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
+                      Years
+                    </label>
+                    <input
+                      inputMode="numeric"
+                      className="w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-3 py-2 text-sm"
+                      value={deltaYears}
+                      onChange={(e) => setDeltaYears(e.target.value.replace(/[^\d]/g, ""))}
+                      placeholder="0"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
+                      Months
+                    </label>
+                    <input
+                      inputMode="numeric"
+                      className="w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-3 py-2 text-sm"
+                      value={deltaMonths}
+                      onChange={(e) => setDeltaMonths(e.target.value.replace(/[^\d]/g, ""))}
+                      placeholder="0"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
+                      Days
+                    </label>
+                    <input
+                      inputMode="numeric"
+                      className="w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-3 py-2 text-sm"
+                      value={deltaDays}
+                      onChange={(e) => setDeltaDays(e.target.value.replace(/[^\d]/g, ""))}
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <button
+                    type="button"
+                    onClick={() => setBaseDate(todayISO())}
+                    className="rounded-full px-4 py-2 text-sm border border-[#8e3e3e] text-[#8e3e3e] bg-white hover:bg-[#f8d7da] transition-colors"
+                  >
+                    Use Today
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setBaseDate("")
+                      setDeltaYears("")
+                      setDeltaMonths("")
+                      setDeltaDays("")
+                      setSign(1)
+                    }}
+                    className="rounded-full px-4 py-2 text-sm border border-[#b91c1c] text-[#b91c1c] bg-white hover:bg-[#ffe8e8] transition-colors"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-[#e3b0b0] p-4 mb-4">
+                <div className="text-sm font-semibold text-[#8e3e3e] mb-2">Result</div>
+
+                {addRes ? (
+                  <div className="space-y-2 text-sm">
+                    <div className="text-[#6b7db3]">
+                      Base:{" "}
+                      <span className="font-semibold text-[#8e3e3e]">
+                        {formatMMDDYYYY(addRes.base)}
+                      </span>
+                    </div>
+
+                    <div className="text-[#6b7db3]">
+                      New date:{" "}
+                      <span className="font-semibold text-[#8e3e3e]">
+                        {formatMMDDYYYY(addRes.out)}
+                      </span>
+                    </div>
+
+                    <div className="text-[#6b7db3]">
+                      Net shift:{" "}
+                      <span className="font-semibold text-[#8e3e3e]">
+                        {addRes.totalDayShift}
+                      </span>{" "}
+                      days
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-sm text-[#6b7db3]">
+                    Pick a base date and enter values to see the result.
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Between tab */}
+          {tab === "between" && (
+            <>
+              <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4 overflow-hidden">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="min-w-0">
+                    <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
+                      Start date
+                    </label>
+                    <input
+                      type="date"
+                      className="block w-full min-w-0 max-w-full box-border appearance-none bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm pr-10 min-h-[44px] min-w-[130px]"
+                      value={startBetween}
+                      onChange={(e) => setStartBetween(e.target.value)}
+                      style={{
+                        WebkitAppearance: 'none',
+                        fontSize: '16px',
+                      }}
+                    />
+                  </div>
+
+                  <div className="min-w-0">
+                    <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
+                      End date
+                    </label>
+                    <input
+                      type="date"
+                      className="block w-full min-w-0 max-w-full box-border appearance-none bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm pr-10 min-h-[44px] min-w-[130px]"
+                      value={endBetween}
+                      onChange={(e) => setEndBetween(e.target.value)}
+                      style={{
+                        WebkitAppearance: 'none',
+                        fontSize: '16px',
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Swap Dates Button - Only show when both dates are entered */}
+                {(startBetween && endBetween) && (
+                  <div className="flex justify-center mt-3">
+                    <button
+                      type="button"
+                      onClick={swapDates}
+                      className="flex items-center gap-2 rounded-full px-4 py-2 text-sm border border-[#6b7db3] text-[#6b7db3] bg-white hover:bg-[#e6edf7] transition-colors"
+                    >
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        width="16" 
+                        height="16" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="2" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round"
+                      >
+                        <path d="m18 4 4 4-4 4"/>
+                        <path d="M2 8h20"/>
+                        <path d="m6 20-4-4 4-4"/>
+                        <path d="M22 16H2"/>
+                      </svg>
+                      Swap Dates
+                    </button>
+                  </div>
+                )}
+
+                <label className="flex items-center gap-2 mt-3 text-sm text-[#6b7db3] select-none">
+                  <input
+                    type="checkbox"
+                    checked={includeEndDate}
+                    onChange={(e) => setIncludeEndDate(e.target.checked)}
+                    className="h-5 w-5 rounded border border-[#6b7db3] accent-[#8e3e3e]"
+                  />
+                  Include end date in calculation (1 day is added)
                 </label>
-                {/* Fix for date bubble cut-off - Add padding on the right */}
-                <input
-                  type="date"
-                  className="block w-full min-w-0 max-w-full box-border bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm
-                    /* Fix for date picker icon cut-off */
-                    pr-10
-                    /* Force WebKit to show full date input */
-                    min-h-[44px] /* iOS tap target */
-                    min-w-[130px] /* Ensure minimum width */
-                  "
-                  value={baseDate}
-                  onChange={(e) => setBaseDate(e.target.value)}
-                  style={{
-                    // Force WebKit browsers to show proper date input width
-                    WebkitAppearance: 'none',
-                    // Additional iOS fixes
-                    fontSize: '16px', // Prevent iOS zoom
-                  }}
-                />
-              </div>
 
-              <div className="flex gap-2 mb-3">
-                <button
-                  type="button"
-                  onClick={() => setSign(1)}
-                  className={`flex-1 rounded-full px-4 py-2 text-sm border transition-colors ${
-                    sign === 1
-                      ? "bg-[#c25e5e] text-white border-[#c25e5e]"
-                      : "bg-white text-[#6b7db3] border-[#6b7db3] hover:bg-white/70"
-                  }`}
-                >
-                  Add
-                </button>
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <button
+                    type="button"
+                    onClick={() => setStartBetween(todayISO())}
+                    className="rounded-full px-4 py-2 text-sm border border-[#8e3e3e] text-[#8e3e3e] bg-white hover:bg-[#f8d7da] transition-colors"
+                  >
+                    Start = Today
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => setSign(-1)}
-                  className={`flex-1 rounded-full px-4 py-2 text-sm border transition-colors ${
-                    sign === -1
-                      ? "bg-[#c25e5e] text-white border-[#c25e5e]"
-                      : "bg-white text-[#6b7db3] border-[#6b7db3] hover:bg-white/70"
-                  }`}
-                >
-                  Subtract
-                </button>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2">
-                <div>
-                  <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
-                    Years
-                  </label>
-                  <input
-                    inputMode="numeric"
-                    className="w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-3 py-2 text-sm"
-                    value={deltaYears}
-                    onChange={(e) => setDeltaYears(e.target.value.replace(/[^\d]/g, ""))}
-                    placeholder="0"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
-                    Months
-                  </label>
-                  <input
-                    inputMode="numeric"
-                    className="w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-3 py-2 text-sm"
-                    value={deltaMonths}
-                    onChange={(e) => setDeltaMonths(e.target.value.replace(/[^\d]/g, ""))}
-                    placeholder="0"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
-                    Days
-                  </label>
-                  <input
-                    inputMode="numeric"
-                    className="w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-3 py-2 text-sm"
-                    value={deltaDays}
-                    onChange={(e) => setDeltaDays(e.target.value.replace(/[^\d]/g, ""))}
-                    placeholder="0"
-                  />
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-2 mt-3">
-                <button
-                  type="button"
-                  onClick={() => setBaseDate(todayISO())}
-                  className="rounded-full px-4 py-2 text-sm border border-[#8e3e3e] text-[#8e3e3e] bg-white hover:bg-[#f8d7da] transition-colors"
-                >
-                  Use Today
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setBaseDate("")
-                    setDeltaYears("0")
-                    setDeltaMonths("0")
-                    setDeltaDays("0")
-                    setSign(1)
-                  }}
-                  className="rounded-full px-4 py-2 text-sm border border-[#b91c1c] text-[#b91c1c] bg-white hover:bg-[#ffe8e8] transition-colors"
-                >
-                  Reset
-                </button>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl border border-[#e3b0b0] p-4 mb-4">
-              <div className="text-sm font-semibold text-[#8e3e3e] mb-2">Result</div>
-
-              {addRes ? (
-                <div className="space-y-2 text-sm">
-                  <div className="text-[#6b7db3]">
-                    Base:{" "}
-                    <span className="font-semibold text-[#8e3e3e]">
-                      {formatMMDDYYYY(addRes.base)}
-                    </span>
-                  </div>
-
-                  <div className="text-[#6b7db3]">
-                    New date:{" "}
-                    <span className="font-semibold text-[#8e3e3e]">
-                      {formatMMDDYYYY(addRes.out)}
-                    </span>
-                  </div>
-
-                  <div className="text-[#6b7db3]">
-                    Net shift:{" "}
-                    <span className="font-semibold text-[#8e3e3e]">
-                      {addRes.totalDayShift}
-                    </span>{" "}
-                    days
-                  </div>
-                </div>
-              ) : (
-                <div className="text-sm text-[#6b7db3]">
-                  Pick a base date and enter values to see the result.
-                </div>
-              )}
-            </div>
-          </>
-        )}
-
-        {/* Between tab */}
-        {tab === "between" && (
-          <>
-            <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4 overflow-hidden">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="min-w-0">
-                  <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
-                    Start date
-                  </label>
-                  <input
-                    type="date"
-                    className="block w-full min-w-0 max-w-full box-border appearance-none bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm
-                      /* Fix for date picker icon cut-off */
-                      pr-10
-                      /* Force WebKit to show full date input */
-                      min-h-[44px] /* iOS tap target */
-                      min-w-[130px] /* Ensure minimum width */
-                    "
-                    value={startBetween}
-                    onChange={(e) => setStartBetween(e.target.value)}
-                    style={{
-                      // Force WebKit browsers to show proper date input width
-                      WebkitAppearance: 'none',
-                      // Additional iOS fixes
-                      fontSize: '16px', // Prevent iOS zoom
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStartBetween("")
+                      setEndBetween("")
+                      setIncludeEndDate(false)
                     }}
-                  />
-                </div>
-
-                <div className="min-w-0">
-                  <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
-                    End date
-                  </label>
-                  <input
-                    type="date"
-                    className="block w-full min-w-0 max-w-full box-border appearance-none bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm
-                      /* Fix for date picker icon cut-off */
-                      pr-10
-                      /* Force WebKit to show full date input */
-                      min-h-[44px] /* iOS tap target */
-                      min-w-[130px] /* Ensure minimum width */
-                    "
-                    value={endBetween}
-                    onChange={(e) => setEndBetween(e.target.value)}
-                    style={{
-                      // Force WebKit browsers to show proper date input width
-                      WebkitAppearance: 'none',
-                      // Additional iOS fixes
-                      fontSize: '16px', // Prevent iOS zoom
-                    }}
-                  />
+                    className="rounded-full px-4 py-2 text-sm border border-[#b91c1c] text-[#b91c1c] bg-white hover:bg-[#ffe8e8] transition-colors"
+                  >
+                    Reset
+                  </button>
                 </div>
               </div>
 
-              <label className="flex items-center gap-2 mt-3 text-sm text-[#6b7db3] select-none">
-                <input
-                  type="checkbox"
-                  checked={includeEndDate}
-                  onChange={(e) => setIncludeEndDate(e.target.checked)}
-                  className="h-5 w-5 rounded border border-[#6b7db3] accent-[#8e3e3e]"
-                />
-                Include end date in calculation (1 day is added)
-              </label>
+              <div className="bg-white rounded-2xl border border-[#e3b0b0] p-4 mb-4">
+                <div className="text-sm font-semibold text-[#8e3e3e] mb-2">Result</div>
 
-              {/* ✅ Quick actions (matches your good screenshot) */}
-              <div className="flex flex-wrap gap-2 mt-3">
-                <button
-                  type="button"
-                  onClick={() => setStartBetween(todayISO())}
-                  className="rounded-full px-4 py-2 text-sm border border-[#8e3e3e] text-[#8e3e3e] bg-white hover:bg-[#f8d7da] transition-colors"
-                >
-                  Start = Today
-                </button>
+                {betweenRes ? (
+                  <div className="space-y-2 text-sm">
+                    <div className="text-[#6b7db3]">
+                      From:{" "}
+                      <span className="font-semibold text-[#8e3e3e]">
+                        {formatMMDDYYYY(betweenRes.start)}
+                      </span>
+                    </div>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setStartBetween("")
-                    setEndBetween("")
-                    setIncludeEndDate(false)
-                  }}
-                  className="rounded-full px-4 py-2 text-sm border border-[#b91c1c] text-[#b91c1c] bg-white hover:bg-[#ffe8e8] transition-colors"
-                >
-                  Reset
-                </button>
+                    <div className="text-[#6b7db3]">
+                      To:{" "}
+                      <span className="font-semibold text-[#8e3e3e]">
+                        {formatMMDDYYYY(betweenRes.end)}
+                      </span>
+                      {betweenRes.isReversed && (
+                        <span className="text-xs text-red-500 ml-2">
+                          (Note: End date is earlier than start date)
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="text-[#6b7db3]">
+                      Total days:{" "}
+                      <span className={`font-semibold ${betweenRes.totalDays < 0 ? 'text-red-500' : 'text-[#8e3e3e]'}`}>
+                        {betweenRes.totalDays} days
+                        {betweenRes.isReversed && betweenRes.totalDays > 0 ? ' (negative shown)' : ''}
+                      </span>
+                    </div>
+
+                    <div className="text-[#6b7db3]">
+                      Years + months + days:{" "}
+                      <span className={`font-semibold ${betweenRes.isReversed ? 'text-red-500' : 'text-[#8e3e3e]'}`}>
+                        {betweenRes.ymd.years} years, {betweenRes.ymd.months} months, {betweenRes.ymd.days} days
+                      </span>
+                    </div>
+
+                    <div className="text-[#6b7db3]">
+                      Months + days:{" "}
+                      <span className={`font-semibold ${betweenRes.isReversed ? 'text-red-500' : 'text-[#8e3e3e]'}`}>
+                        {betweenRes.md.months} months, {betweenRes.md.days} days
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-sm text-[#6b7db3]">
+                    Pick a start and end date to see the result.
+                  </div>
+                )}
               </div>
-            </div>
+            </>
+          )}
 
-            <div className="bg-white rounded-2xl border border-[#e3b0b0] p-4 mb-4">
-              <div className="text-sm font-semibold text-[#8e3e3e] mb-2">Result</div>
-
-              {betweenRes ? (
-                <div className="space-y-2 text-sm">
-                  <div className="text-[#6b7db3]">
-                    From:{" "}
-                    <span className="font-semibold text-[#8e3e3e]">
-                      {formatMMDDYYYY(betweenRes.start)}
-                    </span>
-                  </div>
-
-                  <div className="text-[#6b7db3]">
-                    To:{" "}
-                    <span className="font-semibold text-[#8e3e3e]">
-                      {formatMMDDYYYY(betweenRes.end)}
-                    </span>
-                  </div>
-
-                  <div className="text-[#6b7db3]">
-                    Total days:{" "}
-                    <span className="font-semibold text-[#8e3e3e]">
-                      {betweenRes.totalDays}
-                    </span>
-                  </div>
-
-                  {/* ✅ label change */}
-                  <div className="text-[#6b7db3]">
-                    Years + months + days:{" "}
-                    <span className="font-semibold text-[#8e3e3e]">
-                      {betweenRes.ymd.years} years, {betweenRes.ymd.months} months, {betweenRes.ymd.days} days
-                    </span>
-                  </div>
-
-                  <div className="text-[#6b7db3]">
-                    Months + days:{" "}
-                    <span className="font-semibold text-[#8e3e3e]">
-                      {betweenRes.md.months} months, {betweenRes.md.days} days
-                    </span>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-sm text-[#6b7db3]">
-                  Pick a start and end date to see the result.
-                </div>
-              )}
-            </div>
-          </>
-        )}
-
-        <Button onClick={onClose} className="w-full bg-[#8e3e3e] hover:bg-[#7a3434]">
-          Close
-        </Button>
+          <Button onClick={onClose} className="w-full bg-[#8e3e3e] hover:bg-[#7a3434]">
+            Close
+          </Button>
+        </div>
       </div>
-    </div>
+    </>
   )
 }

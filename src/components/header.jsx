@@ -105,7 +105,7 @@ export default function Header() {
   };
 
   return (
-    <header className="relative w-full bg-gradient-to-b from-[#9fa8f5] via-[#8a9ad4] to-[#e6edf7] pb-1 md:pb-2 shadow-[0_8px_20px_rgba(75,85,160,0.3)] fade-in-up overflow-visible z-10">
+    <header className="relative w-full bg-gradient-to-b from-[#9fa8f5] via-[#8a9ad4] to-[#e6edf7] pb-1 md:pb-2 shadow-[0_8px_20px_rgba(75,85,160,0.3)] fade-in-up overflow-visible">
       {/* Smaller decorative glow */}
       <div className="pointer-events-none absolute -top-3 left-1/2 -translate-x-1/2 md:left-12 md:translate-x-0 w-32 h-32 blur-xl bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.8),_rgba(148,163,233,0))] opacity-70" />
 
