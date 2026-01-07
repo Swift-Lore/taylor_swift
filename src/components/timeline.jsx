@@ -530,6 +530,7 @@ const matchingRealLabel = matchingRealDate.toLocaleDateString("en-US", {
         </div>
       </>
     )
+    }
   const TNInfoModal = () => {
     if (!showTNInfo) return null
 
