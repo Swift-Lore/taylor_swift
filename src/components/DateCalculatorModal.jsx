@@ -469,53 +469,74 @@ export default function DateCalculatorModal({ onClose }) {
                 <div className="text-sm font-semibold text-[#8e3e3e] mb-2">Result</div>
 
                 {betweenRes ? (
-                  <div className="space-y-2 text-sm">
-                    <div className="text-[#6b7db3]">
-                      From:{" "}
-                      <span className="font-semibold text-[#8e3e3e]">
-                        {formatMMDDYYYY(betweenRes.start)}
-                      </span>
-                    </div>
+  <div className="space-y-4">
+    {/* Date Range Header */}
+    <div className="text-center">
+      <div className="text-xs text-[#6b7db3] mb-1">Date Range</div>
+      <div className="text-[#8e3e3e] font-semibold text-sm">
+        {formatMMDDYYYY(betweenRes.start)} → {formatMMDDYYYY(betweenRes.end)}
+      </div>
+      {betweenRes.isReversed && (
+        <div className="text-xs text-red-500 mt-1">
+          (End date is earlier than start date)
+        </div>
+      )}
+    </div>
 
-                    <div className="text-[#6b7db3]">
-                      To:{" "}
-                      <span className="font-semibold text-[#8e3e3e]">
-                        {formatMMDDYYYY(betweenRes.end)}
-                      </span>
-                      {betweenRes.isReversed && (
-                        <span className="text-xs text-red-500 ml-2">
-                          (Note: End date is earlier than start date)
-                        </span>
-                      )}
-                    </div>
+    {/* Results Grid */}
+    <div className="space-y-3">
+      {/* Days - Main Result */}
+      <div className="bg-gradient-to-r from-[#fce0e0] to-[#f8d7da] rounded-lg p-3">
+        <div className="text-xs text-[#6b7db3] mb-1">Days</div>
+        <div className={`text-lg font-bold ${betweenRes.totalDays < 0 ? 'text-red-600' : 'text-[#8e3e3e]'}`}>
+          {Math.abs(betweenRes.totalDays).toLocaleString()} Days
+        </div>
+      </div>
 
-                    <div className="text-[#6b7db3]">
-                      Total days:{" "}
-                      <span className={`font-semibold ${betweenRes.totalDays < 0 ? 'text-red-500' : 'text-[#8e3e3e]'}`}>
-                        {betweenRes.totalDays} days
-                        {betweenRes.isReversed && betweenRes.totalDays > 0 ? ' (negative shown)' : ''}
-                      </span>
-                    </div>
+      {/* Other Formats */}
+      <div className="space-y-2">
+        <div className="flex justify-between items-center border-b border-[#f0d0d3] pb-2">
+          <span className="text-sm text-[#6b7db3]">Weeks</span>
+          <span className={`font-medium ${betweenRes.isReversed ? 'text-red-500' : 'text-[#8e3e3e]'}`}>
+            {Math.floor(Math.abs(betweenRes.totalDays) / 7)} Weeks {Math.abs(betweenRes.totalDays) % 7} Days
+          </span>
+        </div>
 
-                    <div className="text-[#6b7db3]">
-                      Years + months + days:{" "}
-                      <span className={`font-semibold ${betweenRes.isReversed ? 'text-red-500' : 'text-[#8e3e3e]'}`}>
-                        {betweenRes.ymd.years} years, {betweenRes.ymd.months} months, {betweenRes.ymd.days} days
-                      </span>
-                    </div>
+        <div className="flex justify-between items-center border-b border-[#f0d0d3] pb-2">
+          <span className="text-sm text-[#6b7db3]">Months</span>
+          <span className={`font-medium ${betweenRes.isReversed ? 'text-red-500' : 'text-[#8e3e3e]'}`}>
+            {Math.abs(betweenRes.md.months)} Months {Math.abs(betweenRes.md.days)} Days
+          </span>
+        </div>
 
-                    <div className="text-[#6b7db3]">
-                      Months + days:{" "}
-                      <span className={`font-semibold ${betweenRes.isReversed ? 'text-red-500' : 'text-[#8e3e3e]'}`}>
-                        {betweenRes.md.months} months, {betweenRes.md.days} days
-                      </span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-sm text-[#6b7db3]">
-                    Pick a start and end date to see the result.
-                  </div>
-                )}
+        <div className="flex justify-between items-center border-b border-[#f0d0d3] pb-2">
+          <span className="text-sm text-[#6b7db3]">Years</span>
+          <span className={`font-medium ${betweenRes.isReversed ? 'text-red-500' : 'text-[#8e3e3e]'}`}>
+            {Math.abs(betweenRes.ymd.years)} Years {Math.abs(betweenRes.ymd.days)} Days
+          </span>
+        </div>
+
+        <div className="flex justify-between items-center">
+          <span className="text-sm text-[#6b7db3]">Years & Months</span>
+          <span className={`font-medium ${betweenRes.isReversed ? 'text-red-500' : 'text-[#8e3e3e]'}`}>
+            {Math.abs(betweenRes.ymd.years)} Years {Math.abs(betweenRes.ymd.months)} Months {Math.abs(betweenRes.ymd.days)} Days
+          </span>
+        </div>
+      </div>
+    </div>
+
+    {/* Include End Date Note */}
+    {includeEndDate && (
+      <div className="text-xs text-[#6b7db3] italic text-center mt-2">
+        * Includes end date (+1 day)
+      </div>
+    )}
+  </div>
+) : (
+  <div className="text-sm text-[#6b7db3] py-4 text-center">
+    Pick a start and end date to see results.
+  </div>
+)}
               </div>
             </>
           )}
