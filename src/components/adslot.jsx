@@ -1,4 +1,4 @@
-// adslot.jsx - SIMPLIFIED VERSION
+// adslot.jsx - FIXED VERSION
 "use client";
 
 import { useEffect, useRef } from "react";
@@ -78,7 +78,7 @@ export default function AdSlot({
             style={{
               display: 'block',
               width: '100%',
-              minHeight: `${minHeight}px',
+              minHeight: `${minHeight}px`,
             }}
             data-ad-client="ca-pub-4534610257929133"
             data-ad-slot="3327797457"
