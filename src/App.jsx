@@ -145,6 +145,12 @@ function App() {
         declineButtonText="Reject Non-Essential"
         enableDeclineButton
         cookieName="websiteCookieConsent"
+        onAccept={() => {
+    console.log('Cookies accepted - reloading ads if needed');
+    if (window.adsbygoogle) {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    }
+  }}
         style={{
           position: "fixed",
           left: "50%",
