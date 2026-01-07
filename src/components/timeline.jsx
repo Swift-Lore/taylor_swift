@@ -365,8 +365,8 @@ const matchingRealLabel = matchingRealDate.toLocaleDateString("en-US", {
   className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4 isolate"
   onClick={() => setShowCalendar(false)}
 >
-        <div
-          className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in fade-in-zoom-in-95"
+                <div
+          className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in fade-in-zoom-in-95 max-h-[90vh] overflow-y-auto"
           onClick={(e) => e.stopPropagation()}   // clicks inside don't close
         >
           {/* Quick Actions Bar */}
