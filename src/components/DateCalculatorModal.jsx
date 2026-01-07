@@ -181,8 +181,8 @@ const [deltaDays, setDeltaDays] = useState("")
     className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4 isolate"
     onClick={onClose}
   >
-      <div
-        className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6"
+            <div
+        className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-xl font-semibold text-[#8e3e3e] mb-3">Date Calculator</h2>
