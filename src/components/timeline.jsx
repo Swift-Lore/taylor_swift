@@ -360,9 +360,9 @@ const matchingRealLabel = matchingRealDate.toLocaleDateString("en-US", {
 
     const calendarDays = generateCalendar()
 
-    return (
+        return (
       <div
-  className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4"
+  className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4 isolate"
   onClick={() => setShowCalendar(false)}
 >
         <div
