@@ -176,9 +176,9 @@ const [deltaDays, setDeltaDays] = useState("")
   const addRes = tab === "add" ? calcAddSubtract() : null
   const betweenRes = tab === "between" ? calcBetween() : null
 
-  return (
+    return (
   <div
-    className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4"
+    className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4 isolate"
     onClick={onClose}
   >
       <div
