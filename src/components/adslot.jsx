@@ -1,94 +1,71 @@
-// adslot.jsx - FIXED VERSION
+// adslot.jsx — CONTROLLED HEIGHT VERSION
 "use client";
 
 import { useEffect, useRef } from "react";
 
 export default function AdSlot({
-  maxWidthClass = "max-w-4xl",
-  minHeight = 90,
+  variant = "leaderboard", // "leaderboard" | "rectangle"
+  maxWidthClass = "max-w-6xl",
   className = "",
 }) {
-  const adRef = useRef(null);
+  const insRef = useRef(null);
   const initialized = useRef(false);
 
   useEffect(() => {
-    // Only run in production
-    if (!import.meta.env.PROD || initialized.current) return;
+    if (!import.meta.env.PROD) return;
 
-    // Wait for component to mount and Google script to load
+    initialized.current = false;
+
     const loadAd = () => {
+      if (!window.adsbygoogle || initialized.current) return;
       try {
-        // Check if Google script is loaded
-        if (typeof window === 'undefined' || !window.adsbygoogle) {
-          console.warn('AdSense script not loaded yet, retrying...');
-          setTimeout(loadAd, 500);
-          return;
-        }
-
-        // Only initialize once
-        if (adRef.current && !initialized.current) {
-          // This is the standard way to load ads in React
-          (window.adsbygoogle = window.adsbygoogle || []).push({});
-          initialized.current = true;
-          console.log('Ad initialized');
-        }
-      } catch (error) {
-        console.error('Error loading ad:', error);
-      }
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        initialized.current = true;
+      } catch {}
     };
 
-    // Initial load attempt
-    loadAd();
-
-    // Fallback: try again after 1 second
-    const timeoutId = setTimeout(() => {
-      if (!initialized.current) {
-        loadAd();
-      }
-    }, 1000);
-
-    return () => clearTimeout(timeoutId);
+    setTimeout(loadAd, 200);
   }, []);
 
-  // Don't show in development
   if (!import.meta.env.PROD) {
     return (
-      <div className={`${maxWidthClass} mx-auto px-4 my-6`}>
-        <div className="bg-gray-100 rounded-lg p-4 text-center text-gray-600 border border-dashed border-gray-300">
-          [Ad Slot - 300x250]
+      <div className={`${maxWidthClass} mx-auto px-4 ${className}`}>
+        <div className="h-[90px] bg-gray-200 rounded-xl flex items-center justify-center text-sm text-gray-500">
+          [Ad: {variant}]
         </div>
       </div>
     );
   }
 
+  const isLeaderboard = variant === "leaderboard";
+
   return (
-    <div className={`${maxWidthClass} mx-auto px-4 my-6 ${className}`}>
-      <div className="ad-container rounded-lg border border-gray-200 bg-gray-50 p-2">
-        <div className="text-xs text-gray-500 uppercase tracking-wide mb-1 text-center">
-          Advertisement
+    <div className={`${maxWidthClass} mx-auto px-4 ${className}`}>
+      <div className="rounded-xl border border-[#e6d2e1] bg-white/70 shadow-sm px-2 py-2">
+        <div className="text-[10px] text-[#8e3e3e]/60 uppercase tracking-wide mb-1 text-center">
+          Sponsored
         </div>
-        
+
         <div
-          ref={adRef}
-          style={{ minHeight: `${minHeight}px` }}
-          className="flex items-center justify-center"
+          className={`
+            overflow-hidden
+            flex items-center justify-center
+            ${isLeaderboard ? "h-[90px]" : "h-[250px]"}
+          `}
         >
           <ins
+            ref={insRef}
             className="adsbygoogle"
             style={{
-              display: 'block',
-              width: '100%',
-              minHeight: `${minHeight}px`,
+              display: "block",
+              width: "100%",
+              height: isLeaderboard ? "90px" : "250px",
             }}
             data-ad-client="ca-pub-4534610257929133"
             data-ad-slot="3327797457"
-            data-ad-format="auto"
+            data-ad-format={isLeaderboard ? "horizontal" : "rectangle"}
             data-full-width-responsive="true"
           />
-        </div>
-        
-        <div className="text-center text-gray-400 text-xs mt-1">
-          Advertisement may take a moment to load
         </div>
       </div>
     </div>
