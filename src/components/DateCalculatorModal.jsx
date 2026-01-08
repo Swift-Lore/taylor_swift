@@ -409,77 +409,77 @@ export default function DateCalculatorModal({ onClose }) {
 {tab === "between" && (
   <>
     <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4 overflow-hidden">
-      {/* Date Inputs with Swap Button in Between */}
-      <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-end mb-3">
-        {/* Start Date */}
-        <div className="col-span-1 sm:col-span-5 min-w-0">
-          <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
-            Start date
-          </label>
-          <div className="relative">
-            <input
-              type="date"
-              className="block w-full min-w-0 max-w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 pr-12 text-sm min-h-[48px]"
-              value={startBetween}
-                            onChange={handleStartDateChange}
-              style={{
-                fontSize: '16px',
-                lineHeight: '1.5',
-                color: '#6b7db3',
-              }}
-            />
-          </div>
-        </div>
+      {/* Date Inputs */}
+<div className="space-y-4 mb-3">
+  {/* Start Date */}
+  <div className="min-w-0">
+    <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
+      Start date
+    </label>
+    <div className="relative">
+      <input
+        type="date"
+        className="block w-full min-w-0 max-w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 pr-12 text-sm min-h-[48px]"
+        value={startBetween}
+        onChange={handleStartDateChange}
+        style={{
+          fontSize: "16px",
+          lineHeight: "1.5",
+          color: "#6b7db3",
+        }}
+      />
+    </div>
+  </div>
 
-        {/* Swap Button (centered) */}
-        <div className="col-span-1 sm:col-span-2 flex justify-center items-end h-12">
-          {(startBetween || endBetween) && (
-            <button
-              type="button"
-              onClick={swapDates}
-              className="rounded-full p-2 border border-[#6b7db3] text-[#6b7db3] bg-white hover:bg-[#e6edf7] transition-colors"
-              title="Swap dates"
-            >
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                width="16" 
-                height="16" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
-                strokeWidth="2" 
-                strokeLinecap="round" 
-                strokeLinejoin="round"
-              >
-                <path d="m18 4 4 4-4 4"/>
-                <path d="M2 8h20"/>
-                <path d="m6 20-4-4 4-4"/>
-                <path d="M22 16H2"/>
-              </svg>
-            </button>
-          )}
-        </div>
+  {/* Swap Button */}
+  {(startBetween || endBetween) && (
+    <div className="flex justify-center">
+      <button
+        type="button"
+        onClick={swapDates}
+        className="rounded-full p-2 border border-[#6b7db3] text-[#6b7db3] bg-white hover:bg-[#e6edf7] transition-colors"
+        title="Swap dates"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="m18 4 4 4-4 4" />
+          <path d="M2 8h20" />
+          <path d="m6 20-4-4 4-4" />
+          <path d="M22 16H2" />
+        </svg>
+      </button>
+    </div>
+  )}
 
-        {/* End Date */}
-        <div className="col-span-1 sm:col-span-5 min-w-0">
-          <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
-            End date
-          </label>
-          <div className="relative">
-            <input
-              type="date"
-              className="block w-full min-w-0 max-w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 pr-12 text-sm min-h-[48px]"
-              value={endBetween}
-                            onChange={handleEndDateChange}
-              style={{
-                fontSize: '16px',
-                lineHeight: '1.5',
-                color: '#6b7db3',
-              }}
-            />
-          </div>
-        </div>
-      </div>
+  {/* End Date */}
+  <div className="min-w-0">
+    <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
+      End date
+    </label>
+    <div className="relative">
+      <input
+        type="date"
+        className="block w-full min-w-0 max-w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 pr-12 text-sm min-h-[48px]"
+        value={endBetween}
+        onChange={handleEndDateChange}
+        style={{
+          fontSize: "16px",
+          lineHeight: "1.5",
+          color: "#6b7db3",
+        }}
+      />
+    </div>
+  </div>
+</div>
 
       <label className="flex items-center gap-2 mt-3 text-sm text-[#6b7db3] select-none">
         <input
