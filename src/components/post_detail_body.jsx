@@ -536,41 +536,6 @@ return (
   </div>
 );
 
-                        {/* Fallback card */}
-                        <div
-                          id={`fallback-${index}`}
-                          style={{ display: "none" }}
-                          className="fallback-card flex items-center p-3 border border-gray-200 rounded-lg bg-white"
-                        >
-                          <img
-                            src={`https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(
-                              url
-                            )}`}
-                            alt=""
-                            className="w-8 h-8 mr-3"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-red-400 truncate">
-                              {url
-                                .split("/")
-                                .slice(-1)[0]
-                                .replace(/[-_]/g, " ")}
-                            </p>
-                            <p className="text-xs text-gray-500 truncate">
-                              {new URL(url).hostname.replace("www.", "")}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-        </section>
-      )}
-
 {/* AdSense: Post Detail (inline) */}
 {import.meta.env.PROD && !!event && (
   <div className="max-w-4xl mx-auto px-4 mb-8">
