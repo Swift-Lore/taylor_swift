@@ -99,6 +99,126 @@ const normalizeInstagramUrl = (raw) => {
   return `https://www.instagram.com/${type}/${shortcode}/`;
 };
 
+// Helper to extract domain from URL for favicon
+const getDomainFromUrl = (url) => {
+  try {
+    const urlObj = new URL(url);
+    return urlObj.hostname.replace('www.', '');
+  } catch {
+    return 'website';
+  }
+};
+
+// Helper to get favicon
+const getFaviconUrl = (domain) => {
+  return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+};
+
+function LinkPreview({ url }) {
+  const [previewData, setPreviewData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const domain = getDomainFromUrl(url);
+
+  useEffect(() => {
+    const fetchPreview = async () => {
+      setLoading(true);
+      try {
+        // Use a simple fetch
+        const response = await fetch(url, {
+          method: 'GET',
+          mode: 'no-cors', // Use no-cors mode to avoid CORS issues
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+          }
+        });
+        
+        setPreviewData({
+          title: domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1),
+          domain: domain,
+          favicon: getFaviconUrl(domain)
+        });
+      } catch (err) {
+        console.log('Using fallback for:', url);
+        setError(true);
+        setPreviewData({
+          title: domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1),
+          domain: domain,
+          favicon: getFaviconUrl(domain)
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPreview();
+  }, [url, domain]);
+
+  if (loading) {
+    return (
+      <div className="microlink-card block max-w-md mx-auto mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm animate-pulse">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-gray-200"></div>
+          <div className="flex-1 space-y-2">
+            <div className="h-4 bg-gray-200 rounded"></div>
+            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const displayTitle = previewData?.title || domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1);
+  const displayDomain = previewData?.domain || domain;
+
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="microlink-card block max-w-md mx-auto mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition-all duration-200 hover:border-red-300 hover:-translate-y-0.5"
+    >
+      <div className="flex items-start gap-3">
+        <div className="flex-shrink-0">
+          <img
+            src={previewData?.favicon || getFaviconUrl(domain)}
+            alt={`${displayTitle} favicon`}
+            className="w-10 h-10 rounded-lg border border-gray-100"
+            onError={(e) => {
+              e.target.src = `https://www.google.com/s2/favicons?domain=google.com&sz=128`;
+            }}
+          />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-medium text-[#8e3e3e] mb-1 truncate">
+            {displayTitle}
+          </h3>
+          <p className="text-xs text-gray-500 truncate">
+            {displayDomain}
+          </p>
+          <div className="mt-2 flex items-center">
+            <span className="text-xs text-red-400 font-medium">Read article →</span>
+            <span className="ml-auto text-xs text-gray-400">
+              {(() => {
+                try {
+                  const urlObj = new URL(url);
+                  return urlObj.pathname.split('/').slice(-1)[0]
+                    .replace(/[-_]/g, ' ')
+                    .replace(/\.[^/.]+$/, '')
+                    .substring(0, 20) + '...';
+                } catch {
+                  return 'View article';
+                }
+              })()}
+            </span>
+          </div>
+        </div>
+      </div>
+    </a>
+  );
+}
+
 export default function PostDetailBody() {
   const navigate = useNavigate();
   const location = useLocation();
