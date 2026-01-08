@@ -64,6 +64,7 @@ export default function Footer() {
     />
   </div>
 )}
+           </div>
 
       {/* Bottom bar */}
       <div className="bg-[#8a9ad4] py-2 px-4 text-center text-white mt-0">
