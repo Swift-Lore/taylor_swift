@@ -418,7 +418,7 @@ export default function DateCalculatorModal({ onClose }) {
           </label>
           <input
             type="date"
-            className="block w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 text-sm min-h-[48px]"
+            className="date-calc-modal block w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 text-sm min-h-[48px] pr-10"
             value={startBetween}
             onChange={handleStartDateChange}
           />
@@ -431,7 +431,7 @@ export default function DateCalculatorModal({ onClose }) {
           </label>
           <input
             type="date"
-            className="block w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 text-sm min-h-[48px]"
+            className="date-calc-modal block w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 text-sm min-h-[48px] pr-10"
             value={endBetween}
             onChange={handleEndDateChange}
           />
@@ -469,7 +469,7 @@ export default function DateCalculatorModal({ onClose }) {
           </label>
           <input
             type="date"
-            className="block w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 text-sm min-h-[48px]"
+            className="date-calc-modal block w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 text-sm min-h-[48px] pr-10"
             value={startBetween}
             onChange={handleStartDateChange}
           />
@@ -503,7 +503,7 @@ export default function DateCalculatorModal({ onClose }) {
           </label>
           <input
             type="date"
-            className="block w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 text-sm min-h-[48px]"
+            className="date-calc-modal block w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 text-sm min-h-[48px] pr-10"
             value={endBetween}
             onChange={handleEndDateChange}
           />
