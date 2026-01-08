@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 export default function AdSlot({
   maxWidthClass = "max-w-6xl",
@@ -8,20 +8,21 @@ export default function AdSlot({
   variant = "leaderboard", // "leaderboard" | "rectangle"
 }) {
   const insRef = useRef(null);
-  
-  // ✅ UPDATED WITH YOUR REAL IDs
-  const adConfig = {
+
+  const AD_CLIENT = "ca-pub-4534610257929133";
+
+  const adConfig = useMemo(() => ({
     leaderboard: {
-      slot: "6835416711", // ← Your Timeline ad ID
-      width: 728,
-      height: 90
+      slot: "6835416711",
+      maxWidth: 728,
+      minHeight: 90,
     },
     rectangle: {
-      slot: "8756354114", // ← Your Footer ad ID
-      width: 300,
-      height: 250
-    }
-  };
+      slot: "8756354114",
+      maxWidth: 300,
+      minHeight: 250,
+    },
+  }), []);
 
   const config = adConfig[variant] || adConfig.leaderboard;
 
@@ -31,15 +32,17 @@ export default function AdSlot({
     const ins = insRef.current;
     if (!ins) return;
 
-    const alreadyDone = ins.getAttribute("data-adsbygoogle-status") === "done";
-    if (alreadyDone) return;
+    // Reset so it can refill correctly on SPA rerenders
+    ins.removeAttribute("data-adsbygoogle-status");
+    ins.innerHTML = "";
 
+    window.adsbygoogle = window.adsbygoogle || [];
     try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
+      window.adsbygoogle.push({});
     } catch {
       // ignore
     }
-  }, []);
+  }, [config.slot]);
 
   // DEV placeholder
   if (!import.meta.env.PROD) {
@@ -47,13 +50,13 @@ export default function AdSlot({
       <div className={`${maxWidthClass} mx-auto px-4 ${className}`}>
         <div
           className="rounded-xl border border-[#e6d2e1] bg-white/70 shadow-sm flex items-center justify-center text-sm text-gray-500 mx-auto"
-          style={{ 
-            width: `${config.width}px`,
-            height: `${config.height}px`,
-            maxWidth: '100%'
+          style={{
+            width: "100%",
+            maxWidth: `${config.maxWidth}px`,
+            minHeight: `${config.minHeight}px`,
           }}
         >
-          [Ad: {variant} — {config.width}×{config.height}]
+          [Ad: {variant} — up to {config.maxWidth}px wide]
         </div>
       </div>
     );
@@ -62,23 +65,18 @@ export default function AdSlot({
   return (
     <div className={`${maxWidthClass} mx-auto px-4 ${className}`}>
       <div
-        className="relative rounded-xl border border-[#e6d2e1] bg-white/70 shadow-sm overflow-hidden mx-auto"
-        style={{ 
-          width: `${config.width}px`,
-          height: `${config.height}px`,
-          maxWidth: '100%'
+        className="relative rounded-xl border border-[#e6d2e1] bg-white/70 shadow-sm mx-auto"
+        style={{
+          width: "100%",
+          maxWidth: `${config.maxWidth}px`,
+          minHeight: `${config.minHeight}px`,
         }}
       >
-
         <ins
           ref={insRef}
           className="adsbygoogle"
-          style={{
-            display: 'block',
-            width: '100%',
-            height: '100%'
-          }}
-          data-ad-client="ca-pub-4534610257929133"
+          style={{ display: "block", width: "100%" }}
+          data-ad-client={AD_CLIENT}
           data-ad-slot={config.slot}
         />
       </div>
