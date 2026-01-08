@@ -6,7 +6,8 @@ import { useLocation } from "react-router-dom";
 export default function AdSlot({
   maxWidthClass = "max-w-6xl",
   className = "",
-  variant = "leaderboard", // "leaderboard" | "rectangle"
+  variant = "leaderboard",
+  noOuterPadding = false,
 }) {
   const insRef = useRef(null);
   const { pathname } = useLocation();
