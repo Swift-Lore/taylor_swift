@@ -377,110 +377,67 @@ export default function DateCalculatorModal({ onClose }) {
 {tab === "between" && (
   <>
     <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4 overflow-hidden">
-      {/* Date Inputs (desktop: 2 columns, swap icon floats; mobile: stacked + swap icon) */}
-      <div className="mb-3">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 items-end relative">
-          {/* Start Date */}
-          <div className="min-w-0">
-            <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
-              Start date
-            </label>
-            <input
-              type="date"
-              className="date-calc-date"
-              value={startBetween}
-              onChange={handleStartDateChange}
-            />
-          </div>
-
-          {/* End Date */}
-          <div className="min-w-0">
-            <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
-              End date
-            </label>
-            <input
-              type="date"
-              className="date-calc-date"
-              value={endBetween}
-              onChange={handleEndDateChange}
-            />
-          </div>
-
-          {/* Swap button (desktop overlay so inputs stay wide) */}
-          <div className="hidden md:flex absolute left-1/2 top-[42px] -translate-x-1/2">
-            <button
-              type="button"
-              onClick={swapDates}
-              className={`rounded-full border border-[#6b7db3] text-[#6b7db3] bg-white hover:bg-[#e6edf7] transition-colors
-                          h-10 w-10 flex items-center justify-center
-                          ${(startBetween || endBetween) ? "opacity-100" : "opacity-0 pointer-events-none"}`}
-              title="Swap dates"
-              aria-label="Swap dates"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="m18 4 4 4-4 4" />
-                <path d="M2 8h20" />
-                <path d="m6 20-4-4 4-4" />
-                <path d="M22 16H2" />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        {/* Swap button (mobile) */}
-        <div className="md:hidden flex justify-center mt-3">
-          <button
-            type="button"
-            onClick={swapDates}
-            className={`rounded-full border border-[#6b7db3] text-[#6b7db3] bg-white hover:bg-[#e6edf7] transition-colors
-                        h-10 w-10 flex items-center justify-center
-                        ${(startBetween || endBetween) ? "opacity-100" : "opacity-0 pointer-events-none"}`}
-            title="Swap dates"
-            aria-label="Swap dates"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m18 4 4 4-4 4" />
-              <path d="M2 8h20" />
-              <path d="m6 20-4-4 4-4" />
-              <path d="M22 16H2" />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <label className="flex items-center gap-2 mt-3 text-sm text-[#6b7db3] select-none">
-        <input
-          type="checkbox"
-          checked={includeEndDate}
-          onChange={(e) => setIncludeEndDate(e.target.checked)}
-          className="h-5 w-5 rounded border border-[#6b7db3] accent-[#8e3e3e]"
-        />
-        Include end date in calculation (+1 day is added)
+      {/* Date Inputs (Start | Swap | End — stable on mobile & desktop) */}
+<div className="mb-3">
+  <div className="grid grid-cols-[1fr_auto_1fr] gap-3 items-end">
+    {/* Start Date */}
+    <div className="min-w-0">
+      <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
+        Start date
       </label>
+      <input
+        type="date"
+        className="date-calc-date"
+        value={startBetween}
+        onChange={handleStartDateChange}
+      />
+    </div>
 
-      <div className="flex flex-wrap gap-2 mt-3">
-        <button
-          type="button"
-          onClick={() => setStartBetween(todayISO())}
-          className="rounded-full px-4 py-2 text-sm border border-[#8e3e3e] text-[#8e3e3e] bg-white hover:bg-[#f8d7da] transition-colors"
+    {/* Swap Button (always centered) */}
+    <div className="flex justify-center pb-[2px]">
+      <button
+        type="button"
+        onClick={swapDates}
+        className={`rounded-full border border-[#6b7db3] text-[#6b7db3] bg-white hover:bg-[#e6edf7] transition-colors
+                    h-10 w-10 flex items-center justify-center
+                    ${(startBetween || endBetween)
+                      ? "opacity-100"
+                      : "opacity-0 pointer-events-none"}`}
+        aria-label="Swap dates"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         >
-          Start = Today
-        </button>
+          <path d="m18 4 4 4-4 4" />
+          <path d="M2 8h20" />
+          <path d="m6 20-4-4 4-4" />
+          <path d="M22 16H2" />
+        </svg>
+      </button>
+    </div>
 
-        <button
-          type="button"
-          onClick={() => {
-            setStartBetween("")
-            setEndBetween("")
-            setIncludeEndDate(false)
-          }}
-          className="rounded-full px-4 py-2 text-sm border border-[#b91c1c] text-[#b91c1c] bg-white hover:bg-[#ffe8e8] transition-colors"
-        >
-          Reset
-        </button>
-      </div>
+    {/* End Date */}
+    <div className="min-w-0">
+      <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
+        End date
+      </label>
+      <input
+        type="date"
+        className="date-calc-date"
+        value={endBetween}
+        onChange={handleEndDateChange}
+      />
+    </div>
+  </div>
+</div>
     </div>
 
     {/* Results Box */}
