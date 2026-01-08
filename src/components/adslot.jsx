@@ -1,76 +1,114 @@
-// adslot.jsx — FIXED TOTAL HEIGHT (prevents tall boxes)
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export default function AdSlot({
   variant = "leaderboard", // "leaderboard" | "rectangle"
   maxWidthClass = "max-w-6xl",
   className = "",
 }) {
-  const initialized = useRef(false);
+  const insRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile breakpoint
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 640px)");
+    const apply = () => setIsMobile(mq.matches);
+    apply();
+    mq.addEventListener?.("change", apply);
+    return () => mq.removeEventListener?.("change", apply);
+  }, []);
+
+  // ✅ IMPORTANT: Put your real AdSense slot IDs here (create 3 fixed-size units in AdSense)
+  const AD_CLIENT = "ca-pub-4534610257929133";
+  const SLOTS = {
+    LEADERBOARD_DESKTOP: "REPLACE_WITH_728x90_SLOT_ID",
+    LEADERBOARD_MOBILE: "REPLACE_WITH_320x100_SLOT_ID",
+    RECTANGLE: "REPLACE_WITH_300x250_SLOT_ID",
+  };
+
+  const config = useMemo(() => {
+    if (variant === "rectangle") {
+      return {
+        slot: SLOTS.RECTANGLE,
+        width: 300,
+        height: 250,
+      };
+    }
+
+    // leaderboard
+    if (isMobile) {
+      return {
+        slot: SLOTS.LEADERBOARD_MOBILE,
+        width: 320,
+        height: 100,
+      };
+    }
+
+    return {
+      slot: SLOTS.LEADERBOARD_DESKTOP,
+      width: 728,
+      height: 90,
+    };
+  }, [variant, isMobile]);
 
   useEffect(() => {
     if (!import.meta.env.PROD) return;
 
-    initialized.current = false;
+    // If slot IDs are still placeholders, don't try to load ads
+    if (!config.slot || config.slot.includes("REPLACE_WITH")) return;
 
-    const loadAd = () => {
-      if (!window.adsbygoogle || initialized.current) return;
-      try {
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-        initialized.current = true;
-      } catch {}
-    };
+    const ins = insRef.current;
+    if (!ins) return;
 
-    const t = setTimeout(loadAd, 200);
-    return () => clearTimeout(t);
-  }, []);
+    // Clear any previous ad markup when route changes / rerenders
+    ins.innerHTML = "";
 
-  const isLeaderboard = variant === "leaderboard";
-  const SLOT_HEIGHT = isLeaderboard ? 90 : 250;
+    // Push the ad
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    } catch {
+      // ignore
+    }
+  }, [config.slot]);
 
   // DEV placeholder
   if (!import.meta.env.PROD) {
     return (
       <div className={`${maxWidthClass} mx-auto px-4 ${className}`}>
         <div
-          className="bg-gray-200 rounded-xl flex items-center justify-center text-sm text-gray-500"
-          style={{ height: SLOT_HEIGHT }}
+          className="rounded-xl border border-[#e6d2e1] bg-white/70 shadow-sm flex items-center justify-center text-sm text-gray-500"
+          style={{ height: config.height }}
         >
-          [Ad: {variant} — {SLOT_HEIGHT}px]
+          [Ad: {variant} — {config.width}×{config.height}]
         </div>
       </div>
     );
   }
 
+  // PROD render
   return (
     <div className={`${maxWidthClass} mx-auto px-4 ${className}`}>
-      {/* LOCK the TOTAL component height right here */}
       <div
-        className="relative overflow-hidden rounded-xl border border-[#e6d2e1] bg-white/70 shadow-sm"
-        style={{ height: SLOT_HEIGHT }}
+        className="relative rounded-xl border border-[#e6d2e1] bg-white/70 shadow-sm overflow-hidden flex items-center justify-center"
+        style={{ height: config.height }}
       >
-        {/* Sponsored label overlay (does NOT add height) */}
+        {/* Overlay label (does not affect height) */}
         <div className="absolute top-1 left-0 right-0 text-[10px] text-[#8e3e3e]/60 uppercase tracking-wide text-center pointer-events-none z-10">
           Sponsored
         </div>
 
-        {/* Ad container fills the locked height */}
-        <div className="w-full h-full flex items-center justify-center">
-          <ins
-            className="adsbygoogle"
-            style={{
-              display: "block",
-              width: "100%",
-              height: "100%",
-            }}
-            data-ad-client="ca-pub-4534610257929133"
-            data-ad-slot="3327797457"
-            data-ad-format="auto"
-            data-full-width-responsive="true"
-          />
-        </div>
+        <ins
+          ref={insRef}
+          className="adsbygoogle"
+          style={{
+            display: "inline-block",
+            width: `${config.width}px`,
+            height: `${config.height}px`,
+          }}
+          data-ad-client={AD_CLIENT}
+          data-ad-slot={config.slot}
+        />
       </div>
     </div>
   );
