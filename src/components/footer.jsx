@@ -52,10 +52,10 @@ export default function Footer() {
           {import.meta.env.PROD && (
             <div className="w-full md:w-1/2 flex">
               <AdSlot
-                maxWidthClass="max-w-full"
-                minHeight={90}
-                className="bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-3 md:px-5 md:py-4"
-              />
+  variant="rectangle"
+  maxWidthClass="max-w-full"
+  className="bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-3 md:px-5 md:py-4"
+/>
             </div>
           )}
         </div>
