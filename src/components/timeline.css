@@ -237,19 +237,16 @@ ins.adsbygoogle iframe {
   white-space: nowrap;
   border: 0;
 }
-/* ===== Date Calculator: fix native date icon overlap (Chrome/Safari) ===== */
+/* ===== Date Calculator: fix date icon overlap without breaking native UI ===== */
 .date-calc-modal input[type="date"] {
-  /* extra room so the native calendar icon never sits on top of the text */
-  padding-right: 3.75rem !important;
-  -webkit-appearance: none;
-  appearance: none;
+  padding-right: 3.25rem; /* room for the calendar icon */
 }
 
-/* WebKit-specific: control the calendar icon hitbox/spacing */
+/* WebKit (Chrome/Safari) icon positioning */
 .date-calc-modal input[type="date"]::-webkit-calendar-picker-indicator {
   opacity: 0.75;
   cursor: pointer;
-  margin-right: 0.9rem; /* push icon away from the text */
+  margin-right: 0.6rem;
 }
 
 /* Optional: if Safari still overlaps, bump this to 1.1rem */
