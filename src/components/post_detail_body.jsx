@@ -155,7 +155,10 @@ export default function PostDetailBody() {
     setSourceImages(imageLinks);
     setNonImageLinks(otherLinks);
   }, [event]);
-
+useEffect(() => {
+    setMicrolinkErrors({});
+  }, [event]);
+  
   // Modal helpers
   const closeModal = () => setIsModalOpen(false);
 
