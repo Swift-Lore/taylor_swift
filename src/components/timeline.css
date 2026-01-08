@@ -237,42 +237,37 @@ ins.adsbygoogle iframe {
   white-space: nowrap;
   border: 0;
 }
-/* ===== Date Calculator (scoped + safe) ===== */
+/* ===== Date Calculator (scoped + fixes icon overlap) ===== */
 
-/* Modal wrapper sizing ONLY */
-.date-calc-modal-wrap {
+/* Only the modal container uses this class */
+.date-calc-modal {
   width: 100%;
-  max-width: 28rem; /* same as max-w-md */
+  max-width: 28rem; /* ~max-w-md */
   margin: 0 auto;
 }
 
-@media (min-width: 768px) {
-  .date-calc-modal-wrap {
-    max-width: 32rem; /* optional: slightly wider desktop */
-  }
-}
-
-/* Date input styling (ONLY inputs) */
-.date-calc-date[type="date"] {
+/* Date inputs (use THIS class on inputs) */
+.date-calc-date {
   width: 100%;
-  box-sizing: border-box;
   padding: 0.75rem 1rem;
-  padding-right: 3.25rem; /* space for calendar icon */
+  padding-right: 3rem; /* reserve space for icon */
   color: #6b7db3;
   font-size: 16px;
   border: 1px solid #6b7db3;
   border-radius: 9999px;
-  background-color: #fff;
+  background: white;
+  box-sizing: border-box;
 }
 
-/* Make the native calendar icon clickable/visible (Chrome/Safari) */
-.date-calc-date[type="date"]::-webkit-calendar-picker-indicator {
-  opacity: 1;
+/* Hide the native Chrome icon but KEEP it clickable */
+.date-calc-modal .date-calc-date::-webkit-calendar-picker-indicator {
+  opacity: 0;
   cursor: pointer;
-  margin-right: 0.65rem;
+  width: 3rem;
+  height: 100%;
 }
 
-/* Prevent weird shrinking inside flex/grid */
+/* Prevent weird shrinking in flex/grid */
 .date-calc-date {
   min-width: 0;
 }
