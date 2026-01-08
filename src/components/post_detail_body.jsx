@@ -545,7 +545,7 @@ useEffect(() => {
           )}
         </section>
       )}
-      
+
 {/* AdSense: Post Detail (inline) */}
 {import.meta.env.PROD && !!event && (
   <div className="max-w-4xl mx-auto px-4 mb-8">
