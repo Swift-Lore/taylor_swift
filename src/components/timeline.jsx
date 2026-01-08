@@ -919,13 +919,13 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
             </div>
           </div>
 
-          {/* Horizontal 728x90 Leaderboard Ad */}
-{import.meta.env.PROD && !isLoading && !isInitialLoad && records.length > 0 && (
+          {/* Ad block */}
+{import.meta.env.PROD && !loading && (posts.length > 0 || searchResults.length > 0) && (
   <AdSlot
-    variant="leaderboard"
-    maxWidthClass="max-w-6xl"
-    className="mb-2"
-  />
+  variant="leaderboard"  // ← Add this for clarity
+  maxWidthClass="max-w-6xl"
+  className="mb-2"
+/>
 )}
           
           {/* ON THIS DAY Section */}
