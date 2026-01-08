@@ -450,101 +450,50 @@ useEffect(() => {
                       );
                     }
 
-                                        // Non-Getty links: keep using Microlink + fallback as before
-                    return (
-                      <div key={`link-${index}`} className="microlink-card">
-                        {microlinkErrors[url] ? (
-                          // Show custom fallback when Microlink has errored
-                          <a
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="fallback-card flex items-center p-3 border border-gray-200 rounded-lg bg-white hover:shadow-md transition-shadow"
-                          >
-                            <img
-                              src={`https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(
-                                url
-                              )}`}
-                              alt=""
-                              className="w-8 h-8 mr-3"
-                            />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-red-400 truncate">
-                                {url
-                                  .split("/")
-                                  .slice(-1)[0]
-                                  .replace(/[-_]/g, " ")}
-                              </p>
-                              <p className="text-xs text-gray-500 truncate">
-                                {(() => {
-                                  try {
-                                    return new URL(url).hostname.replace("www.", "");
-                                  } catch {
-                                    return "Link";
-                                  }
-                                })()}
-                              </p>
-                            </div>
-                          </a>
-                        ) : (
-                          // Try Microlink first
-                          <>
-                            <div id={`microlink-wrapper-${index}`}>
-                              <Microlink
-                                url={url}
-                                size="large"
-                                media="image"
-                                onError={() => {
-                                  // Mark this URL as failed
-                                  setMicrolinkErrors(prev => ({
-                                    ...prev,
-                                    [url]: true
-                                  }));
-                                }}
-                              />
-                            </div>
-                            {/* Keep the hidden fallback as backup */}
-                            <div
-                              id={`fallback-${index}`}
-                              style={{ display: "none" }}
-                              className="fallback-card flex items-center p-3 border border-gray-200 rounded-lg bg-white"
-                            >
-                              <img
-                                src={`https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(
-                                  url
-                                )}`}
-                                alt=""
-                                className="w-8 h-8 mr-3"
-                              />
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-red-400 truncate">
-                                  {url
-                                    .split("/")
-                                    .slice(-1)[0]
-                                    .replace(/[-_]/g, " ")}
-                                </p>
-                                <p className="text-xs text-gray-500 truncate">
-                                  {(() => {
-                                    try {
-                                      return new URL(url).hostname.replace("www.", "");
-                                    } catch {
-                                      return "";
-                                    }
-                                  })()}
-                                </p>
-                              </div>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-        </section>
-      )}
+                                        // Non-Getty links: simple clean card
+return (
+  <a
+    key={`link-${index}`}
+    href={url}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="microlink-card block max-w-md mx-auto mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow hover:border-red-300"
+  >
+    <div className="flex items-center gap-3">
+      <div className="w-10 h-10 rounded bg-[#8e3e3e] flex items-center justify-center text-white text-sm font-semibold">
+        {(() => {
+          try {
+            return new URL(url).hostname.charAt(0).toUpperCase();
+          } catch {
+            return "L";
+          }
+        })()}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-[#8e3e3e] truncate">
+          {(() => {
+            try {
+              const hostname = new URL(url).hostname.replace("www.", "");
+              const cleanHostname = hostname.replace(/\..+$/, ""); // Remove domain extension
+              return cleanHostname.charAt(0).toUpperCase() + cleanHostname.slice(1);
+            } catch {
+              return "View Article";
+            }
+          })()}
+        </p>
+        <p className="text-xs text-gray-500 truncate">
+          {(() => {
+            try {
+              return new URL(url).hostname.replace("www.", "");
+            } catch {
+              return url.substring(0, 40) + (url.length > 40 ? "..." : "");
+            }
+          })()}
+        </p>
+      </div>
+    </div>
+  </a>
+);
 
 {/* AdSense: Post Detail (inline) */}
 {import.meta.env.PROD && !!event && (
