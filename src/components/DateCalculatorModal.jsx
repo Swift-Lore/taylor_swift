@@ -33,21 +33,15 @@ export default function DateCalculatorModal({ onClose }) {
   const [includeEndDate, setIncludeEndDate] = useState(false)
 
     // --- Debounce for date inputs ---
-  const debounceTimeoutRef = useRef(null)
-  
-  const handleStartDateChange = (e) => {
-    const value = e.target.value
-    
-    // Clear any existing timeout
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current)
-    }
-    
-    // Set new timeout (300ms delay)
-    debounceTimeoutRef.current = setTimeout(() => {
-      setStartBetween(value)
-    }, 300)
-  }
+const handleStartDateChange = (e) => {
+  const value = e.target.value
+  setStartBetween(value)
+}
+
+const handleEndDateChange = (e) => {
+  const value = e.target.value
+  setEndBetween(value)
+}
 
   const handleEndDateChange = (e) => {
     const value = e.target.value
