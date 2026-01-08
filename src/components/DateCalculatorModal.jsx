@@ -410,16 +410,16 @@ export default function DateCalculatorModal({ onClose }) {
   <>
     <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4 overflow-hidden">
       {/* Date Inputs with Swap Button in Between */}
-      <div className="grid grid-cols-12 gap-2 items-end mb-3">
+      <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-end mb-3">
         {/* Start Date */}
-        <div className="col-span-5 min-w-0">
+        <div className="col-span-1 sm:col-span-5 min-w-0">
           <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
             Start date
           </label>
           <div className="relative">
             <input
               type="date"
-              className="block w-full min-w-0 max-w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 pr-10 text-sm min-h-[48px] min-w-[140px]"
+              className="block w-full min-w-0 max-w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 pr-12 text-sm min-h-[48px]"
               value={startBetween}
                             onChange={handleStartDateChange}
               style={{
@@ -432,7 +432,7 @@ export default function DateCalculatorModal({ onClose }) {
         </div>
 
         {/* Swap Button (centered) */}
-        <div className="col-span-2 flex justify-center items-end h-12">
+        <div className="col-span-1 sm:col-span-2 flex justify-center items-end h-12">
           {(startBetween || endBetween) && (
             <button
               type="button"
@@ -461,14 +461,14 @@ export default function DateCalculatorModal({ onClose }) {
         </div>
 
         {/* End Date */}
-        <div className="col-span-5 min-w-0">
+        <div className="col-span-1 sm:col-span-5 min-w-0">
           <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
             End date
           </label>
           <div className="relative">
             <input
               type="date"
-              className="block w-full min-w-0 max-w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 pr-10 text-sm min-h-[48px] min-w-[140px]"
+              className="block w-full min-w-0 max-w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 pr-12 text-sm min-h-[48px]"
               value={endBetween}
                             onChange={handleEndDateChange}
               style={{
