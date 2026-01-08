@@ -409,10 +409,10 @@ export default function DateCalculatorModal({ onClose }) {
 {tab === "between" && (
   <>
     <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4 overflow-hidden">
-      {/* Date Inputs */}
-<div className="space-y-4 mb-3">
+      {/* Date Inputs (mobile stacks, desktop side-by-side) */}
+<div className="mb-3 grid gap-3 md:grid-cols-12 md:items-end">
   {/* Start Date */}
-  <div className="min-w-0">
+  <div className="md:col-span-5 min-w-0">
     <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
       Start date
     </label>
@@ -433,7 +433,7 @@ export default function DateCalculatorModal({ onClose }) {
 
   {/* Swap Button */}
   {(startBetween || endBetween) && (
-    <div className="flex justify-center">
+    <div className="md:col-span-2 flex justify-center md:items-end">
       <button
         type="button"
         onClick={swapDates}
@@ -461,7 +461,7 @@ export default function DateCalculatorModal({ onClose }) {
   )}
 
   {/* End Date */}
-  <div className="min-w-0">
+  <div className="md:col-span-5 min-w-0">
     <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
       End date
     </label>
