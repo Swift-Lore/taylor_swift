@@ -923,7 +923,6 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
 {import.meta.env.PROD && (
   <AdSlot
     maxWidthClass="max-w-6xl"
-    minHeight={90}
     className="mb-2"
   />
 )}
