@@ -1,30 +1,39 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 export default function AdSlot({
   maxWidthClass = "max-w-6xl",
   className = "",
-  variant = "leaderboard", // "leaderboard" | "rectangle"
+  variant = "leaderboard",
+  noOuterPadding = false,
 }) {
   const insRef = useRef(null);
+  const { pathname } = useLocation();
 
   const AD_CLIENT = "ca-pub-4534610257929133";
 
-  const adConfig = useMemo(() => ({
-    leaderboard: {
-      slot: "6835416711",
-      maxWidth: 728,
-      minHeight: 90,
-    },
-    rectangle: {
-      slot: "8756354114",
-      maxWidth: 300,
-      minHeight: 250,
-    },
-  }), []);
+  const SLOTS = {
+    leaderboard: "6835416711",
+    rectangle: "8756354114",
+  };
 
-  const config = adConfig[variant] || adConfig.leaderboard;
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 640px)");
+    const apply = () => setIsMobile(mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
+
+  const config =
+    variant === "rectangle"
+      ? { slot: SLOTS.rectangle, maxWidth: 300, minHeight: 250 }
+      : isMobile
+      ? { slot: SLOTS.leaderboard, maxWidth: 320, minHeight: 100 }
+      : { slot: SLOTS.leaderboard, maxWidth: 728, minHeight: 90 };
 
   useEffect(() => {
     if (!import.meta.env.PROD) return;
@@ -32,47 +41,33 @@ export default function AdSlot({
     const ins = insRef.current;
     if (!ins) return;
 
-    // Reset so it can refill correctly on SPA rerenders
     ins.removeAttribute("data-adsbygoogle-status");
     ins.innerHTML = "";
 
-    window.adsbygoogle = window.adsbygoogle || [];
-    try {
-      window.adsbygoogle.push({});
-    } catch {
-      // ignore
-    }
-  }, [config.slot]);
-
-  // DEV placeholder
-  if (!import.meta.env.PROD) {
-    return (
-      <div className={`${maxWidthClass} mx-auto px-4 ${className}`}>
-        <div
-          className="rounded-xl border border-[#e6d2e1] bg-white/70 shadow-sm flex items-center justify-center text-sm text-gray-500 mx-auto"
-          style={{
-            width: "100%",
-            maxWidth: `${config.maxWidth}px`,
-            minHeight: `${config.minHeight}px`,
-          }}
-        >
-          [Ad: {variant} — up to {config.maxWidth}px wide]
-        </div>
-      </div>
-    );
-  }
+    requestAnimationFrame(() => {
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      } catch {}
+    });
+  }, [config.slot, pathname]);
 
   return (
-    <div className={`${maxWidthClass} mx-auto px-4 ${className}`}>
+    <div
+      className={`${maxWidthClass} mx-auto ${
+        noOuterPadding ? "" : "px-4"
+      } ${className}`}
+    >
       <div
-        className="relative rounded-xl border border-[#e6d2e1] bg-white/70 shadow-sm mx-auto"
+        className="mx-auto"
         style={{
           width: "100%",
-          maxWidth: `${config.maxWidth}px`,
-          minHeight: `${config.minHeight}px`,
+          maxWidth: config.maxWidth,
+          minHeight: config.minHeight,
+          overflow: "visible",
         }}
       >
         <ins
+          key={`${variant}-${config.slot}-${pathname}`}
           ref={insRef}
           className="adsbygoogle"
           style={{ display: "block", width: "100%" }}
