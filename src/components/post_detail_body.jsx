@@ -84,6 +84,373 @@ const normalizeInstagramUrl = (raw) => {
   return `https://www.instagram.com/${type}/${shortcode}/`;
 };
 
+// Helper to extract domain from URL for favicon
+const getDomainFromUrl = (url) => {
+  try {
+    const urlObj = new URL(url);
+    return urlObj.hostname.replace('www.', '');
+  } catch {
+    return 'website';
+  }
+};
+
+// Helper to get favicon
+const getFaviconUrl = (domain) => {
+  return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+};
+
+function LinkPreview({ url }) {
+  const [previewData, setPreviewData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const domain = getDomainFromUrl(url);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchPreview = async () => {
+      if (!isMounted) return;
+
+      try {
+        setLoading(true);
+
+        // ================== STRATEGY 1: Microlink API (Primary) ==================
+        // Microlink provides the most reliable previews with screenshot capability
+        // Get a free API key from https://microlink.io/
+        const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
+        const microlinkUrl = `https://api.microlink.io/?url=${encodeURIComponent(
+          url
+        )}&wait=1500&screenshot=true&embed=screenshot.url&video=false&audio=false&iframe=false&palette=true&theme=light&api_key=${MICROLINK_API_KEY}`;
+
+        const microlinkResponse = await fetch(microlinkUrl, {
+          headers: {
+            'Accept': 'application/json',
+          },
+          signal: AbortSignal.timeout(8000) // 8 second timeout
+        });
+
+        if (microlinkResponse.ok) {
+          const microlinkData = await microlinkResponse.json();
+          
+          if (isMounted && microlinkData.data) {
+            const data = microlinkData.data;
+            
+            // Process and clean the data
+            let imageUrl = data.image?.url || data.screenshot?.url || data.logo?.url;
+            
+            // Ensure image URL is absolute
+            if (imageUrl && imageUrl.startsWith('//')) {
+              imageUrl = 'https:' + imageUrl;
+            } else if (imageUrl && imageUrl.startsWith('/')) {
+              imageUrl = `https://${domain}${imageUrl}`;
+            }
+
+            setPreviewData({
+              title: data.title || 
+                     domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1) + ' Article',
+              description: data.description ? 
+                          (data.description.length > 150 ? data.description.substring(0, 147) + '...' : data.description) : '',
+              image: imageUrl || getFaviconUrl(domain),
+              domain: data.publisher || domain,
+              url: data.url || url,
+              author: data.author || '',
+              date: data.date || ''
+            });
+            return;
+          }
+        }
+
+        // ================== STRATEGY 2: LinkPreview API (Fallback) ==================
+        // Alternative free API that works well
+        const linkPreviewUrl = `https://api.linkpreview.net/?key=${import.meta.env.VITE_LINKPREVIEW_API_KEY || '5b576'}&q=${encodeURIComponent(url)}`;
+        
+        const linkPreviewResponse = await fetch(linkPreviewUrl, {
+          signal: AbortSignal.timeout(5000)
+        });
+
+        if (linkPreviewResponse.ok) {
+          const linkPreviewData = await linkPreviewResponse.json();
+          
+          if (isMounted && linkPreviewData) {
+            setPreviewData({
+              title: linkPreviewData.title || 
+                     domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1) + ' Article',
+              description: linkPreviewData.description ? 
+                          (linkPreviewData.description.length > 150 ? linkPreviewData.description.substring(0, 147) + '...' : linkPreviewData.description) : '',
+              image: linkPreviewData.image || getFaviconUrl(domain),
+              domain: linkPreviewData.url ? getDomainFromUrl(linkPreviewData.url) : domain,
+              url: linkPreviewData.url || url
+            });
+            return;
+          }
+        }
+
+        // ================== STRATEGY 3: Direct Open Graph Fetch with CORS Proxy ==================
+        // For sites that don't work with APIs
+        const corsProxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+        
+        try {
+          const response = await fetch(corsProxyUrl, {
+            signal: AbortSignal.timeout(6000)
+          });
+          
+          if (response.ok) {
+            const html = await response.text();
+            
+            // Parse Open Graph and meta tags
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            const ogTitle = doc.querySelector('meta[property="og:title"]')?.content;
+            const ogDescription = doc.querySelector('meta[property="og:description"]')?.content;
+            const ogImage = doc.querySelector('meta[property="og:image"]')?.content;
+            const ogSiteName = doc.querySelector('meta[property="og:site_name"]')?.content;
+            
+            const metaTitle = doc.querySelector('title')?.textContent;
+            const metaDescription = doc.querySelector('meta[name="description"]')?.content;
+            const metaImage = doc.querySelector('link[rel="image_src"]')?.href;
+            
+            // Process image URL to ensure it's absolute
+            let finalImage = ogImage || metaImage;
+            if (finalImage) {
+              if (finalImage.startsWith('//')) {
+                finalImage = 'https:' + finalImage;
+              } else if (finalImage.startsWith('/')) {
+                finalImage = `https://${domain}${finalImage}`;
+              }
+            }
+            
+            // Build final title
+            let finalTitle = ogTitle || metaTitle;
+            if (!finalTitle || finalTitle.trim() === '') {
+              finalTitle = domain.split('.')[0].charAt(0).toUpperCase() + 
+                          domain.split('.')[0].slice(1) + ' Article';
+            }
+            
+            // Build final description
+            let finalDescription = ogDescription || metaDescription || '';
+            if (finalDescription.length > 150) {
+              finalDescription = finalDescription.substring(0, 147) + '...';
+            }
+            
+            if (isMounted) {
+              setPreviewData({
+                title: finalTitle,
+                description: finalDescription,
+                image: finalImage || getFaviconUrl(domain),
+                domain: ogSiteName || domain,
+                url: url
+              });
+              return;
+            }
+          }
+        } catch (proxyError) {
+          console.log('CORS proxy failed for:', domain, proxyError);
+        }
+
+        // ================== STRATEGY 4: Site-Specific Fallbacks ==================
+        // Custom handling for known sites (like justjared.com)
+        const siteConfigs = {
+          'justjared.com': {
+            title: 'Just Jared - Celebrity News & Photos',
+            description: 'Breaking celebrity news, photos, and entertainment updates',
+            image: 'https://www.justjared.com/images/justjared-logo-new.png'
+          },
+          'nbcrews.com': {
+            title: 'NBC News Entertainment',
+            description: 'Latest entertainment news and updates from NBC News',
+            image: 'https://nodeassets.nbc.com/nbc-web/assets/2.0.0/images/nbc-logo.svg'
+          },
+          'people.com': {
+            title: 'People Magazine',
+            description: 'Breaking celebrity news, entertainment stories and exclusive interviews',
+            image: 'https://people.com/thmb/7fBSYpC6a31D0Mq9B5WgSdIBUZU=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/people_logo-d5e9f7d1e7f34f9eb8e7c26b7bb40d5e.png'
+          },
+          'tmz.com': {
+            title: 'TMZ - Celebrity News',
+            description: 'Breaking celebrity gossip and entertainment news',
+            image: 'https://tmz.ugc.zencdn.net/2019_TMZ_Logo_WhiteOrange.png?1'
+          },
+          'etonline.com': {
+            title: 'Entertainment Tonight',
+            description: 'Entertainment news, celebrity interviews, and TV gossip',
+            image: 'https://www.etonline.com/sites/etonline.com/files/et_logo_0.png'
+          }
+        };
+
+        // Check if we have a site-specific configuration
+        const siteKey = Object.keys(siteConfigs).find(key => 
+          domain.includes(key.replace('www.', ''))
+        );
+
+        if (siteKey && isMounted) {
+          const config = siteConfigs[siteKey];
+          setPreviewData({
+            title: config.title,
+            description: config.description,
+            image: config.image,
+            domain: siteKey,
+            url: url
+          });
+          return;
+        }
+
+        // ================== STRATEGY 5: Ultimate Fallback ==================
+        if (isMounted) {
+          setPreviewData({
+            title: domain.split('.')[0].charAt(0).toUpperCase() + 
+                  domain.split('.')[0].slice(1) + ' Article',
+            description: '',
+            image: getFaviconUrl(domain),
+            domain: domain,
+            url: url
+          });
+        }
+
+      } catch (error) {
+        console.log('Link preview error for', url, error);
+        
+        if (isMounted) {
+          setPreviewData({
+            title: domain.split('.')[0].charAt(0).toUpperCase() + 
+                  domain.split('.')[0].slice(1) + ' Article',
+            description: '',
+            image: getFaviconUrl(domain),
+            domain: domain,
+            url: url
+          });
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchPreview();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [url, domain]);
+
+  if (loading) {
+    return (
+      <div className="microlink-card block max-w-md mx-auto mb-4 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm animate-pulse">
+        <div className="h-40 bg-gradient-to-r from-gray-200 to-gray-300 animate-pulse"></div>
+        <div className="p-4">
+          <div className="h-4 bg-gray-200 rounded mb-2 w-3/4 animate-pulse"></div>
+          <div className="h-3 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+          <div className="flex items-center mt-3">
+            <div className="w-6 h-6 bg-gray-200 rounded-full mr-2 animate-pulse"></div>
+            <div className="h-3 bg-gray-200 rounded w-1/3 animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <a
+      href={previewData.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="microlink-card block max-w-md mx-auto mb-4 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
+    >
+      {/* Thumbnail image with gradient overlay */}
+      <div className="h-48 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 relative">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-60 z-10"></div>
+        <img
+          src={previewData.image}
+          alt={previewData.title}
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
+          onError={(e) => {
+            // If image fails to load, replace with favicon in a nice container
+            e.target.style.display = 'none';
+            const parent = e.target.parentElement;
+            
+            // Create a nice fallback container
+            const fallback = document.createElement('div');
+            fallback.className = 'w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#8e3e3e]/10 to-red-100';
+            
+            const favicon = document.createElement('img');
+            favicon.src = getFaviconUrl(domain);
+            favicon.className = 'w-12 h-12 mb-3 opacity-70';
+            favicon.alt = 'Website favicon';
+            
+            const domainText = document.createElement('span');
+            domainText.className = 'text-sm text-gray-500 font-medium';
+            domainText.textContent = domain.replace('www.', '');
+            
+            fallback.appendChild(favicon);
+            fallback.appendChild(domainText);
+            parent.appendChild(fallback);
+          }}
+        />
+        
+        {/* Hover gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#8e3e3e]/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20"></div>
+      </div>
+      
+      {/* Content area */}
+      <div className="p-5">
+        <div className="flex items-start gap-4">
+          {/* Favicon badge */}
+          <div className="flex-shrink-0">
+            <div className="relative">
+              <img
+                src={getFaviconUrl(domain)}
+                alt={domain}
+                className="w-8 h-8 rounded-lg border border-gray-200 shadow-sm"
+              />
+              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white"></div>
+            </div>
+          </div>
+          
+          {/* Text content */}
+          <div className="flex-1 min-w-0">
+            {/* Title with gradient text on hover */}
+            <h3 className="text-base font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#8e3e3e] group-hover:to-red-500 transition-all duration-300">
+              {previewData.title}
+            </h3>
+            
+            {/* Description */}
+            {previewData.description && (
+              <p className="text-sm text-gray-600 mb-3 line-clamp-2 leading-relaxed">
+                {previewData.description}
+              </p>
+            )}
+            
+            {/* Metadata row */}
+            <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-gray-500 truncate">
+                  {previewData.domain}
+                </span>
+                {previewData.author && (
+                  <>
+                    <span className="text-gray-300">•</span>
+                    <span className="text-xs text-gray-400 truncate">
+                      {previewData.author}
+                    </span>
+                  </>
+                )}
+              </div>
+              
+              {/* CTA button */}
+              <span className="flex items-center gap-1 text-xs font-semibold text-[#8e3e3e] group-hover:text-red-600 transition-colors">
+                Read article
+                <svg className="w-3 h-3 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  );
+}
+
 export default function PostDetailBody() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -101,6 +468,7 @@ export default function PostDetailBody() {
   // Source link state
   const [sourceImages, setSourceImages] = useState([]);
   const [nonImageLinks, setNonImageLinks] = useState([]);
+  const [microlinkErrors, setMicrolinkErrors] = useState({});
 
   // Scroll to top on mount / id change
   useEffect(() => {
@@ -154,7 +522,10 @@ export default function PostDetailBody() {
     setSourceImages(imageLinks);
     setNonImageLinks(otherLinks);
   }, [event]);
-
+useEffect(() => {
+    setMicrolinkErrors({});
+  }, [event]);
+  
   // Modal helpers
   const closeModal = () => setIsModalOpen(false);
 
@@ -446,69 +817,9 @@ useEffect(() => {
                       );
                     }
 
-                    // Non-Getty links: keep using Microlink + fallback as before
+      // Non-Getty links: use our custom LinkPreview component
                     return (
-                      <div key={`link-${index}`} className="microlink-card">
-                        <div id={`microlink-wrapper-${index}`}>
-                          <Microlink
-                            url={url}
-                            size="large"
-                            media="image"
-                            onError={() => {
-                              const fallback = document.getElementById(
-                                `fallback-${index}`
-                              );
-                              if (fallback) fallback.style.display = "flex";
-                            }}
-                            fallback={{
-  image: (() => {
-    try {
-      return `https://logo.clearbit.com/${new URL(url).hostname}`
-    } catch {
-      return ""
-    }
-  })(),
-  title: url
-    .split("/")
-    .slice(-1)[0]
-    .replace(/[-_]/g, " "),
-  description: (() => {
-    try {
-      return new URL(url).hostname.replace("www.", "")
-    } catch {
-      return ""
-    }
-  })(),
-}}
-                          />
-                        </div>
-
-                        {/* Fallback card */}
-                        <div
-                          id={`fallback-${index}`}
-                          style={{ display: "none" }}
-                          className="fallback-card flex items-center p-3 border border-gray-200 rounded-lg bg-white"
-                        >
-                          <img
-                            src={`https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(
-                              url
-                            )}`}
-                            alt=""
-                            className="w-8 h-8 mr-3"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-red-400 truncate">
-                              {url
-                                .split("/")
-                                .slice(-1)[0]
-                                .replace(/[-_]/g, " ")}
-                            </p>
-                            <p className="text-xs text-gray-500 truncate">
-                              {new URL(url).hostname.replace("www.", "")}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
+                      <LinkPreview key={`link-${index}`} url={url} />
                     );
                   })}
                 </div>
@@ -518,15 +829,15 @@ useEffect(() => {
         </section>
       )}
 
-{/* AdSense: Post Detail (inline) */}
-{import.meta.env.PROD && !!event && (
-  <div className="max-w-4xl mx-auto px-4 mb-8">
-    <AdSlot 
-      variant="leaderboard" 
-      maxWidthClass="max-w-4xl" 
-    />
-  </div>
-)}
+      {/* AdSense: Post Detail (inline) */}
+      {import.meta.env.PROD && !!event && (
+        <div className="max-w-4xl mx-auto px-4 mb-8">
+          <AdSlot 
+            variant="leaderboard" 
+            maxWidthClass="max-w-4xl" 
+          />
+        </div>
+      )}
       
       {/* Main image */}
       {event.IMAGE && event.IMAGE.length > 0 && (

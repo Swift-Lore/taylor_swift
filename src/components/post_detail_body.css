@@ -127,6 +127,51 @@
     margin-bottom: 1rem;
 }
 
+/* Ensure Microlink cards are consistent size */
+.microlink-card .microlink_card {
+    width: 100% !important;
+    height: 180px !important; /* Fixed height for consistency */
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+/* Style the content inside Microlink cards */
+.microlink-card .microlink_card__content {
+    padding: 12px !important;
+}
+
+.microlink-card .microlink_card__title {
+    font-size: 14px !important;
+    line-height: 1.3 !important;
+    margin-bottom: 4px !important;
+    color: #8e3e3e !important;
+}
+
+.microlink-card .microlink_card__description {
+    font-size: 12px !important;
+    color: #6b7280 !important;
+    line-height: 1.2 !important;
+}
+
+.microlink-card .microlink_card__image {
+    height: 100px !important;
+    object-fit: cover !important;
+}
+
+/* Fix for when Microlink shows just URL */
+.microlink-card a[href*="//"] {
+    display: flex !important;
+    align-items: center !important;
+    padding: 12px !important;
+    text-decoration: none !important;
+    color: #8e3e3e !important;
+}
+
+.microlink-card a[href*="//"]:hover {
+    color: #dc3545 !important;
+}
+
 /* Override any parent constraints that might be limiting size */
 .w-\[90\%\],
 .md\:w-\[80vw\] {
@@ -234,4 +279,18 @@
 .tiktok-wrapper {
   width: 100%;
   max-width: 350px;
+}
+/* Add to your post_detail_body.css */
+.bg-gradient-text {
+  background: linear-gradient(135deg, #8e3e3e 0%, #d53f3f 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
