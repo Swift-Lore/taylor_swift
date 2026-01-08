@@ -504,12 +504,12 @@ export default function DateCalculatorModal({ onClose }) {
       {/* Results in Grid - More Compact */}
       <div className="grid gap-2">
         {/* Days */}
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-[#6b7db3]">Days</div>
-          <div className={`font-semibold ${betweenRes.totalDays < 0 ? 'text-red-500' : 'text-[#8e3e3e]'}`}>
-            {betweenRes.totalDays < 0 ? '-' : ''}{Math.abs(betweenRes.totalDays).toLocaleString()}
-          </div>
-        </div>
+<div className="flex items-center justify-between">
+  <div className="text-sm text-[#6b7db3]">Days</div>
+  <div className={`font-semibold ${betweenRes.totalDays < 0 ? 'text-red-500' : 'text-[#8e3e3e]'}`}>
+    {betweenRes.totalDays < 0 ? '-' : ''}{Math.abs(betweenRes.totalDays).toLocaleString()} Days
+  </div>
+</div>
 
         {/* Weeks */}
         <div className="flex items-center justify-between">
