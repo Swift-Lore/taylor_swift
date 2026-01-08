@@ -10,6 +10,7 @@ import PrivacyPolicy from "./components/privacy_policy";
 import CookieConsent from "react-cookie-consent";
 import ErasTourShows from "./components/ErasTourShows";
 import AboutContact from "./components/AboutContact";
+import { useEffect } from 'react';
 
 /* ------------ Shared layout ------------ */
 
@@ -84,6 +85,38 @@ function ErasTourShowsPage() {
 /* ------------ App root ------------ */
 
 function App() {
+  useEffect(() => {
+    // Only load in production
+    if (import.meta.env.PROD) {
+      console.log('App mounted - checking AdSense script...');
+      
+      // Check if script already exists
+      if (!document.querySelector('script[src*="pagead2.googlesyndication.com"]')) {
+        console.log('Loading AdSense script...');
+        const script = document.createElement('script');
+        script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4534610257929133';
+        script.async = true;
+        script.crossOrigin = 'anonymous';
+        
+        script.onload = () => {
+          console.log('✅ AdSense script loaded successfully');
+          // Initialize ads after script loads
+          if (window.adsbygoogle) {
+            console.log('Initializing ads...');
+            (window.adsbygoogle = window.adsbygoogle || []).push({});
+          }
+        };
+        
+        script.onerror = (e) => {
+          console.error('❌ Failed to load AdSense script:', e);
+        };
+        
+        document.head.appendChild(script);
+      } else {
+        console.log('✅ AdSense script already loaded');
+      }
+    }
+  }, []);
   return (
     <>
       <Routes>
@@ -112,6 +145,12 @@ function App() {
         declineButtonText="Reject Non-Essential"
         enableDeclineButton
         cookieName="websiteCookieConsent"
+        onAccept={() => {
+    console.log('Cookies accepted - reloading ads if needed');
+    if (window.adsbygoogle) {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    }
+  }}
         style={{
           position: "fixed",
           left: "50%",
