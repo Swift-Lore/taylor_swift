@@ -482,25 +482,6 @@ export default function DateCalculatorModal({ onClose }) {
       </div>
     </div>
 
-    {/* Results Box - REMOVED "Result" header */}
-    <div className="bg-white rounded-2xl border border-[#e3b0b0] p-4 mb-4">
-      {betweenRes ? (
-        <div className="space-y-3">
-          {/* Date Display - REMOVED "Date Range" header */}
-          <div className="text-center">
-            <div className="text-[#8e3e3e] font-semibold text-sm mb-1">
-              {formatMMDDYYYY(betweenRes.start)} → {formatMMDDYYYY(betweenRes.end)}
-            </div>
-            {betweenRes.isReversed && (
-              <div className="text-xs text-red-500">
-                (End date is earlier than start date)
-              </div>
-            )}
-          </div>
-
-          {/* Separator */}
-          <div className="border-t border-[#e3b0b0] my-2"></div>
-
           {/* Results Box - REMOVED "Result" header */}
 <div className="bg-white rounded-2xl border border-[#e3b0b0] p-4 mb-4">
   {betweenRes ? (
