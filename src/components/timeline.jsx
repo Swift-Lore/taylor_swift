@@ -918,14 +918,6 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               </div>
             </div>
           </div>
-          
-{/* Ad block */}
-{import.meta.env.PROD && !isLoading && !isInitialLoad && records.length > 0 && (
-  <AdSlot
-    maxWidthClass="max-w-6xl"
-    className="mb-2"
-  />
-)}
 
           {/* ON THIS DAY Section */}
 <div className="text-center mb-1 flex-shrink-0">
