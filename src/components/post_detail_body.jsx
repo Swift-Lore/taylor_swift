@@ -520,11 +520,9 @@ useEffect(() => {
 
 {/* AdSense: Post Detail (inline) */}
 {import.meta.env.PROD && (
-  <AdSlot
-    maxWidthClass="max-w-4xl"
-    minHeight={90}
-    className="mb-8"
-  />
+  <div className="max-w-4xl mx-auto px-4 mb-8">
+    <AdSlot variant="leaderboard" maxWidthClass="max-w-full" />
+  </div>
 )}
       
       {/* Main image */}
