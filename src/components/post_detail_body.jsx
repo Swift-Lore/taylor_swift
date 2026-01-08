@@ -447,39 +447,21 @@ useEffect(() => {
                     }
 
                     // Non-Getty links: keep using Microlink + fallback as before
-                    return (
-                      <div key={`link-${index}`} className="microlink-card">
-                        <div id={`microlink-wrapper-${index}`}>
-                          <Microlink
-                            url={url}
-                            size="large"
-                            media="image"
-                            onError={() => {
-                              const fallback = document.getElementById(
-                                `fallback-${index}`
-                              );
-                              if (fallback) fallback.style.display = "flex";
-                            }}
-                            fallback={{
-  image: (() => {
-    try {
-      return `https://logo.clearbit.com/${new URL(url).hostname}`
-    } catch {
-      return ""
-    }
-  })(),
-  title: url
-    .split("/")
-    .slice(-1)[0]
-    .replace(/[-_]/g, " "),
-  description: (() => {
-    try {
-      return new URL(url).hostname.replace("www.", "")
-    } catch {
-      return ""
-    }
-  })(),
-}}
+return (
+  <div key={`link-${index}`} className="microlink-card">
+    <div id={`microlink-wrapper-${index}`}>
+      <Microlink
+        url={url}
+        size="large"
+        media="image"
+        onError={() => {
+          const fallback = document.getElementById(
+            `fallback-${index}`
+          );
+          if (fallback) fallback.style.display = "flex";
+        }}
+      />
+    </div>
                           />
                         </div>
 
