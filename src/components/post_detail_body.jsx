@@ -462,8 +462,6 @@ return (
         }}
       />
     </div>
-                          />
-                        </div>
 
                         {/* Fallback card */}
                         <div
