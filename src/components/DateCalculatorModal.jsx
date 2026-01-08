@@ -428,54 +428,54 @@ export default function DateCalculatorModal({ onClose }) {
 </div>
 
       {/* Desktop layout: side by side */}
-      <div className="hidden md:flex md:gap-4 md:items-end">
-        {/* Start date */}
-        <div className="flex-1 min-w-0">
-          <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
-            Start date
-          </label>
-          <input
-            type="date"
-            className="date-calc-modal block w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 text-sm min-h-[48px] pr-10"
-            value={startBetween}
-            onChange={handleStartDateChange}
-          />
-        </div>
+<div className="hidden md:flex md:gap-4 md:items-end">
+  {/* Start date */}
+  <div className="flex-1 min-w-0">
+    <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
+      Start date
+    </label>
+    <input
+      type="date"
+      className="date-calc-modal block w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 text-sm min-h-[48px] pr-10"
+      value={startBetween}
+      onChange={handleStartDateChange}
+    />
+  </div>
 
-        {/* Swap button for desktop */}
-        <div className="flex items-end pb-[10px]">
-          <button
-            type="button"
-            onClick={swapDates}
-            className={`rounded-full p-2 border border-[#6b7db3] text-[#6b7db3] bg-white hover:bg-[#e6edf7] transition-colors h-10 w-10 flex items-center justify-center ${
-              (startBetween || endBetween) ? "opacity-100" : "opacity-0 pointer-events-none"
-            }`}
-            title="Swap dates"
-            tabIndex={(startBetween || endBetween) ? 0 : -1}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m18 4 4 4-4 4" />
-              <path d="M2 8h20" />
-              <path d="m6 20-4-4 4-4" />
-              <path d="M22 16H2" />
-            </svg>
-          </button>
-        </div>
+  {/* Swap button for desktop */}
+  <div className="flex items-end pb-[10px]">
+    <button
+      type="button"
+      onClick={swapDates}
+      className={`rounded-full p-2 border border-[#6b7db3] text-[#6b7db3] bg-white hover:bg-[#e6edf7] transition-colors h-10 w-10 flex items-center justify-center ${
+        (startBetween || endBetween) ? "opacity-100" : "opacity-0 pointer-events-none"
+      }`}
+      title="Swap dates"
+      tabIndex={(startBetween || endBetween) ? 0 : -1}
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="m18 4 4 4-4 4" />
+        <path d="M2 8h20" />
+        <path d="m6 20-4-4 4-4" />
+        <path d="M22 16H2" />
+      </svg>
+    </button>
+  </div>
 
-        {/* End date */}
-        <div className="flex-1 min-w-0">
-          <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
-            End date
-          </label>
-          <input
-            type="date"
-            className="date-calc-modal block w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 text-sm min-h-[48px] pr-10"
-            value={endBetween}
-            onChange={handleEndDateChange}
-          />
-        </div>
-      </div>
+  {/* End date */}
+  <div className="flex-1 min-w-0">
+    <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
+      End date
+    </label>
+    <input
+      type="date"
+      className="date-calc-modal block w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 text-sm min-h-[48px] pr-10"
+      value={endBetween}
+      onChange={handleEndDateChange}
+    />
+  </div>
+</div>
 
       <label className="flex items-center gap-2 mt-3 text-sm text-[#6b7db3] select-none">
         <input
