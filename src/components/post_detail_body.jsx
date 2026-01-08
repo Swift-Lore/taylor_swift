@@ -494,8 +494,8 @@ return (
     </div>
   </a>
 );
-                  });
-                  </div>
+  });
+     </div>
 
 {/* AdSense: Post Detail (inline) */}
 {import.meta.env.PROD && !!event && (
