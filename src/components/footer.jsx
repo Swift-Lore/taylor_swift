@@ -56,12 +56,9 @@ export default function Footer() {
           </div>
 
           {/* AD SECTION – footer sponsored card */}
-          {import.meta.env.PROD && (
+          {import.meta.env.PROD && mounted && (
             <div className="w-full md:w-1/2 flex">
-              <AdSlot
-  variant="rectangle"
-  maxWidthClass="max-w-full"
-/>
+              <AdSlot variant="rectangle" maxWidthClass="max-w-full" />
             </div>
           )}
         </div>
