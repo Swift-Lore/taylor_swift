@@ -431,34 +431,36 @@ export default function DateCalculatorModal({ onClose }) {
     </div>
   </div>
 
-  {/* Swap Button */}
-  {(startBetween || endBetween) && (
-    <div className="md:col-span-2 flex justify-center md:items-end">
-      <button
-        type="button"
-        onClick={swapDates}
-        className="rounded-full p-2 border border-[#6b7db3] text-[#6b7db3] bg-white hover:bg-[#e6edf7] transition-colors"
-        title="Swap dates"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="m18 4 4 4-4 4" />
-          <path d="M2 8h20" />
-          <path d="m6 20-4-4 4-4" />
-          <path d="M22 16H2" />
-        </svg>
-      </button>
-    </div>
-  )}
+  {/* Swap Button (keep column so layout never shifts) */}
+<div className="md:col-span-2 flex justify-center md:items-end">
+  <button
+    type="button"
+    onClick={swapDates}
+    className={`rounded-full p-2 border border-[#6b7db3] text-[#6b7db3] bg-white hover:bg-[#e6edf7] transition-colors ${
+      (startBetween || endBetween) ? "opacity-100" : "opacity-0 pointer-events-none"
+    }`}
+    title="Swap dates"
+    aria-hidden={!(startBetween || endBetween)}
+    tabIndex={(startBetween || endBetween) ? 0 : -1}
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m18 4 4 4-4 4" />
+      <path d="M2 8h20" />
+      <path d="m6 20-4-4 4-4" />
+      <path d="M22 16H2" />
+    </svg>
+  </button>
+</div>
 
   {/* End Date */}
   <div className="md:col-span-5 min-w-0">
