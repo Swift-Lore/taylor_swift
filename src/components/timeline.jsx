@@ -922,14 +922,14 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           {/* Ad block */}
 {import.meta.env.PROD && !isLoading && !isInitialLoad && records.length > 0 && (
   <AdSlot
-    variant="leaderboard"
-    maxWidthClass="max-w-6xl"
-    className="mb-2"
-  />
+  variant="leaderboard"
+  maxWidthClass="max-w-6xl"
+  className="mb-6 relative z-0"
+/>
 )}
           
           {/* ON THIS DAY Section */}
-<div className="text-center mb-1 flex-shrink-0">
+<div className="text-center mt-3 mb-1 flex-shrink-0 relative z-10">
   {/* Glowy header card */}
   <div className="relative w-full mb-2 md:mb-3 px-2">
     <div
