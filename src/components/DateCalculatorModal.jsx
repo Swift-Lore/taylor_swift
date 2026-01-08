@@ -131,22 +131,31 @@ export default function DateCalculatorModal({ onClose }) {
     // Apply negative sign if dates are reversed
     const finalTotalDays = isReversed ? -totalDays : totalDays
 
-    // Build Years / Months / Days by stepping forward (always from earlier to later)
-    let cursor = new Date(earlier.getTime())
+    // ---- Years-only breakdown (years + remaining days, ignoring months) ----
+let yCursor = new Date(earlier.getTime())
+let yOnlyYears = 0
+while (addYearsUTC(yCursor, 1).getTime() <= later.getTime()) {
+  yCursor = addYearsUTC(yCursor, 1)
+  yOnlyYears += 1
+}
+const yOnlyDays = diffDaysUTC(yCursor, later)
 
-    let years = 0
-    while (addYearsUTC(cursor, 1).getTime() <= later.getTime()) {
-      cursor = addYearsUTC(cursor, 1)
-      years += 1
-    }
+// ---- Your existing Years+Months+Days breakdown (ymd) ----
+let cursor = new Date(earlier.getTime())
 
-    let months = 0
-    while (addMonthsUTC(cursor, 1).getTime() <= later.getTime()) {
-      cursor = addMonthsUTC(cursor, 1)
-      months += 1
-    }
+let years = 0
+while (addYearsUTC(cursor, 1).getTime() <= later.getTime()) {
+  cursor = addYearsUTC(cursor, 1)
+  years += 1
+}
 
-    const days = diffDaysUTC(cursor, later)
+let months = 0
+while (addMonthsUTC(cursor, 1).getTime() <= later.getTime()) {
+  cursor = addMonthsUTC(cursor, 1)
+  months += 1
+}
+
+const days = diffDaysUTC(cursor, later)
     
     // Apply negative sign to all components if dates are reversed
     const finalYears = isReversed ? -years : years
