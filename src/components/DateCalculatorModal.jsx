@@ -419,7 +419,7 @@ export default function DateCalculatorModal({ onClose }) {
           <div className="relative">
             <input
               type="date"
-              className="block w-full min-w-0 max-w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 text-sm min-h-[48px] min-w-[140px]"
+              className="block w-full min-w-0 max-w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 pr-10 text-sm min-h-[48px] min-w-[140px]"
               value={startBetween}
                             onChange={handleStartDateChange}
               style={{
@@ -468,7 +468,7 @@ export default function DateCalculatorModal({ onClose }) {
           <div className="relative">
             <input
               type="date"
-              className="block w-full min-w-0 max-w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 text-sm min-h-[48px] min-w-[140px]"
+              className="block w-full min-w-0 max-w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 pr-10 text-sm min-h-[48px] min-w-[140px]"
               value={endBetween}
                             onChange={handleEndDateChange}
               style={{
