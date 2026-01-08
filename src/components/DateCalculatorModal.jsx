@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react" 
 import { Button } from "./ui/Button"
 
 export default function DateCalculatorModal({ onClose }) {
@@ -16,12 +16,52 @@ export default function DateCalculatorModal({ onClose }) {
       document.body.style.overflow = originalStyle
     }
   }, [])
+
+    // Cleanup debounce timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current)
+      }
+    }
+  }, [])
   
   // --- Tabs ---
   const [tab, setTab] = useState("between")
 
   // Days Between option: include end date (+1 day)
   const [includeEndDate, setIncludeEndDate] = useState(false)
+
+    // --- Debounce for date inputs ---
+  const debounceTimeoutRef = useRef(null)
+  
+  const handleStartDateChange = (e) => {
+    const value = e.target.value
+    
+    // Clear any existing timeout
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current)
+    }
+    
+    // Set new timeout (300ms delay)
+    debounceTimeoutRef.current = setTimeout(() => {
+      setStartBetween(value)
+    }, 300)
+  }
+
+  const handleEndDateChange = (e) => {
+    const value = e.target.value
+    
+    // Clear any existing timeout
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current)
+    }
+    
+    // Set new timeout (300ms delay)
+    debounceTimeoutRef.current = setTimeout(() => {
+      setEndBetween(value)
+    }, 300)
+  }
 
   // --- Between dates state ---
   const [startBetween, setStartBetween] = useState("")
@@ -381,7 +421,7 @@ export default function DateCalculatorModal({ onClose }) {
               type="date"
               className="block w-full min-w-0 max-w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 text-sm min-h-[48px] min-w-[140px]"
               value={startBetween}
-              onChange={(e) => setStartBetween(e.target.value)}
+                            onChange={handleStartDateChange}
               style={{
                 fontSize: '14px',
                 lineHeight: '1.5',
@@ -434,7 +474,7 @@ export default function DateCalculatorModal({ onClose }) {
               type="date"
               className="block w-full min-w-0 max-w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 text-sm min-h-[48px] min-w-[140px]"
               value={endBetween}
-              onChange={(e) => setEndBetween(e.target.value)}
+                            onChange={handleEndDateChange}
               style={{
                 fontSize: '14px',
                 lineHeight: '1.5',
