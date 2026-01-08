@@ -427,7 +427,7 @@ export default function ErasTourShows() {
                         {/* Inline ad */}
 {import.meta.env.PROD && !loading && selectedShow && (
   <AdSlot
-    variant="rectangle"  {/* ← Add this for 300×250 square ad */}
+    variant="rectangle"
     maxWidthClass="max-w-5xl"
     className="my-6"
   />
