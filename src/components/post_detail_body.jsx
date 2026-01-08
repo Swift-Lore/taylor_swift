@@ -103,7 +103,6 @@ export default function PostDetailBody() {
   const [nonImageLinks, setNonImageLinks] = useState([]);
   const [microlinkErrors, setMicrolinkErrors] = useState({});
 
-
   // Scroll to top on mount / id change
   useEffect(() => {
     window.scrollTo(0, 0);
