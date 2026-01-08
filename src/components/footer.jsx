@@ -54,11 +54,11 @@ export default function Footer() {
           {import.meta.env.PROD && (
             <div className="w-full md:w-1/2 flex">
               <AdSlot
-                variant="rectangle"
-                maxWidthClass="max-w-full"
-                noOuterPadding
-                className="bg-white/75 rounded-3xl border border-[#f8dada] p-3"
-              />
+  variant="leaderboard"
+  maxWidthClass="max-w-full"
+  noOuterPadding
+  className="bg-white/75 rounded-3xl border border-[#f8dada] p-3"
+/>
             </div>
           )}
         </div>
