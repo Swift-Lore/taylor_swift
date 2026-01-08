@@ -238,9 +238,10 @@ export default function DateCalculatorModal({ onClose }) {
                   </label>
                   <input
   type="date"
-  className="date-calc-modal block w-full min-w-0 box-border bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm pr-10 min-h-[44px]"
+  className="w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm min-h-[44px]"
   value={baseDate}
   onChange={(e) => setBaseDate(e.target.value)}
+  style={{ paddingRight: '2.5rem' }}
 />
                 </div>
 
