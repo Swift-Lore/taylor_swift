@@ -405,32 +405,34 @@ export default function DateCalculatorModal({ onClose }) {
 
       {/* Swap Dates Button - Only show when both dates are entered */}
       {startBetween && endBetween && (
-        <div className="flex justify-center mt-3">
-          <button
-            type="button"
-            onClick={swapDates}
-            className="flex items-center gap-2 rounded-full px-4 py-2 text-sm border border-[#6b7db3] text-[#6b7db3] bg-white hover:bg-[#e6edf7] transition-colors"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="m18 4 4 4-4 4" />
-              <path d="M2 8h20" />
-              <path d="m6 20-4-4 4-4" />
-              <path d="M22 16H2" />
-            </svg>
-            Swap Dates
-          </button>
-        </div>
-      )}
+  <div className="flex justify-center mt-3">
+    <button
+      type="button"
+      onClick={swapDates}
+      className="rounded-full border border-[#6b7db3] text-[#6b7db3] bg-white hover:bg-[#e6edf7] transition-colors
+                 h-10 w-10 flex items-center justify-center"
+      title="Swap dates"
+      aria-label="Swap dates"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="m18 4 4 4-4 4" />
+        <path d="M2 8h20" />
+        <path d="m6 20-4-4 4-4" />
+        <path d="M22 16H2" />
+      </svg>
+    </button>
+  </div>
+)}
 
       <label className="flex items-center gap-2 mt-3 text-sm text-[#6b7db3] select-none">
         <input
