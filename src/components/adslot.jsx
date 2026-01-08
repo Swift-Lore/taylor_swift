@@ -9,15 +9,15 @@ export default function AdSlot({
 }) {
   const insRef = useRef(null);
   
-  // Your actual slot IDs from AdSense (REPLACE THESE)
+  // ✅ UPDATED WITH YOUR REAL IDs
   const adConfig = {
     leaderboard: {
-      slot: "REPLACE_WITH_728x90_SLOT_ID",
+      slot: "6835416711", // ← Your Timeline ad ID
       width: 728,
       height: 90
     },
     rectangle: {
-      slot: "REPLACE_WITH_300x250_SLOT_ID",
+      slot: "8756354114", // ← Your Footer ad ID
       width: 300,
       height: 250
     }
@@ -46,7 +46,7 @@ export default function AdSlot({
     return (
       <div className={`${maxWidthClass} mx-auto px-4 ${className}`}>
         <div
-          className="rounded-xl border border-[#e6d2e1] bg-white/70 shadow-sm flex items-center justify-center text-sm text-gray-500"
+          className="rounded-xl border border-[#e6d2e1] bg-white/70 shadow-sm flex items-center justify-center text-sm text-gray-500 mx-auto"
           style={{ 
             width: `${config.width}px`,
             height: `${config.height}px`,
