@@ -1,7 +1,14 @@
+import { useEffect, useState } from "react";
 import { Button } from "./ui/Button";
 import AdSlot from "./adslot";
 
 export default function Footer() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <footer className="bg-gradient-to-b from-[#e8ecf7] to-[#b6c1e3] pt-0 pb-2">
       {/* Main footer content */}
@@ -49,12 +56,9 @@ export default function Footer() {
           </div>
 
           {/* AD SECTION – footer sponsored card */}
-          {import.meta.env.PROD && (
+          {import.meta.env.PROD && mounted && (
             <div className="w-full md:w-1/2 flex">
-              <AdSlot
-  variant="rectangle"
-  maxWidthClass="max-w-full"
-/>
+              <AdSlot variant="rectangle" maxWidthClass="max-w-full" />
             </div>
           )}
         </div>
