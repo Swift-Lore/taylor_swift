@@ -42,6 +42,21 @@ const isGettyUrl = (url) => {
   return lower.includes("gettyimages.com");
 };
 
+// Helper to extract domain from URL for favicon
+const getDomainFromUrl = (url) => {
+  try {
+    const urlObj = new URL(url);
+    return urlObj.hostname.replace('www.', '');
+  } catch {
+    return 'website';
+  }
+};
+
+// Helper to get favicon
+const getFaviconUrl = (domain) => {
+  return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+};
+
 // Format DATE field as "Nov-07-2025" (force UTC so it doesn't shift by timezone)
 const formatEventDate = (isoDate) => {
   if (!isoDate) return "";
@@ -450,24 +465,10 @@ useEffect(() => {
                       );
                     }
 
-                                                                               // Non-Getty links: use Microlink like it used to work
-                    return (
-                      <div key={`link-${index}`} className="microlink-card">
-                        <Microlink
-                          url={url}
-                          size="large"
-                          media="image"
-                          // NO FALLBACK PROP - let Microlink use its default
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-        </section>
-      )}
+      // Non-Getty links: use our custom LinkPreview component
+return (
+  <LinkPreview key={`link-${index}`} url={url} />
+);
 
       {/* AdSense: Post Detail (inline) */}
       {import.meta.env.PROD && !!event && (
