@@ -52,11 +52,6 @@ const getDomainFromUrl = (url) => {
   }
 };
 
-// Helper to get favicon
-const getFaviconUrl = (domain) => {
-  return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
-};
-
 // Format DATE field as "Nov-07-2025" (force UTC so it doesn't shift by timezone)
 const formatEventDate = (isoDate) => {
   if (!isoDate) return "";
