@@ -43,20 +43,6 @@ const handleEndDateChange = (e) => {
   setEndBetween(value)
 }
 
-  const handleEndDateChange = (e) => {
-    const value = e.target.value
-    
-    // Clear any existing timeout
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current)
-    }
-    
-    // Set new timeout (300ms delay)
-    debounceTimeoutRef.current = setTimeout(() => {
-      setEndBetween(value)
-    }, 300)
-  }
-
   // --- Between dates state ---
   const [startBetween, setStartBetween] = useState("")
   const [endBetween, setEndBetween] = useState("")
