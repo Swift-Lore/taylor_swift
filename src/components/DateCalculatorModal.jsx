@@ -364,13 +364,7 @@ export default function DateCalculatorModal({ onClose }) {
               </div>
             </>
           )}
-
-         {/* Between tab */}
-{tab === "between" && (
-  <>
-    <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4 overflow-hidden">
-      {/* Date Inputs with Swap Button in Between */}
-      <div className="grid grid-cols-12 gap-2 items-end mb-3">
+          
         {/* Between tab */}
 {tab === "between" && (
   <>
