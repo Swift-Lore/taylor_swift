@@ -95,7 +95,7 @@ export default function AdSlot({
           maxWidth: config.maxWidth,
           minHeight: config.minHeight,
           // IMPORTANT: don't clip ads
-          overflow: "visible",
+          overflow: "hidden",
         }}
       >
         <ins
