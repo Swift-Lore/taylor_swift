@@ -196,7 +196,7 @@ export default function DateCalculatorModal({ onClose }) {
       />
       <div className="fixed inset-0 flex items-center justify-center z-[9999] p-4 pointer-events-none">
         <div
-  className="date-calc-modal bg-white rounded-2xl shadow-xl max-w-md w-full p-6 pointer-events-auto max-h-[90vh] overflow-y-auto"
+  className="date-calc-modal-wrap bg-white rounded-2xl shadow-xl max-w-md w-full p-6 pointer-events-auto max-h-[90vh] overflow-y-auto"
   onClick={(e) => e.stopPropagation()}
 >
           <h2 className="text-xl font-semibold text-[#8e3e3e] mb-3">Date Calculator</h2>
