@@ -423,7 +423,7 @@ export default function DateCalculatorModal({ onClose }) {
               value={startBetween}
                             onChange={handleStartDateChange}
               style={{
-                fontSize: '14px',
+                fontSize: '16px',
                 lineHeight: '1.5',
                 color: '#6b7db3',
               }}
@@ -472,7 +472,7 @@ export default function DateCalculatorModal({ onClose }) {
               value={endBetween}
                             onChange={handleEndDateChange}
               style={{
-                fontSize: '14px',
+                fontSize: '16px',
                 lineHeight: '1.5',
                 color: '#6b7db3',
               }}
