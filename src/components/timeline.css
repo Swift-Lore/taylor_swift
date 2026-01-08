@@ -241,28 +241,30 @@ ins.adsbygoogle iframe {
 
 .date-calc-modal {
   width: 100%;
-  max-width: 28rem; /* ~ max-w-md */
+  max-width: 28rem;
   margin: 0 auto;
 }
 
-/* Date inputs */
 .date-calc-date {
   width: 100%;
   padding: 0.75rem 1rem;
-  padding-right: 3rem; /* reserve space for native calendar icon */
+  padding-right: 4.25rem; /* MORE space so the native icon never overlaps year */
   color: #6b7db3;
   font-size: 16px;
   line-height: 1.2;
   border: 1px solid #6b7db3;
   border-radius: 9999px;
-  background: white;
+  background: #fff;
   box-sizing: border-box;
   min-width: 0;
 }
 
-/* Make the native calendar icon clickable/consistent */
+/* Make the native calendar icon clickable and reserve a consistent area */
 .date-calc-modal .date-calc-date::-webkit-calendar-picker-indicator {
   cursor: pointer;
+  width: 3.5rem;
+  height: 100%;
+  margin-right: 0.25rem;
 }
 
 /* Prevent weird shrinking inside grids/flex */
