@@ -3,14 +3,27 @@
 import { useEffect, useRef } from "react";
 
 export default function AdSlot({
-  // Just layout helpers now
   maxWidthClass = "max-w-6xl",
   className = "",
-  minHeight = 90, // small default; override per placement
+  variant = "leaderboard", // "leaderboard" | "rectangle"
 }) {
   const insRef = useRef(null);
+  
+  // ✅ UPDATED WITH YOUR REAL IDs
+  const adConfig = {
+    leaderboard: {
+      slot: "6835416711", // ← Your Timeline ad ID
+      width: 728,
+      height: 90
+    },
+    rectangle: {
+      slot: "8756354114", // ← Your Footer ad ID
+      width: 300,
+      height: 250
+    }
+  };
 
-  const AD_CLIENT = "ca-pub-4534610257929133";
+  const config = adConfig[variant] || adConfig.leaderboard;
 
   useEffect(() => {
     if (!import.meta.env.PROD) return;
@@ -18,8 +31,6 @@ export default function AdSlot({
     const ins = insRef.current;
     if (!ins) return;
 
-    // ✅ Key: don't push again if this ins already rendered an ad
-    // (React rerenders + route changes can otherwise break AdSense)
     const alreadyDone = ins.getAttribute("data-adsbygoogle-status") === "done";
     if (alreadyDone) return;
 
@@ -35,10 +46,14 @@ export default function AdSlot({
     return (
       <div className={`${maxWidthClass} mx-auto px-4 ${className}`}>
         <div
-          className="rounded-xl border border-[#e6d2e1] bg-white/70 shadow-sm flex items-center justify-center text-sm text-gray-500"
-          style={{ minHeight }}
+          className="rounded-xl border border-[#e6d2e1] bg-white/70 shadow-sm flex items-center justify-center text-sm text-gray-500 mx-auto"
+          style={{ 
+            width: `${config.width}px`,
+            height: `${config.height}px`,
+            maxWidth: '100%'
+          }}
         >
-          [Ad Placeholder — Auto]
+          [Ad: {variant} — {config.width}×{config.height}]
         </div>
       </div>
     );
@@ -47,26 +62,27 @@ export default function AdSlot({
   return (
     <div className={`${maxWidthClass} mx-auto px-4 ${className}`}>
       <div
-        className="relative rounded-xl border border-[#e6d2e1] bg-white/70 shadow-sm overflow-hidden"
-        style={{ minHeight }}
+        className="relative rounded-xl border border-[#e6d2e1] bg-white/70 shadow-sm overflow-hidden mx-auto"
+        style={{ 
+          width: `${config.width}px`,
+          height: `${config.height}px`,
+          maxWidth: '100%'
+        }}
       >
-        {/* Label (doesn't affect height) */}
         <div className="absolute top-1 left-0 right-0 text-[10px] text-[#8e3e3e]/60 uppercase tracking-wide text-center pointer-events-none z-10">
           Sponsored
         </div>
 
-        {/* Auto Ads responsive unit */}
         <ins
           ref={insRef}
           className="adsbygoogle"
           style={{
-            display: "block",
-            width: "100%",
-            height: "auto",
+            display: 'block',
+            width: '100%',
+            height: '100%'
           }}
-          data-ad-client={AD_CLIENT}
-          data-ad-format="auto"
-          data-full-width-responsive="true"
+          data-ad-client="ca-pub-4534610257929133"
+          data-ad-slot={config.slot}
         />
       </div>
     </div>

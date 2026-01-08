@@ -55,50 +55,52 @@ export default function Footer() {
             </div>
           </div>
 
-         {/* AD SECTION – footer sponsored card */}
-{import.meta.env.PROD && mounted && (
-  <div className="w-full md:w-1/2 flex items-center">
-    <AdSlot maxWidthClass="max-w-full" minHeight={180} />
-  </div>
-)}
+          {/* AD SECTION – footer sponsored card */}
+          {import.meta.env.PROD && mounted && (
+            <div className="w-full md:w-1/2 flex items-center justify-center">
+              <AdSlot 
+                variant="rectangle" 
+                maxWidthClass="max-w-full" 
+              />
+            </div>
           )}
-        </div>
-      </div>
+        </div> {/* ← THIS WAS MISSING */}
 
-      {/* Bottom bar */}
-      <div className="bg-[#8a9ad4] py-2 px-4 text-center text-white mt-0">
-        <div className="max-w-5xl mx-auto flex flex-wrap justify-center items-center gap-2 md:gap-3 text-[11px] md:text-sm">
-          
-          <a
-            href="/cookie-policy"
-            className="text-white hover:text-gray-200 underline"
-          >
-            Cookie Policy
-          </a>
+        {/* Bottom bar */}
+        <div className="bg-[#8a9ad4] py-2 px-4 text-center text-white mt-0">
+          <div className="max-w-5xl mx-auto flex flex-wrap justify-center items-center gap-2 md:gap-3 text-[11px] md:text-sm">
+            
+            <a
+              href="/cookie-policy"
+              className="text-white hover:text-gray-200 underline"
+            >
+              Cookie Policy
+            </a>
 
-          <span className="mx-1">•</span>
+            <span className="mx-1">•</span>
 
-          <a
-            href="/about"
-            className="text-white hover:text-gray-200 underline"
-          >
-            About / Contact
-          </a>
+            <a
+              href="/about"
+              className="text-white hover:text-gray-200 underline"
+            >
+              About / Contact
+            </a>
 
-          <span className="mx-1">•</span>
+            <span className="mx-1">•</span>
 
-          <a
-            href="/privacy_policy"
-            className="text-white hover:text-gray-200 underline"
-          >
-            Privacy Policy
-          </a>
+            <a
+              href="/privacy_policy"
+              className="text-white hover:text-gray-200 underline"
+            >
+              Privacy Policy
+            </a>
 
-          <span className="mx-1">•</span>
+            <span className="mx-1">•</span>
 
-          <p className="mx-1">
-            Copyright © 2025 Swift-Lore · Fan-made, not affiliated with Taylor Swift.
-          </p>
+            <p className="mx-1">
+              Copyright © 2025 Swift-Lore · Fan-made, not affiliated with Taylor Swift.
+            </p>
+          </div>
         </div>
       </div>
     </footer>
