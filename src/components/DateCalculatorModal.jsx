@@ -165,15 +165,23 @@ const days = diffDaysUTC(cursor, later)
     const finalTotalMonths = isReversed ? -totalMonths : totalMonths
 
     return {
-      start,
-      end,
-      isReversed,
-      earlier,
-      later,
-      totalDays: finalTotalDays,
-      ymd: { years: finalYears, months: finalMonths, days: finalDays },
-      md: { months: finalTotalMonths, days: finalDays },
-    }
+  start,
+  end,
+  isReversed,
+  earlier,
+  later,
+  totalDays: finalTotalDays,
+
+  // years-only row should be years + remaining days (ignoring months)
+  yOnly: {
+    years: isReversed ? -yOnlyYears : yOnlyYears,
+    days:  isReversed ? -yOnlyDays  : yOnlyDays,
+  },
+
+  // your existing breakdowns
+  ymd: { years: finalYears, months: finalMonths, days: finalDays },
+  md:  { months: finalTotalMonths, days: finalDays },
+}
   }
 
   // Function to swap start and end dates
