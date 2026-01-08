@@ -1515,7 +1515,7 @@ const CalendarModal = () => {
                   {/* Ad block */}
 {import.meta.env.PROD && !loading && (posts.length > 0 || searchResults.length > 0) && (
   <AdSlot
-  variant="leaderboard"  // ← Add this for clarity
+  variant="leaderboard" 
   maxWidthClass="max-w-6xl"
   className="mb-2"
 />
