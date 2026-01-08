@@ -16,15 +16,6 @@ export default function DateCalculatorModal({ onClose }) {
       document.body.style.overflow = originalStyle
     }
   }, [])
-
-    // Cleanup debounce timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current)
-      }
-    }
-  }, [])
   
   // --- Tabs ---
   const [tab, setTab] = useState("between")
@@ -32,21 +23,21 @@ export default function DateCalculatorModal({ onClose }) {
   // Days Between option: include end date (+1 day)
   const [includeEndDate, setIncludeEndDate] = useState(false)
 
-    // --- Debounce for date inputs ---
-const handleStartDateChange = (e) => {
-  const value = e.target.value
-  setStartBetween(value)
-}
+  // --- Date input handlers ---
+  const handleStartDateChange = (e) => {
+    const value = e.target.value
+    setStartBetween(value)
+  }
 
-const handleEndDateChange = (e) => {
-  const value = e.target.value
-  setEndBetween(value)
-}
+  const handleEndDateChange = (e) => {
+    const value = e.target.value
+    setEndBetween(value)
+  }
 
   // --- Between dates state ---
   const [startBetween, setStartBetween] = useState("")
   const [endBetween, setEndBetween] = useState("")
-
+  
   // --- Add/Subtract state ---
   const [baseDate, setBaseDate] = useState(() => {
     const t = new Date()
