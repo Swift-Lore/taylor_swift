@@ -429,7 +429,7 @@ export default function DateCalculatorModal({ onClose }) {
 </div>
 
       {/* Desktop layout: side by side */}
-<div className="hidden md:flex md:gap-4 md:items-end">
+<div className="hidden md:flex md:gap-4 md:items-end w-full">
   {/* Start date */}
   <div className="flex-1 min-w-0">
     <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
