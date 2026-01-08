@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react" 
+import { useState, useEffect } from "react"
 import { Button } from "./ui/Button"
 
 export default function DateCalculatorModal({ onClose }) {
@@ -16,52 +16,12 @@ export default function DateCalculatorModal({ onClose }) {
       document.body.style.overflow = originalStyle
     }
   }, [])
-
-    // Cleanup debounce timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current)
-      }
-    }
-  }, [])
   
   // --- Tabs ---
   const [tab, setTab] = useState("between")
 
   // Days Between option: include end date (+1 day)
   const [includeEndDate, setIncludeEndDate] = useState(false)
-
-    // --- Debounce for date inputs ---
-  const debounceTimeoutRef = useRef(null)
-  
-  const handleStartDateChange = (e) => {
-    const value = e.target.value
-    
-    // Clear any existing timeout
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current)
-    }
-    
-    // Set new timeout (300ms delay)
-    debounceTimeoutRef.current = setTimeout(() => {
-      setStartBetween(value)
-    }, 300)
-  }
-
-  const handleEndDateChange = (e) => {
-    const value = e.target.value
-    
-    // Clear any existing timeout
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current)
-    }
-    
-    // Set new timeout (300ms delay)
-    debounceTimeoutRef.current = setTimeout(() => {
-      setEndBetween(value)
-    }, 300)
-  }
 
   // --- Between dates state ---
   const [startBetween, setStartBetween] = useState("")
@@ -404,90 +364,75 @@ export default function DateCalculatorModal({ onClose }) {
               </div>
             </>
           )}
-          
-        {/* Between tab */}
+
+         {/* Between tab */}
 {tab === "between" && (
   <>
     <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4 overflow-hidden">
-      {/* Date Inputs with Swap Button in Between */}
-      <div className="grid grid-cols-12 gap-2 items-end mb-3">
-        {/* Start Date */}
-        <div className="col-span-5 min-w-0">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="min-w-0">
           <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
             Start date
           </label>
-          <div className="relative">
-            <input
-              type="date"
-              className="block w-full min-w-0 max-w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 text-sm min-h-[48px] min-w-[140px]"
-              value={startBetween}
-                            onChange={handleStartDateChange}
-              style={{
-                fontSize: '14px',
-                lineHeight: '1.5',
-                color: '#6b7db3',
-              }}
-            />
-            {/* Custom calendar emoji */}
-            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none text-[#6b7db3] text-lg">
-              📅
-            </div>
-          </div>
+          <input
+            type="date"
+            className="block w-full min-w-0 max-w-full box-border appearance-none bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm pr-10 min-h-[44px] min-w-[130px]"
+            value={startBetween}
+            onChange={(e) => setStartBetween(e.target.value)}
+            style={{
+              WebkitAppearance: "none",
+              fontSize: "16px",
+            }}
+          />
         </div>
 
-        {/* Swap Button (centered) */}
-        <div className="col-span-2 flex justify-center items-end h-12">
-          {(startBetween || endBetween) && (
-            <button
-              type="button"
-              onClick={swapDates}
-              className="rounded-full p-2 border border-[#6b7db3] text-[#6b7db3] bg-white hover:bg-[#e6edf7] transition-colors"
-              title="Swap dates"
-            >
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                width="16" 
-                height="16" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
-                strokeWidth="2" 
-                strokeLinecap="round" 
-                strokeLinejoin="round"
-              >
-                <path d="m18 4 4 4-4 4"/>
-                <path d="M2 8h20"/>
-                <path d="m6 20-4-4 4-4"/>
-                <path d="M22 16H2"/>
-              </svg>
-            </button>
-          )}
-        </div>
-
-        {/* End Date */}
-        <div className="col-span-5 min-w-0">
+        <div className="min-w-0">
           <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
             End date
           </label>
-          <div className="relative">
-            <input
-              type="date"
-              className="block w-full min-w-0 max-w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-3 text-sm min-h-[48px] min-w-[140px]"
-              value={endBetween}
-                            onChange={handleEndDateChange}
-              style={{
-                fontSize: '14px',
-                lineHeight: '1.5',
-                color: '#6b7db3',
-              }}
-            />
-            {/* Custom calendar emoji */}
-            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none text-[#6b7db3] text-lg">
-              📅
-            </div>
-          </div>
+          <input
+            type="date"
+            className="block w-full min-w-0 max-w-full box-border appearance-none bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm pr-10 min-h-[44px] min-w-[130px]"
+            value={endBetween}
+            onChange={(e) => setEndBetween(e.target.value)}
+            style={{
+              WebkitAppearance: "none",
+              fontSize: "16px",
+            }}
+          />
         </div>
       </div>
+
+      {/* Swap Dates Button - Only show when both dates are entered */}
+      {startBetween && endBetween && (
+  <div className="flex justify-center mt-3">
+    <button
+      type="button"
+      onClick={swapDates}
+      className="rounded-full border border-[#6b7db3] text-[#6b7db3] bg-white hover:bg-[#e6edf7] transition-colors
+                 h-10 w-10 flex items-center justify-center"
+      title="Swap dates"
+      aria-label="Swap dates"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="m18 4 4 4-4 4" />
+        <path d="M2 8h20" />
+        <path d="m6 20-4-4 4-4" />
+        <path d="M22 16H2" />
+      </svg>
+    </button>
+  </div>
+)}
 
       <label className="flex items-center gap-2 mt-3 text-sm text-[#6b7db3] select-none">
         <input
@@ -496,7 +441,7 @@ export default function DateCalculatorModal({ onClose }) {
           onChange={(e) => setIncludeEndDate(e.target.checked)}
           className="h-5 w-5 rounded border border-[#6b7db3] accent-[#8e3e3e]"
         />
-        Include end date in calculation (+1 day is added)
+        Include end date in calculation (1 day is added)
       </label>
 
       <div className="flex flex-wrap gap-2 mt-3">
@@ -522,86 +467,105 @@ export default function DateCalculatorModal({ onClose }) {
       </div>
     </div>
 
-          {/* Results Box - REMOVED "Result" header */}
-<div className="bg-white rounded-2xl border border-[#e3b0b0] p-4 mb-4">
-  {betweenRes ? (
-    <div className="space-y-3">
-      {/* Date Display - REMOVED "Date Range" header */}
-      <div className="text-center">
-        <div className="text-[#8e3e3e] font-semibold text-sm mb-1">
-          {formatMMDDYYYY(betweenRes.start)} → {formatMMDDYYYY(betweenRes.end)}
-        </div>
-        {betweenRes.isReversed && (
-          <div className="text-xs text-red-500">
-            (End date is earlier than start date)
+    {/* Results Box (THIS WRAPPER WAS MISSING) */}
+    <div className="bg-white rounded-2xl border border-[#e3b0b0] p-4 mb-4">
+      <div className="text-sm font-semibold text-[#8e3e3e] mb-2">Result</div>
+
+      {betweenRes ? (
+        <div className="space-y-3">
+          <div className="text-center">
+            <div className="text-[#8e3e3e] font-semibold text-sm mb-1">
+              {formatMMDDYYYY(betweenRes.start)} → {formatMMDDYYYY(betweenRes.end)}
+            </div>
+
+            {betweenRes.isReversed && (
+              <div className="text-xs text-red-500">
+                (End date is earlier than start date)
+              </div>
+            )}
           </div>
-        )}
-      </div>
 
-      {/* Separator */}
-      <div className="border-t border-[#e3b0b0] my-2"></div>
+          <div className="border-t border-[#e3b0b0] my-2" />
 
-      {/* Results in Grid - More Compact */}
-      <div className="grid gap-2">
-        {/* Days */}
-<div className="flex items-center justify-between">
-  <div className="text-sm text-[#6b7db3]">Days</div>
-  <div className={`font-semibold ${betweenRes.totalDays < 0 ? 'text-red-500' : 'text-[#8e3e3e]'}`}>
-    {betweenRes.totalDays < 0 ? '-' : ''}{Math.abs(betweenRes.totalDays).toLocaleString()} Days
-  </div>
-</div>
+          <div className="grid gap-2">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-[#6b7db3]">Days</div>
+              <div
+                className={`font-semibold ${
+                  betweenRes.totalDays < 0 ? "text-red-500" : "text-[#8e3e3e]"
+                }`}
+              >
+                {betweenRes.totalDays < 0 ? "-" : ""}
+                {Math.abs(betweenRes.totalDays).toLocaleString()} Days
+              </div>
+            </div>
 
-        {/* Weeks */}
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-[#6b7db3]">Weeks</div>
-          <div className={`font-semibold ${betweenRes.isReversed ? 'text-red-500' : 'text-[#8e3e3e]'}`}>
-            {betweenRes.isReversed ? '-' : ''}{Math.floor(Math.abs(betweenRes.totalDays) / 7)} Weeks{" "}
-            {Math.abs(betweenRes.totalDays) % 7} Days
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-[#6b7db3]">Weeks</div>
+              <div
+                className={`font-semibold ${
+                  betweenRes.isReversed ? "text-red-500" : "text-[#8e3e3e]"
+                }`}
+              >
+                {betweenRes.isReversed ? "-" : ""}
+                {Math.floor(Math.abs(betweenRes.totalDays) / 7)} Weeks{" "}
+                {Math.abs(betweenRes.totalDays) % 7} Days
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-[#6b7db3]">Months</div>
+              <div
+                className={`font-semibold ${
+                  betweenRes.isReversed ? "text-red-500" : "text-[#8e3e3e]"
+                }`}
+              >
+                {betweenRes.isReversed ? "-" : ""}
+                {Math.abs(betweenRes.md.months)} Months{" "}
+                {Math.abs(betweenRes.md.days)} Days
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-[#6b7db3]">Years</div>
+              <div
+                className={`font-semibold ${
+                  betweenRes.isReversed ? "text-red-500" : "text-[#8e3e3e]"
+                }`}
+              >
+                {betweenRes.isReversed ? "-" : ""}
+                {Math.abs(betweenRes.ymd.years)} Years{" "}
+                {Math.abs(betweenRes.ymd.days)} Days
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-[#6b7db3]">Years & Months</div>
+              <div
+                className={`font-semibold ${
+                  betweenRes.isReversed ? "text-red-500" : "text-[#8e3e3e]"
+                }`}
+              >
+                {betweenRes.isReversed ? "-" : ""}
+                {Math.abs(betweenRes.ymd.years)} Years{" "}
+                {Math.abs(betweenRes.ymd.months)} Months{" "}
+                {Math.abs(betweenRes.ymd.days)} Days
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Months */}
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-[#6b7db3]">Months</div>
-          <div className={`font-semibold ${betweenRes.isReversed ? 'text-red-500' : 'text-[#8e3e3e]'}`}>
-            {betweenRes.isReversed ? '-' : ''}{Math.abs(betweenRes.md.months)} Months{" "}
-            {Math.abs(betweenRes.md.days)} Days
-          </div>
+          {includeEndDate && (
+            <div className="text-xs text-[#6b7db3] italic text-center pt-2 border-t border-[#e3b0b0] mt-2">
+              * End date included in calculation (+1 day added)
+            </div>
+          )}
         </div>
-
-        {/* Years */}
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-[#6b7db3]">Years</div>
-          <div className={`font-semibold ${betweenRes.isReversed ? 'text-red-500' : 'text-[#8e3e3e]'}`}>
-            {betweenRes.isReversed ? '-' : ''}{Math.abs(betweenRes.ymd.years)} Years{" "}
-            {Math.abs(betweenRes.ymd.days)} Days
-          </div>
-        </div>
-
-        {/* Years & Months */}
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-[#6b7db3]">Years & Months</div>
-          <div className={`font-semibold ${betweenRes.isReversed ? 'text-red-500' : 'text-[#8e3e3e]'}`}>
-            {betweenRes.isReversed ? '-' : ''}{Math.abs(betweenRes.ymd.years)} Years{" "}
-            {Math.abs(betweenRes.ymd.months)} Months{" "}
-            {Math.abs(betweenRes.ymd.days)} Days
-          </div>
-        </div>
-      </div>
-
-      {/* Include End Date Note */}
-      {includeEndDate && (
-        <div className="text-xs text-[#6b7db3] italic text-center pt-2 border-t border-[#e3b0b0] mt-2">
-          * End date included in calculation (+1 day added)
+      ) : (
+        <div className="text-sm text-[#6b7db3] py-3 text-center">
+          Pick a start and end date to see the result.
         </div>
       )}
     </div>
-  ) : (
-    <div className="text-sm text-[#6b7db3] py-3 text-center">
-      Pick a start and end date to see the result.
-    </div>
-  )}
-</div>
   </>
 )}
 
