@@ -1515,10 +1515,10 @@ const CalendarModal = () => {
                   {/* Ad block */}
 {import.meta.env.PROD && !loading && (posts.length > 0 || searchResults.length > 0) && (
   <AdSlot
-    maxWidthClass="max-w-6xl"
-    minHeight={120}
-    className="mb-2"
-  />
+  variant="leaderboard"  // ← Add this for clarity
+  maxWidthClass="max-w-6xl"
+  className="mb-2"
+/>
 )}
 
       {/* Selected keywords chips */}
