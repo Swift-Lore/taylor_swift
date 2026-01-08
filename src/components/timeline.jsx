@@ -919,6 +919,15 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
             </div>
           </div>
 
+          {/* Horizontal 728x90 Leaderboard Ad */}
+{import.meta.env.PROD && !isLoading && !isInitialLoad && records.length > 0 && (
+  <AdSlot
+    variant="leaderboard"
+    maxWidthClass="max-w-6xl"
+    className="mb-2"
+  />
+)}
+          
           {/* ON THIS DAY Section */}
 <div className="text-center mb-1 flex-shrink-0">
   {/* Glowy header card */}
