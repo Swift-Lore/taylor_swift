@@ -42,16 +42,6 @@ const isGettyUrl = (url) => {
   return lower.includes("gettyimages.com");
 };
 
-// Helper to extract domain from URL for favicon
-const getDomainFromUrl = (url) => {
-  try {
-    const urlObj = new URL(url);
-    return urlObj.hostname.replace('www.', '');
-  } catch {
-    return 'website';
-  }
-};
-
 // Format DATE field as "Nov-07-2025" (force UTC so it doesn't shift by timezone)
 const formatEventDate = (isoDate) => {
   if (!isoDate) return "";
