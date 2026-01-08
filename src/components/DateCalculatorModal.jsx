@@ -260,15 +260,11 @@ const handleEndDateChange = (e) => {
                     Base date
                   </label>
                   <input
-                    type="date"
-                    className="block w-full min-w-0 max-w-full box-border bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm pr-10 min-h-[44px] min-w-[130px]"
-                    value={baseDate}
-                    onChange={(e) => setBaseDate(e.target.value)}
-                    style={{
-                      WebkitAppearance: 'none',
-                      fontSize: '16px',
-                    }}
-                  />
+  type="date"
+  className="date-calc-modal block w-full min-w-0 box-border bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm pr-10 min-h-[44px]"
+  value={baseDate}
+  onChange={(e) => setBaseDate(e.target.value)}
+/>
                 </div>
 
                 <div className="flex gap-2 mb-3">
