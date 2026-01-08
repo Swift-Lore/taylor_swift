@@ -365,72 +365,75 @@ export default function DateCalculatorModal({ onClose }) {
             </>
           )}
 
-          {/* Between tab */}
-          {tab === "between" && (
-            <>
-              <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4 overflow-hidden">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="min-w-0">
-                    <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
-                      Start date
-                    </label>
-                    <input
-                      type="date"
-                      className="block w-full min-w-0 max-w-full box-border appearance-none bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm pr-10 min-h-[44px] min-w-[130px]"
-                      value={startBetween}
-                      onChange={(e) => setStartBetween(e.target.value)}
-                      style={{
-                        WebkitAppearance: 'none',
-                        fontSize: '16px',
-                      }}
-                    />
-                  </div>
+         {/* Between tab */}
+{tab === "between" && (
+  <>
+    <div className="bg-[#e6edf7] rounded-2xl p-4 border border-[#d3dceb] mb-4 overflow-hidden">
+      {/* Date Inputs with Swap Button in Between */}
+      <div className="grid grid-cols-12 gap-2 items-end mb-3">
+        {/* Start Date */}
+        <div className="col-span-5 min-w-0">
+          <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
+            Start date
+          </label>
+          <input
+            type="date"
+            className="block w-full min-w-0 max-w-full box-border appearance-none bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-3 py-2 text-sm pr-10 min-h-[44px]"
+            value={startBetween}
+            onChange={(e) => setStartBetween(e.target.value)}
+            style={{
+              WebkitAppearance: 'none',
+              fontSize: '16px',
+            }}
+          />
+        </div>
 
-                  <div className="min-w-0">
-                    <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
-                      End date
-                    </label>
-                    <input
-                      type="date"
-                      className="block w-full min-w-0 max-w-full box-border appearance-none bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-2 text-sm pr-10 min-h-[44px] min-w-[130px]"
-                      value={endBetween}
-                      onChange={(e) => setEndBetween(e.target.value)}
-                      style={{
-                        WebkitAppearance: 'none',
-                        fontSize: '16px',
-                      }}
-                    />
-                  </div>
-                </div>
+        {/* Swap Button (centered) */}
+        <div className="col-span-2 flex justify-center items-end h-10">
+          {(startBetween || endBetween) && (
+            <button
+              type="button"
+              onClick={swapDates}
+              className="rounded-full p-2 border border-[#6b7db3] text-[#6b7db3] bg-white hover:bg-[#e6edf7] transition-colors"
+              title="Swap dates"
+            >
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="16" 
+                height="16" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              >
+                <path d="m18 4 4 4-4 4"/>
+                <path d="M2 8h20"/>
+                <path d="m6 20-4-4 4-4"/>
+                <path d="M22 16H2"/>
+              </svg>
+            </button>
+          )}
+        </div>
 
-                {/* Swap Dates Button - Only show when both dates are entered */}
-                {(startBetween && endBetween) && (
-                  <div className="flex justify-center mt-3">
-                    <button
-                      type="button"
-                      onClick={swapDates}
-                      className="flex items-center gap-2 rounded-full px-4 py-2 text-sm border border-[#6b7db3] text-[#6b7db3] bg-white hover:bg-[#e6edf7] transition-colors"
-                    >
-                      <svg 
-                        xmlns="http://www.w3.org/2000/svg" 
-                        width="16" 
-                        height="16" 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        strokeWidth="2" 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round"
-                      >
-                        <path d="m18 4 4 4-4 4"/>
-                        <path d="M2 8h20"/>
-                        <path d="m6 20-4-4 4-4"/>
-                        <path d="M22 16H2"/>
-                      </svg>
-                      Swap Dates
-                    </button>
-                  </div>
-                )}
+        {/* End Date */}
+        <div className="col-span-5 min-w-0">
+          <label className="block text-xs font-semibold text-[#6b7db3] mb-1">
+            End date
+          </label>
+          <input
+            type="date"
+            className="block w-full min-w-0 max-w-full box-border appearance-none bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-3 py-2 text-sm pr-10 min-h-[44px]"
+            value={endBetween}
+            onChange={(e) => setEndBetween(e.target.value)}
+            style={{
+              WebkitAppearance: 'none',
+              fontSize: '16px',
+            }}
+          />
+        </div>
+      </div>
 
                 <label className="flex items-center gap-2 mt-3 text-sm text-[#6b7db3] select-none">
                   <input
