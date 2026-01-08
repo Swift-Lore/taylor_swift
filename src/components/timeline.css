@@ -239,7 +239,6 @@ ins.adsbygoogle iframe {
 }
 /* ===== Date Calculator (scoped + stable across desktop & mobile) ===== */
 
-/* Modal wrapper */
 .date-calc-modal {
   width: 100%;
   max-width: 28rem; /* ~ max-w-md */
@@ -250,7 +249,7 @@ ins.adsbygoogle iframe {
 .date-calc-date {
   width: 100%;
   padding: 0.75rem 1rem;
-  padding-right: 3rem; /* reserve space for calendar icon */
+  padding-right: 3rem; /* reserve space for native calendar icon */
   color: #6b7db3;
   font-size: 16px;
   line-height: 1.2;
@@ -261,17 +260,8 @@ ins.adsbygoogle iframe {
   min-width: 0;
 }
 
-/* Hide native Chrome calendar icon but KEEP it clickable */
+/* Make the native calendar icon clickable/consistent */
 .date-calc-modal .date-calc-date::-webkit-calendar-picker-indicator {
-  opacity: 0;
-  cursor: pointer;
-  width: 3rem;
-  height: 100%;
-}
-
-/* Firefox fix */
-.date-calc-modal .date-calc-date::-moz-calendar-picker-indicator {
-  opacity: 0;
   cursor: pointer;
 }
 
