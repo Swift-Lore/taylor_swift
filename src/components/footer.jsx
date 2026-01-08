@@ -1,3 +1,7 @@
+import { useEffect, useState } from "react";
+import { Button } from "./ui/Button";
+import AdSlot from "./adslot";
+
 export default function Footer() {
   const [mounted, setMounted] = useState(false);
 
