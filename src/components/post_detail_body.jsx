@@ -450,17 +450,24 @@ useEffect(() => {
                       );
                     }
 
-                                        // Non-Getty links: use Microlink like it used to work
-return (
-  <div key={`link-${index}`} className="microlink-card">
-    <Microlink
-      url={url}
-      size="large"
-      media="image"
-      // NO FALLBACK PROP - let Microlink use its default
-    />
-  </div>
-);
+                                                                               // Non-Getty links: use Microlink like it used to work
+                    return (
+                      <div key={`link-${index}`} className="microlink-card">
+                        <Microlink
+                          url={url}
+                          size="large"
+                          media="image"
+                          // NO FALLBACK PROP - let Microlink use its default
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </section>
+      )}
 
       {/* AdSense: Post Detail (inline) */}
       {import.meta.env.PROD && !!event && (
