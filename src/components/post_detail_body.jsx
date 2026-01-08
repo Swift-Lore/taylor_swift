@@ -571,9 +571,16 @@ useEffect(() => {
                     }
 
       // Non-Getty links: use our custom LinkPreview component
-return (
-  <LinkPreview key={`link-${index}`} url={url} />
-);
+                    return (
+                      <LinkPreview key={`link-${index}`} url={url} />
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </section>
+      )}
 
       {/* AdSense: Post Detail (inline) */}
       {import.meta.env.PROD && !!event && (
