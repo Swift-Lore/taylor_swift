@@ -1,87 +1,90 @@
-"use client";
+import { useEffect, useState } from "react";
+import { Button } from "./ui/Button";
+import AdSlot from "./adslot";
 
-import { useEffect, useMemo, useRef } from "react";
-
-export default function AdSlot({
-  maxWidthClass = "max-w-6xl",
-  className = "",
-  variant = "leaderboard", // "leaderboard" | "rectangle"
-}) {
-  const insRef = useRef(null);
-
-  const AD_CLIENT = "ca-pub-4534610257929133";
-
-  const adConfig = useMemo(() => ({
-    leaderboard: {
-      slot: "6835416711",
-      maxWidth: 728,
-      minHeight: 90,
-    },
-    rectangle: {
-      slot: "8756354114",
-      maxWidth: 300,
-      minHeight: 250,
-    },
-  }), []);
-
-  const config = adConfig[variant] || adConfig.leaderboard;
+export default function Footer() {
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (!import.meta.env.PROD) return;
-
-    const ins = insRef.current;
-    if (!ins) return;
-
-    // Reset so it can refill correctly on SPA rerenders
-    ins.removeAttribute("data-adsbygoogle-status");
-    ins.innerHTML = "";
-
-    window.adsbygoogle = window.adsbygoogle || [];
-    try {
-      window.adsbygoogle.push({});
-    } catch {
-      // ignore
-    }
-  }, [config.slot]);
-
-  // DEV placeholder
-  if (!import.meta.env.PROD) {
-    return (
-      <div className={`${maxWidthClass} mx-auto px-4 ${className}`}>
-        <div
-          className="rounded-xl border border-[#e6d2e1] bg-white/70 shadow-sm flex items-center justify-center text-sm text-gray-500 mx-auto"
-          style={{
-            width: "100%",
-            maxWidth: `${config.maxWidth}px`,
-            minHeight: `${config.minHeight}px`,
-          }}
-        >
-          [Ad: {variant} — up to {config.maxWidth}px wide]
-        </div>
-      </div>
-    );
-  }
+    setMounted(true);
+  }, []);
 
   return (
-    <div className={`${maxWidthClass} mx-auto px-4 ${className}`}>
-      <div
-        className="relative rounded-xl border border-[#e6d2e1] bg-white/70 shadow-sm mx-auto"
-        style={{
-          width: "100%",
-          maxWidth: `${config.maxWidth}px`,
-          minHeight: `${config.minHeight}px`,
-        }}
-      >
-        <ins
-  ref={insRef}
-  className="adsbygoogle"
-  style={{ display: "block", width: "100%" }}
-  data-ad-client={AD_CLIENT}
-  data-ad-slot={config.slot}
-  data-ad-format="auto"
-  data-full-width-responsive="true"
-/>
+    <footer className="bg-gradient-to-b from-[#e8ecf7] to-[#b6c1e3] pt-0 pb-0">
+      {/* Main footer content */}
+      <div className="max-w-5xl mx-auto px-4 py-3">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-stretch justify-between">
+          {/* About section */}
+          <div className="bg-white/70 rounded-3xl shadow-sm px-4 py-3 md:px-5 md:py-4 w-full md:w-1/2 flex flex-col">
+            <h2 className="text-sm md:text-base font-semibold text-[#5a2b60] tracking-wide mb-2 logo-glow">
+              About Swift-Lore
+            </h2>
+
+            <p className="text-xs md:text-sm text-[#4b4b63] leading-relaxed flex-1">
+              Swift-Lore is a fan-crafted, interactive timeline chronicling the
+              epic life and career of Taylor Swift — from album releases and
+              Easter Eggs to dating history and iconic moments.{" "}
+              <span className="font-semibold">No era left behind.</span>
+            </p>
+
+            <div className="mt-3 flex flex-wrap gap-2 justify-start">
+              <a
+                href="https://buymeacoffee.com/swiftlore"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button
+                  variant="secondary"
+                  className="rounded-full px-4 py-1.5 text-xs md:text-sm"
+                >
+                  Support the Site
+                </Button>
+              </a>
+
+              <a
+                href="https://docs.google.com/forms/d/e/1FAIpQLSc0f-asKuKOM81V3sPMusyvSkdcFr9XqrGVT0VgodPKKpkKPg/viewform?usp=header"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button
+                  variant="secondary"
+                  className="rounded-full px-4 py-1.5 text-xs md:text-sm"
+                >
+                  Submit a Suggestion
+                </Button>
+              </a>
+            </div>
+          </div>
+
+          {/* Ad */}
+          {import.meta.env.PROD && mounted && (
+            <div className="w-full md:w-1/2 flex items-center justify-center">
+              <AdSlot variant="rectangle" maxWidthClass="max-w-full" />
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+
+      {/* Bottom bar (FULL WIDTH) */}
+      <div className="bg-[#8a9ad4] py-2 px-4 text-center text-white">
+        <div className="max-w-5xl mx-auto flex flex-wrap justify-center items-center gap-2 md:gap-3 text-[11px] md:text-sm">
+          <a href="/cookie-policy" className="text-white hover:text-gray-200 underline">
+            Cookie Policy
+          </a>
+          <span className="mx-1">•</span>
+          <a href="/about" className="text-white hover:text-gray-200 underline">
+            About / Contact
+          </a>
+          <span className="mx-1">•</span>
+          <a href="/privacy_policy" className="text-white hover:text-gray-200 underline">
+            Privacy Policy
+          </a>
+          <span className="mx-1">•</span>
+          <p className="mx-1">
+            Copyright © 2025 Swift-Lore · Fan-made, not affiliated with Taylor Swift.
+          </p>
+        </div>
+      </div>
+    </footer>
   );
 }
