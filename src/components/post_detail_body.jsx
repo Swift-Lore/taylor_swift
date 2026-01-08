@@ -522,7 +522,7 @@ useEffect(() => {
 {import.meta.env.PROD && !!event && (
   <div className="max-w-4xl mx-auto px-4 mb-8">
     <AdSlot 
-      variant="rectangle" 
+      variant="leaderboard" 
       maxWidthClass="max-w-4xl" 
     />
   </div>

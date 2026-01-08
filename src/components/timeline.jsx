@@ -919,7 +919,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
             </div>
           </div>
 
-          {/* Horizontal 728x90 Leaderboard Ad */}
+          {/* Ad block */}
 {import.meta.env.PROD && !isLoading && !isInitialLoad && records.length > 0 && (
   <AdSlot
     variant="leaderboard"
