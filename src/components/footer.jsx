@@ -55,13 +55,16 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* AD SECTION – footer sponsored card */}
-          {import.meta.env.PROD && mounted && (
-            <div className="w-full md:w-1/2 flex items-center justify-center h-[250px]">
-  <AdSlot variant="rectangle" maxWidthClass="max-w-full" className="h-full" />
-</div>
-          )}
-        </div> 
+         {/* AD SECTION – footer sponsored card */}
+{import.meta.env.PROD && mounted && (
+  <div className="w-full md:w-1/2 flex items-center justify-center">
+    <AdSlot
+      variant="rectangle"
+      maxWidthClass="max-w-full"
+      className="my-0"
+    />
+  </div>
+)}
 
         {/* Bottom bar */}
         <div className="bg-[#8a9ad4] py-2 px-4 text-center text-white mt-0">
