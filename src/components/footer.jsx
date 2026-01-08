@@ -54,6 +54,7 @@ export default function Footer() {
               <AdSlot
   variant="rectangle"
   maxWidthClass="max-w-full"
+  noOuterPadding
   className="bg-white/75 rounded-3xl border border-[#f8dada] px-4 py-3 md:px-5 md:py-4"
 />
             </div>
