@@ -494,18 +494,23 @@ return (
     </div>
   </a>
 );
-  });
-     </div>
+                    })}
+                </div>
+              )}
+            </div>
+          )}
+        </section>
+      )}
 
-{/* AdSense: Post Detail (inline) */}
-{import.meta.env.PROD && !!event && (
-  <div className="max-w-4xl mx-auto px-4 mb-8">
-    <AdSlot 
-      variant="leaderboard" 
-      maxWidthClass="max-w-4xl" 
-    />
-  </div>
-)}
+      {/* AdSense: Post Detail (inline) */}
+      {import.meta.env.PROD && !!event && (
+        <div className="max-w-4xl mx-auto px-4 mb-8">
+          <AdSlot 
+            variant="leaderboard" 
+            maxWidthClass="max-w-4xl" 
+          />
+        </div>
+      )}
       
       {/* Main image */}
       {event.IMAGE && event.IMAGE.length > 0 && (
