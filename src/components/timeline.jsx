@@ -922,10 +922,10 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           {/* Ad block */}
 {import.meta.env.PROD && !isLoading && !isInitialLoad && records.length > 0 && (
   <AdSlot
-    variant="leaderboard"
-    maxWidthClass="max-w-6xl"
-    className="mb-2"
-  />
+  variant="leaderboard"
+  maxWidthClass="max-w-6xl"
+  className="mb-6 relative z-0"
+/>
 )}
           
           {/* ON THIS DAY Section */}
