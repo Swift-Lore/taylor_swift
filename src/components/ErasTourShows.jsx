@@ -428,7 +428,6 @@ export default function ErasTourShows() {
 {import.meta.env.PROD && !loading && selectedShow && (
   <AdSlot
     maxWidthClass="max-w-5xl"
-    minHeight={90}
     className="my-6"
   />
 )}
