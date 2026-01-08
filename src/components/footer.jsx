@@ -1,7 +1,10 @@
-import { Button } from "./ui/Button";
-import AdSlot from "./adslot";
-
 export default function Footer() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <footer className="bg-gradient-to-b from-[#e8ecf7] to-[#b6c1e3] pt-0 pb-2">
       {/* Main footer content */}
