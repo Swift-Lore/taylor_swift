@@ -551,8 +551,8 @@ const days = diffDaysUTC(cursor, later)
                 }`}
               >
                 {betweenRes.isReversed ? "-" : ""}
-                {Math.abs(betweenRes.ymd.years)} Years{" "}
-                {Math.abs(betweenRes.ymd.days)} Days
+                {Math.abs(betweenRes.yOnly.years)} Years{" "}
+{Math.abs(betweenRes.yOnly.days)} Days
               </div>
             </div>
 
