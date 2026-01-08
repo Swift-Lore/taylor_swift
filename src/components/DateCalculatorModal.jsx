@@ -428,10 +428,6 @@ export default function DateCalculatorModal({ onClose }) {
                 color: '#6b7db3',
               }}
             />
-            {/* Custom calendar emoji */}
-            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none text-[#6b7db3] text-lg">
-              📅
-            </div>
           </div>
         </div>
 
