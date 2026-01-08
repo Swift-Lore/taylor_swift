@@ -920,12 +920,12 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           </div>
 
           {/* Ad block */}
-{import.meta.env.PROD && !loading && (posts.length > 0 || searchResults.length > 0) && (
+{import.meta.env.PROD && !isLoading && !isInitialLoad && records.length > 0 && (
   <AdSlot
-  variant="leaderboard"  // ← Add this for clarity
-  maxWidthClass="max-w-6xl"
-  className="mb-2"
-/>
+    variant="leaderboard"
+    maxWidthClass="max-w-6xl"
+    className="mb-2"
+  />
 )}
           
           {/* ON THIS DAY Section */}
