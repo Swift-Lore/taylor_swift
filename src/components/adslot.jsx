@@ -73,12 +73,14 @@ export default function AdSlot({
         }}
       >
         <ins
-          ref={insRef}
-          className="adsbygoogle"
-          style={{ display: "block", width: "100%" }}
-          data-ad-client={AD_CLIENT}
-          data-ad-slot={config.slot}
-        />
+  ref={insRef}
+  className="adsbygoogle"
+  style={{ display: "block", width: "100%" }}
+  data-ad-client={AD_CLIENT}
+  data-ad-slot={config.slot}
+  data-ad-format="auto"
+  data-full-width-responsive="true"
+/>
       </div>
     </div>
   );
