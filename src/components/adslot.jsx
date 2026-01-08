@@ -69,9 +69,6 @@ export default function AdSlot({
           maxWidth: '100%'
         }}
       >
-        <div className="absolute top-1 left-0 right-0 text-[10px] text-[#8e3e3e]/60 uppercase tracking-wide text-center pointer-events-none z-10">
-          Sponsored
-        </div>
 
         <ins
           ref={insRef}
