@@ -1519,7 +1519,6 @@ const CalendarModal = () => {
   </div>
 )}
 
-         
       {/* Selected keywords chips */}
       {filterKeywords.length > 0 && (
         <div className="max-w-6xl mx-auto px-4 mb-4">
