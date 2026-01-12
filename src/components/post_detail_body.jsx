@@ -117,9 +117,13 @@ function LinkPreview({ url }) {
         // Microlink provides the most reliable previews with screenshot capability
         // Get a free API key from https://microlink.io/
         const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
-        const microlinkUrl = `https://api.microlink.io/?url=${encodeURIComponent(
-          url
-        )}&wait=1500&screenshot=true&embed=screenshot.url&video=false&audio=false&iframe=false&palette=true&theme=light&api_key=${MICROLINK_API_KEY}`;
+        const microlinkUrl =
+  `https://api.microlink.io/?url=${encodeURIComponent(url)}` +
+  `&wait=1500` +
+  `&screenshot=true` +
+  `&video=false&audio=false&iframe=false` +
+  `&palette=true&theme=light` +
+  (MICROLINK_API_KEY ? `&api_key=${MICROLINK_API_KEY}` : "");
 
         const microlinkResponse = await fetch(microlinkUrl, {
           headers: {
@@ -135,7 +139,17 @@ function LinkPreview({ url }) {
             const data = microlinkData.data;
             
             // Process and clean the data
-            let imageUrl = data.image?.url || data.screenshot?.url || data.logo?.url;
+            const isLogoish = (u) => {
+  const s = String(u || "").toLowerCase();
+  return s.includes("logo") || s.includes("icon") || s.includes("favicon") || s.includes("apple-touch-icon");
+};
+
+let imageUrl = data.image?.url || data.screenshot?.url || data.logo?.url;
+
+// If OG image looks like a logo/icon, prefer screenshot
+if (isLogoish(imageUrl) && data.screenshot?.url) {
+  imageUrl = data.screenshot.url;
+}
             
             // Ensure image URL is absolute
             if (imageUrl && imageUrl.startsWith('//')) {
