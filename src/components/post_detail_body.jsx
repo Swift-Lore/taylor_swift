@@ -122,6 +122,36 @@ function LinkPreview({ url }) {
       try {
         setLoading(true);
 
+        // ✅ X/Twitter: use oEmbed instead of scraping (prevents "Not found" screenshots)
+if (isXUrl(url)) {
+  try {
+    const cleanUrl = url.split("?")[0].replace("x.com/", "twitter.com/");
+    const oembedUrl = `https://publish.twitter.com/oembed?omit_script=1&url=${encodeURIComponent(cleanUrl)}`;
+
+    const oembedRes = await fetch(oembedUrl, {
+      signal: AbortSignal.timeout(5000),
+    });
+
+    if (oembedRes.ok) {
+      const o = await oembedRes.json();
+
+      if (isMounted) {
+        setEmbedHtml(o.html || "");
+        setPreviewData({
+          title: o.author_name ? `${o.author_name} on X` : "Post on X",
+          description: "",
+          image: getFaviconUrl("x.com"),
+          domain: "x.com",
+          url: cleanUrl,
+        });
+      }
+      return;
+    }
+  } catch (e) {
+    // If oEmbed fails, continue to Strategy 1/2/3
+  }
+}
+
         // ================== STRATEGY 1: Microlink API (Primary) ==================
         // Microlink provides the most reliable previews with screenshot capability
         // Get a free API key from https://microlink.io/
