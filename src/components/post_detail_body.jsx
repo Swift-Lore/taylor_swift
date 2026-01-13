@@ -102,16 +102,7 @@ const getFaviconUrl = (domain) => {
 function LinkPreview({ url }) {
   const [previewData, setPreviewData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [embedHtml, setEmbedHtml] = useState("");
   const domain = getDomainFromUrl(url);
-  const isXUrl = (u) => {
-  try {
-    const h = new URL(u).hostname.replace("www.", "");
-    return h === "x.com" || h === "twitter.com";
-  } catch {
-    return false;
-  }
-};
 
   useEffect(() => {
     let isMounted = true;
@@ -121,36 +112,6 @@ function LinkPreview({ url }) {
 
       try {
         setLoading(true);
-
-        // ✅ X/Twitter: use oEmbed instead of scraping (prevents "Not found" screenshots)
-if (isXUrl(url)) {
-  try {
-    const cleanUrl = url.split("?")[0].replace("x.com/", "twitter.com/");
-    const oembedUrl = `https://publish.twitter.com/oembed?omit_script=1&url=${encodeURIComponent(cleanUrl)}`;
-
-    const oembedRes = await fetch(oembedUrl, {
-      signal: AbortSignal.timeout(5000),
-    });
-
-    if (oembedRes.ok) {
-      const o = await oembedRes.json();
-
-      if (isMounted) {
-        setEmbedHtml(o.html || "");
-        setPreviewData({
-          title: o.author_name ? `${o.author_name} on X` : "Post on X",
-          description: "",
-          image: getFaviconUrl("x.com"),
-          domain: "x.com",
-          url: cleanUrl,
-        });
-      }
-      return;
-    }
-  } catch (e) {
-    // If oEmbed fails, continue to Strategy 1/2/3
-  }
-}
 
         // ================== STRATEGY 1: Microlink API (Primary) ==================
         // Microlink provides the most reliable previews with screenshot capability
@@ -176,21 +137,6 @@ if (isXUrl(url)) {
           
           if (isMounted && microlinkData.data) {
             const data = microlinkData.data;
-            // If this is an X/Twitter link and Microlink got the "Not found" bot page,
-// treat it as a failure so we can fall back.
-const isX = (() => {
-  try {
-    const h = new URL(url).hostname.replace("www.", "");
-    return h === "x.com" || h === "twitter.com";
-  } catch {
-    return false;
-  }
-})();
-
-const titleLower = String(data.title || "").toLowerCase();
-if (isX && (titleLower === "not found" || titleLower.includes("not found"))) {
-  // do NOT setPreviewData or return; just fall through to the fallback
-} else {
             
             // Process and clean the data
             const isLogoish = (u) => {
