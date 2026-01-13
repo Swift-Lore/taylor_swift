@@ -137,6 +137,21 @@ function LinkPreview({ url }) {
           
           if (isMounted && microlinkData.data) {
             const data = microlinkData.data;
+            // If this is an X/Twitter link and Microlink got the "Not found" bot page,
+// treat it as a failure so we can fall back.
+const isX = (() => {
+  try {
+    const h = new URL(url).hostname.replace("www.", "");
+    return h === "x.com" || h === "twitter.com";
+  } catch {
+    return false;
+  }
+})();
+
+const titleLower = String(data.title || "").toLowerCase();
+if (isX && (titleLower === "not found" || titleLower.includes("not found"))) {
+  // do NOT setPreviewData or return; just fall through to the fallback
+} else {
             
             // Process and clean the data
             const isLogoish = (u) => {
