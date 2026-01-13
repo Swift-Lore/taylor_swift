@@ -173,6 +173,44 @@ if (isLogoish(imageUrl) && data.screenshot?.url) {
           }
         }
 
+        // If Microlink fails and it's an X/Twitter link, use oEmbed as a fallback
+const isXUrl = (u) => {
+  try {
+    const h = new URL(u).hostname.replace("www.", "");
+    return h === "x.com" || h === "twitter.com";
+  } catch {
+    return false;
+  }
+};
+
+if (isXUrl(url)) {
+  try {
+    const cleanUrl = url.split("?")[0]; // strip ?s=20 etc. (helps sometimes)
+    const oembedUrl = `https://publish.twitter.com/oembed?omit_script=1&url=${encodeURIComponent(cleanUrl)}`;
+
+    const oembedRes = await fetch(oembedUrl, {
+      signal: AbortSignal.timeout(5000),
+    });
+
+    if (oembedRes.ok) {
+      const o = await oembedRes.json();
+
+      if (isMounted) {
+        setPreviewData({
+          title: o.author_name ? `${o.author_name} on X` : "Post on X",
+          description: "",
+          image: getFaviconUrl("x.com"),
+          domain: "x.com",
+          url: cleanUrl,
+        });
+      }
+      return;
+    }
+  } catch (e) {
+    // ignore and continue to Strategy 2
+  }
+}
+        
         // ================== STRATEGY 2: LinkPreview API (Fallback) ==================
         // Alternative free API that works well
         const linkPreviewUrl = `https://api.linkpreview.net/?key=${import.meta.env.VITE_LINKPREVIEW_API_KEY || '5b576'}&q=${encodeURIComponent(url)}`;
