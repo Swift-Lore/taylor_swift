@@ -172,7 +172,7 @@ if (isLogoish(imageUrl) && data.screenshot?.url) {
             return;
           }
         }
-          }
+          
 
         // If Microlink fails and it's an X/Twitter link, use oEmbed as a fallback
 const isXUrl = (u) => {
