@@ -102,7 +102,16 @@ const getFaviconUrl = (domain) => {
 function LinkPreview({ url }) {
   const [previewData, setPreviewData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [embedHtml, setEmbedHtml] = useState("");
   const domain = getDomainFromUrl(url);
+  const isXUrl = (u) => {
+  try {
+    const h = new URL(u).hostname.replace("www.", "");
+    return h === "x.com" || h === "twitter.com";
+  } catch {
+    return false;
+  }
+};
 
   useEffect(() => {
     let isMounted = true;
