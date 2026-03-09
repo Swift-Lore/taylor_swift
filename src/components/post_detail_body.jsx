@@ -145,9 +145,20 @@ const domain = getDomainFromUrl(url);
     s.includes("logo") ||
     s.includes("icon") ||
     s.includes("favicon") ||
-    s.includes("apple-touch-icon")
+    s.includes("apple-touch-icon") ||
+    s.includes("sprite") ||
+    s.includes("badge") ||
+    s.includes("brand")
   );
 };
+
+const LOGO_HEAVY_DOMAINS = [
+  "people.com", "yahoo.com", "eonline.com", "usmagazine.com",
+  "tmz.com", "hollywoodlife.com", "dailymail.co.uk", "mirror.co.uk",
+  "nytimes.com", "foxnews.com", "nbcnews.com", "cbsnews.com",
+  "abcnews.go.com", "rollingstone.com", "billboard.com",
+  "vanityfair.com", "vogue.com", "cosmopolitan.com", "elle.com",
+];
 
 const fallbackTitle =
   domain.split(".")[0].charAt(0).toUpperCase() +
@@ -155,17 +166,21 @@ const fallbackTitle =
   " Article";
 
 const isGenericTitle = !data.title || data.title.trim() === "" || data.title === fallbackTitle;
+const currentDomain = data.url ? getDomainFromUrl(data.url) : domain;
+const isLogoHeavyDomain = LOGO_HEAVY_DOMAINS.some(d => currentDomain.includes(d));
 
-let imageUrl = data.image?.url || data.screenshot?.url || data.logo?.url;
-
-// If title is generic, prefer screenshot because metadata is probably weak
-if (isGenericTitle && data.screenshot?.url) {
+let imageUrl;
+if (data.screenshot?.url && (isLogoHeavyDomain || isGenericTitle)) {
   imageUrl = data.screenshot.url;
-}
-
-// If the chosen image still looks like a logo, try screenshot instead
-if (isLogoish(imageUrl) && data.screenshot?.url) {
-  imageUrl = data.screenshot.url;
+} else {
+  imageUrl = data.image?.url || null;
+  if (isLogoish(imageUrl) && data.screenshot?.url) {
+    imageUrl = data.screenshot.url;
+  } else if (!imageUrl && data.screenshot?.url) {
+    imageUrl = data.screenshot.url;
+  } else if (!imageUrl) {
+    imageUrl = data.logo?.url || null;
+  }
 }
             
             // Ensure image URL is absolute
