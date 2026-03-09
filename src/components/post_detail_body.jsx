@@ -347,9 +347,21 @@ if (isMounted) {
       </div>
     );
   }
-const hasUsableImage =
-  previewData?.image &&
-  previewData.image !== getFaviconUrl(domain);
+const isLikelyRealPreviewImage = (imageUrl) => {
+  if (!imageUrl) return false;
+
+  const s = String(imageUrl).toLowerCase();
+
+  return !(
+    s.includes("google.com/s2/favicons") ||
+    s.includes("favicon") ||
+    s.includes("logo") ||
+    s.includes("icon") ||
+    s.includes("apple-touch-icon")
+  );
+};
+
+const hasUsableImage = isLikelyRealPreviewImage(previewData?.image);
   
   if (!hasUsableImage) {
   return (
