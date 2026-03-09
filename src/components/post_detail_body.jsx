@@ -99,23 +99,6 @@ const getFaviconUrl = (domain) => {
   return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
 };
 
-const preferScreenshotDomains = [
-  "eonline.com",
-  "wwd.com",
-  "vanityfair.com",
-  "elle.com",
-  "glamour.com",
-  "tmz.com",
-  "justjared.com",
-  "change.org",
-  "bigmachinelabelgroup.com",
-  "tumblr.com"
-];
-
-const shouldPreferScreenshot = (domain) => {
-  return preferScreenshotDomains.some((d) => domain.includes(d));
-};
-
 function LinkPreview({ url }) {
   const [previewData, setPreviewData] = useState(null);
 const [loading, setLoading] = useState(true);
@@ -162,29 +145,15 @@ const domain = getDomainFromUrl(url);
     s.includes("logo") ||
     s.includes("icon") ||
     s.includes("favicon") ||
-    s.includes("apple-touch-icon") ||
-    s.includes("brand") ||
-    s.includes("publisher") ||
-    s.includes("siteicon") ||
-    s.includes("avatar")
+    s.includes("apple-touch-icon")
   );
 };
 
-const ogImage = data.image?.url || "";
-const screenshotImage = data.screenshot?.url || "";
-const logoImage = data.logo?.url || "";
+let imageUrl = data.image?.url || data.screenshot?.url || data.logo?.url;
 
-let imageUrl;
-
-if (shouldPreferScreenshot(domain)) {
-  imageUrl = screenshotImage || ogImage || logoImage;
-} else {
-  imageUrl = ogImage || screenshotImage || logoImage;
-}
-
-// If chosen image still looks logo-ish, fall back to screenshot
-if (isLogoish(imageUrl) && screenshotImage) {
-  imageUrl = screenshotImage;
+// If the chosen image looks like a logo, try screenshot instead
+if (isLogoish(imageUrl) && data.screenshot?.url) {
+  imageUrl = data.screenshot.url;
 }
             
             // Ensure image URL is absolute
