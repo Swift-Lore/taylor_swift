@@ -588,15 +588,21 @@ export default function PostDetailBody() {
 
   // Populate sourceImages / nonImageLinks from event.SOURCES
   useEffect(() => {
-    if (!event || !event.SOURCES) return;
+  if (!event || !event.SOURCES) return;
 
-    const rawUrls = event.SOURCES.split(" || ").map((url) => url.trim());
-    const imageLinks = rawUrls.filter((url) => isLikelyImage(url));
-    const otherLinks = rawUrls.filter((url) => !isLikelyImage(url));
+  const rawUrls = event.SOURCES.split(" || ").map((url) => url.trim());
 
-    setSourceImages(imageLinks);
-    setNonImageLinks(otherLinks);
-  }, [event]);
+  const imageLinks = rawUrls.filter(
+    (url) => isLikelyImage(url) || isPinterestUrl(url)
+  );
+
+  const otherLinks = rawUrls.filter(
+    (url) => !isLikelyImage(url) && !isPinterestUrl(url)
+  );
+
+  setSourceImages(imageLinks);
+  setNonImageLinks(otherLinks);
+}, [event]);
 useEffect(() => {
     setMicrolinkErrors({});
   }, [event]);
@@ -842,32 +848,87 @@ useEffect(() => {
             <div className="space-y-6">
               {sourceImages.length > 0 && (
                 <div className="image-only-grid flex flex-wrap gap-6 justify-start">
-                  {sourceImages.map((url, index) => (
-                    <a
-                      key={`img-${index}`}
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group relative flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-all"
-                      style={{ width: "500px", height: "400px" }}
-                    >
-                      <img
-                        src={url}
-                        alt="Source"
-                        className="max-w-full max-h-full object-contain cursor-pointer"
-                        loading="lazy"
-                      />
-                      <span className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs p-1 opacity-0 group-hover:opacity-100 transition-opacity truncate text-center">
-                        {(() => {
-                          try {
-                            return new URL(url).hostname.replace("www.", "");
-                          } catch {
-                            return "Source";
-                          }
-                        })()}
-                      </span>
-                    </a>
-                  ))}
+                  {sourceImages.map((url, index) => {
+  const isPinterest = isPinterestUrl(url);
+  const pinId = getPinterestPinId(url);
+
+  if (isPinterest && pinId) {
+    return (
+      <div
+        key={`img-${index}`}
+        className="group relative bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-all"
+        style={{ width: "345px", height: "460px" }}
+      >
+        <iframe
+          src={`https://assets.pinterest.com/ext/embed.html?id=${pinId}`}
+          width="345"
+          height="460"
+          frameBorder="0"
+          scrolling="no"
+          style={{
+            display: "block",
+            width: "345px",
+            height: "460px",
+            border: "0",
+            overflow: "hidden"
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (isPinterest) {
+    return (
+      <a
+        key={`img-${index}`}
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group relative flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-all"
+        style={{ width: "345px", height: "220px" }}
+      >
+        <div className="flex items-center gap-3 px-4">
+          <img
+            src={getFaviconUrl("pinterest.com")}
+            alt="Pinterest"
+            className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm flex-shrink-0"
+          />
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-gray-900">Pinterest Pin</p>
+            <p className="text-xs text-gray-500 truncate">pinterest.com</p>
+          </div>
+        </div>
+      </a>
+    );
+  }
+
+  return (
+    <a
+      key={`img-${index}`}
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group relative flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-all"
+      style={{ width: "500px", height: "400px" }}
+    >
+      <img
+        src={url}
+        alt="Source"
+        className="max-w-full max-h-full object-contain cursor-pointer"
+        loading="lazy"
+      />
+      <span className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs p-1 opacity-0 group-hover:opacity-100 transition-opacity truncate text-center">
+        {(() => {
+          try {
+            return new URL(url).hostname.replace("www.", "");
+          } catch {
+            return "Source";
+          }
+        })()}
+      </span>
+    </a>
+  );
+})}
                 </div>
               )}
 
@@ -875,7 +936,6 @@ useEffect(() => {
                 <div className="microlink-grid">
                   {nonImageLinks.map((url, index) => {
                     const isGetty = isGettyUrl(url);
-const isPinterest = isPinterestUrl(url);
 
 if (isGetty) {
                       // Clean, branded Getty card instead of Microlink
