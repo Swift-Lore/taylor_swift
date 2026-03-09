@@ -103,7 +103,6 @@ function LinkPreview({ url }) {
   const [previewData, setPreviewData] = useState(null);
 const [loading, setLoading] = useState(true);
 const domain = getDomainFromUrl(url);
-const previewCacheKey = `linkPreview:${url}`;
 
   useEffect(() => {
     let isMounted = true;
