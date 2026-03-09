@@ -156,35 +156,7 @@ function App() {
           sameSite="Lax"
         onAccept={() => {
   console.log("Cookies accepted");
-
-  const existingScript = document.querySelector(
-    'script[src*="pagead2.googlesyndication.com"]'
-  );
-
-  if (!existingScript) {
-    console.log("Loading AdSense script after consent...");
-    const script = document.createElement("script");
-    script.src =
-      "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4534610257929133";
-    script.async = true;
-    script.crossOrigin = "anonymous";
-
-    script.onload = () => {
-      console.log("✅ AdSense script loaded after consent");
-      if (window.adsbygoogle) {
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-      }
-    };
-
-    script.onerror = (e) => {
-      console.error("❌ Failed to load AdSense script after consent:", e);
-    };
-
-    document.head.appendChild(script);
-  } else if (window.adsbygoogle) {
-    console.log("AdSense already loaded - initializing ads");
-    (window.adsbygoogle = window.adsbygoogle || []).push({});
-  }
+  window.location.reload();
 }}
 onDecline={() => {
   console.log("Non-essential cookies rejected");
