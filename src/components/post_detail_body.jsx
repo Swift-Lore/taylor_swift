@@ -385,7 +385,7 @@ const hasUsableImage = isLikelyRealPreviewImage(previewData?.image);
       href={previewData.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="microlink-card block max-w-md mx-auto mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
+      className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
     >
       <div className="flex items-center gap-3">
         <img
