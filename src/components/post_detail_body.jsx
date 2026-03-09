@@ -771,11 +771,16 @@ useEffect(() => {
       }, 2500);
     };
     
-    if (event.INSTAGRAM) {
+        if (event.INSTAGRAM) {
       loadInstagramScript();
       setTimeout(loadInstagramScript, 500);
     }
-    if (event.TWITTER) loadTwitterScript();
+
+    if (event.TWITTER) {
+      loadTwitterScript();
+      detectFailedTwitterEmbeds();
+      setTimeout(detectFailedTwitterEmbeds, 4500);
+    }
   }, [event]);
   
   // Getty embed: inject HTML and execute its scripts
