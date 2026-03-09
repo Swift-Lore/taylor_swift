@@ -333,7 +333,10 @@ if (isMounted) {
       </div>
     );
   }
-
+const hasUsableImage =
+  previewData?.image &&
+  previewData.image !== getFaviconUrl(domain);
+  
   // Compact card for logo-heavy domains (no big image)
   const isBadDomainCard = LOGO_HEAVY_DOMAINS.some(d => domain.includes(d));
   if (isBadDomainCard) {
