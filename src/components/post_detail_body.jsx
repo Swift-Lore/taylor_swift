@@ -156,30 +156,15 @@ const previewCacheKey = `linkPreview:${url}`;
     s.includes("logo") ||
     s.includes("icon") ||
     s.includes("favicon") ||
-    s.includes("apple-touch-icon") ||
-    s.includes("/branding/") ||
-    s.includes("/brand/") ||
-    s.includes("publisher") ||
-    s.includes("site-logo")
+    s.includes("apple-touch-icon")
   );
 };
 
-const normalizeImageUrl = (img, domain) => {
-  if (!img) return "";
-  if (img.startsWith("//")) return "https:" + img;
-  if (img.startsWith("/")) return `https://${domain}${img}`;
-  return img;
-};
+let imageUrl = data.image?.url || data.screenshot?.url || data.logo?.url;
 
-const screenshotUrl = normalizeImageUrl(data.screenshot?.url, domain);
-const ogImageUrl = normalizeImageUrl(data.image?.url, domain);
-const logoUrl = normalizeImageUrl(data.logo?.url, domain);
-
-// Prefer screenshot when available unless the OG image clearly looks like a real article image
-let imageUrl = screenshotUrl || ogImageUrl || logoUrl;
-
-if (ogImageUrl && !isLogoish(ogImageUrl)) {
-  imageUrl = ogImageUrl;
+// If the chosen image looks like a logo, try screenshot instead
+if (isLogoish(imageUrl) && data.screenshot?.url) {
+  imageUrl = data.screenshot.url;
 }
             
             // Ensure image URL is absolute
@@ -292,52 +277,20 @@ if (ogImageUrl && !isLogoish(ogImageUrl)) {
           console.log('CORS proxy failed for:', domain, proxyError);
         }
 
-        // ================== STRATEGY 4: Site-Specific Fallbacks ==================
-        // Custom handling for known sites (like justjared.com)
-        const siteConfigs = {
-          'justjared.com': {
-            title: 'Just Jared - Celebrity News & Photos',
-            description: 'Breaking celebrity news, photos, and entertainment updates',
-            image: 'https://www.justjared.com/images/justjared-logo-new.png'
-          },
-          'nbcrews.com': {
-            title: 'NBC News Entertainment',
-            description: 'Latest entertainment news and updates from NBC News',
-            image: 'https://nodeassets.nbc.com/nbc-web/assets/2.0.0/images/nbc-logo.svg'
-          },
-          'people.com': {
-            title: 'People Magazine',
-            description: 'Breaking celebrity news, entertainment stories and exclusive interviews',
-            image: 'https://people.com/thmb/7fBSYpC6a31D0Mq9B5WgSdIBUZU=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/people_logo-d5e9f7d1e7f34f9eb8e7c26b7bb40d5e.png'
-          },
-          'tmz.com': {
-            title: 'TMZ - Celebrity News',
-            description: 'Breaking celebrity gossip and entertainment news',
-            image: 'https://tmz.ugc.zencdn.net/2019_TMZ_Logo_WhiteOrange.png?1'
-          },
-          'etonline.com': {
-            title: 'Entertainment Tonight',
-            description: 'Entertainment news, celebrity interviews, and TV gossip',
-            image: 'https://www.etonline.com/sites/etonline.com/files/et_logo_0.png'
-          }
-        };
-
-        // Check if we have a site-specific configuration
-        const siteKey = Object.keys(siteConfigs).find(key => 
-          domain.includes(key.replace('www.', ''))
-        );
-
-        if (siteKey && isMounted) {
-          const config = siteConfigs[siteKey];
-          setPreviewData({
-            title: config.title,
-            description: config.description,
-            image: config.image,
-            domain: siteKey,
-            url: url
-          });
-          return;
-        }
+        // ================== STRATEGY 4: Final generic fallback ==================
+if (isMounted) {
+  setPreviewData({
+    title:
+      domain.split(".")[0].charAt(0).toUpperCase() +
+      domain.split(".")[0].slice(1) +
+      " Article",
+    description: "",
+    image: getFaviconUrl(domain),
+    domain: domain,
+    url: url
+  });
+  return;
+}
 
         // ================== STRATEGY 5: Ultimate Fallback ==================
         if (isMounted) {
