@@ -129,7 +129,7 @@ const domain = getDomainFromUrl(url);
           headers: {
             'Accept': 'application/json',
           },
-          signal: AbortSignal.timeout(3500)
+          signal: AbortSignal.timeout(8000)
         });
 
         if (microlinkResponse.ok) {
