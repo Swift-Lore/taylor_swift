@@ -152,34 +152,6 @@ const domain = getDomainFromUrl(url);
   );
 };
 
-const currentDomainCheck = getDomainFromUrl(url);
-const isBadDomain = LOGO_HEAVY_DOMAINS.some(d => currentDomainCheck.includes(d));
-
-if (isBadDomain) {
-  // Extract a readable title from the URL slug as best-effort
-  const urlPath = new URL(url).pathname;
-  const slug = urlPath.split("/").filter(Boolean).pop() || "";
-  const slugTitle = slug
-    .replace(/[-_]/g, " ")
-    .replace(/\.\w+$/, "")
-    .replace(/\b\w/g, c => c.toUpperCase())
-    .trim();
-
-  if (isMounted) {
-    setPreviewData({
-      title: slugTitle || (currentDomainCheck.split(".")[0].charAt(0).toUpperCase() + currentDomainCheck.split(".")[0].slice(1) + " Article"),
-      description: "",
-      image: getFaviconUrl(currentDomainCheck),
-      domain: currentDomainCheck,
-      url: url,
-      author: "",
-      date: ""
-    });
-    setLoading(false);
-  }
-  return;
-}
-
 const fallbackTitle =
   domain.split(".")[0].charAt(0).toUpperCase() +
   domain.split(".")[0].slice(1) +
