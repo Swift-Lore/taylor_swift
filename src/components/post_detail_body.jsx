@@ -310,15 +310,14 @@ if (isMounted) {
         console.log('Link preview error for', url, error);
         
         if (isMounted) {
-          setPreviewData({
-            title: domain.split('.')[0].charAt(0).toUpperCase() + 
-                  domain.split('.')[0].slice(1) + ' Article',
-            description: '',
-            image: getFaviconUrl(domain),
-            domain: domain,
-            url: url
-          });
-        }
+  setPreviewData({
+    title: getFallbackTitleFromUrl(url, domain),
+    description: '',
+    image: getFaviconUrl(domain),
+    domain: domain,
+    url: url
+  });
+}
       } finally {
         if (isMounted) {
           setLoading(false);
