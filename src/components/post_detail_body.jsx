@@ -538,6 +538,51 @@ const hasUsableImage = isLikelyRealPreviewImage(previewData?.image);
   );
 }
 
+function TwitterFallbackCard({ url }) {
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
+    >
+      <div className="flex items-center gap-3">
+        <img
+          src={getFaviconUrl("x.com")}
+          alt="X"
+          className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm flex-shrink-0"
+        />
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-[#8e3e3e] transition-colors">
+            View post on X
+          </h3>
+          <div className="flex items-center justify-between mt-1">
+            <span className="text-xs text-gray-500 truncate">
+              x.com
+            </span>
+            <span className="flex items-center gap-1 text-xs font-semibold text-[#8e3e3e]">
+              Open post
+              <svg
+                className="w-3 h-3 transform group-hover:translate-x-1 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M14 5l7 7m0 0l-7 7m7-7H3"
+                />
+              </svg>
+            </span>
+          </div>
+        </div>
+      </div>
+    </a>
+  );
+}
+
 export default function PostDetailBody() {
   const navigate = useNavigate();
   const location = useLocation();
