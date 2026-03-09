@@ -109,10 +109,20 @@ const previewCacheKey = `linkPreview:${url}`;
     let isMounted = true;
 
     const fetchPreview = async () => {
-      if (!isMounted) return;
+  if (!isMounted) return;
 
-      try {
-        setLoading(true);
+  const cached = sessionStorage.getItem(previewCacheKey);
+  if (cached) {
+    try {
+      const parsed = JSON.parse(cached);
+      setPreviewData(parsed);
+      setLoading(false);
+      return;
+    } catch {}
+  }
+
+  try {
+    setLoading(true);
 
         // ================== STRATEGY 1: Microlink API (Primary) ==================
         // Microlink provides the most reliable previews with screenshot capability
