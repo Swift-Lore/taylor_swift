@@ -735,6 +735,17 @@ useEffect(() => {
   }
 }, [event?.["GETTY EMBED"]]);
   
+  // Pinterest embed script
+useEffect(() => {
+  if (!document.getElementById("pinterest-script")) {
+    const script = document.createElement("script");
+    script.id = "pinterest-script";
+    script.src = "https://assets.pinterest.com/js/pinit.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }
+}, []);
+ 
   // TikTok embed script loading
   useEffect(() => {
     if (!event?.TIKTOK) return;
