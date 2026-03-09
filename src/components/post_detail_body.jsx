@@ -157,22 +157,13 @@ const fallbackTitle =
   domain.split(".")[0].slice(1) +
   " Article";
 
-const isGenericTitle = !data.title || data.title.trim() === "" || data.title === fallbackTitle;
-const currentDomain = data.url ? getDomainFromUrl(data.url) : domain;
-const isLogoHeavyDomain = LOGO_HEAVY_DOMAINS.some(d => currentDomain.includes(d));
+const isGenericTitle =
+  !data.title || data.title.trim() === "" || data.title === fallbackTitle;
 
-let imageUrl;
-if (data.screenshot?.url && (isLogoHeavyDomain || isGenericTitle)) {
-  imageUrl = data.screenshot.url;
-} else {
-  imageUrl = data.image?.url || null;
-  if (isLogoish(imageUrl) && data.screenshot?.url) {
-    imageUrl = data.screenshot.url;
-  } else if (!imageUrl && data.screenshot?.url) {
-    imageUrl = data.screenshot.url;
-  } else if (!imageUrl) {
-    imageUrl = data.logo?.url || null;
-  }
+let imageUrl = data.image?.url || null;
+
+if (!imageUrl || isLogoish(imageUrl) || isGenericTitle) {
+  imageUrl = data.screenshot?.url || data.image?.url || data.logo?.url || null;
 }
             
             // Ensure image URL is absolute
