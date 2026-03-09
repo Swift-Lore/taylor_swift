@@ -105,10 +105,11 @@ const getFallbackTitleFromUrl = (url, domain) => {
     const slug = parts[parts.length - 1] || "";
 
     const cleaned = slug
-      .replace(/\.\w+$/, "")
-      .replace(/[-_]+/g, " ")
-      .replace(/\b\w/g, (c) => c.toUpperCase())
-      .trim();
+  .replace(/\.\w+$/, "")
+  .replace(/[-_]+\d+(?:[-_]\d+)*$/, "")
+  .replace(/[-_]+/g, " ")
+  .replace(/\b\w/g, (c) => c.toUpperCase())
+  .trim();
 
     if (cleaned && cleaned.length > 3) {
       return cleaned;
