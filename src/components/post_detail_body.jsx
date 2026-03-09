@@ -40,6 +40,18 @@ const isGettyUrl = (url) => {
   const lower = url.toLowerCase();
   return lower.includes("gettyimages.com");
 };
+
+// Detect Facebook URLs
+const isFacebookUrl = (url) => {
+  if (!url) return false;
+  const lower = url.toLowerCase();
+  return (
+    lower.includes("facebook.com") ||
+    lower.includes("fb.watch") ||
+    lower.includes("fb.com")
+  );
+};
+
 // Detect Pinterest URLs
 const isPinterestUrl = (url) => {
   if (!url) return false;
@@ -936,6 +948,7 @@ useEffect(() => {
                 <div className="microlink-grid">
                   {nonImageLinks.map((url, index) => {
                     const isGetty = isGettyUrl(url);
+const isFacebook = isFacebookUrl(url);
 
 if (isGetty) {
                       // Clean, branded Getty card instead of Microlink
