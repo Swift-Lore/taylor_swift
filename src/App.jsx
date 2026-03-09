@@ -155,7 +155,6 @@ function App() {
           sameSite="Lax"
         onAccept={() => {
   console.log("Cookies accepted");
-  window.location.reload();
 }}
 onDecline={() => {
   console.log("Non-essential cookies rejected");
