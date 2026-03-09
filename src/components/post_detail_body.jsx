@@ -556,6 +556,7 @@ export default function PostDetailBody() {
   const [sourceImages, setSourceImages] = useState([]);
   const [nonImageLinks, setNonImageLinks] = useState([]);
   const [microlinkErrors, setMicrolinkErrors] = useState({});
+  const [failedTwitterEmbeds, setFailedTwitterEmbeds] = useState({});
 
   // Scroll to top on mount / id change
   useEffect(() => {
