@@ -149,9 +149,21 @@ const domain = getDomainFromUrl(url);
   );
 };
 
+const fallbackTitle =
+  domain.split(".")[0].charAt(0).toUpperCase() +
+  domain.split(".")[0].slice(1) +
+  " Article";
+
+const isGenericTitle = !data.title || data.title.trim() === "" || data.title === fallbackTitle;
+
 let imageUrl = data.image?.url || data.screenshot?.url || data.logo?.url;
 
-// If the chosen image looks like a logo, try screenshot instead
+// If title is generic, prefer screenshot because metadata is probably weak
+if (isGenericTitle && data.screenshot?.url) {
+  imageUrl = data.screenshot.url;
+}
+
+// If the chosen image still looks like a logo, try screenshot instead
 if (isLogoish(imageUrl) && data.screenshot?.url) {
   imageUrl = data.screenshot.url;
 }
