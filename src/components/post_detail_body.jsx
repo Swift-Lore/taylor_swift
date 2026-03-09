@@ -412,7 +412,7 @@ if (isMounted) {
   const isBadDomainCard = LOGO_HEAVY_DOMAINS.some(d => domain.includes(d));
   if (isBadDomainCard) {
     return (
-      
+      <a
         href={previewData.url}
         target="_blank"
         rel="noopener noreferrer"
@@ -440,7 +440,7 @@ if (isMounted) {
   }
 
   return (
-    
+    <a
       href={previewData.url}
       target="_blank"
       rel="noopener noreferrer"
