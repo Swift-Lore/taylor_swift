@@ -747,6 +747,30 @@ useEffect(() => {
       }
     };
 
+    const detectFailedTwitterEmbeds = () => {
+      setTimeout(() => {
+        const containers = document.querySelectorAll(".twitter-container");
+
+        containers.forEach((container, index) => {
+          const text = container.textContent?.toLowerCase() || "";
+          const iframe = container.querySelector("iframe");
+
+          const failed =
+            text.includes("not found") ||
+            text.includes("sorry, we can't create an embed for that") ||
+            text.includes("sorry, we can’t create an embed for that") ||
+            text.includes("deleted or made private");
+
+          if (failed || !iframe) {
+            setFailedTwitterEmbeds((prev) => ({
+              ...prev,
+              [index]: true,
+            }));
+          }
+        });
+      }, 2500);
+    };
+    
     if (event.INSTAGRAM) {
       loadInstagramScript();
       setTimeout(loadInstagramScript, 500);
