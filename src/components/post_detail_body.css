@@ -121,10 +121,18 @@
 
 /* Microlink grid styling */
 .microlink-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 1.5rem;
     margin-bottom: 1rem;
+    align-items: flex-start;
+}
+
+.microlink-grid > * {
+    width: 100%;
+    max-width: 420px;
+    flex: 0 0 auto;
+    align-self: flex-start;
 }
 
 /* Ensure Microlink cards are consistent size */
@@ -224,8 +232,11 @@
     }
 
     .microlink-grid {
-        grid-template-columns: 1fr;
         gap: 1rem;
+    }
+
+    .microlink-grid > * {
+        max-width: 100%;
     }
 }
 
