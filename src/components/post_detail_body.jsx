@@ -429,7 +429,7 @@ const hasUsableImage = isLikelyRealPreviewImage(previewData?.image);
       href={previewData.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="microlink-card block max-w-md mx-auto mb-4 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
+      className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
     >
       {/* Thumbnail image with gradient overlay */}
       <div className="h-48 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 relative">
@@ -945,7 +945,7 @@ if (isGetty) {
                           href={url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="microlink-card block max-w-md mx-auto mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow"
+                          className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow"
                         >
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded bg-black flex items-center justify-center text-white text-xs font-semibold">
