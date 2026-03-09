@@ -86,37 +86,42 @@ function ErasTourShowsPage() {
 
 function App() {
   useEffect(() => {
-    // Only load in production
-    if (import.meta.env.PROD) {
-      console.log('App mounted - checking AdSense script...');
-      
-      // Check if script already exists
-      if (!document.querySelector('script[src*="pagead2.googlesyndication.com"]')) {
-        console.log('Loading AdSense script...');
-        const script = document.createElement('script');
-        script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4534610257929133';
-        script.async = true;
-        script.crossOrigin = 'anonymous';
-        
-        script.onload = () => {
-          console.log('✅ AdSense script loaded successfully');
-          // Initialize ads after script loads
-          if (window.adsbygoogle) {
-            console.log('Initializing ads...');
-            (window.adsbygoogle = window.adsbygoogle || []).push({});
-          }
-        };
-        
-        script.onerror = (e) => {
-          console.error('❌ Failed to load AdSense script:', e);
-        };
-        
-        document.head.appendChild(script);
-      } else {
-        console.log('✅ AdSense script already loaded');
+  if (!import.meta.env.PROD) return;
+
+  const consent = document.cookie.includes("websiteCookieConsent=true");
+
+  if (!consent) {
+    console.log("No cookie consent yet - AdSense not loaded");
+    return;
+  }
+
+  console.log("Consent found - checking AdSense script...");
+
+  if (!document.querySelector('script[src*="pagead2.googlesyndication.com"]')) {
+    console.log("Loading AdSense script...");
+    const script = document.createElement("script");
+    script.src =
+      "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4534610257929133";
+    script.async = true;
+    script.crossOrigin = "anonymous";
+
+    script.onload = () => {
+      console.log("✅ AdSense script loaded successfully");
+      if (window.adsbygoogle) {
+        console.log("Initializing ads...");
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
       }
-    }
-  }, []);
+    };
+
+    script.onerror = (e) => {
+      console.error("❌ Failed to load AdSense script:", e);
+    };
+
+    document.head.appendChild(script);
+  } else {
+    console.log("✅ AdSense script already loaded");
+  }
+}, []);
   return (
     <>
       <Routes>
@@ -149,8 +154,34 @@ function App() {
         cookieName="websiteCookieConsent"
           sameSite="Lax"
         onAccept={() => {
-  console.log("Cookies accepted - reloading ads if needed");
-  if (window.adsbygoogle) {
+  console.log("Cookies accepted");
+
+  const existingScript = document.querySelector(
+    'script[src*="pagead2.googlesyndication.com"]'
+  );
+
+  if (!existingScript) {
+    console.log("Loading AdSense script after consent...");
+    const script = document.createElement("script");
+    script.src =
+      "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4534610257929133";
+    script.async = true;
+    script.crossOrigin = "anonymous";
+
+    script.onload = () => {
+      console.log("✅ AdSense script loaded after consent");
+      if (window.adsbygoogle) {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      }
+    };
+
+    script.onerror = (e) => {
+      console.error("❌ Failed to load AdSense script after consent:", e);
+    };
+
+    document.head.appendChild(script);
+  } else if (window.adsbygoogle) {
+    console.log("AdSense already loaded - initializing ads");
     (window.adsbygoogle = window.adsbygoogle || []).push({});
   }
 }}
