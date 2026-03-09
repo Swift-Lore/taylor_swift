@@ -33,7 +33,7 @@ const FIXED_HOLIDAYS = new Set(
   [
     "New Year's Eve",
     "New Year's Day",
-    "Sant Patrick's Day",      // matches your Airtable exactly
+    "Sant Patrick's Day",      
     "Austin Swift's Birthday",
     "Andrea Swift's Birthday",
     "Scott Swift's Birthday",
@@ -58,6 +58,7 @@ const FIXED_HOLIDAYS = new Set(
     "Marjorie Finlay's Birthday",
     "Christmas Eve",
     "Christmas Day",
+    "Independence Day",
   ].map((s) => s.toLowerCase())
 )
 
