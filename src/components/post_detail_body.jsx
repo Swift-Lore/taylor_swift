@@ -99,6 +99,30 @@ const getFaviconUrl = (domain) => {
   return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
 };
 
+const getFallbackTitleFromUrl = (url, domain) => {
+  try {
+    const pathname = new URL(url).pathname;
+    const parts = pathname.split("/").filter(Boolean);
+    const slug = parts[parts.length - 1] || "";
+
+    const cleaned = slug
+      .replace(/\.\w+$/, "")
+      .replace(/[-_]+/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase())
+      .trim();
+
+    if (cleaned && cleaned.length > 3) {
+      return cleaned;
+    }
+  } catch {}
+
+  return (
+    domain.split(".")[0].charAt(0).toUpperCase() +
+    domain.split(".")[0].slice(1) +
+    " Article"
+  );
+};
+
 function LinkPreview({ url }) {
   const [previewData, setPreviewData] = useState(null);
 const [loading, setLoading] = useState(true);
@@ -152,10 +176,7 @@ const domain = getDomainFromUrl(url);
   );
 };
 
-const fallbackTitle =
-  domain.split(".")[0].charAt(0).toUpperCase() +
-  domain.split(".")[0].slice(1) +
-  " Article";
+const fallbackTitle = getFallbackTitleFromUrl(url, domain);
 
 const isGenericTitle =
   !data.title || data.title.trim() === "" || data.title === fallbackTitle;
@@ -174,8 +195,7 @@ if (!imageUrl || isLogoish(imageUrl) || isGenericTitle) {
             }
 
             setPreviewData({
-              title: data.title || 
-                     domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1) + ' Article',
+              title: data.title || getFallbackTitleFromUrl(url, domain),
               description: data.description ? 
                           (data.description.length > 150 ? data.description.substring(0, 147) + '...' : data.description) : '',
               image: imageUrl || getFaviconUrl(domain),
@@ -201,8 +221,7 @@ if (!imageUrl || isLogoish(imageUrl) || isGenericTitle) {
           
           if (isMounted && linkPreviewData) {
             setPreviewData({
-              title: linkPreviewData.title || 
-                     domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1) + ' Article',
+              title: linkPreviewData.title || getFallbackTitleFromUrl(url, domain),
               description: linkPreviewData.description ? 
                           (linkPreviewData.description.length > 150 ? linkPreviewData.description.substring(0, 147) + '...' : linkPreviewData.description) : '',
               image: linkPreviewData.image || getFaviconUrl(domain),
@@ -250,10 +269,9 @@ if (!imageUrl || isLogoish(imageUrl) || isGenericTitle) {
             
             // Build final title
             let finalTitle = ogTitle || metaTitle;
-            if (!finalTitle || finalTitle.trim() === '') {
-              finalTitle = domain.split('.')[0].charAt(0).toUpperCase() + 
-                          domain.split('.')[0].slice(1) + ' Article';
-            }
+if (!finalTitle || finalTitle.trim() === '') {
+  finalTitle = getFallbackTitleFromUrl(url, domain);
+}
             
             // Build final description
             let finalDescription = ogDescription || metaDescription || '';
@@ -279,10 +297,7 @@ if (!imageUrl || isLogoish(imageUrl) || isGenericTitle) {
         // ================== STRATEGY 4: Final generic fallback ==================
 if (isMounted) {
   setPreviewData({
-    title:
-      domain.split(".")[0].charAt(0).toUpperCase() +
-      domain.split(".")[0].slice(1) +
-      " Article",
+    title: getFallbackTitleFromUrl(url, domain),
     description: "",
     image: getFaviconUrl(domain),
     domain: domain,
