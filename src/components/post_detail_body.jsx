@@ -116,6 +116,33 @@ const domain = getDomainFromUrl(url);
         // ================== STRATEGY 1: Microlink API (Primary) ==================
         // Microlink provides the most reliable previews with screenshot capability
         // Get a free API key from https://microlink.io/
+        const currentDomainCheck = getDomainFromUrl(url);
+        const isBadDomain = LOGO_HEAVY_DOMAINS.some(d => currentDomainCheck.includes(d));
+
+        if (isBadDomain) {
+          const urlPath = new URL(url).pathname;
+          const slug = urlPath.split("/").filter(Boolean).pop() || "";
+          const slugTitle = slug
+            .replace(/[-_]/g, " ")
+            .replace(/\.\w+$/, "")
+            .replace(/\b\w/g, c => c.toUpperCase())
+            .trim();
+
+          if (isMounted) {
+            setPreviewData({
+              title: slugTitle || (currentDomainCheck.split(".")[0].charAt(0).toUpperCase() + currentDomainCheck.split(".")[0].slice(1) + " Article"),
+              description: "",
+              image: getFaviconUrl(currentDomainCheck),
+              domain: currentDomainCheck,
+              url: url,
+              author: "",
+              date: ""
+            });
+            setLoading(false);
+          }
+          return;
+        }
+
         const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
         const microlinkUrl =
   `https://api.microlink.io/?url=${encodeURIComponent(url)}` +
@@ -159,6 +186,34 @@ const LOGO_HEAVY_DOMAINS = [
   "abcnews.go.com", "rollingstone.com", "billboard.com",
   "vanityfair.com", "vogue.com", "cosmopolitan.com", "elle.com",
 ];
+
+const currentDomainCheck = getDomainFromUrl(url);
+const isBadDomain = LOGO_HEAVY_DOMAINS.some(d => currentDomainCheck.includes(d));
+
+if (isBadDomain) {
+  // Extract a readable title from the URL slug as best-effort
+  const urlPath = new URL(url).pathname;
+  const slug = urlPath.split("/").filter(Boolean).pop() || "";
+  const slugTitle = slug
+    .replace(/[-_]/g, " ")
+    .replace(/\.\w+$/, "")
+    .replace(/\b\w/g, c => c.toUpperCase())
+    .trim();
+
+  if (isMounted) {
+    setPreviewData({
+      title: slugTitle || (currentDomainCheck.split(".")[0].charAt(0).toUpperCase() + currentDomainCheck.split(".")[0].slice(1) + " Article"),
+      description: "",
+      image: getFaviconUrl(currentDomainCheck),
+      domain: currentDomainCheck,
+      url: url,
+      author: "",
+      date: ""
+    });
+    setLoading(false);
+  }
+  return;
+}
 
 const fallbackTitle =
   domain.split(".")[0].charAt(0).toUpperCase() +
