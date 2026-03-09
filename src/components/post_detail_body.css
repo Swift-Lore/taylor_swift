@@ -228,9 +228,7 @@
 @media (max-width: 768px) {
     .image-only-grid a {
         width: 320px;
-        /* Changed from 250px */
         height: 260px;
-        /* Changed from 210px */
     }
 
     .microlink-grid {
@@ -238,7 +236,9 @@
     }
 
     .microlink-grid > * {
+        width: 100%;
         max-width: 100%;
+        flex: 1 1 100%;
     }
 }
 
