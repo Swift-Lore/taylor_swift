@@ -141,16 +141,22 @@ function App() {
 
       {/* Cookie banner stays once at the very bottom */}
       <CookieConsent
+        location="none"
+  disableStyles={false}
         buttonText="Accept All Cookies"
         declineButtonText="Reject Non-Essential"
         enableDeclineButton
         cookieName="websiteCookieConsent"
+          sameSite="Lax"
         onAccept={() => {
-    console.log('Cookies accepted - reloading ads if needed');
-    if (window.adsbygoogle) {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    }
-  }}
+  console.log("Cookies accepted - reloading ads if needed");
+  if (window.adsbygoogle) {
+    (window.adsbygoogle = window.adsbygoogle || []).push({});
+  }
+}}
+onDecline={() => {
+  console.log("Non-essential cookies rejected");
+}}
         style={{
           position: "fixed",
           left: "50%",
@@ -196,26 +202,26 @@ function App() {
         to browse, you agree to our use of cookies.
         <span style={{ fontSize: "12px", display: "block", marginTop: "8px" }}>
           <a
-            href="/privacy_policy"
-            style={{
-              color: "#b91c1c",
-              textDecoration: "underline",
-              fontWeight: "500",
-            }}
-          >
-            Privacy Policy
-          </a>
-          {" | "}
-          <a
-            href="/cookie_policy"
-            style={{
-              color: "#b91c1c",
-              textDecoration: "underline",
-              fontWeight: "500",
-            }}
-          >
-            Cookie Policy
-          </a>
+  href="/privacy_policy"
+  style={{
+    color: "#b91c1c",
+    textDecoration: "underline",
+    fontWeight: "500",
+  }}
+>
+  Privacy Policy
+</a>
+{" | "}
+<a
+  href="/cookie-policy"
+  style={{
+    color: "#b91c1c",
+    textDecoration: "underline",
+    fontWeight: "500",
+  }}
+>
+  Cookie Policy
+</a>
         </span>
       </CookieConsent>
     </>
