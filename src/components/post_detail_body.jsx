@@ -756,6 +756,17 @@ useEffect(() => {
     window.gie.widgets.load();
   }
 }, [event?.["GETTY EMBED"]]);
+
+// Facebook embed: inject iframe HTML
+useEffect(() => {
+  const embedHtml = event?.["FACEBOOK EMBED"];
+  if (!embedHtml) return;
+
+  const container = document.getElementById("facebook-embed-container");
+  if (!container) return;
+
+  container.innerHTML = embedHtml;
+}, [event?.["FACEBOOK EMBED"]]);
   
   // Pinterest embed script
 useEffect(() => {
@@ -1051,6 +1062,16 @@ if (isFacebook) {
           />
         </section>
       )}
+
+      {/* Facebook */}
+{event["FACEBOOK EMBED"] && (
+  <section className="max-w-4xl mx-auto px-4 mb-10">
+    <div
+      id="facebook-embed-container"
+      className="facebook-embed w-full max-w-[500px]"
+    />
+  </section>
+)}
 
       {/* YouTube */}
 {hasVideos && (
