@@ -40,7 +40,19 @@ const isGettyUrl = (url) => {
   const lower = url.toLowerCase();
   return lower.includes("gettyimages.com");
 };
+// Detect Pinterest URLs
+const isPinterestUrl = (url) => {
+  if (!url) return false;
+  const lower = url.toLowerCase();
+  return lower.includes("pinterest.com/pin/");
+};
 
+// Extract Pinterest pin ID
+const getPinterestPinId = (url) => {
+  if (!url) return null;
+  const match = url.match(/pinterest\.com\/pin\/(\d+)/i);
+  return match ? match[1] : null;
+};
 // Format DATE field as "Nov-07-2025" (force UTC so it doesn't shift by timezone)
 const formatEventDate = (isoDate) => {
   if (!isoDate) return "";
