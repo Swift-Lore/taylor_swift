@@ -147,6 +147,7 @@ function App() {
       {/* Cookie banner stays once at the very bottom */}
       <CookieConsent
         location="bottom"
+        debug={true}
   disableStyles={false}
         buttonText="Accept All Cookies"
         declineButtonText="Reject Non-Essential"
