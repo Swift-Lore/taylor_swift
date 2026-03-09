@@ -617,8 +617,9 @@ export default function PostDetailBody() {
   setNonImageLinks(otherLinks);
 }, [event]);
 useEffect(() => {
-    setMicrolinkErrors({});
-  }, [event]);
+  setMicrolinkErrors({});
+  setFailedTwitterEmbeds({});
+}, [event]);
   
   // Modal helpers
   const closeModal = () => setIsModalOpen(false);
