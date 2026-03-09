@@ -141,14 +141,34 @@ function LinkPreview({ url }) {
             // Process and clean the data
             const isLogoish = (u) => {
   const s = String(u || "").toLowerCase();
-  return s.includes("logo") || s.includes("icon") || s.includes("favicon") || s.includes("apple-touch-icon");
+  return (
+    s.includes("logo") ||
+    s.includes("icon") ||
+    s.includes("favicon") ||
+    s.includes("apple-touch-icon") ||
+    s.includes("/branding/") ||
+    s.includes("/brand/") ||
+    s.includes("publisher") ||
+    s.includes("site-logo")
+  );
 };
 
-let imageUrl = data.image?.url || data.screenshot?.url || data.logo?.url;
+const normalizeImageUrl = (img, domain) => {
+  if (!img) return "";
+  if (img.startsWith("//")) return "https:" + img;
+  if (img.startsWith("/")) return `https://${domain}${img}`;
+  return img;
+};
 
-// If OG image looks like a logo/icon, prefer screenshot
-if (isLogoish(imageUrl) && data.screenshot?.url) {
-  imageUrl = data.screenshot.url;
+const screenshotUrl = normalizeImageUrl(data.screenshot?.url, domain);
+const ogImageUrl = normalizeImageUrl(data.image?.url, domain);
+const logoUrl = normalizeImageUrl(data.logo?.url, domain);
+
+// Prefer screenshot when available unless the OG image clearly looks like a real article image
+let imageUrl = screenshotUrl || ogImageUrl || logoUrl;
+
+if (ogImageUrl && !isLogoish(ogImageUrl)) {
+  imageUrl = ogImageUrl;
 }
             
             // Ensure image URL is absolute
