@@ -94,16 +94,6 @@ const getDomainFromUrl = (url) => {
   }
 };
 
-// Domains that return logos instead of article images
-const LOGO_HEAVY_DOMAINS = [
-  "people.com", "yahoo.com", "eonline.com", "usmagazine.com",
-  "tmz.com", "hollywoodlife.com", "dailymail.co.uk", "mirror.co.uk",
-  "nytimes.com", "foxnews.com", "nbcnews.com", "cbsnews.com",
-  "abcnews.go.com", "rollingstone.com", "billboard.com",
-  "vanityfair.com", "vogue.com", "cosmopolitan.com", "elle.com",
-  "justjared.com", "change.org", "tumblr.com",
-];
-
 // Helper to get favicon
 const getFaviconUrl = (domain) => {
   return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
