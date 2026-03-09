@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import Microlink from "@microlink/react";
 import "./post_detail_body.css";
 import AdSlot from "./adslot";
 
@@ -99,19 +98,43 @@ const getFaviconUrl = (domain) => {
   return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
 };
 
+const getFallbackTitleFromUrl = (url, domain) => {
+  try {
+    const pathname = new URL(url).pathname;
+    const parts = pathname.split("/").filter(Boolean);
+    const slug = parts[parts.length - 1] || "";
+
+    const cleaned = slug
+      .replace(/\.\w+$/, "")
+      .replace(/[-_]+/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase())
+      .trim();
+
+    if (cleaned && cleaned.length > 3) {
+      return cleaned;
+    }
+  } catch {}
+
+  return (
+    domain.split(".")[0].charAt(0).toUpperCase() +
+    domain.split(".")[0].slice(1) +
+    " Article"
+  );
+};
+
 function LinkPreview({ url }) {
   const [previewData, setPreviewData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const domain = getDomainFromUrl(url);
+const [loading, setLoading] = useState(true);
+const domain = getDomainFromUrl(url);
 
   useEffect(() => {
     let isMounted = true;
 
     const fetchPreview = async () => {
-      if (!isMounted) return;
+  if (!isMounted) return;
 
-      try {
-        setLoading(true);
+  try {
+    setLoading(true);
 
         // ================== STRATEGY 1: Microlink API (Primary) ==================
         // Microlink provides the most reliable previews with screenshot capability
@@ -129,7 +152,7 @@ function LinkPreview({ url }) {
           headers: {
             'Accept': 'application/json',
           },
-          signal: AbortSignal.timeout(8000) // 8 second timeout
+          signal: AbortSignal.timeout(8000)
         });
 
         if (microlinkResponse.ok) {
@@ -141,14 +164,26 @@ function LinkPreview({ url }) {
             // Process and clean the data
             const isLogoish = (u) => {
   const s = String(u || "").toLowerCase();
-  return s.includes("logo") || s.includes("icon") || s.includes("favicon") || s.includes("apple-touch-icon");
+  return (
+    s.includes("logo") ||
+    s.includes("icon") ||
+    s.includes("favicon") ||
+    s.includes("apple-touch-icon") ||
+    s.includes("sprite") ||
+    s.includes("badge") ||
+    s.includes("brand")
+  );
 };
 
-let imageUrl = data.image?.url || data.screenshot?.url || data.logo?.url;
+const fallbackTitle = getFallbackTitleFromUrl(url, domain);
 
-// If OG image looks like a logo/icon, prefer screenshot
-if (isLogoish(imageUrl) && data.screenshot?.url) {
-  imageUrl = data.screenshot.url;
+const isGenericTitle =
+  !data.title || data.title.trim() === "" || data.title === fallbackTitle;
+
+let imageUrl = data.image?.url || null;
+
+if (!imageUrl || isLogoish(imageUrl) || isGenericTitle) {
+  imageUrl = data.screenshot?.url || data.image?.url || data.logo?.url || null;
 }
             
             // Ensure image URL is absolute
@@ -159,8 +194,7 @@ if (isLogoish(imageUrl) && data.screenshot?.url) {
             }
 
             setPreviewData({
-              title: data.title || 
-                     domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1) + ' Article',
+              title: data.title || getFallbackTitleFromUrl(url, domain),
               description: data.description ? 
                           (data.description.length > 150 ? data.description.substring(0, 147) + '...' : data.description) : '',
               image: imageUrl || getFaviconUrl(domain),
@@ -186,8 +220,7 @@ if (isLogoish(imageUrl) && data.screenshot?.url) {
           
           if (isMounted && linkPreviewData) {
             setPreviewData({
-              title: linkPreviewData.title || 
-                     domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1) + ' Article',
+              title: linkPreviewData.title || getFallbackTitleFromUrl(url, domain),
               description: linkPreviewData.description ? 
                           (linkPreviewData.description.length > 150 ? linkPreviewData.description.substring(0, 147) + '...' : linkPreviewData.description) : '',
               image: linkPreviewData.image || getFaviconUrl(domain),
@@ -204,7 +237,7 @@ if (isLogoish(imageUrl) && data.screenshot?.url) {
         
         try {
           const response = await fetch(corsProxyUrl, {
-            signal: AbortSignal.timeout(6000)
+            signal: AbortSignal.timeout(4000)
           });
           
           if (response.ok) {
@@ -235,10 +268,9 @@ if (isLogoish(imageUrl) && data.screenshot?.url) {
             
             // Build final title
             let finalTitle = ogTitle || metaTitle;
-            if (!finalTitle || finalTitle.trim() === '') {
-              finalTitle = domain.split('.')[0].charAt(0).toUpperCase() + 
-                          domain.split('.')[0].slice(1) + ' Article';
-            }
+if (!finalTitle || finalTitle.trim() === '') {
+  finalTitle = getFallbackTitleFromUrl(url, domain);
+}
             
             // Build final description
             let finalDescription = ogDescription || metaDescription || '';
@@ -261,78 +293,30 @@ if (isLogoish(imageUrl) && data.screenshot?.url) {
           console.log('CORS proxy failed for:', domain, proxyError);
         }
 
-        // ================== STRATEGY 4: Site-Specific Fallbacks ==================
-        // Custom handling for known sites (like justjared.com)
-        const siteConfigs = {
-          'justjared.com': {
-            title: 'Just Jared - Celebrity News & Photos',
-            description: 'Breaking celebrity news, photos, and entertainment updates',
-            image: 'https://www.justjared.com/images/justjared-logo-new.png'
-          },
-          'nbcrews.com': {
-            title: 'NBC News Entertainment',
-            description: 'Latest entertainment news and updates from NBC News',
-            image: 'https://nodeassets.nbc.com/nbc-web/assets/2.0.0/images/nbc-logo.svg'
-          },
-          'people.com': {
-            title: 'People Magazine',
-            description: 'Breaking celebrity news, entertainment stories and exclusive interviews',
-            image: 'https://people.com/thmb/7fBSYpC6a31D0Mq9B5WgSdIBUZU=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/people_logo-d5e9f7d1e7f34f9eb8e7c26b7bb40d5e.png'
-          },
-          'tmz.com': {
-            title: 'TMZ - Celebrity News',
-            description: 'Breaking celebrity gossip and entertainment news',
-            image: 'https://tmz.ugc.zencdn.net/2019_TMZ_Logo_WhiteOrange.png?1'
-          },
-          'etonline.com': {
-            title: 'Entertainment Tonight',
-            description: 'Entertainment news, celebrity interviews, and TV gossip',
-            image: 'https://www.etonline.com/sites/etonline.com/files/et_logo_0.png'
-          }
-        };
-
-        // Check if we have a site-specific configuration
-        const siteKey = Object.keys(siteConfigs).find(key => 
-          domain.includes(key.replace('www.', ''))
-        );
-
-        if (siteKey && isMounted) {
-          const config = siteConfigs[siteKey];
-          setPreviewData({
-            title: config.title,
-            description: config.description,
-            image: config.image,
-            domain: siteKey,
-            url: url
-          });
-          return;
-        }
-
-        // ================== STRATEGY 5: Ultimate Fallback ==================
-        if (isMounted) {
-          setPreviewData({
-            title: domain.split('.')[0].charAt(0).toUpperCase() + 
-                  domain.split('.')[0].slice(1) + ' Article',
-            description: '',
-            image: getFaviconUrl(domain),
-            domain: domain,
-            url: url
-          });
-        }
+        // ================== STRATEGY 4: Final generic fallback ==================
+if (isMounted) {
+  setPreviewData({
+    title: getFallbackTitleFromUrl(url, domain),
+    description: "",
+    image: getFaviconUrl(domain),
+    domain: domain,
+    url: url
+  });
+  return;
+}
 
       } catch (error) {
         console.log('Link preview error for', url, error);
         
         if (isMounted) {
-          setPreviewData({
-            title: domain.split('.')[0].charAt(0).toUpperCase() + 
-                  domain.split('.')[0].slice(1) + ' Article',
-            description: '',
-            image: getFaviconUrl(domain),
-            domain: domain,
-            url: url
-          });
-        }
+  setPreviewData({
+    title: getFallbackTitleFromUrl(url, domain),
+    description: '',
+    image: getFaviconUrl(domain),
+    domain: domain,
+    url: url
+  });
+}
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -362,6 +346,54 @@ if (isLogoish(imageUrl) && data.screenshot?.url) {
       </div>
     );
   }
+const hasUsableImage =
+  previewData?.image &&
+  previewData.image !== getFaviconUrl(domain);
+  
+  if (!hasUsableImage) {
+  return (
+    <a
+      href={previewData.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="microlink-card block max-w-md mx-auto mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
+    >
+      <div className="flex items-center gap-3">
+        <img
+          src={getFaviconUrl(domain)}
+          alt={domain}
+          className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm flex-shrink-0"
+        />
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-[#8e3e3e] transition-colors">
+            {previewData.title}
+          </h3>
+          <div className="flex items-center justify-between mt-1">
+            <span className="text-xs text-gray-500 truncate">
+              {previewData.domain}
+            </span>
+            <span className="flex items-center gap-1 text-xs font-semibold text-[#8e3e3e]">
+              Read article
+              <svg
+                className="w-3 h-3 transform group-hover:translate-x-1 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M14 5l7 7m0 0l-7 7m7-7H3"
+                />
+              </svg>
+            </span>
+          </div>
+        </div>
+      </div>
+    </a>
+  );
+}
 
   return (
     <a
