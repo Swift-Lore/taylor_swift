@@ -911,23 +911,24 @@ if (isPinterest) {
     return (
       <div
         key={`pin-${index}`}
-        style={{
-          maxWidth: "345px",
-          margin: "0 auto 20px auto"
-        }}
+        className="w-[345px] mx-auto mb-4 align-top"
       >
-        <iframe
-          src={`https://assets.pinterest.com/ext/embed.html?id=${pinId}`}
-          height="620"
-          width="345"
-          frameBorder="0"
-          scrolling="no"
-          style={{
-            borderRadius: "12px",
-            border: "1px solid #e5e7eb",
-            background: "#fff"
-          }}
-        />
+        <div className="rounded-xl overflow-hidden border border-gray-200 bg-white shadow-sm">
+          <iframe
+            src={`https://assets.pinterest.com/ext/embed.html?id=${pinId}`}
+            width="345"
+            height="460"
+            frameBorder="0"
+            scrolling="no"
+            style={{
+              display: "block",
+              width: "345px",
+              height: "460px",
+              border: "0",
+              overflow: "hidden"
+            }}
+          />
+        </div>
       </div>
     );
   }
@@ -953,7 +954,7 @@ if (isPinterest) {
           </h3>
           <div className="flex items-center justify-between mt-1">
             <span className="text-xs text-gray-500 truncate">
-              pin.it
+              pinterest.com
             </span>
             <span className="flex items-center gap-1 text-xs font-semibold text-[#8e3e3e]">
               Open pin
