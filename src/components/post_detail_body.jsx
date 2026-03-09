@@ -888,7 +888,34 @@ if (isGetty) {
                         </a>
                       );
                     }
+if (isPinterest) {
+  const pinId = getPinterestPinId(url);
 
+  if (!pinId) return null;
+
+  return (
+    <div
+      key={`pin-${index}`}
+      style={{
+        maxWidth: "345px",
+        margin: "0 auto 20px auto"
+      }}
+    >
+      <iframe
+        src={`https://assets.pinterest.com/ext/embed.html?id=${pinId}`}
+        height="620"
+        width="345"
+        frameBorder="0"
+        scrolling="no"
+        style={{
+          borderRadius: "12px",
+          border: "1px solid #e5e7eb",
+          background: "#fff"
+        }}
+      />
+    </div>
+  );
+}
       // Non-Getty links: use our custom LinkPreview component
                     return (
                       <LinkPreview key={`link-${index}`} url={url} />
