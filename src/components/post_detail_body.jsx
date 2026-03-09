@@ -910,9 +910,14 @@ if (isPinterest) {
   if (pinId) {
     return (
       <div
-        key={`pin-${index}`}
-        className="w-[345px] mx-auto mb-4 align-top"
-      >
+  key={`pin-${index}`}
+  style={{
+    width: "345px",
+    marginBottom: "1rem",
+    alignSelf: "flex-start",
+    flex: "0 0 auto"
+  }}
+>
         <div className="rounded-xl overflow-hidden border border-gray-200 bg-white shadow-sm">
           <iframe
             src={`https://assets.pinterest.com/ext/embed.html?id=${pinId}`}
