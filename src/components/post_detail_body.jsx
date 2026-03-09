@@ -976,6 +976,35 @@ if (isGetty) {
                         </a>
                       );
                     }
+
+if (isFacebook) {
+  return (
+    <a
+      key={`link-${index}`}
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow"
+    >
+      <div className="flex items-center gap-3">
+        <img
+          src="https://www.facebook.com/images/fb_icon_325x325.png"
+          alt="Facebook"
+          className="w-10 h-10 rounded-lg"
+        />
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-[#8e3e3e] truncate">
+            View this post on Facebook
+          </p>
+          <p className="text-xs text-gray-500 truncate">
+            facebook.com
+          </p>
+        </div>
+      </div>
+    </a>
+  );
+}
+                  
       // Non-Getty links: use our custom LinkPreview component
                     return (
                       <LinkPreview key={`link-${index}`} url={url} />
