@@ -110,16 +110,6 @@ const domain = getDomainFromUrl(url);
     const fetchPreview = async () => {
   if (!isMounted) return;
 
-  const cached = sessionStorage.getItem(previewCacheKey);
-  if (cached) {
-    try {
-      const parsed = JSON.parse(cached);
-      setPreviewData(parsed);
-      setLoading(false);
-      return;
-    } catch {}
-  }
-
   try {
     setLoading(true);
 
@@ -290,18 +280,6 @@ if (isMounted) {
   });
   return;
 }
-
-        // ================== STRATEGY 5: Ultimate Fallback ==================
-        if (isMounted) {
-          setPreviewData({
-            title: domain.split('.')[0].charAt(0).toUpperCase() + 
-                  domain.split('.')[0].slice(1) + ' Article',
-            description: '',
-            image: getFaviconUrl(domain),
-            domain: domain,
-            url: url
-          });
-        }
 
       } catch (error) {
         console.log('Link preview error for', url, error);
