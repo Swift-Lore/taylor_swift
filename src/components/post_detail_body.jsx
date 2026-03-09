@@ -860,8 +860,9 @@ useEffect(() => {
                 <div className="microlink-grid">
                   {nonImageLinks.map((url, index) => {
                     const isGetty = isGettyUrl(url);
+const isPinterest = isPinterestUrl(url);
 
-                    if (isGetty) {
+if (isGetty) {
                       // Clean, branded Getty card instead of Microlink
                       return (
                         <a
