@@ -1168,15 +1168,23 @@ if (isFacebook) {
         </section>
       )}
 
-      {/* Twitter / X */}
+            {/* Twitter / X */}
       {event.TWITTER && (
         <section className="w-full px-4 mb-10">
-  <div className="flex flex-wrap justify-start gap-6 mt-2 max-w-[1400px] mx-auto">
+          <div className="flex flex-wrap justify-start gap-6 mt-2 max-w-[1400px] mx-auto">
             {event.TWITTER.split(" || ").map((url, index) => {
-              const cleanUrl = url.trim().replace("x.com", "twitter.com");
+              const trimmedUrl = url.trim();
+              const cleanUrl = trimmedUrl.replace("x.com", "twitter.com");
               const isValid =
                 /^https:\/\/twitter\.com\/[^/]+\/status\/\d+/.test(cleanUrl);
-              return isValid ? (
+
+              if (!isValid) return null;
+
+              if (failedTwitterEmbeds[index]) {
+                return <TwitterFallbackCard key={index} url={trimmedUrl} />;
+              }
+
+              return (
                 <div
                   key={index}
                   className="twitter-container flex-shrink-0"
@@ -1186,7 +1194,7 @@ if (isFacebook) {
                     <a href={cleanUrl}>{cleanUrl}</a>
                   </blockquote>
                 </div>
-              ) : null;
+              );
             })}
           </div>
         </section>
