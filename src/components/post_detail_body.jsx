@@ -40,7 +40,19 @@ const isGettyUrl = (url) => {
   const lower = url.toLowerCase();
   return lower.includes("gettyimages.com");
 };
+// Detect Pinterest URLs
+const isPinterestUrl = (url) => {
+  if (!url) return false;
+  const lower = url.toLowerCase();
+  return lower.includes("pinterest.com/pin/");
+};
 
+// Extract Pinterest pin ID
+const getPinterestPinId = (url) => {
+  if (!url) return null;
+  const match = url.match(/pinterest\.com\/pin\/(\d+)/i);
+  return match ? match[1] : null;
+};
 // Format DATE field as "Nov-07-2025" (force UTC so it doesn't shift by timezone)
 const formatEventDate = (isoDate) => {
   if (!isoDate) return "";
@@ -723,6 +735,17 @@ useEffect(() => {
   }
 }, [event?.["GETTY EMBED"]]);
   
+  // Pinterest embed script
+useEffect(() => {
+  if (!document.getElementById("pinterest-script")) {
+    const script = document.createElement("script");
+    script.id = "pinterest-script";
+    script.src = "https://assets.pinterest.com/js/pinit.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }
+}, []);
+ 
   // TikTok embed script loading
   useEffect(() => {
     if (!event?.TIKTOK) return;
@@ -848,8 +871,9 @@ useEffect(() => {
                 <div className="microlink-grid">
                   {nonImageLinks.map((url, index) => {
                     const isGetty = isGettyUrl(url);
+const isPinterest = isPinterestUrl(url);
 
-                    if (isGetty) {
+if (isGetty) {
                       // Clean, branded Getty card instead of Microlink
                       return (
                         <a
@@ -875,7 +899,34 @@ useEffect(() => {
                         </a>
                       );
                     }
+if (isPinterest) {
+  const pinId = getPinterestPinId(url);
 
+  if (!pinId) return null;
+
+  return (
+    <div
+      key={`pin-${index}`}
+      style={{
+        maxWidth: "345px",
+        margin: "0 auto 20px auto"
+      }}
+    >
+      <iframe
+        src={`https://assets.pinterest.com/ext/embed.html?id=${pinId}`}
+        height="620"
+        width="345"
+        frameBorder="0"
+        scrolling="no"
+        style={{
+          borderRadius: "12px",
+          border: "1px solid #e5e7eb",
+          background: "#fff"
+        }}
+      />
+    </div>
+  );
+}
       // Non-Getty links: use our custom LinkPreview component
                     return (
                       <LinkPreview key={`link-${index}`} url={url} />
