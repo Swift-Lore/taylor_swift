@@ -53,6 +53,7 @@ const isPinterestUrl = (url) => {
 // Extract Pinterest pin ID
 const getPinterestPinId = (url) => {
   if (!url) return null;
+
   const match = url.match(/pinterest\.com\/pin\/(\d+)/i);
   return match ? match[1] : null;
 };
