@@ -44,7 +44,10 @@ const isGettyUrl = (url) => {
 const isPinterestUrl = (url) => {
   if (!url) return false;
   const lower = url.toLowerCase();
-  return lower.includes("pinterest.com/pin/");
+  return (
+    lower.includes("pinterest.com/pin/") ||
+    lower.includes("pin.it/")
+  );
 };
 
 // Extract Pinterest pin ID
