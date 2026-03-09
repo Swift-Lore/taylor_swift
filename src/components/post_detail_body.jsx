@@ -136,7 +136,7 @@ const domain = getDomainFromUrl(url);
         const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
         const microlinkUrl =
   `https://api.microlink.io/?url=${encodeURIComponent(url)}` +
-  `&wait=1500` +
+  `&wait=900` +
   `&screenshot=true` +
   `&video=false&audio=false&iframe=false` +
   `&palette=true&theme=light` +
@@ -146,7 +146,7 @@ const domain = getDomainFromUrl(url);
           headers: {
             'Accept': 'application/json',
           },
-          signal: AbortSignal.timeout(8000) // 8 second timeout
+          signal: AbortSignal.timeout(3500)
         });
 
         if (microlinkResponse.ok) {
@@ -240,7 +240,7 @@ if (isLogoish(imageUrl) && screenshotImage) {
         
         try {
           const response = await fetch(corsProxyUrl, {
-            signal: AbortSignal.timeout(6000)
+            signal: AbortSignal.timeout(4000)
           });
           
           if (response.ok) {
