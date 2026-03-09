@@ -261,24 +261,37 @@
     box-shadow: 0 0 0 2px blue !important;
 }
 /* TIKTOK EMBED FIXES */
+.tiktok-wrapper {
+  width: 100%;
+  max-width: 325px;
+  height: 740px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
 .tiktok-embed {
   margin: 0 !important;
   padding: 0 !important;
+  min-width: 325px !important;
+  max-width: 325px !important;
+  width: 325px !important;
+  height: 740px !important;
+  overflow: hidden !important;
 }
 
 .tiktok-embed iframe {
-  margin: 0 !important;
-  padding: 0 !important;
-  max-width: 100% !important;
   width: 100% !important;
-  height: 520px !important; /* adjust shorter/taller if needed */
-  border-radius: 12px !important;
-}
-
-/* Wrapper so we can have 3-across on desktop */
-.tiktok-wrapper {
-  width: 100%;
-  max-width: 350px;
+  height: 740px !important;
+  min-height: 740px !important;
+  max-height: 740px !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  display: block !important;
 }
 /* Add to your post_detail_body.css */
 .bg-gradient-text {
