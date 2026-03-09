@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import Microlink from "@microlink/react";
 import "./post_detail_body.css";
 import AdSlot from "./adslot";
 
