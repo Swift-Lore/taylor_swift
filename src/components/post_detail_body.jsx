@@ -44,12 +44,16 @@ const isGettyUrl = (url) => {
 const isPinterestUrl = (url) => {
   if (!url) return false;
   const lower = url.toLowerCase();
-  return lower.includes("pinterest.com/pin/");
+  return (
+    lower.includes("pinterest.com/pin/") ||
+    lower.includes("pin.it/")
+  );
 };
 
 // Extract Pinterest pin ID
 const getPinterestPinId = (url) => {
   if (!url) return null;
+
   const match = url.match(/pinterest\.com\/pin\/(\d+)/i);
   return match ? match[1] : null;
 };
@@ -381,7 +385,7 @@ const hasUsableImage = isLikelyRealPreviewImage(previewData?.image);
       href={previewData.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="microlink-card block max-w-md mx-auto mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
+      className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
     >
       <div className="flex items-center gap-3">
         <img
@@ -425,7 +429,7 @@ const hasUsableImage = isLikelyRealPreviewImage(previewData?.image);
       href={previewData.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="microlink-card block max-w-md mx-auto mb-4 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
+      className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
     >
       {/* Thumbnail image with gradient overlay */}
       <div className="h-48 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 relative">
@@ -584,15 +588,21 @@ export default function PostDetailBody() {
 
   // Populate sourceImages / nonImageLinks from event.SOURCES
   useEffect(() => {
-    if (!event || !event.SOURCES) return;
+  if (!event || !event.SOURCES) return;
 
-    const rawUrls = event.SOURCES.split(" || ").map((url) => url.trim());
-    const imageLinks = rawUrls.filter((url) => isLikelyImage(url));
-    const otherLinks = rawUrls.filter((url) => !isLikelyImage(url));
+  const rawUrls = event.SOURCES.split(" || ").map((url) => url.trim());
 
-    setSourceImages(imageLinks);
-    setNonImageLinks(otherLinks);
-  }, [event]);
+  const imageLinks = rawUrls.filter(
+    (url) => isLikelyImage(url) || isPinterestUrl(url)
+  );
+
+  const otherLinks = rawUrls.filter(
+    (url) => !isLikelyImage(url) && !isPinterestUrl(url)
+  );
+
+  setSourceImages(imageLinks);
+  setNonImageLinks(otherLinks);
+}, [event]);
 useEffect(() => {
     setMicrolinkErrors({});
   }, [event]);
@@ -838,32 +848,87 @@ useEffect(() => {
             <div className="space-y-6">
               {sourceImages.length > 0 && (
                 <div className="image-only-grid flex flex-wrap gap-6 justify-start">
-                  {sourceImages.map((url, index) => (
-                    <a
-                      key={`img-${index}`}
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group relative flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-all"
-                      style={{ width: "500px", height: "400px" }}
-                    >
-                      <img
-                        src={url}
-                        alt="Source"
-                        className="max-w-full max-h-full object-contain cursor-pointer"
-                        loading="lazy"
-                      />
-                      <span className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs p-1 opacity-0 group-hover:opacity-100 transition-opacity truncate text-center">
-                        {(() => {
-                          try {
-                            return new URL(url).hostname.replace("www.", "");
-                          } catch {
-                            return "Source";
-                          }
-                        })()}
-                      </span>
-                    </a>
-                  ))}
+                  {sourceImages.map((url, index) => {
+  const isPinterest = isPinterestUrl(url);
+  const pinId = getPinterestPinId(url);
+
+  if (isPinterest && pinId) {
+    return (
+      <div
+        key={`img-${index}`}
+        className="group relative bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-all"
+        style={{ width: "345px", height: "460px" }}
+      >
+        <iframe
+          src={`https://assets.pinterest.com/ext/embed.html?id=${pinId}`}
+          width="345"
+          height="460"
+          frameBorder="0"
+          scrolling="no"
+          style={{
+            display: "block",
+            width: "345px",
+            height: "460px",
+            border: "0",
+            overflow: "hidden"
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (isPinterest) {
+    return (
+      <a
+        key={`img-${index}`}
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group relative flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-all"
+        style={{ width: "345px", height: "220px" }}
+      >
+        <div className="flex items-center gap-3 px-4">
+          <img
+            src={getFaviconUrl("pinterest.com")}
+            alt="Pinterest"
+            className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm flex-shrink-0"
+          />
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-gray-900">Pinterest Pin</p>
+            <p className="text-xs text-gray-500 truncate">pinterest.com</p>
+          </div>
+        </div>
+      </a>
+    );
+  }
+
+  return (
+    <a
+      key={`img-${index}`}
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group relative flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-all"
+      style={{ width: "500px", height: "400px" }}
+    >
+      <img
+        src={url}
+        alt="Source"
+        className="max-w-full max-h-full object-contain cursor-pointer"
+        loading="lazy"
+      />
+      <span className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs p-1 opacity-0 group-hover:opacity-100 transition-opacity truncate text-center">
+        {(() => {
+          try {
+            return new URL(url).hostname.replace("www.", "");
+          } catch {
+            return "Source";
+          }
+        })()}
+      </span>
+    </a>
+  );
+})}
                 </div>
               )}
 
@@ -871,7 +936,6 @@ useEffect(() => {
                 <div className="microlink-grid">
                   {nonImageLinks.map((url, index) => {
                     const isGetty = isGettyUrl(url);
-const isPinterest = isPinterestUrl(url);
 
 if (isGetty) {
                       // Clean, branded Getty card instead of Microlink
@@ -881,7 +945,7 @@ if (isGetty) {
                           href={url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="microlink-card block max-w-md mx-auto mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow"
+                          className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow"
                         >
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded bg-black flex items-center justify-center text-white text-xs font-semibold">
@@ -899,34 +963,6 @@ if (isGetty) {
                         </a>
                       );
                     }
-if (isPinterest) {
-  const pinId = getPinterestPinId(url);
-
-  if (!pinId) return null;
-
-  return (
-    <div
-      key={`pin-${index}`}
-      style={{
-        maxWidth: "345px",
-        margin: "0 auto 20px auto"
-      }}
-    >
-      <iframe
-        src={`https://assets.pinterest.com/ext/embed.html?id=${pinId}`}
-        height="620"
-        width="345"
-        frameBorder="0"
-        scrolling="no"
-        style={{
-          borderRadius: "12px",
-          border: "1px solid #e5e7eb",
-          background: "#fff"
-        }}
-      />
-    </div>
-  );
-}
       // Non-Getty links: use our custom LinkPreview component
                     return (
                       <LinkPreview key={`link-${index}`} url={url} />
