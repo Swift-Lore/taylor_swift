@@ -583,6 +583,7 @@ function TwitterFallbackCard({ url }) {
 
 function TwitterEmbed({ url }) {
   const [failed, setFailed] = useState(false);
+  const [checked, setChecked] = useState(false);
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -594,13 +595,42 @@ function TwitterEmbed({ url }) {
 
     if (!tweetId) {
       setFailed(true);
+      setChecked(true);
       return;
     }
+
+    const checkIfEmbeddable = async () => {
+      try {
+        const oembedUrl = `https://publish.twitter.com/oembed?omit_script=true&url=${encodeURIComponent(cleanUrl)}`;
+        const response = await fetch(oembedUrl);
+
+        if (!response.ok) {
+          if (!cancelled) {
+            setFailed(true);
+            setChecked(true);
+          }
+          return false;
+        }
+
+        if (!cancelled) {
+          setChecked(true);
+        }
+        return true;
+      } catch (error) {
+        if (!cancelled) {
+          setFailed(true);
+          setChecked(true);
+        }
+        return false;
+      }
+    };
 
     const renderTweet = async () => {
       try {
         if (!window.twttr || !window.twttr.widgets || !containerRef.current) {
-          setFailed(true);
+          if (!cancelled) {
+            setFailed(true);
+          }
           return;
         }
 
@@ -623,7 +653,10 @@ function TwitterEmbed({ url }) {
       }
     };
 
-    const waitForTwitter = () => {
+    const init = async () => {
+      const embeddable = await checkIfEmbeddable();
+      if (!embeddable || cancelled) return;
+
       let attempts = 0;
 
       const interval = setInterval(() => {
@@ -634,12 +667,14 @@ function TwitterEmbed({ url }) {
           renderTweet();
         } else if (attempts > 30) {
           clearInterval(interval);
-          setFailed(true);
+          if (!cancelled) {
+            setFailed(true);
+          }
         }
       }, 300);
     };
 
-    waitForTwitter();
+    init();
 
     return () => {
       cancelled = true;
@@ -648,6 +683,17 @@ function TwitterEmbed({ url }) {
 
   if (failed) {
     return <TwitterFallbackCard url={url} />;
+  }
+
+  if (!checked) {
+    return (
+      <div
+        className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm animate-pulse"
+      >
+        <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+      </div>
+    );
   }
 
   return (
