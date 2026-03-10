@@ -206,16 +206,30 @@ const domain = getDomainFromUrl(url);
 
 const fallbackTitle = getFallbackTitleFromUrl(url, domain);
 
-const isGenericTitle =
-  !data.title || data.title.trim() === "" || data.title === fallbackTitle;
+const screenshotUrl = data.screenshot?.url || null;
+const ogImageUrl = data.image?.url || null;
+const logoUrl = data.logo?.url || null;
 
-let imageUrl = data.image?.url || null;
+let imageUrl = null;
 
-if (!imageUrl || isLogoish(imageUrl)) {
-  imageUrl = data.screenshot?.url || data.image?.url || data.logo?.url || null;
-} else if (isGenericTitle && data.screenshot?.url) {
-  imageUrl = data.screenshot.url;
+// Prefer screenshot first because it usually gives a more visual card
+if (screenshotUrl) {
+  imageUrl = screenshotUrl;
+} else if (ogImageUrl && !isLogoish(ogImageUrl)) {
+  imageUrl = ogImageUrl;
+} else if (ogImageUrl) {
+  imageUrl = ogImageUrl;
+} else if (logoUrl) {
+  imageUrl = logoUrl;
 }
+
+console.log("PREVIEW DEBUG", {
+  url,
+  ogImage: ogImageUrl,
+  screenshot: screenshotUrl,
+  logo: logoUrl,
+  chosenImage: imageUrl,
+});
             
             // Ensure image URL is absolute
             if (imageUrl && imageUrl.startsWith('//')) {
