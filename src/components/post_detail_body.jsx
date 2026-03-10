@@ -711,7 +711,7 @@ useEffect(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isModalOpen, selectedImageIndex, event?.IMAGE]);
 
-  // Social media embeds script loading (Instagram, Twitter, Getty)
+    // Social media embeds script loading (Instagram, Twitter)
   useEffect(() => {
     if (!event) return;
 
@@ -748,40 +748,48 @@ useEffect(() => {
       }
     };
 
-    const detectFailedTwitterEmbeds = () => {
-      setTimeout(() => {
-        const containers = document.querySelectorAll(".twitter-container");
-
-        containers.forEach((container, index) => {
-          const text = container.textContent?.toLowerCase() || "";
-          const iframe = container.querySelector("iframe");
-
-          const failed =
-            text.includes("not found") ||
-            text.includes("sorry, we can't create an embed for that") ||
-            text.includes("sorry, we can’t create an embed for that") ||
-            text.includes("deleted or made private");
-
-          if (failed || !iframe) {
-            setFailedTwitterEmbeds((prev) => ({
-              ...prev,
-              [index]: true,
-            }));
-          }
-        });
-      }, 2500);
-    };
-    
-        if (event.INSTAGRAM) {
+    if (event.INSTAGRAM) {
       loadInstagramScript();
       setTimeout(loadInstagramScript, 500);
     }
 
     if (event.TWITTER) {
       loadTwitterScript();
-      detectFailedTwitterEmbeds();
-      setTimeout(detectFailedTwitterEmbeds, 4500);
     }
+
+    const observer = new MutationObserver(() => {
+      const root = twitterSectionRef.current;
+      if (!root) return;
+
+      const containers = root.querySelectorAll(".twitter-container");
+
+      containers.forEach((container, index) => {
+        const text = (container.textContent || "").toLowerCase();
+
+        const failed =
+          text.includes("not found") ||
+          text.includes("sorry, we can't create an embed for that") ||
+          text.includes("sorry, we can’t create an embed for that") ||
+          text.includes("deleted or made private");
+
+        if (failed) {
+          setFailedTwitterEmbeds((prev) => {
+            if (prev[index]) return prev;
+            return { ...prev, [index]: true };
+          });
+        }
+      });
+    });
+
+    if (twitterSectionRef.current) {
+      observer.observe(twitterSectionRef.current, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+      });
+    }
+
+    return () => observer.disconnect();
   }, [event]);
   
   // Getty embed: inject HTML and execute its scripts
