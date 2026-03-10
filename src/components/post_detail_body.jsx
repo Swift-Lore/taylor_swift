@@ -1254,7 +1254,10 @@ if (isFacebook) {
             {/* Twitter / X */}
       {event.TWITTER && (
         <section className="w-full px-4 mb-10">
-          <div className="flex flex-wrap justify-start gap-6 mt-2 max-w-[1400px] mx-auto">
+          <div
+  ref={twitterSectionRef}
+  className="flex flex-wrap justify-start gap-6 mt-2 max-w-[1400px] mx-auto"
+>
             {event.TWITTER.split(" || ").map((url, index) => {
               const trimmedUrl = url.trim();
               const cleanUrl = trimmedUrl.replace("x.com", "twitter.com");
