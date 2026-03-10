@@ -816,27 +816,43 @@ useEffect(() => {
     }
 
     const checkForFailedEmbeds = () => {
-      const root = twitterSectionRef.current;
-      if (!root) return;
+  const root = twitterSectionRef.current;
+  if (!root) return;
 
-      const containers = root.querySelectorAll(".twitter-container");
-      containers.forEach((container, index) => {
-        const text = (container.textContent || "").toLowerCase();
-        const iframes = container.querySelectorAll("iframe");
-        const failed =
-          text.includes("not found") ||
-          text.includes("sorry") ||
-          text.includes("deleted or made private") ||
-          (iframes.length === 0 && text.trim().length > 10);
+  const containers = root.querySelectorAll(".twitter-container");
+  
+  containers.forEach((container, index) => {
+    const text = (container.textContent || "").toLowerCase();
+    const iframes = container.querySelectorAll("iframe");
+    
+    // Log the container content to see exact error message
+    console.log(`Tweet ${index} content:`, container.textContent);
+    console.log(`Tweet ${index} HTML:`, container.innerHTML);
+    
+    // More comprehensive failure detection
+    const failed = 
+      text.includes("not found") ||
+      text.includes("sorry, that page doesn’t exist") ||
+      text.includes("hmm...this page doesn’t exist") ||
+      text.includes("this tweet has been deleted") ||
+      text.includes("tweet is not available") ||
+      text.includes("this tweet is from a suspended account") ||
+      text.includes("年龄限制") || // Chinese for age restriction
+      text.includes("adult content") ||
+      text.includes("敏感内容") || // Chinese for sensitive content
+      (iframes.length === 0 && text.trim().length > 10 && text.includes("twitter"));
 
-        if (failed) {
-          setFailedTwitterEmbeds((prev) => {
-            if (prev[index]) return prev;
-            return { ...prev, [index]: true };
-          });
-        }
+    if (failed) {
+      console.log(`❌ Tweet ${index} FAILED with text:`, text);
+      setFailedTwitterEmbeds((prev) => {
+        if (prev[index]) return prev;
+        return { ...prev, [index]: true };
       });
-    };
+    } else {
+      console.log(`✅ Tweet ${index} loaded successfully`);
+    }
+  });
+};
 
     const timers = [
       setTimeout(checkForFailedEmbeds, 2000),
