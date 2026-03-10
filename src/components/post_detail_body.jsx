@@ -214,11 +214,11 @@ const logoUrl = data.logo?.url || null;
 
 let imageUrl = null;
 
-// Prefer screenshot first because it usually gives a more visual card
-if (screenshotUrl) {
-  imageUrl = screenshotUrl;
-} else if (ogImageUrl && !isLogoish(ogImageUrl)) {
+// Prefer real article/OG image first
+if (ogImageUrl && !isLogoish(ogImageUrl)) {
   imageUrl = ogImageUrl;
+} else if (screenshotUrl) {
+  imageUrl = screenshotUrl;
 } else if (ogImageUrl) {
   imageUrl = ogImageUrl;
 } else if (logoUrl) {
