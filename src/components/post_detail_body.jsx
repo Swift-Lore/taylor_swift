@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import "./post_detail_body.css";
@@ -602,6 +602,7 @@ export default function PostDetailBody() {
   const [nonImageLinks, setNonImageLinks] = useState([]);
   const [microlinkErrors, setMicrolinkErrors] = useState({});
   const [failedTwitterEmbeds, setFailedTwitterEmbeds] = useState({});
+  const twitterSectionRef = useRef(null);
 
   // Scroll to top on mount / id change
   useEffect(() => {
