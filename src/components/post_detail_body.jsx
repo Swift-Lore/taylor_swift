@@ -257,7 +257,8 @@ console.log("PREVIEW DEBUG", {
   url: data.url || url,
   author: data.author || "",
   date: data.date || "",
-  isSiteFallback: false
+  isSiteFallback: false,
+  imageType
 });
             return;
           }
