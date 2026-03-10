@@ -241,15 +241,19 @@ console.log("PREVIEW DEBUG", {
             }
 
             setPreviewData({
-              title: data.title || getFallbackTitleFromUrl(url, domain),
-              description: data.description ? 
-                          (data.description.length > 150 ? data.description.substring(0, 147) + '...' : data.description) : '',
-              image: imageUrl || getFaviconUrl(domain),
-              domain: data.publisher || domain,
-              url: data.url || url,
-              author: data.author || '',
-              date: data.date || ''
-            });
+  title: data.title || getFallbackTitleFromUrl(url, domain),
+  description: data.description
+    ? (data.description.length > 150
+        ? data.description.substring(0, 147) + "..."
+        : data.description)
+    : "",
+  image: imageUrl || getFaviconUrl(domain),
+  domain: data.publisher || domain,
+  url: data.url || url,
+  author: data.author || "",
+  date: data.date || "",
+  isSiteFallback: false
+});
             return;
           }
         }
