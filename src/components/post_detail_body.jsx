@@ -757,20 +757,19 @@ useEffect(() => {
       loadTwitterScript();
     }
 
-    const observer = new MutationObserver(() => {
+    const checkForFailedEmbeds = () => {
       const root = twitterSectionRef.current;
       if (!root) return;
 
       const containers = root.querySelectorAll(".twitter-container");
-
       containers.forEach((container, index) => {
         const text = (container.textContent || "").toLowerCase();
-
+        const iframes = container.querySelectorAll("iframe");
         const failed =
           text.includes("not found") ||
-          text.includes("sorry, we can't create an embed for that") ||
-          text.includes("sorry, we can’t create an embed for that") ||
-          text.includes("deleted or made private");
+          text.includes("sorry") ||
+          text.includes("deleted or made private") ||
+          (iframes.length === 0 && text.trim().length > 10);
 
         if (failed) {
           setFailedTwitterEmbeds((prev) => {
@@ -779,17 +778,15 @@ useEffect(() => {
           });
         }
       });
-    });
+    };
 
-    if (twitterSectionRef.current) {
-      observer.observe(twitterSectionRef.current, {
-        childList: true,
-        subtree: true,
-        characterData: true,
-      });
-    }
+    const timers = [
+      setTimeout(checkForFailedEmbeds, 2000),
+      setTimeout(checkForFailedEmbeds, 4000),
+      setTimeout(checkForFailedEmbeds, 7000),
+    ];
 
-    return () => observer.disconnect();
+    return () => timers.forEach(clearTimeout);
   }, [event]);
   
   // Getty embed: inject HTML and execute its scripts
