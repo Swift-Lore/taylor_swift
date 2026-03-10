@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import "./post_detail_body.css";
@@ -40,6 +40,18 @@ const isGettyUrl = (url) => {
   const lower = url.toLowerCase();
   return lower.includes("gettyimages.com");
 };
+
+// Detect Facebook URLs
+const isFacebookUrl = (url) => {
+  if (!url) return false;
+  const lower = url.toLowerCase();
+  return (
+    lower.includes("facebook.com") ||
+    lower.includes("fb.watch") ||
+    lower.includes("fb.com")
+  );
+};
+
 // Detect Pinterest URLs
 const isPinterestUrl = (url) => {
   if (!url) return false;
@@ -526,6 +538,173 @@ const hasUsableImage = isLikelyRealPreviewImage(previewData?.image);
   );
 }
 
+function TwitterFallbackCard({ url }) {
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
+    >
+      <div className="flex items-center gap-3">
+        <img
+          src={getFaviconUrl("x.com")}
+          alt="X"
+          className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm flex-shrink-0"
+        />
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-[#8e3e3e] transition-colors">
+            View post on X
+          </h3>
+          <div className="flex items-center justify-between mt-1">
+            <span className="text-xs text-gray-500 truncate">x.com</span>
+            <span className="flex items-center gap-1 text-xs font-semibold text-[#8e3e3e]">
+              Open post
+              <svg
+                className="w-3 h-3 transform group-hover:translate-x-1 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M14 5l7 7m0 0l-7 7m7-7H3"
+                />
+              </svg>
+            </span>
+          </div>
+        </div>
+      </div>
+    </a>
+  );
+}
+
+function TwitterEmbed({ url }) {
+  const [failed, setFailed] = useState(false);
+  const [checked, setChecked] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const cleanUrl = url.trim().replace("x.com", "twitter.com");
+    const match = cleanUrl.match(/status\/(\d+)/);
+    const tweetId = match ? match[1] : null;
+
+    if (!tweetId) {
+      setFailed(true);
+      setChecked(true);
+      return;
+    }
+
+    const checkIfEmbeddable = async () => {
+      try {
+        const oembedUrl = `https://publish.twitter.com/oembed?omit_script=true&url=${encodeURIComponent(cleanUrl)}`;
+        const response = await fetch(oembedUrl);
+
+        if (!response.ok) {
+          if (!cancelled) {
+            setFailed(true);
+            setChecked(true);
+          }
+          return false;
+        }
+
+        if (!cancelled) {
+          setChecked(true);
+        }
+        return true;
+      } catch (error) {
+        if (!cancelled) {
+          setFailed(true);
+          setChecked(true);
+        }
+        return false;
+      }
+    };
+
+    const renderTweet = async () => {
+      try {
+        if (!window.twttr || !window.twttr.widgets || !containerRef.current) {
+          if (!cancelled) {
+            setFailed(true);
+          }
+          return;
+        }
+
+        containerRef.current.innerHTML = "";
+
+        await window.twttr.widgets.createTweet(tweetId, containerRef.current, {
+          align: "left",
+          theme: "light",
+          dnt: true,
+          conversation: "none",
+        });
+
+        if (!cancelled && !containerRef.current.querySelector("iframe")) {
+          setFailed(true);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setFailed(true);
+        }
+      }
+    };
+
+    const init = async () => {
+      const embeddable = await checkIfEmbeddable();
+      if (!embeddable || cancelled) return;
+
+      let attempts = 0;
+
+      const interval = setInterval(() => {
+        attempts += 1;
+
+        if (window.twttr && window.twttr.widgets) {
+          clearInterval(interval);
+          renderTweet();
+        } else if (attempts > 30) {
+          clearInterval(interval);
+          if (!cancelled) {
+            setFailed(true);
+          }
+        }
+      }, 300);
+    };
+
+    init();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [url]);
+
+  if (failed) {
+    return <TwitterFallbackCard url={url} />;
+  }
+
+  if (!checked) {
+    return (
+      <div
+        className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm animate-pulse"
+      >
+        <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="twitter-container flex-shrink-0"
+      style={{ width: "320px" }}
+      ref={containerRef}
+    />
+  );
+}
+
 export default function PostDetailBody() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -604,8 +783,8 @@ export default function PostDetailBody() {
   setNonImageLinks(otherLinks);
 }, [event]);
 useEffect(() => {
-    setMicrolinkErrors({});
-  }, [event]);
+  setMicrolinkErrors({});
+}, [event]);
   
   // Modal helpers
   const closeModal = () => setIsModalOpen(false);
@@ -651,7 +830,7 @@ useEffect(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isModalOpen, selectedImageIndex, event?.IMAGE]);
 
-  // Social media embeds script loading (Instagram, Twitter, Getty)
+    // Social media embeds script loading (Instagram, Twitter)
   useEffect(() => {
     if (!event) return;
 
@@ -692,7 +871,10 @@ useEffect(() => {
       loadInstagramScript();
       setTimeout(loadInstagramScript, 500);
     }
-    if (event.TWITTER) loadTwitterScript();
+
+    if (event.TWITTER) {
+      loadTwitterScript();
+    }
   }, [event]);
   
   // Getty embed: inject HTML and execute its scripts
@@ -744,6 +926,17 @@ useEffect(() => {
     window.gie.widgets.load();
   }
 }, [event?.["GETTY EMBED"]]);
+
+// Facebook embed: inject iframe HTML
+useEffect(() => {
+  const embedHtml = event?.["FACEBOOK EMBED"];
+  if (!embedHtml) return;
+
+  const container = document.getElementById("facebook-embed-container");
+  if (!container) return;
+
+  container.innerHTML = embedHtml;
+}, [event?.["FACEBOOK EMBED"]]);
   
   // Pinterest embed script
 useEffect(() => {
@@ -936,6 +1129,7 @@ useEffect(() => {
                 <div className="microlink-grid">
                   {nonImageLinks.map((url, index) => {
                     const isGetty = isGettyUrl(url);
+const isFacebook = isFacebookUrl(url);
 
 if (isGetty) {
                       // Clean, branded Getty card instead of Microlink
@@ -963,6 +1157,35 @@ if (isGetty) {
                         </a>
                       );
                     }
+
+if (isFacebook) {
+  return (
+    <a
+      key={`link-${index}`}
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow"
+    >
+      <div className="flex items-center gap-3">
+        <img
+          src="https://www.facebook.com/images/fb_icon_325x325.png"
+          alt="Facebook"
+          className="w-10 h-10 rounded-lg"
+        />
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-[#8e3e3e] truncate">
+            View this post on Facebook
+          </p>
+          <p className="text-xs text-gray-500 truncate">
+            facebook.com
+          </p>
+        </div>
+      </div>
+    </a>
+  );
+}
+                  
       // Non-Getty links: use our custom LinkPreview component
                     return (
                       <LinkPreview key={`link-${index}`} url={url} />
@@ -1009,6 +1232,16 @@ if (isGetty) {
           />
         </section>
       )}
+
+      {/* Facebook */}
+{event["FACEBOOK EMBED"] && (
+  <section className="max-w-4xl mx-auto px-4 mb-10">
+    <div
+      id="facebook-embed-container"
+      className="facebook-embed w-full max-w-[500px]"
+    />
+  </section>
+)}
 
       {/* YouTube */}
 {hasVideos && (
@@ -1103,25 +1336,19 @@ if (isGetty) {
         </section>
       )}
 
-      {/* Twitter / X */}
+                  {/* Twitter / X */}
       {event.TWITTER && (
         <section className="w-full px-4 mb-10">
-  <div className="flex flex-wrap justify-start gap-6 mt-2 max-w-[1400px] mx-auto">
+          <div className="flex flex-wrap justify-start gap-6 mt-2 max-w-[1400px] mx-auto">
             {event.TWITTER.split(" || ").map((url, index) => {
-              const cleanUrl = url.trim().replace("x.com", "twitter.com");
+              const trimmedUrl = url.trim();
+              const cleanUrl = trimmedUrl.replace("x.com", "twitter.com");
               const isValid =
                 /^https:\/\/twitter\.com\/[^/]+\/status\/\d+/.test(cleanUrl);
-              return isValid ? (
-                <div
-                  key={index}
-                  className="twitter-container flex-shrink-0"
-                  style={{ width: "320px" }}
-                >
-                  <blockquote className="twitter-tweet" data-lang="en">
-                    <a href={cleanUrl}>{cleanUrl}</a>
-                  </blockquote>
-                </div>
-              ) : null;
+
+              if (!isValid) return null;
+
+              return <TwitterEmbed key={index} url={trimmedUrl} />;
             })}
           </div>
         </section>
