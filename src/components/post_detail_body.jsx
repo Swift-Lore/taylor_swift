@@ -457,7 +457,8 @@ const isFallbackFavicon = (imageUrl) => {
 const hasUsableImage =
   !!previewData?.image &&
   !isFallbackFavicon(previewData.image) &&
-  !previewData?.isSiteFallback;
+  !previewData?.isSiteFallback &&
+  (previewData?.imageType === "og" || previewData?.imageType === "screenshot");
   
   if (!hasUsableImage) {
   return (
