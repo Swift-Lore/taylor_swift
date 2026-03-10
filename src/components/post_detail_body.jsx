@@ -383,7 +383,8 @@ if (!finalTitle || finalTitle.trim() === '') {
   description: config.description,
   image: config.image,
   domain: siteKey,
-  url: url
+  url: url,
+  isSiteFallback: true
 });
           return;
         }
