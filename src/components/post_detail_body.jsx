@@ -375,12 +375,12 @@ if (!finalTitle || finalTitle.trim() === '') {
         if (siteKey && isMounted) {
           const config = siteConfigs[siteKey];
           setPreviewData({
-            title: config.title,
-            description: config.description,
-            image: config.image,
-            domain: siteKey,
-            url: url
-          });
+  title: getFallbackTitleFromUrl(url, domain),
+  description: config.description,
+  image: config.image,
+  domain: siteKey,
+  url: url
+});
           return;
         }
 
