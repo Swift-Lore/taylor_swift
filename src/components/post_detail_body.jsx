@@ -375,21 +375,13 @@ if (isMounted) {
       </div>
     );
   }
-const isLikelyRealPreviewImage = (imageUrl) => {
-  if (!imageUrl) return false;
-
+const isFallbackFavicon = (imageUrl) => {
+  if (!imageUrl) return true;
   const s = String(imageUrl).toLowerCase();
-
-  return !(
-    s.includes("google.com/s2/favicons") ||
-    s.includes("favicon") ||
-    s.includes("logo") ||
-    s.includes("icon") ||
-    s.includes("apple-touch-icon")
-  );
+  return s.includes("google.com/s2/favicons");
 };
 
-const hasUsableImage = isLikelyRealPreviewImage(previewData?.image);
+const hasUsableImage = !!previewData?.image && !isFallbackFavicon(previewData.image);
   
   if (!hasUsableImage) {
   return (
