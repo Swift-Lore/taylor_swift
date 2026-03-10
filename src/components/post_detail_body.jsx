@@ -157,13 +157,15 @@ const [loading, setLoading] = useState(true);
 const domain = getDomainFromUrl(url);
 
   useEffect(() => {
-    let isMounted = true;
+  let isMounted = true;
 
-    const fetchPreview = async () => {
-  if (!isMounted) return;
+  setPreviewData(null);
+  setLoading(true);
 
-  try {
-    setLoading(true);
+  const fetchPreview = async () => {
+    if (!isMounted) return;
+
+    try {
 
         // ================== STRATEGY 1: Microlink API (Primary) ==================
         // Microlink provides the most reliable previews with screenshot capability
