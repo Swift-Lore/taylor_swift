@@ -339,8 +339,52 @@ if (!finalTitle || finalTitle.trim() === '') {
         } catch (proxyError) {
           console.log('CORS proxy failed for:', domain, proxyError);
         }
+        // ================== STRATEGY 4: Site-specific fallback ==================
+        const siteConfigs = {
+          "justjared.com": {
+            title: "Just Jared - Celebrity News & Photos",
+            description: "Breaking celebrity news, photos, and entertainment updates",
+            image: "https://www.justjared.com/images/justjared-logo-new.png"
+          },
+          "people.com": {
+            title: "People Magazine",
+            description: "Breaking celebrity news, entertainment stories and exclusive interviews",
+            image: "https://people.com/thmb/7fBSYpC6a31D0Mq9B5WgSdIBUZU=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/people_logo-d5e9f7d1e7f34f9eb8e7c26b7bb40d5e.png"
+          },
+          "tmz.com": {
+            title: "TMZ - Celebrity News",
+            description: "Breaking celebrity gossip and entertainment news",
+            image: "https://tmz.ugc.zencdn.net/2019_TMZ_Logo_WhiteOrange.png?1"
+          },
+          "etonline.com": {
+            title: "Entertainment Tonight",
+            description: "Entertainment news, celebrity interviews, and TV gossip",
+            image: "https://www.etonline.com/sites/etonline.com/files/et_logo_0.png"
+          },
+          "eonline.com": {
+            title: "E! Online",
+            description: "Celebrity news, entertainment news, and pop culture coverage",
+            image: "https://www.eonline.com/favicon.ico"
+          }
+        };
 
-        // ================== STRATEGY 4: Final generic fallback ==================
+        const siteKey = Object.keys(siteConfigs).find((key) =>
+          domain.includes(key.replace("www.", ""))
+        );
+
+        if (siteKey && isMounted) {
+          const config = siteConfigs[siteKey];
+          setPreviewData({
+            title: config.title,
+            description: config.description,
+            image: config.image,
+            domain: siteKey,
+            url: url
+          });
+          return;
+        }
+
+        // ================== STRATEGY 5: Final generic fallback ==================
 if (isMounted) {
   setPreviewData({
     title: getFallbackTitleFromUrl(url, domain),
