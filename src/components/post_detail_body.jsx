@@ -1441,55 +1441,23 @@ if (isFacebook) {
         </section>
       )}
 
-            {/* Twitter / X */}
+                  {/* Twitter / X */}
       {event.TWITTER && (
-  <section className="w-full px-4 mb-10">
-    <div
-      ref={twitterSectionRef}
-      className="flex flex-wrap justify-start gap-6 mt-2 max-w-[1400px] mx-auto"
-    >
-      {event.TWITTER.split(" || ").map((url, index) => {
-        const trimmedUrl = url.trim();
-        // Handle both twitter.com and x.com URLs
-        const cleanUrl = trimmedUrl
-          .replace("x.com", "twitter.com")
-          .split("?")[0]; // Remove query params
-        
-        // Extract tweet ID for better fallback
-        const tweetIdMatch = cleanUrl.match(/\/status\/(\d+)/);
-        const tweetId = tweetIdMatch ? tweetIdMatch[1] : null;
-        
-        const isValid = tweetId !== null;
+        <section className="w-full px-4 mb-10">
+          <div className="flex flex-wrap justify-start gap-6 mt-2 max-w-[1400px] mx-auto">
+            {event.TWITTER.split(" || ").map((url, index) => {
+              const trimmedUrl = url.trim();
+              const cleanUrl = trimmedUrl.replace("x.com", "twitter.com");
+              const isValid =
+                /^https:\/\/twitter\.com\/[^/]+\/status\/\d+/.test(cleanUrl);
 
-        if (!isValid) return null;
+              if (!isValid) return null;
 
-        // If we've detected this embed failed, show the enhanced fallback
-        if (failedTwitterEmbeds[index]) {
-          return (
-            <TwitterFallbackCard 
-              key={index} 
-              url={trimmedUrl} 
-              tweetId={tweetId}
-            />
-          );
-        }
-
-        // Try to render the normal embed
-        return (
-          <div
-            key={index}
-            className="twitter-container flex-shrink-0"
-            style={{ width: "320px" }}
-          >
-            <blockquote className="twitter-tweet" data-lang="en" data-dnt="true">
-              <a href={cleanUrl}>{cleanUrl}</a>
-            </blockquote>
+              return <TwitterEmbed key={index} url={trimmedUrl} />;
+            })}
           </div>
-        );
-      })}
-    </div>
-  </section>
-)}
+        </section>
+      )}
 
       {/* TikTok */}
       {event.TIKTOK && (
