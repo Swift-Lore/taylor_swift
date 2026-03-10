@@ -236,6 +236,7 @@ console.log("PREVIEW DEBUG", {
   screenshot: screenshotUrl,
   logo: logoUrl,
   chosenImage: imageUrl,
+  imageType
 });
             
             // Ensure image URL is absolute
