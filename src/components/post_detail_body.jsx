@@ -677,7 +677,6 @@ export default function PostDetailBody() {
   const [sourceImages, setSourceImages] = useState([]);
   const [nonImageLinks, setNonImageLinks] = useState([]);
   const [microlinkErrors, setMicrolinkErrors] = useState({});
-  const twitterSectionRef = useRef(null);
 
   // Scroll to top on mount / id change
   useEffect(() => {
