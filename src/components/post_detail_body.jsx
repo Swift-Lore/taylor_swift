@@ -213,16 +213,21 @@ const ogImageUrl = data.image?.url || null;
 const logoUrl = data.logo?.url || null;
 
 let imageUrl = null;
+let imageType = "none";
 
 // Prefer real article/OG image first
 if (ogImageUrl && !isLogoish(ogImageUrl)) {
   imageUrl = ogImageUrl;
+  imageType = "og";
 } else if (screenshotUrl) {
   imageUrl = screenshotUrl;
+  imageType = "screenshot";
 } else if (ogImageUrl) {
   imageUrl = ogImageUrl;
+  imageType = "logoish-og";
 } else if (logoUrl) {
   imageUrl = logoUrl;
+  imageType = "logo";
 }
 
 console.log("PREVIEW DEBUG", {
