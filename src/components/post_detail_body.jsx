@@ -448,7 +448,10 @@ const isFallbackFavicon = (imageUrl) => {
   return s.includes("google.com/s2/favicons");
 };
 
-const hasUsableImage = !!previewData?.image && !isFallbackFavicon(previewData.image);
+const hasUsableImage =
+  !!previewData?.image &&
+  !isFallbackFavicon(previewData.image) &&
+  !previewData?.isSiteFallback;
   
   if (!hasUsableImage) {
   return (
