@@ -840,10 +840,6 @@ export default function PostDetailBody() {
   setSourceImages(imageLinks);
   setNonImageLinks(otherLinks);
 }, [event]);
-useEffect(() => {
-  setMicrolinkErrors({});
-  setFailedTwitterEmbeds({});
-}, [event]);
   
   // Modal helpers
   const closeModal = () => setIsModalOpen(false);
