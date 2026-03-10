@@ -211,8 +211,10 @@ const isGenericTitle =
 
 let imageUrl = data.image?.url || null;
 
-if (!imageUrl || isLogoish(imageUrl) || isGenericTitle) {
+if (!imageUrl || isLogoish(imageUrl)) {
   imageUrl = data.screenshot?.url || data.image?.url || data.logo?.url || null;
+} else if (isGenericTitle && data.screenshot?.url) {
+  imageUrl = data.screenshot.url;
 }
             
             // Ensure image URL is absolute
