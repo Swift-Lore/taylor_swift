@@ -55,6 +55,7 @@ const FIXED_HOLIDAYS = new Set(
     "National Donut Day",
     "National White Wine Day",
     "National Red Wine Day",
+    "National Boyfriend Day",
     "International Cat Day",
     "International Women's Day",
     "International Dance Day",
