@@ -33,7 +33,7 @@ const FIXED_HOLIDAYS = new Set(
   [
     "New Year's Eve",
     "New Year's Day",
-    "Sant Patrick's Day",      
+    "Saint Patrick's Day",      
     "Austin Swift's Birthday",
     "Andrea Swift's Birthday",
     "Scott Swift's Birthday",
