@@ -1092,19 +1092,34 @@ const getEmbedJustifyClass = (count) => {
     <div className="bg-[#e6edf7] py-8 md:py-12">
       {/* Compact title/date block */}
       <section className="max-w-4xl mx-auto px-4 mt-2 mb-8 text-center">
-        {event.EVENT && (
-          <h2 className="text-xl md:text-2xl font-serif text-[#8e3e3e] leading-snug">
-            {event.EVENT}
-          </h2>
-        )}
-        {event.DATE && (
-          <p className="mt-1 text-sm md:text-base text-[#6b7db3]">
-            {formatEventDate(event.DATE)}
-          </p>
-        )}
+  {event.EVENT && (
+    <h2 className="text-xl md:text-2xl font-serif text-[#8e3e3e] leading-snug">
+      {event.EVENT}
+    </h2>
+  )}
+  {event.DATE && (
+    <p className="mt-1 text-sm md:text-base text-[#6b7db3]">
+      {formatEventDate(event.DATE)}
+    </p>
+  )}
 
-        {/* No Notes Fallback */}
-        {!event.NOTES && (
+  {event.KEYWORDS && event.KEYWORDS.length > 0 && (
+    <div className="mt-4 flex flex-wrap justify-center gap-2">
+      {event.KEYWORDS.map((tag, index) => (
+        <button
+          key={index}
+          type="button"
+          onClick={() => navigate(`/posts?keyword=${encodeURIComponent(tag)}`)}
+          className="bg-[#8a9ac7] text-white font-medium text-xs md:text-sm px-3 py-1 rounded-full whitespace-nowrap shadow-sm hover:bg-[#6b7db3] transition-colors"
+        >
+          {tag}
+        </button>
+      ))}
+    </div>
+  )}
+
+  {/* No Notes Fallback */}
+  {!event.NOTES && (
           <p className="mt-3 text-sm md:text-base text-[#8e3e3e] font-medium italic leading-relaxed px-2">
             No additional notes are available for this event yet, but more
             context may be added later as Swift Lore expands its archive of
