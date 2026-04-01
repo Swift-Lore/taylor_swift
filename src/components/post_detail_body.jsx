@@ -1069,25 +1069,57 @@ useEffect(() => {
   const hasVideos = !!event.YOUTUBE;
   const hasNotes = !!event.NOTES && event.NOTES.trim() !== "";
   const hasSources = nonImageLinks.length > 0 || sourceImages.length > 0;
+  const instagramUrls = event?.INSTAGRAM
+  ? event.INSTAGRAM.split(" || ")
+      .map((rawUrl) => normalizeInstagramUrl(rawUrl))
+      .filter(Boolean)
+  : [];
 
+const twitterUrls = event?.TWITTER
+  ? event.TWITTER.split(" || ")
+      .map((url) => url.trim())
+      .filter((trimmedUrl) => {
+        const cleanUrl = trimmedUrl.replace("x.com", "twitter.com");
+        return /^https:\/\/twitter\.com\/[^/]+\/status\/\d+/.test(cleanUrl);
+      })
+  : [];
+
+const getEmbedJustifyClass = (count) => {
+  return count >= 4 ? "justify-start" : "justify-center";
+};
   // ---- MAIN RENDER ----
   return (
     <div className="bg-[#e6edf7] py-8 md:py-12">
       {/* Compact title/date block */}
       <section className="max-w-4xl mx-auto px-4 mt-2 mb-8 text-center">
-        {event.EVENT && (
-          <h2 className="text-xl md:text-2xl font-serif text-[#8e3e3e] leading-snug">
-            {event.EVENT}
-          </h2>
-        )}
-        {event.DATE && (
-          <p className="mt-1 text-sm md:text-base text-[#6b7db3]">
-            {formatEventDate(event.DATE)}
-          </p>
-        )}
+  {event.EVENT && (
+    <h2 className="text-xl md:text-2xl font-serif text-[#8e3e3e] leading-snug">
+      {event.EVENT}
+    </h2>
+  )}
+  {event.DATE && (
+    <p className="mt-1 text-sm md:text-base text-[#6b7db3]">
+      {formatEventDate(event.DATE)}
+    </p>
+  )}
 
-        {/* No Notes Fallback */}
-        {!event.NOTES && (
+  {event.KEYWORDS && event.KEYWORDS.length > 0 && (
+    <div className="mt-4 flex flex-wrap justify-center gap-2">
+      {event.KEYWORDS.map((tag, index) => (
+        <button
+          key={index}
+          type="button"
+          onClick={() => navigate(`/posts?keyword=${encodeURIComponent(tag)}`)}
+          className="bg-[#8a9ac7] text-white font-medium text-xs md:text-sm px-3 py-1 rounded-full whitespace-nowrap shadow-sm hover:bg-[#6b7db3] transition-colors"
+        >
+          {tag}
+        </button>
+      ))}
+    </div>
+  )}
+
+  {/* No Notes Fallback */}
+  {!event.NOTES && (
           <p className="mt-3 text-sm md:text-base text-[#8e3e3e] font-medium italic leading-relaxed px-2">
             No additional notes are available for this event yet, but more
             context may be added later as Swift Lore expands its archive of
@@ -1374,55 +1406,53 @@ if (isFacebook) {
 
       {/* Instagram */}
       {event.INSTAGRAM && (
-        <section className="w-full px-4 mb-10">
-  <div className="flex flex-wrap justify-start gap-6 mt-2 max-w-[1400px] mx-auto">
-            {event.INSTAGRAM.split(" || ").map((rawUrl, index) => {
-              const url = normalizeInstagramUrl(rawUrl);
-              return url ? (
-                <div
-                  key={index}
-                  className="instagram-container flex-shrink-0"
-                  style={{ width: "320px" }}
-                >
-                  <blockquote
-                    className="instagram-media"
-                    data-instgrm-permalink={url}
-                    data-instgrm-version="14"
-                    style={{
-                      background: "#FFF",
-                      borderRadius: "8px",
-                      border: "1px solid #dbdbdb",
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                      margin: "0",
-                      width: "320px",
-                      minWidth: "320px",
-                      padding: "0",
-                    }}
-                  ></blockquote>
-                </div>
-              ) : null;
-            })}
-          </div>
-        </section>
-      )}
+  <section className="w-full px-4 mb-10">
+    <div
+      className={`flex flex-wrap gap-6 mt-2 max-w-[1400px] mx-auto ${getEmbedJustifyClass(
+        instagramUrls.length
+      )}`}
+    >
+      {instagramUrls.map((url, index) => (
+        <div
+          key={index}
+          className="instagram-container flex-shrink-0"
+          style={{ width: "320px" }}
+        >
+          <blockquote
+            className="instagram-media"
+            data-instgrm-permalink={url}
+            data-instgrm-version="14"
+            style={{
+              background: "#FFF",
+              borderRadius: "8px",
+              border: "1px solid #dbdbdb",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              margin: "0",
+              width: "320px",
+              minWidth: "320px",
+              padding: "0",
+            }}
+          ></blockquote>
+        </div>
+      ))}
+    </div>
+  </section>
+)}
 
                   {/* Twitter / X */}
       {event.TWITTER && (
-        <section className="w-full px-4 mb-10">
-          <div className="flex flex-wrap justify-start gap-6 mt-2 max-w-[1400px] mx-auto">
-            {event.TWITTER.split(" || ").map((url, index) => {
-              const trimmedUrl = url.trim();
-              const cleanUrl = trimmedUrl.replace("x.com", "twitter.com");
-              const isValid =
-                /^https:\/\/twitter\.com\/[^/]+\/status\/\d+/.test(cleanUrl);
-
-              if (!isValid) return null;
-
-              return <TwitterEmbed key={index} url={trimmedUrl} />;
-            })}
-          </div>
-        </section>
-      )}
+  <section className="w-full px-4 mb-10">
+    <div
+      className={`flex flex-wrap gap-6 mt-2 max-w-[1400px] mx-auto ${getEmbedJustifyClass(
+        twitterUrls.length
+      )}`}
+    >
+      {twitterUrls.map((url, index) => (
+        <TwitterEmbed key={index} url={url} />
+      ))}
+    </div>
+  </section>
+)}
 
       {/* TikTok */}
       {event.TIKTOK && (
