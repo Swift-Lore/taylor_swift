@@ -78,6 +78,13 @@ const isGlobalHolidayName = (holiday) => {
 const getHolidayEmoji = (holiday) => {
   const name = holiday.toLowerCase()
 
+  // 🤡 April Fools' Day
+  if (name.includes("april fool")) return "🤡"
+
+  // 🍞 Sourdough / bread holidays
+  if (name.includes("sourdough")) return "🍞"
+  if (name.includes("bread")) return "🍞"
+
   // 🐱🎂 Taylor's cats (Meredith, Olivia, Benjamin)
   if (
     name.includes("meredith") ||
