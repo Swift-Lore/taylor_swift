@@ -1069,7 +1069,24 @@ useEffect(() => {
   const hasVideos = !!event.YOUTUBE;
   const hasNotes = !!event.NOTES && event.NOTES.trim() !== "";
   const hasSources = nonImageLinks.length > 0 || sourceImages.length > 0;
+  const instagramUrls = event?.INSTAGRAM
+  ? event.INSTAGRAM.split(" || ")
+      .map((rawUrl) => normalizeInstagramUrl(rawUrl))
+      .filter(Boolean)
+  : [];
 
+const twitterUrls = event?.TWITTER
+  ? event.TWITTER.split(" || ")
+      .map((url) => url.trim())
+      .filter((trimmedUrl) => {
+        const cleanUrl = trimmedUrl.replace("x.com", "twitter.com");
+        return /^https:\/\/twitter\.com\/[^/]+\/status\/\d+/.test(cleanUrl);
+      })
+  : [];
+
+const getEmbedJustifyClass = (count) => {
+  return count >= 4 ? "justify-start" : "justify-center";
+};
   // ---- MAIN RENDER ----
   return (
     <div className="bg-[#e6edf7] py-8 md:py-12">
