@@ -1231,7 +1231,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   <div className="w-full mt-2">
     {hasGlobalHoliday && (
   <div className="flex justify-center mb-1">
-    <div className="flex flex-wrap justify-center gap-2 max-w-[85%]">
+    <div className="flex flex-col items-center gap-1 max-w-[85%]">
       {globalHolidayTagsForDay.map((holiday, i) => (
         <span
           key={i}
