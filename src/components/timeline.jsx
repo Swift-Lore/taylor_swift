@@ -78,6 +78,13 @@ const isGlobalHolidayName = (holiday) => {
 const getHolidayEmoji = (holiday) => {
   const name = holiday.toLowerCase()
 
+  // 🤡 April Fools' Day
+  if (name.includes("april fool")) return "🤡"
+
+  // 🍞 Sourdough / bread holidays
+  if (name.includes("sourdough")) return "🍞"
+  if (name.includes("bread")) return "🍞"
+
   // 🐱🎂 Taylor's cats (Meredith, Olivia, Benjamin)
   if (
     name.includes("meredith") ||
@@ -1223,8 +1230,11 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   {/* 🌟 Global fixed-date holiday badge + Event Counter */}
   <div className="w-full mt-2">
     {hasGlobalHoliday && (
-      <div className="flex justify-center mb-1">
+  <div className="flex justify-center mb-1">
+    <div className="flex flex-wrap justify-center gap-2 max-w-[85%]">
+      {globalHolidayTagsForDay.map((holiday, i) => (
         <span
+          key={i}
           className="
             inline-flex items-center
             px-3 py-1
@@ -1234,16 +1244,15 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
             text-[#8e3e3e]
             border border-[#e3b0b0]
             shadow-sm
-            max-w-[85%]
           "
         >
-          <span className="mr-1 text-sm">
-            {getHolidayEmoji(globalHolidayTagsForDay[0])}
-          </span>
-          {globalHolidayTagsForDay[0]}
+          <span className="mr-1 text-sm">{getHolidayEmoji(holiday)}</span>
+          {holiday}
         </span>
-      </div>
-    )}
+      ))}
+    </div>
+  </div>
+)}
 
     <div className="flex justify-center mt-0.5 mb-1 flex-shrink-0">
       <div
