@@ -1409,21 +1409,18 @@ if (isFacebook) {
 
                   {/* Twitter / X */}
       {event.TWITTER && (
-        <section className="w-full px-4 mb-10">
-          <div className="flex flex-wrap justify-start gap-6 mt-2 max-w-[1400px] mx-auto">
-            {event.TWITTER.split(" || ").map((url, index) => {
-              const trimmedUrl = url.trim();
-              const cleanUrl = trimmedUrl.replace("x.com", "twitter.com");
-              const isValid =
-                /^https:\/\/twitter\.com\/[^/]+\/status\/\d+/.test(cleanUrl);
-
-              if (!isValid) return null;
-
-              return <TwitterEmbed key={index} url={trimmedUrl} />;
-            })}
-          </div>
-        </section>
-      )}
+  <section className="w-full px-4 mb-10">
+    <div
+      className={`flex flex-wrap gap-6 mt-2 max-w-[1400px] mx-auto ${getEmbedJustifyClass(
+        twitterUrls.length
+      )}`}
+    >
+      {twitterUrls.map((url, index) => (
+        <TwitterEmbed key={index} url={url} />
+      ))}
+    </div>
+  </section>
+)}
 
       {/* TikTok */}
       {event.TIKTOK && (
