@@ -52,7 +52,6 @@ const FIXED_HOLIDAYS = new Set(
     "National French Fry Day",
     "National Siblings Day",
     "National Cat Day",
-    "National Burrito Day",
     "National Donut Day",
     "National White Wine Day",
     "National Red Wine Day",
