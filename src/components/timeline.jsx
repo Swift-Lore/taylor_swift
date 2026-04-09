@@ -903,6 +903,7 @@ const TimelineCard = ({ record, index, currentMonth, currentDay, currentYear, is
   )
 }
 const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
+  if (!hasMounted) return null
      // ===== JSX =====
   return (
     <>
