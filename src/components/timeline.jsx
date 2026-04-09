@@ -280,8 +280,8 @@ const matchingRealLabel = matchingRealDate.toLocaleDateString("en-US", {
   })()
 
   // Calendar state - use actual current year
-  const [calendarMonth, setCalendarMonth] = useState(today.getMonth())
-  const [calendarYear, setCalendarYear] = useState(today.getFullYear())
+  const [calendarMonth, setCalendarMonth] = useState(0)
+const [calendarYear, setCalendarYear] = useState(2026)
   // ===== Calendar Functions =====
   const getDaysInMonth = (month, year) => {
     return new Date(year, month + 1, 0).getDate()
