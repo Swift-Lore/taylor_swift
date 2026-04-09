@@ -712,7 +712,7 @@ response.data.records?.forEach((record) => {
   }, [calendarMonth, calendarYear, showCalendar])
 
 // ===== Card component =====
-const TimelineCard = ({ record, index }) => {
+const TimelineCard = ({ record, index, currentMonth, currentDay, currentYear, isTorontoMode }) => {
   const handleTagClick = (e, keyword) => {
     e.preventDefault()
     e.stopPropagation()
