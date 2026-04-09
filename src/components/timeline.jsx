@@ -185,14 +185,26 @@ export default function Timeline() {
   const [currentYear, setCurrentYear] = useState(today.getFullYear())
   const displayDate = new Date(currentYear, currentMonth - 1, currentDay)
   const todayLabel = today.toLocaleDateString("en-US", {
-  month: "short",
-  day: "2-digit",
-  year: "numeric",
-})
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  })
   const [showTNInfo, setShowTNInfo] = useState(false)
   const [showDateCalc, setShowDateCalc] = useState(false)
   const [isInitialLoad, setIsInitialLoad] = useState(true)
-  
+
+  useEffect(() => {
+    const returnTo = location.state?.returnTo
+    if (!returnTo) return
+
+    setCurrentMonth(returnTo.month)
+    setCurrentDay(returnTo.day)
+    setCurrentYear(returnTo.year)
+    setIsTorontoMode(!!returnTo.isTorontoMode)
+
+    window.history.replaceState({}, document.title)
+  }, [location.state])
+
   // ===== SEO META TAGS UPDATE =====
   useEffect(() => {
     // Update page title
