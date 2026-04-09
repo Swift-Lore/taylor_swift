@@ -1,297 +1,143 @@
 "use client"
 
-import { ChevronLeft, ChevronRight, Calendar, Star, Zap, Clock, HelpCircle } from "lucide-react"
-import { Button } from "./ui/Button"
-import { useNavigate, Link, useLocation } from "react-router-dom"
-import { useEffect, useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import axios from "axios"
-import "./timeline.css"
-import { SITE_UPDATES } from "./site-updates"
+import { useNavigate, useLocation, Link } from "react-router-dom"
+import { ChevronLeft, ChevronRight, Calendar, Star, Zap, Clock } from "lucide-react"
+import { Button } from "./ui/Button"
 import AdSlot from "./adslot"
-import DateCalculatorModal from "./DateCalculatorModal";
+import DateCalculatorModal from "./DateCalculatorModal"
 
+// helper: convert "MM/DD/YYYY" -> "YYYY-MM-DD" for Airtable
+const parseMMDDYYYYToISO = (value) => {
+  if (!value) return ""
+  const trimmed = value.trim()
+  const match = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(trimmed)
+  if (!match) return ""
 
-// ===== Toronto Theory Alternate Timeline (helper) =====
-// Anchor: REAL date  = Nov 22, 2024
-//         ALT date   = Apr 25, 2019
-const REAL_ANCHOR_DATE = new Date(2024, 10, 22) // month is 0-based → 10 = November
-const ALT_ANCHOR_DATE  = new Date(2019, 3, 25)  // 3 = April
-// ---- Holiday helpers shared by timeline + cards ----
-const parseHolidayTags = (holidayTagsRaw) => {
-  if (Array.isArray(holidayTagsRaw)) return holidayTagsRaw
-  if (typeof holidayTagsRaw === "string") {
-    return holidayTagsRaw
-      .split(/[;,|]/)
-      .map((tag) => tag.trim())
-      .filter(Boolean)
-  }
-  return []
+  const [, m, d, y] = match
+  const month = m.padStart(2, "0")
+  const day = d.padStart(2, "0")
+  return `${y}-${month}-${day}`
 }
 
-// Holidays we only want to show once at the top of the timeline
-const FIXED_HOLIDAYS = new Set(
-  [
-    "Austin Swift's Birthday",
-    "Andrea Swift's Birthday",
-    "Scott Swift's Birthday",
-    "Taylor's Birthday",
-    "Marjorie Finlay's Birthday",
-    "Olivia's Birthday",
-    "Meredith's Birthday",
-    "Benjamin Button's Birthday",
-    "April Fools' Day",
-    "New Year's Eve",
-    "New Year's Day",
-    "Saint Patrick's Day",
-    "Halloween",
-    "Christmas Eve",
-    "Christmas Day",
-    "Independence Day",
-    "Valentine's Day",
-    "World Bread Day",
-    "National French Fry Day",
-    "National Siblings Day",
-    "National Cat Day",
-    "National Donut Day",
-    "National White Wine Day",
-    "National Red Wine Day",
-    "National Boyfriend Day",
-    "National Sourdough Bread Day",
-    "International Cat Day",
-    "International Women's Day",
-    "International Dance Day",
-    "Mean Girls Day",
-    "Last Kiss Day",
-    "High Infidelity Day",
-    
-  ].map((s) => s.toLowerCase())
-)
+// helper: is "MM/DD" complete enough to filter?
+const isCompleteMonthDay = (value) => {
+  if (!value) return false
+  const parts = value.split("/")
+  if (parts.length !== 2) return false
 
-const isGlobalHolidayName = (holiday) => {
-  if (!holiday) return false
-  const name = holiday.trim().toLowerCase()
-  return FIXED_HOLIDAYS.has(name)
+  const [m, d] = parts.map((p) => p.trim())
+  if (!m || !d) return false
+
+  const monthNum = parseInt(m, 10)
+  const dayNum = parseInt(d, 10)
+
+  if (Number.isNaN(monthNum) || Number.isNaN(dayNum)) return false
+  if (monthNum < 1 || monthNum > 12) return false
+  if (dayNum < 1 || dayNum > 31) return false
+
+  return true
 }
+const pad2 = (n) => String(n).padStart(2, "0")
 
-// Map holiday names to emojis
-const getHolidayEmoji = (holiday) => {
-  const name = holiday.toLowerCase()
-
-  // 🤡 April Fools' Day
-  if (name.includes("april fool")) return "🤡"
-
-  // 🍞 Sourdough / bread holidays
-  if (name.includes("sourdough")) return "🍞"
-  if (name.includes("bread")) return "🍞"
-
-  // 🐱🎂 Taylor's cats (Meredith, Olivia, Benjamin)
-  if (
-    name.includes("meredith") ||
-    name.includes("olivia") ||
-    name.includes("benjamin")
-  ) {
-    return "🐱🎂"
-  }
-
-  // ☘️ Saint Patrick's Day
-  if (name.includes("patrick")) return "☘️"
-
-  // 🍩 National Donut Day
-  if (name.includes("donut") || name.includes("doughnut")) return "🍩"
-
-  // 🎂 Any "birthday"
-  if (name.includes("birthday")) return "🎂"
-
-  // 🇺🇸 American holidays
-  if (
-    name.includes("independence") ||
-    name.includes("memorial day") ||
-    name.includes("labor day")
-  ) {
-    return "🇺🇸"
-  }
-
-  // 🍷 Wine days
-  if (name.includes("red wine") || name.includes("white wine")) return "🍷"
-
-  // 🐍 “Mean Girls Cat”
-  if (name.includes("mean girls")) return "🐍"
-
-  // 🐱 Any holiday with “cat” in it
-  if (name.includes("cat")) return "🐱"
-
-  // 🎃 Halloween
-  if (name.includes("halloween")) return "🎃"
-
-  // 🎄 Christmas
-  if (name.includes("christmas") || name.includes("xmas")) return "🎄"
-
-  // 🎆 New Years
-  if (name.includes("new year")) return "🎆"
-
-  // 💘 Valentine’s Day
-  if (name.includes("valentine")) return "💘"
-
-  // 🐣 Easter
-  if (name.includes("easter")) return "🐣"
-
-  // 🦃 Thanksgiving
-  if (name.includes("thanksgiving")) return "🦃"
-
-  // 🎀 Default
-  return "🎀"
-}
-
-function getTorontoTimelineDate(date) {
-  // Normalize to midnight to avoid timezone issues
-  const base = new Date(date.getFullYear(), date.getMonth(), date.getDate())
-
-  // Calculate difference in DAYS between real anchor and selected date
-  const diffTime = base.getTime() - REAL_ANCHOR_DATE.getTime()
-  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24))
-
-  // Create result by adding days to ALT_ANCHOR_DATE
-  const result = new Date(ALT_ANCHOR_DATE)
-  result.setDate(result.getDate() + diffDays)
-
-  return result
-}
-function getRealDateFromTorontoDate(tnDate) {
-  // Normalize to midnight to avoid timezone issues
-  const base = new Date(tnDate.getFullYear(), tnDate.getMonth(), tnDate.getDate())
-
-  // Difference in DAYS between selected TN date and ALT anchor
-  const diffTime = base.getTime() - ALT_ANCHOR_DATE.getTime()
-  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24))
-
-  // Apply that to REAL anchor to get the matching real timeline date
-  const result = new Date(REAL_ANCHOR_DATE)
-  result.setDate(result.getDate() + diffDays)
-
-  return result
-}
-
-export default function Timeline() {
+export default function TimelineBody() {
   const navigate = useNavigate()
   const location = useLocation()
-  const [records, setRecords] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [showCalendar, setShowCalendar] = useState(false)
-  const [dateEventsMap, setDateEventsMap] = useState({})
-  const [isTorontoMode, setIsTorontoMode] = useState(false)
-  const [currentMonth, setCurrentMonth] = useState(1)
-const [currentDay, setCurrentDay] = useState(1)
-const [currentYear, setCurrentYear] = useState(2026)
-const [hasMounted, setHasMounted] = useState(false)
-const displayDate = new Date(currentYear, currentMonth - 1, currentDay)
-  const [showTNInfo, setShowTNInfo] = useState(false)
-  const [showDateCalc, setShowDateCalc] = useState(false)
-  const [isInitialLoad, setIsInitialLoad] = useState(true)
+  // prevent "restore effects" from overwriting fast user input
+const didRestoreRef = useRef(false)
+const userInteractedRef = useRef(false)
+   useEffect(() => {
+    document.title = "Swift-Lore - Full Taylor Swift Timeline Archive"
 
-  useEffect(() => {
-  const returnTo = location.state?.returnTo
-  if (!returnTo) return
-
-  setCurrentMonth(returnTo.month)
-  setCurrentDay(returnTo.day)
-  setCurrentYear(returnTo.year)
-  setIsTorontoMode(!!returnTo.isTorontoMode)
-
-  window.history.replaceState({}, document.title)
-}, [location.state])
-
-useEffect(() => {
-  const returnTo = location.state?.returnTo
-
-  if (!returnTo) {
-    const today = new Date()
-    setCurrentMonth(today.getMonth() + 1)
-    setCurrentDay(today.getDate())
-    setCurrentYear(today.getFullYear())
-    setCalendarMonth(today.getMonth())
-    setCalendarYear(today.getFullYear())
-  }
-
-  setHasMounted(true)
-}, [location.state])
-
-// ===== SEO META TAGS UPDATE =====
-useEffect(() => {
-    // Update page title
-    document.title = `Swift-Lore - Taylor Swift Timeline | On This Day`
-    
-    // Update or create meta description
     let metaDescription = document.querySelector('meta[name="description"]')
     if (!metaDescription) {
-      metaDescription = document.createElement('meta')
+      metaDescription = document.createElement("meta")
       metaDescription.name = "description"
       document.head.appendChild(metaDescription)
     }
-    metaDescription.content = `Explore Taylor Swift events on this day across all eras. Interactive timeline with ${SITE_UPDATES.totalEvents}+ verified events, updated ${SITE_UPDATES.lastUpdated}.`
-    
-    // Add structured data for Google
-    const scriptId = "structured-data-script"
-    let existingScript = document.getElementById(scriptId)
-    if (existingScript) {
-      existingScript.remove()
-    }
-    
-    const script = document.createElement('script')
-    script.id = scriptId
-    script.type = "application/ld+json"
-    script.textContent = JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "Swift-Lore - Taylor Swift Timeline",
-      "description": `Interactive archive of ${SITE_UPDATES.totalEvents}+ Taylor Swift events from 2003 to present.`,
-      "url": window.location.origin,
-      "applicationCategory": "EntertainmentApplication",
-      "operatingSystem": "Any",
-      "datePublished": "2024-01-01",
-      "dateModified": new Date().toISOString().split('T')[0]
-    })
-    document.head.appendChild(script)
-    
-    // Cleanup on component unmount
-    return () => {
-      if (script.parentNode) {
-        script.remove()
-      }
-    }
+
+    metaDescription.content =
+      "Browse the full Swift-Lore Taylor Swift timeline: thousands of dated events with filters for albums, tours, Taylor sightings, and other characters within the Taylor Swift Cinematic Universe :)."
+
   }, [])
-  const torontoDate = getTorontoTimelineDate(displayDate)
-const matchingRealDate = getRealDateFromTorontoDate(displayDate)
-const matchingRealLabel = matchingRealDate.toLocaleDateString("en-US", {
-  month: "short",
-  day: "2-digit",
-  year: "numeric",
-})
+  
+  // Helper: Update URL params when filters change
+  const updateURLParams = () => {
+  const params = new URLSearchParams()
 
-    // Global (fixed-date) holidays for this day (shown once at top)
-  const globalHolidayTagsForDay = (() => {
-    const seen = new Set()
-    const result = []
+  if (sortOrder && sortOrder !== "desc") params.set("sort", sortOrder)
+  if (viewMode && viewMode !== "grid") params.set("view", viewMode)
+  if (filterKeywords.length > 0) params.set("keywords", filterKeywords.join(","))
+  if (startDateInput) params.set("start", startDateInput)
+  if (endDateInput) params.set("end", endDateInput)
+  if (monthDay) params.set("monthday", monthDay)
+  if (searchQuery) params.set("q", searchQuery)
+  if (keywordMatchType !== "all") params.set("match", keywordMatchType)
 
-    records.forEach((record) => {
-      const tags = parseHolidayTags(record?.fields?.HOLIDAYS)
-      tags.forEach((tag) => {
-        if (!tag) return
-        if (!isGlobalHolidayName(tag)) return
+  const queryString = params.toString()
+  const basePath = window.location.pathname
+  const newUrl = queryString ? `${basePath}?${queryString}` : basePath
 
-        const key = tag.toLowerCase()
-        if (!seen.has(key)) {
-          seen.add(key)
-          result.push(tag)
-        }
-      })
-    })
+  window.history.replaceState({}, "", newUrl)
+}
 
-    return result
-  })()
+  const [posts, setPosts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
+  const recordsPerPage = 12
+const filterRecordsPerPage = 100
+const searchRecordsPerPage = 100
 
-  // Calendar state - use actual current year
-  const [calendarMonth, setCalendarMonth] = useState(0)
-const [calendarYear, setCalendarYear] = useState(2026)
+  // Filter states
+  const [sortOrder, setSortOrder] = useState("desc")
+  const [filterKeywords, setFilterKeywords] = useState([])
+
+  // these are what the user types, in MM/DD/YYYY
+  const [startDateInput, setStartDateInput] = useState("")
+  const [endDateInput, setEndDateInput] = useState("")
+
+  const [monthDay, setMonthDay] = useState("")
+  const [searchQuery, setSearchQuery] = useState("")
+
+  // keywords
+  const [allKeywords, setAllKeywords] = useState([])
+  const [keywordsLoading, setKeywordsLoading] = useState(false)
+  const [keywordsLoaded, setKeywordsLoaded] = useState(false)
+  const [showKeywordDropdown, setShowKeywordDropdown] = useState(false)
+
+  // keyword search + match type
+  const [keywordSearchQuery, setKeywordSearchQuery] = useState("")
+  const [keywordMatchType, setKeywordMatchType] = useState("all") // "any" or "all"
+
+  // pagination offsets
+  const [offsetHistory, setOffsetHistory] = useState([null])
+  const [currentOffsetIndex, setCurrentOffsetIndex] = useState(0)
+
+  // search mode
+const [isSearchMode, setIsSearchMode] = useState(false)
+const [searchResults, setSearchResults] = useState([])
+
+// search pagination (separate from normal timeline pagination)
+const [searchPage, setSearchPage] = useState(1)
+const [searchHasMore, setSearchHasMore] = useState(false)
+const [searchOffsetHistory, setSearchOffsetHistory] = useState([null])
+const [searchOffsetIndex, setSearchOffsetIndex] = useState(0)
+
+    const [isFilterMode, setIsFilterMode] = useState(false)
+
+  // Calendar state
+  const [showCalendar, setShowCalendar] = useState(false)
+  const [showDateCalc, setShowDateCalc] = useState(false)
+  const [dateEventsMap, setDateEventsMap] = useState({})
+  const [calendarMonth, setCalendarMonth] = useState(new Date().getMonth())
+  const [calendarYear, setCalendarYear] = useState(new Date().getFullYear())
+
+  // view mode: "grid" or "compact"
+  const [viewMode, setViewMode] = useState("grid")
+  const TIMELINE_FILTERS_KEY = "swiftLoreTimelineFilters"
+
   // ===== Calendar Functions =====
   const getDaysInMonth = (month, year) => {
     return new Date(year, month + 1, 0).getDate()
@@ -325,13 +171,18 @@ const [calendarYear, setCalendarYear] = useState(2026)
 }
 
   const handleDateSelect = (day) => {
-  if (day) {
-    setCurrentYear(calendarYear)        // ADD THIS LINE
-    setCurrentMonth(calendarMonth + 1)
-    setCurrentDay(day)
-    setShowCalendar(false)
+    if (day) {
+      const selectedMonth = calendarMonth + 1
+      const selectedDay = day
+      const monthStr = selectedMonth.toString().padStart(2, '0')
+      const dayStr = selectedDay.toString().padStart(2, '0')
+      
+      // Set the monthDay input with MM/DD format
+      setMonthDay(`${monthStr}/${dayStr}`)
+      setShowCalendar(false)
+      resetPagination()
+    }
   }
-}
 
   const navigateCalendarMonth = (direction) => {
     if (direction === 'prev') {
@@ -353,11 +204,19 @@ const [calendarYear, setCalendarYear] = useState(2026)
 
   const jumpToToday = () => {
   const today = new Date()
-  setCurrentYear(today.getFullYear())
-  setCurrentMonth(today.getMonth() + 1)
-  setCurrentDay(today.getDate())
-  setIsTorontoMode(false)
+  const monthStr = (today.getMonth() + 1).toString().padStart(2, '0')
+  const dayStr = today.getDate().toString().padStart(2, '0')
+  
+  // Batch state updates
+  setMonthDay(`${monthStr}/${dayStr}`)
+  setCalendarMonth(today.getMonth())
+  setCalendarYear(today.getFullYear())
   setShowCalendar(false)
+  
+  // Small delay to prevent double render
+  setTimeout(() => {
+    resetPagination()
+  }, 10)
 }
 
   const jumpToThisMonth = () => {
@@ -368,7 +227,7 @@ const [calendarYear, setCalendarYear] = useState(2026)
 
   const hasEvents = (day) => {
   if (!day) return false
-  const dateKey = `${calendarYear}-${calendarMonth + 1}-${day}`
+  const dateKey = `${calendarYear}-${pad2(calendarMonth + 1)}-${pad2(day)}`
   return !!dateEventsMap[dateKey]
 }
 
@@ -378,1042 +237,1480 @@ const [calendarYear, setCalendarYear] = useState(2026)
   ]
 
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-
-  // ===== Calendar Modal Component =====
-  const CalendarModal = () => {
-    useEffect(() => {
-    if (showCalendar) {
-      const originalStyle = window.getComputedStyle(document.body).overflow
-      document.body.style.overflow = 'hidden'
-      return () => {
-        document.body.style.overflow = originalStyle
-      }
-    }
-  }, [showCalendar])
-
-  if (!showCalendar) return null
-
-    const calendarDays = generateCalendar()
-
-            return (
-      <>
-        <div 
-          className="fixed inset-0 bg-black/50 z-[9998]" 
-          onClick={() => setShowCalendar(false)} 
-        />
-        <div className="fixed inset-0 flex items-center justify-center z-[9999] p-4 pointer-events-none">
-          <div
-            className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in fade-in-zoom-in-95 pointer-events-auto max-h-[90vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Keep all the existing CalendarModal content here - it's the same */}
-            {/* Quick Actions Bar */}
-            <div className="flex gap-2 mb-4">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={jumpToToday}
-                className="flex-1 text-xs py-1 h-auto"
-              >
-                <Clock size={12} className="mr-1" />
-                Today
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={jumpToThisMonth}
-                className="flex-1 text-xs py-1 h-auto"
-              >
-                <Zap size={12} className="mr-1" />
-                This Month
-              </Button>
-            </div>
-
-            {/* Calendar Header */}
-            <div className="flex items-center justify-between mb-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigateCalendarMonth("prev")}
-                className="p-2 hover:bg-[#f8d7da] transition-colors"
-              >
-                <ChevronLeft size={18} className="text-[#8e3e3e]" />
-              </Button>
-
-              <div className="text-lg font-semibold text-[#8e3e3e] flex items-center gap-2">
-                <Star size={16} className="text-[#ffd700]" fill="#ffd700" />
-                {monthNames[calendarMonth]} {calendarYear}
-                <Star size={16} className="text-[#ffd700]" fill="#ffd700" />
-              </div>
-
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigateCalendarMonth("next")}
-                className="p-2 hover:bg-[#f8d7da] transition-colors"
-              >
-                <ChevronRight size={18} className="text-[#8e3e3e]" />
-              </Button>
-            </div>
-
-            {/* Month / Year dropdowns */}
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <select
-                className="border border-[#e3b0b0] rounded-full px-3 py-1 text-xs text-[#8e3e3e] bg-white"
-                value={calendarMonth}
-                onChange={(e) => setCalendarMonth(Number(e.target.value))}
-              >
-                {monthNames.map((name, idx) => (
-                  <option key={name} value={idx}>
-                    {name}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                className="border border-[#e3b0b0] rounded-full px-3 py-1 text-xs text-[#8e3e3e] bg-white"
-                value={calendarYear}
-                onChange={(e) => setCalendarYear(Number(e.target.value))}
-              >
-                {Array.from(
-                  { length: new Date().getFullYear() + 5 - 2006 + 1 },
-                  (_, i) => 2006 + i
-                ).map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Day Headers */}
-            <div className="grid grid-cols-7 gap-1 mb-2">
-              {dayNames.map(day => (
-                <div key={day} className="text-center text-xs font-semibold text-[#6b7db3] py-1">
-                  {day}
-                </div>
-              ))}
-            </div>
-
-            {/* Calendar Grid */}
-            <div className="grid grid-cols-7 gap-1">
-              {calendarDays.map((day, index) => {
-                const isEmpty = !day
-                let isSelected = false
-                if (!isEmpty) {
-                  isSelected =
-                    day === currentDay &&
-                    calendarMonth + 1 === currentMonth &&
-                    calendarYear === currentYear
-                }
-
-                const baseClasses =
-                  "relative h-8 rounded-lg text-sm font-medium transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center"
-
-                const visibilityClasses = isEmpty ? "invisible" : ""
-                const stateClasses = isSelected
-                  ? "bg-[#8e3e3e] text-white shadow-md scale-105"
-                  : "bg-white/80 text-[#8e3e3e] hover:bg-[#f8d7da]"
-                const borderClasses = hasEvents(day)
-                  ? "border-2 border-[#e3b0b0]"
-                  : "border border-transparent"
-
-                return (
-                  <button
-                    key={index}
-                    onClick={() => handleDateSelect(day)}
-                    disabled={isEmpty}
-                    className={`${baseClasses} ${visibilityClasses} ${stateClasses} ${borderClasses}`}
-                  >
-                    {!isEmpty && (
-                      <span className="relative z-10">
-                        {day}
-                      </span>
-                    )}
-                    {hasEvents(day) && !isEmpty && (
-                      <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#8e3e3e] rounded-full" />
-                    )}
-                  </button>
-                )
-              })}
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-2 justify-center mt-4">
-              <Button
-                variant="secondary"
-                onClick={() => setShowCalendar(false)}
-                className="rounded-full px-6 flex-1"
-              >
-                Close
-              </Button>
-              <Button
-                onClick={() => {
-                  const today = new Date()
-                  setCurrentYear(today.getFullYear())
-                  setCurrentMonth(today.getMonth() + 1)
-                  setCurrentDay(today.getDate())
-                  setIsTorontoMode(false)
-                  setShowCalendar(false)
-                }}
-                className="rounded-full px-6 flex-1 bg-[#8e3e3e] hover:bg-[#7a3434]"
-              >
-                Go to Today
-              </Button>
-            </div>
-          </div>
-        </div>
-      </>
-    )
-    }
-  const TNInfoModal = () => {
-    if (!showTNInfo) return null
-
-    return (
-      <div
-  className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4"
-  onClick={() => setShowTNInfo(false)}
->
-        <div
-          className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <h3 className="text-lg font-semibold text-[#8e3e3e]">
-            What is the Taylor Nation Timeline?
-          </h3>
-
-          <p className="text-sm text-[#5c678f] leading-relaxed">
-            On November 22, 2024, Taylor Nation tweeted about everyone being
-            &quot;back in Nashville that one morning on April 25th, 2019&quot; and
-            praised fans for their top-notch detective skills. That playful post
-            sparked a fan theory about a &quot;Taylor Nation timeline&quot; - an
-            alternate timeline that runs in parallel to the current date.
-          </p>
-
-          <p className="text-sm text-[#5c678f] leading-relaxed">
-            This tool lets you jump to the date that lines up with that alternate
-            timeline so you can see what Taylor was doing on that &quot;TN
-            timeline&quot; day.
-          </p>
-
-          <a
-            href="https://x.com/taylornation13/status/1860097353564446759?s=20"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-[#8a3f5b] underline decoration-dotted hover:text-[#6c3047]"
-          >
-            View the original Taylor Nation tweet
-          </a>
-
-          <div className="flex justify-end pt-2">
-            <Button
-              variant="secondary"
-              className="rounded-full px-4"
-              onClick={() => setShowTNInfo(false)}
-            >
-              Got it
-            </Button>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // ===== Existing Functions =====
-    const handleNextDay = () => {
-  const currentDate = new Date(currentYear, currentMonth - 1, currentDay)
-  currentDate.setDate(currentDate.getDate() + 1)
-  setCurrentMonth(currentDate.getMonth() + 1)
-  setCurrentDay(currentDate.getDate())
-  setCurrentYear(currentDate.getFullYear())
-  // DON'T exit Toronto mode - keep it active
-}
-
-const handlePreviousDay = () => {
-  const currentDate = new Date(currentYear, currentMonth - 1, currentDay)
-  currentDate.setDate(currentDate.getDate() - 1)
-  setCurrentMonth(currentDate.getMonth() + 1)
-  setCurrentDay(currentDate.getDate())
-  setCurrentYear(currentDate.getFullYear())
-  // DON'T exit Toronto mode - keep it active
-}
-
-    // ===== Airtable fetch =====
-  useEffect(() => {
-    const fetchRecordsByDate = async (month, day, year) => {
-      const fetchByDate = async () => {
-        let filterFormula
-      
-        if (isTorontoMode) {
-          // In Toronto mode: show ONLY this specific year
-          filterFormula = `AND(MONTH({DATE}) = ${month}, DAY({DATE}) = ${day}, YEAR({DATE}) = ${year})`
-        } else {
-          // Normal mode: show this day across all years
-          filterFormula = `AND(MONTH({DATE}) = ${month}, DAY({DATE}) = ${day})`
-        }
-      
-        const response = await axios.get(
-          "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-            },
-            params: {
-              filterByFormula: filterFormula,
-              sort: [{ field: "DATE", direction: "desc" }],
-            },
-          }
-        )
-        return response.data.records || []
-      }
-
-            try {
-        setIsLoading(true)
-        const fetched = await fetchByDate()
-        setRecords(fetched)
-        setIsInitialLoad(false) // ← ADD THIS LINE
-      } catch (error) {
-        console.error("Error fetching records:", error)
-        setRecords([])
-        setIsInitialLoad(false) // ← ADD THIS LINE
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    if (currentMonth && currentDay) {
-      fetchRecordsByDate(currentMonth, currentDay, currentYear)
-    }
-  }, [currentMonth, currentDay, currentYear, isTorontoMode])
-
-  // ===== Pre-fetch events for calendar indicators =====
-  useEffect(() => {
-    const fetchEventsForMonth = async (month, year) => {
-      try {
-        const response = await axios.get(
-          "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-            },
-            params: {
-  filterByFormula: `AND(MONTH({DATE}) = ${month}, YEAR({DATE}) = ${year})`,
-  fields: ["DATE"],
-},
-          }
-        )
-        
-        // Create a map of dates that have events
-const eventsMap = {}
-response.data.records?.forEach((record) => {
-  const raw = record.fields.DATE
-  if (!raw) return
-
-  // Handle "YYYY-MM-DD" or "YYYY-MM-DDTHH:MM:SS..."
-  const [datePart] = raw.split("T")
-  const [yearStr, monthStr, dayStr] = datePart.split("-")
-  if (!yearStr || !monthStr || !dayStr) return
-
-  const year = Number(yearStr)
-  const month = Number(monthStr) // 1–12
-  const day = Number(dayStr)
-
-  const dateKey = `${year}-${month}-${day}`
-  eventsMap[dateKey] = true
-})
-        
-        setDateEventsMap(prev => ({ ...prev, ...eventsMap }))
-      } catch (error) {
-        console.error("Error fetching calendar events:", error)
-      }
-    }
-
-    if (showCalendar) {
-      fetchEventsForMonth(calendarMonth + 1, calendarYear)
-    }
-  }, [calendarMonth, calendarYear, showCalendar])
-
-// ===== Card component =====
-const TimelineCard = ({ record, index, currentMonth, currentDay, currentYear, isTorontoMode }) => {
+  // Tag click = add filter, don’t navigate
   const handleTagClick = (e, keyword) => {
     e.preventDefault()
     e.stopPropagation()
-    navigate(`/posts?keyword=${encodeURIComponent(keyword)}`)
-  }
 
-  const handleCardClick = (e) => {
-    // If click is on a keyword pill, let that handler do its thing
-    if (e.target.closest(".keyword-container")) {
-      return
+    userInteractedRef.current = true
+
+if (!filterKeywords.includes(keyword)) {
+  setFilterKeywords([...filterKeywords, keyword])
+}
+resetPagination()
+  }
+  // On first mount, restore filters from sessionStorage (per user / per tab)
+  useEffect(() => {
+  if (typeof window === "undefined") return
+  if (didRestoreRef.current) return
+  if (userInteractedRef.current) return
+
+    const saved = window.sessionStorage.getItem(TIMELINE_FILTERS_KEY)
+    if (!saved) return
+
+    try {
+      const parsed = JSON.parse(saved)
+
+      if (parsed.sortOrder) setSortOrder(parsed.sortOrder)
+      if (Array.isArray(parsed.filterKeywords)) setFilterKeywords(parsed.filterKeywords)
+      if (typeof parsed.startDateInput === "string") setStartDateInput(parsed.startDateInput)
+      if (typeof parsed.endDateInput === "string") setEndDateInput(parsed.endDateInput)
+      if (typeof parsed.monthDay === "string") setMonthDay(parsed.monthDay)
+      if (typeof parsed.searchQuery === "string") setSearchQuery(parsed.searchQuery)
+      if (parsed.keywordMatchType) setKeywordMatchType(parsed.keywordMatchType)
+      if (parsed.viewMode) setViewMode(parsed.viewMode)
+      didRestoreRef.current = true
+    } catch (e) {
+      console.error("Error parsing saved timeline filters:", e)
     }
+    didRestoreRef.current = true
+  }, [])
+  // On first mount, if the URL has filters (shared link), apply them
+  useEffect(() => {
+  if (typeof window === "undefined") return
+  if (didRestoreRef.current) return
+  if (userInteractedRef.current) return
 
-    // If there is ANY selected text, don't navigate
-    const sel = window.getSelection()
-    if (sel && sel.toString().length > 0) {
-      e.preventDefault()
-      return
+    const urlParams = new URLSearchParams(window.location.search)
+
+    const urlSort = urlParams.get("sort")
+    const urlView = urlParams.get("view")
+    const urlKeywords = urlParams.get("keywords")
+    const urlStart = urlParams.get("start")
+    const urlEnd = urlParams.get("end")
+    const urlMonthDay = urlParams.get("monthday")
+    const urlQ = urlParams.get("q")
+    const urlMatch = urlParams.get("match")
+
+    if (urlSort) setSortOrder(urlSort)
+    if (urlView) setViewMode(urlView)
+    if (urlKeywords) setFilterKeywords(urlKeywords.split(","))
+    if (urlStart) setStartDateInput(urlStart)
+    if (urlEnd) setEndDateInput(urlEnd)
+    if (urlMonthDay) setMonthDay(urlMonthDay)
+    if (urlQ) setSearchQuery(urlQ)
+    if (urlMatch) setKeywordMatchType(urlMatch)
+  }, [])
+
+  // Read query params (?q=, ?keyword=)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search)
+    const queryFromUrl = urlParams.get("q")
+    const keywordFromUrl = urlParams.get("keyword")
+
+    if (keywordFromUrl) {
+      if (!filterKeywords.includes(keywordFromUrl)) {
+        setFilterKeywords([keywordFromUrl])
+      }
+      setSearchQuery("")
+      setStartDateInput("")
+      setEndDateInput("")
+      setMonthDay("")
+      resetPagination()
+
+      setTimeout(() => {
+        urlParams.delete("keyword")
+        navigate(`?${urlParams.toString()}`, { replace: true })
+      }, 0)
+    } else if (queryFromUrl) {
+      setSearchQuery(queryFromUrl)
     }
+  }, [location.search, navigate, filterKeywords])
 
-    // Otherwise, let the <Link> handle navigation normally
-    // (left-click, Cmd/Ctrl+click, middle-click, etc.)
+  // lazy-load all unique keywords from Airtable when dropdown first opens
+  const loadKeywordsIfNeeded = async () => {
+  // Check cache first
+  const cached = localStorage.getItem('swiftlore_keywords');
+  const cacheTime = localStorage.getItem('swiftlore_keywords_time');
+  
+  // Use cache if it's less than 1 hour old
+  if (cached && cacheTime && (Date.now() - parseInt(cacheTime)) < 60 * 60 * 1000) {
+    setAllKeywords(JSON.parse(cached));
+    setKeywordsLoaded(true);
+    return;
   }
 
-  const handleCardCopy = (e) => {
-    const selection = window.getSelection()
-    if (!selection) return
+  if (keywordsLoaded || keywordsLoading) return;
 
-    const text = selection.toString()
-    if (!text) return
+  setKeywordsLoading(true);
+  try {
+    const keywordSet = new Set();
+    let offset = undefined;
 
-    // Prevent browser from adding the link URL to the copied text
-    e.preventDefault()
-    e.clipboardData.setData("text/plain", text)
+    do {
+      const response = await axios.get(
+        "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+        {
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+          },
+          params: {
+            pageSize: 100,
+            offset,
+            fields: ["KEYWORDS"],
+          },
+        }
+      );
+
+      response.data.records.forEach((record) => {
+        ;(record.fields.KEYWORDS || []).forEach((kw) => {
+          const cleaned = typeof kw === "string" ? kw.trim() : "";
+          if (cleaned) keywordSet.add(cleaned);
+        });
+      });
+
+      offset = response.data.offset;
+    } while (offset);
+
+    const keywords = Array.from(keywordSet).sort((a, b) => a.localeCompare(b));
+    setAllKeywords(keywords);
+    setKeywordsLoaded(true);
+    
+    // Save to cache
+    localStorage.setItem('swiftlore_keywords', JSON.stringify(keywords));
+    localStorage.setItem('swiftlore_keywords_time', Date.now().toString());
+    
+  } catch (error) {
+    console.error("Error fetching all keywords:", error);
+  } finally {
+    setKeywordsLoading(false);
   }
+};
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "Loading..."
-    const date = new Date(dateString)
-    const options = {
-      month: "short",
-      day: "2-digit",
-      year: "numeric",
-      timeZone: "UTC",
+  // preload keywords in the background as soon as the page mounts
+  useEffect(() => {
+    loadKeywordsIfNeeded()
+  }, [])
+// Background sync for keywords
+useEffect(() => {
+  const checkForUpdates = async () => {
+    const cacheTime = localStorage.getItem('swiftlore_keywords_time');
+    // Only check if cache is older than 1 hour
+    if (!cacheTime || (Date.now() - parseInt(cacheTime)) > 60 * 60 * 1000) {
+      await loadKeywordsIfNeeded();
     }
-    return date.toLocaleDateString("en-US", options)
+  };
+  
+  // Check for updates 30 seconds after page load (non-blocking)
+  const timer = setTimeout(checkForUpdates, 30000);
+  return () => clearTimeout(timer);
+}, []);
+  // ===== Pre-fetch events for calendar indicators =====
+useEffect(() => {
+  const fetchEventsForMonth = async (month, year) => {
+    try {
+      const response = await axios.get(
+        "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+        {
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+          },
+          params: {
+  filterByFormula: `AND(MONTH({DATE}) = ${month}, YEAR({DATE}) = ${year})`,
+  fields: ["DATE"],
+},
+        }
+      )
+      
+      // Create a map of dates that have events (no timezone conversion)
+const eventsMap = {}
+response.data.records?.forEach(record => {
+  const raw = record.fields.DATE
+  if (typeof raw === "string") {
+    // Airtable date-only fields come back as "YYYY-MM-DD"
+    const [y, m, d] = raw.split("-").map(Number)
+    const dateKey = `${y}-${pad2(m)}-${pad2(d)}` // e.g. 2019-06-30
+    eventsMap[dateKey] = true
+  }
+})
+
+setDateEventsMap(prev => ({ ...prev, ...eventsMap }))
+    } catch (error) {
+      console.error("Error fetching calendar events:", error)
+    }
   }
 
-  const rawHolidayTags = parseHolidayTags(record?.fields?.HOLIDAYS)
-  const holidayTags = rawHolidayTags.filter((tag) => !isGlobalHolidayName(tag))
-  const hasHoliday = holidayTags.length > 0
+  if (showCalendar) {
+    fetchEventsForMonth(calendarMonth + 1, calendarYear)
+  }
+}, [calendarMonth, calendarYear, showCalendar])
+useEffect(() => {
+  // Only trigger filter when cleared or when MM/DD is valid
+  if (monthDay === "" || isCompleteMonthDay(monthDay)) {
+    // Small delay to batch state updates
+    const timer = setTimeout(() => {
+      resetPagination()
+    }, 10)
+    
+    return () => clearTimeout(timer)
+  }
+}, [monthDay])
 
-  return (
-    <Link
-  to={`/post_details?id=${record.id}`}
-  state={{
-    returnTo: {
-      month: currentMonth,
-      day: currentDay,
-      year: currentYear,
-      isTorontoMode,
-    },
-  }}
-      className="block relative hover:opacity-95 transition-opacity timeline-card"
-      style={{ marginTop: index === 0 ? "17px" : "43px" }}
-      draggable={false}
-      onDragStart={(e) => e.preventDefault()}
-      onClick={handleCardClick}
-      onCopy={handleCardCopy}
-    >
-      <div className="relative">
-        <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
-          <div className="bg-white/80 backdrop-blur-sm rounded-[10px] p-3 border border-[#f0d0d3] relative">
-            {/* Top date pill - not selectable */}
-            <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 -translate-y-1/4 border border-[#8e3e3e] bg-white rounded-full px-3 py-1 text-sm text-[#8e3e3e] font-semibold shadow-md z-10 min-w-[150px] text-center no-text-highlight">
-              {formatDate(record?.fields?.DATE)}
-            </div>
+// filter keywords list (using dynamic list from Airtable)
+const getFilteredKeywords = () => {
+  const source = allKeywords.length ? allKeywords : []
+  if (!keywordSearchQuery.trim()) return source
 
-            {/* Holiday badges - not selectable */}
-            {holidayTags.length > 0 && (
-              <>
-                {/* MOBILE */}
-                <div className="mt-2 mb-1 flex justify-center md:hidden">
-                  <div className="flex flex-wrap gap-1 justify-center no-text-highlight">
-                    {holidayTags.map((holiday, i) => (
-                      <span
-                        key={i}
-                        className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#fbeff7] text-[#8e3e3e] border border-[#e3b0b0] shadow-sm"
-                      >
-                        <span className="mr-1">
-                          {getHolidayEmoji(holiday)}
-                        </span>
-                        <span className="truncate max-w-[110px]">
-                          {holiday}
-                        </span>
-                      </span>
-                    ))}
-                  </div>
-                </div>
+  const query = keywordSearchQuery.toLowerCase()
+  return source
+    .filter((keyword) => keyword.toLowerCase().includes(query))
+    .sort((a, b) => {
+      const aLower = a.toLowerCase()
+      const bLower = b.toLowerCase()
+      if (aLower.startsWith(query) && !bLower.startsWith(query)) return -1
+      if (!aLower.startsWith(query) && bLower.startsWith(query)) return 1
+      return a.localeCompare(b)
+    })
+}
 
-                {/* DESKTOP */}
-                <div className="hidden md:flex absolute top-1 left-3 flex-wrap gap-1 justify-start max-w-[45%] no-text-highlight">
-                  {holidayTags.map((holiday, i) => (
-                    <span
-                      key={i}
-                      className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-[#fbeff7] text-[#8e3e3e] border border-[#e3b0b0] shadow-sm"
-                    >
-                      <span className="mr-1 text-sm">
-                        {getHolidayEmoji(holiday)}
-                      </span>
-                      <span className="truncate max-w-[140px]">
-                        {holiday}
-                      </span>
-                    </span>
-                  ))}
-                </div>
-              </>
-            )}
+  // Fetch posts (filters + pagination)
+  useEffect(() => {
+  const fetchPosts = async () => {
+      // If user started typing Month/Day but it's not a complete MM/DD yet, don't fetch yet
+      if (monthDay && !isCompleteMonthDay(monthDay)) {
+        return
+      }
 
-            {/* Main text content – this stays fully selectable */}
-            <div
-              className={`timeline-card-text flex flex-col gap-2.5 mt-3 ${
-                hasHoliday ? "md:mt-7" : "md:mt-3"
-              }`}
-            >
-              <h3 className="text-[#8e3e3e] font-bold text-sm md:text-base leading-relaxed text-center">
-                {record?.fields?.EVENT || "Event description unavailable"}
-              </h3>
+      setLoading(true)
 
-              {record?.fields?.NOTES && (
-                <div className="text-xs md:text-sm text-center font-medium text-gray-700 leading-relaxed whitespace-pre-line">
-                  {record.fields.NOTES}
-                </div>
-              )}
+      try {
+        const clauses = []
 
-              {/* Keywords – clickable buttons */}
-              {record?.fields?.KEYWORDS &&
-                record.fields.KEYWORDS.length > 0 && (
-                  <div className="flex flex-wrap gap-1 md:gap-1.5 justify-center keyword-container">
-                    {record.fields.KEYWORDS.slice(0, 4).map((tag, tagIndex) => (
-                      <button
-                        key={tagIndex}
-                        type="button"
-                        className="bg-[#8a9ac7] text-white font-medium text-xs px-2 py-0.5 rounded-full whitespace-nowrap shadow-sm hover:bg-[#6b7db3] transition-colors"
-                        onClick={(e) => handleTagClick(e, tag)}
-                      >
-                        {tag}
-                      </button>
-                    ))}
-                    {record.fields.KEYWORDS.length > 4 && (
-                      <div className="bg-[#b8c5e8] text-[#8e3e3e] font-medium text-xs px-2 py-0.5 rounded-full">
-                        +{record.fields.KEYWORDS.length - 4}
-                      </div>
-                    )}
-                  </div>
-                )}
-            </div>
-          </div>
-        </div>
-      </div>
-    </Link>
+        const startISO = parseMMDDYYYYToISO(startDateInput)
+        const endISO = parseMMDDYYYYToISO(endDateInput)
+
+        // inclusive start: DATE >= startISO
+        if (startISO) {
+          clauses.push(
+            `OR(IS_SAME({DATE}, '${startISO}'), IS_AFTER({DATE}, '${startISO}'))`
+          )
+        }
+
+        // inclusive end: DATE <= endISO
+        if (endISO) {
+          clauses.push(
+            `OR(IS_SAME({DATE}, '${endISO}'), IS_BEFORE({DATE}, '${endISO}'))`
+          )
+        }
+
+        // month/day MM/DD (any year), only when valid
+if (isCompleteMonthDay(monthDay)) {
+  const [m, d] = monthDay.split("/")
+  const monthNum = parseInt(m, 10)
+  const dayNum = parseInt(d, 10)
+
+  clauses.push(
+    `AND(MONTH({DATE}) = ${monthNum}, DAY({DATE}) = ${dayNum})`
   )
 }
-const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
-  if (!hasMounted) return null
-     // ===== JSX =====
-  return (
-    <>
-      {/* ===== HIDDEN SEO CONTENT FOR CRAWLERS ===== */}
-      <div style={{ 
-        position: 'absolute', 
-        opacity: 0, 
-        height: 0, 
-        overflow: 'hidden',
-        pointerEvents: 'none'
-      }}>
-        <h1>Swift-Lore - Taylor Swift Complete Career Timeline</h1>
-        <h2>Interactive Archive of Taylor Swift Events</h2>
-        <p>Swift-Lore is a comprehensive interactive timeline documenting Taylor Alison Swift's complete career from her earliest performances in 2003 through the present day. This fan-run archive includes thousands of verified events including album releases, tour dates, award show appearances, interviews, music videos, public appearances, personal milestones, and cultural moments.</p>
-        <p>Browse Taylor Swift's career by specific dates, filter events by era (Debut, Fearless, Speak Now, Red, 1989, Reputation, Lover, Folklore, Evermore, Midnights, The Tortured Poets Department), search for specific keywords, or explore connections between different moments in her career.</p>
-        <p>Each event includes detailed descriptions, contextual background information, source citations, and keyword tagging for easy navigation. The archive is regularly updated with new events and additional context.</p>
-        <h3>Featured Content Areas:</h3>
-        <ul>
-          <li>Album Releases and Announcements</li>
-          <li>Tour Dates and Concert Information</li>
-          <li>Award Show Appearances and Wins</li>
-          <li>Music Video Releases</li>
-          <li>Interview and Media Appearances</li>
-          <li>Public Events and Appearances</li>
-          <li>Personal Milestones and Birthdays</li>
-          <li>Cultural Impact Moments</li>
-          <li>Fan Community Events</li>
-          <li>Charity and Philanthropy</li>
-        </ul>
-        <p>This independent research project is maintained by dedicated fans and serves as a comprehensive resource for understanding the timeline and context of Taylor Swift's career evolution.</p>
-      </div>
-            {/* ===== VISIBLE TO CRAWLERS, HIDDEN FROM USERS ===== */}
-      <div className="sr-only" aria-hidden="true">
-        <h1>Taylor Swift Timeline Archive</h1>
-        <p>Browse {SITE_UPDATES.totalEvents}+ events from Taylor Swift's career including album releases, tour dates, awards, interviews, and personal milestones.</p>
-        <p>Current date: {displayDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
-        <p>Archive last updated: {SITE_UPDATES.lastUpdated}</p>
-      </div>
-      
-      {/* Your existing visible timeline JSX */}
-      <section className="w-full bg-[#e8ecf7] py-1 px-2 md:px-6 flex flex-col min-h-0">
-        <div className="container mx-auto flex flex-col min-h-0 flex-1">
-          {/* Homepage Intro for SEO / AdSense - WIDER but same height */}
-          <div className="max-w-4xl mx-auto mt-1 mb-2 px-3">
-            <div className="bg-white/70 border border-[#e3d5dd] rounded-xl shadow-sm px-4 py-3 md:px-6 md:py-3 text-center">
-              <h2 className="text-base md:text-lg font-semibold text-[#8e3e3e] mb-2">
-                Swift-Lore: Taylor Swift's Complete Career Timeline
-              </h2>
-              <div className="text-[#6b7db3] text-sm md:text-base leading-relaxed space-y-2">
-                <p>
-                  Swift-Lore is an independent, fan-run research archive documenting Taylor
-                  Swift's career from her earliest performances to the present day.
-                  Each entry is tied to a specific date, with context notes and source links.
-                </p>
-                <p>
-                  Browse by date, filter events, and follow her journey across albums and
-                  eras — from releases and award shows to interviews, paparazzi spots, and
-                  deep-cut easter eggs. The timeline currently tracks thousands of verified
-                  moments and is updated regularly.
-                </p>
-              </div>
-            </div>
-          </div>
 
-          {/* Ad block */}
-{import.meta.env.PROD && !isLoading && !isInitialLoad && records.length > 0 && (
-  <AdSlot
-  variant="leaderboard"
-  maxWidthClass="max-w-6xl"
-  className="mb-6 relative z-0"
-/>
-)}
-          
-          {/* ON THIS DAY Section */}
-<div className="text-center mt-3 mb-1 flex-shrink-0 relative z-10">
-  {/* Glowy header card */}
-  <div className="relative w-full mb-2 md:mb-3 px-2">
-    <div
-      className="
-        relative w-full max-w-md mx-auto px-3 py-2
-        bg-gradient-to-b from-[#fdf6fb] via-[#fbeff7] to-[#f6e5f0]
-        rounded-2xl
-        border border-[#e6d2e1]
-        shadow-[0_8px_20px rgba(210,160,180,0.25)]
-      "
-    >
-      <div className="mx-auto text-center">
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-serif text-[#8e3e3e]">
-          <span className="block tracking-wide">ON THIS DAY</span>
-          <span className="text-xs sm:text-sm md:text-base block mt-0.5 text-[#b4667f]">
-            across Taylor&apos;s eras
-          </span>
-        </h2>
+        // keyword filters
+        if (filterKeywords.length > 0) {
+          const keywordFilters = filterKeywords.map((keyword) => {
+            const safe = keyword.replace(/'/g, "\\'")
+            return `FIND('${safe}', ARRAYJOIN({KEYWORDS}, ',')) > 0`
+          })
 
-        <p className="mt-1 text-[#6b7db3] text-xs leading-relaxed px-1">
-          Explore what happened on this day across the years
-        </p>
-      </div>
+          const keywordFormula =
+            keywordMatchType === "any"
+              ? `OR(${keywordFilters.join(",")})`
+              : `AND(${keywordFilters.join(",")})`
 
-      {/* Side stars */}
-      <div className="pointer-events-none absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 opacity-70">
-        <img
-          src="/images/star.png"
-          alt="Star"
-          className="w-[20px] h-[20px] sm:w-[26px] sm:h-[26px]"
-        />
-      </div>
+          clauses.push(keywordFormula)
+        }
 
-      <div className="pointer-events-none absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 opacity-70">
-        <img
-          src="/images/star.png"
-          alt="Star"
-          className="w-[20px] h-[20px] sm:w-[26px] sm:h-[26px]"
-        />
-      </div>
-    </div>
-  </div>
+        // basic search (when not in "search mode")
+        if (searchQuery.trim() && !isSearchMode) {
+          const capitalizedQuery =
+            searchQuery.trim().charAt(0).toUpperCase() +
+            searchQuery.trim().slice(1)
 
-  {/* Date navigation container with properly positioned TN box */}
-  <div className="relative mt-0 md:mt-1 max-w-3xl mx-auto">
-    {/* Main date navigation - CENTERED (Date Calc does NOT affect centering) */}
-<div className="relative w-full">
-  {/* Mobile: Date Calc on its own row */}
-  <div className="flex justify-center mb-2 sm:hidden">
-    <Button
-      variant="secondary"
-      className="
-        rounded-full h-7 px-3
-        text-[10px]
-        flex items-center justify-center
-        min-w-[90px]
-      "
-      onClick={() => setShowDateCalc(true)}
-      title="Open date calculator"
-    >
-      Date Calc
-    </Button>
-  </div>
+          const searchFormula = `OR(
+            FIND('${capitalizedQuery}', {EVENT}) > 0,
+            FIND('${capitalizedQuery}', {LOCATION}) > 0,
+            FIND('${capitalizedQuery}', {CATEGORY}) > 0,
+            FIND('${capitalizedQuery}', ARRAYJOIN({KEYWORDS}, ',')) > 0
+          )`
 
-  {/* Desktop/tablet: Date Calc pinned left, doesn't push center */}
-  <div className="hidden sm:block absolute left-0 top-1/2 -translate-y-1/2">
-    <Button
-      variant="secondary"
-      className="
-        rounded-full h-7 md:h-8 px-2 md:px-3
-        text-[10px] sm:text-xs
-        flex items-center justify-center
-        min-w-[90px]
-      "
-      onClick={() => setShowDateCalc(true)}
-      title="Open date calculator"
-    >
-      Date Calc
-    </Button>
-  </div>
+          clauses.push(searchFormula)
+        }
 
-  {/* TRUE centered row */}
-  <div className="flex items-center justify-center gap-1 md:gap-2">
-    <Button
-      variant="secondary"
-      className="
-        rounded-full h-7 md:h-8 px-2 md:px-3
-        text-[10px] sm:text-xs
-        flex items-center justify-center gap-1 min-w-[80px]
-      "
-      onClick={handlePreviousDay}
-    >
-      <ChevronLeft size={10} />
-      <span className="hidden sm:inline">Previous</span>
-      <span className="sm:hidden">Prev</span>
-    </Button>
+        const filterFormula =
+          clauses.length === 0
+            ? ""
+            : clauses.length === 1
+            ? clauses[0]
+            : `AND(${clauses.join(",")})`
 
-    {/* Date bubble */}
-    <div className="relative">
-      <div
-        className="
-          bg-white rounded-full
-          pl-3 sm:pl-4
-          pr-7 sm:pr-8
-          py-0.5
-          min-w-[120px] sm:min-w-[140px]
-          border border-[#b66b6b]
-          flex items-center justify-center
-        "
-      >
-        <span className="text-[#8e3e3e] text-sm font-medium">
-          {displayDate.toLocaleDateString("en-US", {
-            month: "long",
-            day: "numeric",
-          })}
-        </span>
-      </div>
+        const isFilterActive = clauses.length > 0
+        setIsFilterMode(isFilterActive)
 
-      <button
-        onClick={() => setShowCalendar(true)}
-        className="
-          absolute right-1 sm:right-1.5
-          top-1/2 -translate-y-1/2
-          bg-white rounded-full p-0.5
-          shadow-sm border border-[#b66b6b]
-          hover:bg-[#f8d7da] transition-colors
-        "
-        title="Open calendar"
-      >
-        <Calendar size={12} className="text-[#8e3e3e]" />
-      </button>
-    </div>
+        console.log("Airtable filter formula:", filterFormula || "(none)")
 
-    <Button
-      variant="secondary"
-      className="
-        rounded-full h-7 md:h-8 px-2 md:px-3
-        text-[10px] sm:text-xs
-        flex items-center justify-center gap-1 min-w-[80px]
-      "
-      onClick={handleNextDay}
-    >
-      <span className="hidden sm:inline">Next</span>
-      <span className="sm:hidden">Next</span>
-      <ChevronRight size={10} />
-    </Button>
-  </div>
-</div>
+        const currentOffset = offsetHistory[currentOffsetIndex]
 
-    {/* TN box - Desktop: positioned to right */}
-    <div
-      className="
-        hidden
-        lg:block lg:absolute lg:right-[-10px] lg:top-[-5px]
-      "
-    >
-      <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 w-56">
-        <Button
-          variant="outline"
-          className="
-            rounded-xl px-2 py-1
-            text-xs font-medium
-            border-[#b66b6b] text-[#8e3e3e]
-            bg-white/95 hover:bg-[#fbeff7]
-            w-full break-words whitespace-normal
-            flex items-center justify-center text-center
-          "
-          onClick={() => {
-  if (isTorontoMode) {
-    // FIXED: Go to the matching real date shown on the button, not today
-    setCurrentYear(matchingRealDate.getFullYear())
-    setCurrentMonth(matchingRealDate.getMonth() + 1)
-    setCurrentDay(matchingRealDate.getDate())
-    setIsTorontoMode(false)
-  } else {
-    setCurrentYear(torontoDate.getFullYear())
-    setCurrentMonth(torontoDate.getMonth() + 1)
-    setCurrentDay(torontoDate.getDate())
-    setIsTorontoMode(true)
+const response = await axios.get(
+  "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+  {
+    headers: {
+      Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+    },
+    params: {
+  pageSize: clauses.length > 0 ? filterRecordsPerPage : recordsPerPage,
+  offset: currentOffset || undefined,
+  filterByFormula: filterFormula || undefined,
+  sort: [{ field: "DATE", direction: sortOrder }],
+},
   }
-}}
-        >
-          {isTorontoMode ? (
-            <span className="font-semibold flex items-center">
-              <ChevronLeft size={12} className="mr-1" />
-              Return to: {matchingRealLabel}
-            </span>
-          ) : (
-            <span className="font-semibold flex flex-col leading-snug">
-              <span>Taylor Nation Timeline Date:</span>
-              <span className="text-[11px] mt-0.5">
-                {torontoDate.toLocaleDateString("en-US", {
+)
+
+const hasMoreRecords = !!response.data.offset
+setHasMore(hasMoreRecords)
+
+if (hasMoreRecords && currentOffsetIndex === offsetHistory.length - 1) {
+  setOffsetHistory((prev) => [...prev, response.data.offset])
+}
+
+const formattedPosts = response.data.records.map((record) => ({
+  id: record.id,
+  date: record.fields.DATE
+    ? (() => {
+        const date = new Date(record.fields.DATE)
+        const options = {
+          month: "short",
+          day: "2-digit",
+          year: "numeric",
+          timeZone: "UTC",
+        }
+        return date.toLocaleDateString("en-US", options)
+      })()
+    : "No date",
+  category: record.fields.CATEGORY || "Uncategorized",
+  title: record.fields.EVENT || "Untitled Event",
+  location: record.fields.LOCATION || "",
+  image: record.fields.IMAGE?.[0]?.url || null,
+  year: record.fields.DATE ? new Date(record.fields.DATE).getFullYear() : "",
+  keywords: record.fields.KEYWORDS || [],
+  notes: record.fields.NOTES || null,
+}))
+
+setPosts(formattedPosts)
+      } catch (error) {
+        console.error("Error fetching records:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchPosts()
+  }, [
+    currentOffsetIndex,
+    sortOrder,
+    filterKeywords,
+    keywordMatchType,
+    startDateInput,
+    endDateInput,
+    monthDay,
+    searchQuery,
+    offsetHistory,
+    isSearchMode,
+  ])
+
+  // when paging search results, re-run the search fetch using the current offset
+useEffect(() => {
+  if (!isSearchMode) return
+  if (!searchQuery.trim()) return
+
+  // run the same search logic as submit, but using updated offset
+  handleSearch(new Event("submit"), { reset: false })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [searchOffsetIndex, sortOrder])
+
+  // filter helpers
+  const handleSortChange = (order) => {
+  userInteractedRef.current = true
+  setSortOrder(order)
+  resetPagination()
+}
+
+  const handleKeywordFilter = (keyword) => {
+  userInteractedRef.current = true
+
+  if (filterKeywords.includes(keyword)) {
+    setFilterKeywords(filterKeywords.filter((k) => k !== keyword))
+  } else {
+    setFilterKeywords([...filterKeywords, keyword])
+  }
+  resetPagination()
+}
+
+  const handleMonthDayChange = (value) => {
+  userInteractedRef.current = true
+  setMonthDay(value)
+}
+
+const handleStartDateChange = (value) => {
+  userInteractedRef.current = true
+  setStartDateInput(value)
+  resetPagination()
+}
+
+const handleEndDateChange = (value) => {
+  userInteractedRef.current = true
+  setEndDateInput(value)
+  resetPagination()
+}
+
+  // Search
+  const handleSearch = async (e, { reset = true } = {}) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      try {
+        setLoading(true)
+setIsSearchMode(true)
+
+// reset search pagination ONLY for a fresh search
+if (reset) {
+  setSearchPage(1)
+  setSearchHasMore(false)
+  setSearchOffsetHistory([null])
+  setSearchOffsetIndex(0)
+}
+
+        const searchTerms = searchQuery
+          .trim()
+          .toLowerCase()
+          .split(" ")
+          .filter((term) => term.length > 0)
+
+        const searchConditions = searchTerms.map(
+          (term) => `OR(
+          SEARCH("${term}", LOWER({EVENT})),
+          SEARCH("${term}", LOWER({NOTES})),
+          SEARCH("${term}", LOWER(ARRAYJOIN({KEYWORDS}, ", ")))
+        )`
+        )
+
+        const filterFormula =
+          searchConditions.length > 1
+            ? `AND(${searchConditions.join(", ")})`
+            : searchConditions[0]
+
+        const currentSearchOffset = searchOffsetHistory[searchOffsetIndex]
+
+const response = await axios.get(
+  "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+  {
+    headers: {
+      Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+    },
+    params: {
+      pageSize: searchRecordsPerPage,
+      offset: currentSearchOffset || undefined,
+      filterByFormula: filterFormula,
+      sort: [{ field: "DATE", direction: sortOrder }],
+    },
+  }
+)
+
+const hasMore = !!response.data.offset
+setSearchHasMore(hasMore)
+
+if (hasMore && searchOffsetIndex === searchOffsetHistory.length - 1) {
+  setSearchOffsetHistory((prev) => [...prev, response.data.offset])
+}
+
+        const formattedResults = response.data.records.map((record) => ({
+          id: record.id,
+          date: record.fields.DATE
+            ? (() => {
+                const date = new Date(record.fields.DATE)
+                const options = {
                   month: "short",
                   day: "2-digit",
                   year: "numeric",
-                })}
-              </span>
-            </span>
-          )}
-        </Button>
+                  timeZone: "UTC",
+                }
+                return date.toLocaleDateString("en-US", options)
+              })()
+            : "No date",
+          category: record.fields.CATEGORY || "Uncategorized",
+          title: record.fields.EVENT || "Untitled Event",
+          location: record.fields.LOCATION || "",
+          image: record.fields.IMAGE?.[0]?.url || null,
+          year: record.fields.DATE
+            ? new Date(record.fields.DATE).getFullYear()
+            : "",
+          keywords: record.fields.KEYWORDS || [],
+          notes: record.fields.NOTES || null,
+        }))
 
-        <div className="mt-1 flex items-center justify-center gap-1 text-[11px]">
-          {isTorontoMode && (
-            <span className="text-[#6b7db3]">TN Timeline Mode</span>
-          )}
-          <button
-            type="button"
-            onClick={() => setShowTNInfo(true)}
-            className="inline-flex items-center text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
-          >
-            <HelpCircle size={10} className="mr-0.5" />
-            What is this?
-          </button>
-        </div>
-      </div>
-    </div>
-
-    {/* Mobile TN box - centered */}
-    <div className="mt-2 w-full md:mt-3 lg:hidden">
-      <div className="w-full flex justify-center">
-        <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 w-56">
-          <Button
-            variant="outline"
-            className="
-              rounded-xl px-2 py-1
-              text-xs font-medium
-              border-[#b66b6b] text-[#8e3e3e]
-              bg-white/95 hover:bg-[#fbeff7]
-              w-full break-words whitespace-normal
-              flex items-center justify-center text-center
-            "
-            onClick={() => {
-  if (isTorontoMode) {
-    // FIXED: Go to the matching real date shown on the button, not today
-    setCurrentYear(matchingRealDate.getFullYear())
-    setCurrentMonth(matchingRealDate.getMonth() + 1)
-    setCurrentDay(matchingRealDate.getDate())
-    setIsTorontoMode(false)
-  } else {
-    setCurrentYear(torontoDate.getFullYear())
-    setCurrentMonth(torontoDate.getMonth() + 1)
-    setCurrentDay(torontoDate.getDate())
-    setIsTorontoMode(true)
+        setSearchResults(formattedResults)
+      } catch (error) {
+        console.error("Error fetching search results:", error)
+        setSearchResults([])
+      } finally {
+        setLoading(false)
+      }
+    } else {
+      setIsSearchMode(false)
+      setSearchResults([])
+    }
   }
-}}
-          >
-            {isTorontoMode ? (
-              <span className="font-semibold flex items-center">
-                <ChevronLeft size={12} className="mr-1" />
-                Return to: {matchingRealLabel}
-              </span>
-            ) : (
-              <span className="font-semibold flex flex-col leading-snug">
-                <span>Taylor Nation Timeline Date:</span>
-                <span className="text-[11px] mt-0.5">
-                  {torontoDate.toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "2-digit",
-                    year: "numeric",
-                  })}
-                </span>
-              </span>
-            )}
-          </Button>
 
-          <div className="mt-1 flex items-center justify-center gap-1 text-[11px]">
-            {isTorontoMode && (
-              <span className="text-[#6b7db3]">TN Timeline Mode</span>
-            )}
-            <button
-              type="button"
-              onClick={() => setShowTNInfo(true)}
-              className="inline-flex items-center text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
-            >
-              <HelpCircle size={10} className="mr-0.5" />
-              What is this?
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  const clearSearch = () => {
+    setIsSearchMode(false)
+    setSearchResults([])
+    setSearchQuery("")
+  }
 
-  {/* 🌟 Global fixed-date holiday badge + Event Counter */}
-  <div className="w-full mt-2">
-    {hasGlobalHoliday && (
-  <div className="flex justify-center mb-1">
-    <div className="flex flex-col items-center gap-1 max-w-[85%]">
-      {globalHolidayTagsForDay.map((holiday, i) => (
-        <span
-          key={i}
-          className="
-            inline-flex items-center
-            px-3 py-1
-            rounded-full
-            text-xs font-semibold
-            bg-[#fbeff7]
-            text-[#8e3e3e]
-            border border-[#e3b0b0]
-            shadow-sm
-          "
+  const handleSearchInputChange = (e) => {
+  userInteractedRef.current = true
+  setSearchQuery(e.target.value)
+}
+
+  const handleSearchKeyPress = (e) => {
+  if (e.key === "Enter") {
+    // let the form onSubmit handle it
+    // (prevents double-trigger)
+  }
+}
+
+  // pagination helpers (timeline)
+const handleSearchPreviousPage = () => {
+  if (searchOffsetIndex > 0) {
+    setSearchOffsetIndex((prev) => prev - 1)
+    setSearchPage((prev) => prev - 1)
+    window.scrollTo(0, 0)
+  }
+}
+
+const handleSearchNextPage = () => {
+  if (searchHasMore) {
+    setSearchOffsetIndex((prev) => prev + 1)
+    setSearchPage((prev) => prev + 1)
+    window.scrollTo(0, 0)
+  }
+}
+
+// pagination helpers
+const resetPagination = () => {
+  // timeline paging
+  setPage(1)
+  setCurrentOffsetIndex(0)
+  setOffsetHistory([null])
+
+  // search paging
+  setSearchPage(1)
+  setSearchOffsetIndex(0)
+  setSearchOffsetHistory([null])
+  setSearchHasMore(false)
+}
+
+  const handlePreviousPage = () => {
+    if (currentOffsetIndex > 0) {
+      setCurrentOffsetIndex((prev) => prev - 1)
+      setPage((prev) => prev - 1)
+      window.scrollTo(0, 0)
+    }
+  }
+
+  const handleNextPage = () => {
+    if (hasMore) {
+      setCurrentOffsetIndex((prev) => prev + 1)
+      setPage((prev) => prev + 1)
+      window.scrollTo(0, 0)
+    }
+  }
+
+  // Reset ALL filters
+  const resetAllFilters = () => {
+  setSortOrder("desc")
+  setFilterKeywords([])
+  setKeywordMatchType("all")
+  setKeywordSearchQuery("")
+  setStartDateInput("")
+  setEndDateInput("")
+  setMonthDay("")
+  setSearchQuery("")
+  setIsSearchMode(false)
+  setSearchResults([])
+  setShowKeywordDropdown(false)
+  resetPagination()
+
+  // also clear saved filters + clean URL
+  if (typeof window !== "undefined") {
+    window.sessionStorage.removeItem(TIMELINE_FILTERS_KEY)
+    const basePath = window.location.pathname
+    window.history.replaceState({}, "", basePath)
+  }
+}
+
+  // Persist filters + view mode to sessionStorage whenever they change
+    useEffect(() => {
+    if (typeof window === "undefined") return
+
+    const payload = {
+      sortOrder,
+      filterKeywords,
+      startDateInput,
+      endDateInput,
+      monthDay,
+      searchQuery,
+      keywordMatchType,
+      viewMode,
+    }
+
+    try {
+      window.sessionStorage.setItem(TIMELINE_FILTERS_KEY, JSON.stringify(payload))
+      updateURLParams()
+    } catch (e) {
+      console.error("Error saving timeline filters:", e)
+    }
+  }, [
+    sortOrder,
+    filterKeywords,
+    startDateInput,
+    endDateInput,
+    monthDay,
+    searchQuery,
+    keywordMatchType,
+    viewMode,
+  ])
+
+  // group posts by year in original order
+  const groupPostsByYear = (list) => {
+    const groups = []
+    const map = new Map()
+    list.forEach((post) => {
+      const year = post.year || "Unknown"
+      if (!map.has(year)) {
+        const group = { year, posts: [] }
+        map.set(year, group)
+        groups.push(group)
+      }
+      map.get(year).posts.push(post)
+    })
+    return groups
+  }
+
+  // render helpers: grid vs compact archive
+  const renderGridCards = (items) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 items-start">
+      {items.map((post) => (
+        <Link
+          key={post.id}
+          to={`/post_details?id=${post.id}`}
+          className="bg-[#ffe8e8] rounded-xl overflow-hidden border border-[#ffcaca] flex flex-col hover:shadow-lg transition-shadow duration-200 cursor-pointer h-full"
         >
-          <span className="mr-1 text-sm">{getHolidayEmoji(holiday)}</span>
-          {holiday}
-        </span>
+          <div className="relative pt-1 flex flex-col">
+            {/* date pill */}
+            <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 bg-white text-[#b91c1c] text-xs font-medium px-2 py-1 rounded-full z-10">
+              {post.date}
+            </div>
+
+            {/* title */}
+            <div className="px-4 pt-6 pb-2 mt-2">
+              <h3 className="text-[#b91c1c] font-medium text-sm text-center line-clamp-2">
+                {post.title}
+              </h3>
+            </div>
+
+            {/* image */}
+            {post.image && (
+              <div className="w-[90%] aspect-[4/3] mx-auto mb-2 rounded-[3%] overflow-hidden flex items-center justify-center">
+                <img
+                  src={post.image}
+                  alt={post.title}
+                  className="w-full h-full object-cover object-[center_30%]"
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="p-4 flex flex-col flex-grow">
+            {post.notes && (
+              <div className="text-[#6b7db3] text-xs mb-2 line-clamp-2 whitespace-pre-line">
+                {post.notes}
+              </div>
+            )}
+
+            <div className="mt-auto">
+              <div className="flex flex-wrap gap-2">
+                {post.keywords?.map((keyword, index) => (
+                  <span
+                    key={index}
+                    className="bg-[#8a9ac7] text-white text-[10px] px-1.5 py-0.5 rounded-full whitespace-nowrap cursor-pointer hover:bg-[#6b7db3] transition-colors"
+                    onClick={(e) => handleTagClick(e, keyword)}
+                  >
+                    {keyword}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Link>
       ))}
     </div>
-  </div>
-)}
+  )
 
-    <div className="flex justify-center mt-0.5 mb-1 flex-shrink-0">
+  const renderCompactArchive = (items) => {
+    const groups = groupPostsByYear(items)
+    return (
+      <div className="space-y-4">
+        {groups.map((group) => (
+          <div key={group.year}>
+            <h3 className="text-sm font-semibold text-[#8e3e3e] mb-1 mt-2">
+              {group.year}
+            </h3>
+            <div className="space-y-2">
+              {group.posts.map((post) => (
+                <Link
+                  key={post.id}
+                  to={`/post_details?id=${post.id}`}
+                  className="flex items-start gap-3 bg-[#ffe8e8] border border-[#ffcaca] rounded-lg px-3 py-2 hover:shadow-md transition-shadow duration-150 cursor-pointer"
+                >
+                  {/* date pill */}
+                  <div className="shrink-0">
+                    <div className="bg-white text-[#b91c1c] text-[11px] font-medium px-2 py-1 rounded-full text-center min-w-[88px]">
+                      {post.date}
+                    </div>
+                  </div>
+
+                  {/* text content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1">
+                      <h3 className="text-[#b91c1c] font-medium text-sm line-clamp-1">
+                        {post.title}
+                      </h3>
+                      {post.location && (
+                        <span className="text-[11px] text-[#6b7db3] line-clamp-1">
+                          {post.location}
+                        </span>
+                      )}
+                    </div>
+
+                    {post.notes && (
+                      <p className="mt-1 text-[11px] text-[#6b7db3] line-clamp-2 whitespace-pre-line">
+                        {post.notes}
+                      </p>
+                    )}
+
+                    {/* tags row */}
+                    {post.keywords?.length > 0 && (
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {post.keywords.slice(0, 4).map((keyword, index) => (
+                          <span
+                            key={index}
+                            className="bg-[#8a9ac7] text-white text-[10px] px-1.5 py-0.5 rounded-full whitespace-nowrap cursor-pointer hover:bg-[#6b7db3] transition-colors"
+                            onClick={(e) => handleTagClick(e, keyword)}
+                          >
+                            {keyword}
+                          </span>
+                        ))}
+                        {post.keywords.length > 4 && (
+                          <span className="text-[10px] text-gray-500">
+                            +{post.keywords.length - 4} more
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+// ===== Enhanced Calendar Modal =====
+const CalendarModal = () => {
+  if (!showCalendar) return null
+
+  const calendarDays = generateCalendar()
+
+  return (
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      onClick={() => setShowCalendar(false)}
+    >
       <div
-        className="
-          event-counter-pill
-          bg-white rounded-full px-2 py-0.5
-          border border-[#b66b6b] shadow-sm
-        "
+        className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in fade-in-zoom-in-95"
+        onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center gap-1">
-          <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse" />
-                    <span className="event-counter-text text-[#8e3e3e] text-xs font-medium">
-            {isInitialLoad
-              ? `Loading ${SITE_UPDATES.totalEvents}+ events...`
-              : isLoading
-              ? "Loading events..."
-              : `${records.length} ${
-                  records.length === 1 ? "Event" : "Events"
-                } Found${isTorontoMode ? " (TN)" : ""}`}
+        {/* Quick Actions Bar */}
+        <div className="flex gap-2 mb-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={jumpToToday}
+            className="flex-1 text-xs py-1 h-auto"
+          >
+            <Clock size={12} className="mr-1" />
+            Today
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={jumpToThisMonth}
+            className="flex-1 text-xs py-1 h-auto"
+          >
+            <Zap size={12} className="mr-1" />
+            This Month
+          </Button>
+        </div>
+
+        {/* Calendar Header */}
+<div className="flex items-center justify-between mb-2">
+  <Button
+    variant="ghost"
+    size="sm"
+    onClick={() => navigateCalendarMonth("prev")}
+    className="p-2 hover:bg-[#f8d7da] transition-colors"
+  >
+    <ChevronLeft size={18} className="text-[#8e3e3e]" />
+  </Button>
+
+  <div className="text-lg font-semibold text-[#8e3e3e] flex items-center gap-2">
+    <Star size={16} className="text-[#ffd700]" fill="#ffd700" />
+    {monthNames[calendarMonth]} {calendarYear}
+    <Star size={16} className="text-[#ffd700]" fill="#ffd700" />
+  </div>
+
+  <Button
+    variant="ghost"
+    size="sm"
+    onClick={() => navigateCalendarMonth("next")}
+    className="p-2 hover:bg-[#f8d7da] transition-colors"
+  >
+    <ChevronRight size={18} className="text-[#8e3e3e]" />
+  </Button>
+</div>
+
+{/* Month / Year dropdowns */}
+<div className="flex items-center justify-center gap-2 mb-4">
+  {/* Month select */}
+  <select
+    className="border border-[#e3b0b0] rounded-full px-3 py-1 text-xs text-[#8e3e3e] bg-white"
+    value={calendarMonth}
+    onChange={(e) => setCalendarMonth(Number(e.target.value))}
+  >
+    {monthNames.map((name, idx) => (
+      <option key={name} value={idx}>
+        {name}
+      </option>
+    ))}
+  </select>
+
+  {/* Year select */}
+  <select
+    className="border border-[#e3b0b0] rounded-full px-3 py-1 text-xs text-[#8e3e3e] bg-white"
+    value={calendarYear}
+    onChange={(e) => setCalendarYear(Number(e.target.value))}
+  >
+    {Array.from(
+      { length: new Date().getFullYear() + 5 - 2006 + 1 },
+      (_, i) => 2006 + i
+    ).map((year) => (
+      <option key={year} value={year}>
+        {year}
+      </option>
+    ))}
+  </select>
+</div>
+
+        {/* Day Headers */}
+        <div className="grid grid-cols-7 gap-1 mb-2">
+          {dayNames.map(day => (
+            <div key={day} className="text-center text-xs font-semibold text-[#6b7db3] py-1">
+              {day}
+            </div>
+          ))}
+        </div>
+
+        {/* Calendar Grid */}
+<div className="grid grid-cols-7 gap-1">
+  {calendarDays.map((day, index) => {
+    const isEmpty = !day
+
+    // figure out if this day is the selected MM/DD
+    let isSelected = false
+    if (!isEmpty && monthDay && monthDay.includes("/")) {
+      const [selMonthStr, selDayStr] = monthDay.split("/")
+      const selMonth = parseInt(selMonthStr, 10)
+      const selDay = parseInt(selDayStr, 10)
+      isSelected = day === selDay && (calendarMonth + 1) === selMonth
+    }
+
+    const baseClasses =
+      "relative h-8 rounded-lg text-sm font-medium transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center"
+
+    const visibilityClasses = isEmpty ? "invisible" : ""
+
+    const stateClasses = isSelected
+      ? "bg-[#8e3e3e] text-white shadow-md scale-105"
+      : "bg-white/80 text-[#8e3e3e] hover:bg-[#f8d7da]"
+
+    const borderClasses = hasEvents(day)
+      ? "border-2 border-[#e3b0b0]"
+      : "border border-transparent"
+
+    return (
+      <button
+        key={index}
+        onClick={() => handleDateSelect(day)}
+        disabled={isEmpty}
+        className={`${baseClasses} ${visibilityClasses} ${stateClasses} ${borderClasses}`}
+      >
+        {/* Day number */}
+        {!isEmpty && (
+          <span className="relative z-10">
+            {day}
           </span>
-          <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse" />
+        )}
+
+        {/* Event indicator dot */}
+        {hasEvents(day) && !isEmpty && (
+          <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#8e3e3e] rounded-full" />
+        )}
+      </button>
+    )
+  })}
+</div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2 justify-center mt-4">
+          <Button
+            variant="secondary"
+            onClick={() => setShowCalendar(false)}
+            className="rounded-full px-6 flex-1"
+          >
+            Close
+          </Button>
+          <Button
+            onClick={jumpToToday}
+            className="rounded-full px-6 flex-1 bg-[#8e3e3e] hover:bg-[#7a3434]"
+          >
+            Go to Today
+          </Button>
         </div>
       </div>
     </div>
-  </div>
-</div>
-            
-                    {/* Mobile Timeline – only show when there are events */}
-          {records.length > 0 && (
-            <div className="md:hidden mt-1 px-3">
-              <div className="relative">
-                <div className="pointer-events-none absolute inset-0 flex justify-center z-0">
-                  <div className="w-[2px] h-full bg-[#8a9ad4]" />
-                  <div className="absolute left-1/2 -translate-x-1/2 top-0 w-6 h-6 rounded-full bg-[#6B78B4]" />
-                  <div className="absolute left-1/2 -translate-x-1/2 -bottom-2 w-6 h-6 rounded-full bg-[#6B78B4]" />
-                </div>
+  )
+}
+  
+  return (
+       <div className="bg-[#e6edf7] py-8 overflow-x-hidden">
+               {/* SEO helper for crawlers, hidden visually */}
+      <div className="sr-only" aria-hidden="true">
+        <h1>Taylor Swift Full Timeline Archive</h1>
+        <p>
+          Browse the complete Swift-Lore archive of Taylor Swift events with
+          filters for dates, keywords, albums, tours, locations, and deep-cut
+          easter eggs.
+        </p>
+      </div>
+         
+      {/* ADD INTRODUCTORY TEXT HERE - New Section */}
+      <div className="max-w-6xl mx-auto px-4 mb-6">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-serif text-[#8e3e3e] mb-4">
+            Swift-Lore
+          </h1>
+          <p className="text-[#6b7db3] text-lg max-w-2xl mx-auto">
+            Welcome to Swift-Lore, a fan-made interactive timeline exploring 
+            Taylor Swift's career history, releases, Easter eggs, and more. 
+            Browse events, filter by keywords, or search for specific moments.
+          </p>
+        </div>
+      </div>
 
-                <div className="relative w-full max-w-xl mx-auto z-10 pt-2">
-                  {records.map((record, index) => (
-                    <div key={`mobile-${record.id}`} className="relative mb-4">
-                      <div className="absolute left-1/2 top-4 w-6 h-[2px] bg-[#8a9ad4] -translate-x-1/2" />
-                      <TimelineCard
-  record={record}
-  index={index}
-  currentMonth={currentMonth}
-  currentDay={currentDay}
-  currentYear={currentYear}
-  isTorontoMode={isTorontoMode}
-/>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-                    {/* Desktop Timeline – only show when there are events */}
-          {records.length > 0 && (
-            <div className="hidden md:block min-h-0">
-              <div className="relative flex justify-center">
-                <div className="absolute w-[2px] flex flex-col items-center h-full">
-                  <div className="w-[5px] bg-[#8a9ad4] h-full"></div>
-                  <div className="absolute left-1/2 -translate-x-1/2 top-0 w-6 h-6 rounded-full bg-[#6B78B4]"></div>
-                  <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-6 h-6 rounded-full bg-[#6B78B4]"></div>
-                </div>
-
-                <div className="relative left-[37.5%] -translate-x-1/4 w-3/4">
-                  {records.map((record, index) => (
-                    <div
-                      key={`desktop-${record.id}`}
-                      className="relative transition-all duration-300"
-                      style={{
-                        marginTop: index === 0 ? "0" : "40px",
-                      }}
-                    >
-                      <div className="transform scale-[0.90] origin-top -translate-x-1/4">
-                        <TimelineCard
-  record={record}
-  index={index}
-  currentMonth={currentMonth}
-  currentDay={currentDay}
-  currentYear={currentYear}
-  isTorontoMode={isTorontoMode}
-/>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-          {/* Empty state when no events for this date */}
-          {!isLoading && !isInitialLoad && records.length === 0 && (
-            <div className="text-center text-xs md:text-sm text-[#6b7db3] mt-3 mb-2 px-4">
-              No events are logged for this date yet. The archive is still growing, so check back soon.
-            </div>
-          )}
-          {/* Timeline meta / last updated */}
-<div className="text-center text-[11px] md:text-xs text-[#6b7db3] mt-2 mb-2 px-4">
-  Last updated: {SITE_UPDATES.lastUpdated} · Currently tracking{" "}
-  <span className="font-semibold">{SITE_UPDATES.totalEvents}+</span> Taylor Swift events
-  from {SITE_UPDATES.firstYear} to present.
-</div>
-<div className="text-center text-[10px] text-[#6b7db3] mt-1 mb-3 px-4 leading-tight">
-  All event dates and information are collected from publicly available sources.
-  Swift-Lore is a fan-created research project and may contain occasional inaccuracies.
-  If you spot an error, please contact us.
-</div>
-          
-          {/* View Full Timeline Button */}
-          <div className="flex justify-center mt-1 mb-1 flex-shrink-0">
-            <Button
-              variant="secondary"
-              className="rounded-full px-4 py-1 text-sm w-full max-w-xs sm:max-w-sm"
-              onClick={() => {
-                navigate("/posts")
-                window.scrollTo(0, 0)
-              }}
+      {/* Filters */}
+      <div className="max-w-6xl mx-auto px-4 mb-6">
+        {/* ... your existing filters code continues from here ... */}
+        <div className="relative flex flex-wrap gap-2 py-4 items-center overflow-visible">
+          {/* Sort By */}
+          <div className="relative">
+            <button
+              className="flex items-center justify-between bg.white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-1.5 text-sm min-w-[120px] bg-white"
+              onClick={() =>
+                handleSortChange(sortOrder === "asc" ? "desc" : "asc")
+              }
             >
-              View Full Timeline
-            </Button>
+              <span>
+  {sortOrder === "asc" ? "Oldest → Newest" : "Newest → Oldest"}
+</span>
+              <span className="ml-2">▼</span>
+            </button>
           </div>
 
-          {/* Modals */}
-          <CalendarModal />
-          <TNInfoModal />
-          {showDateCalc && (
+          {/* Filter Keywords dropdown */}
+          <div className="relative">
+            <button
+              className="flex items-center justify-between bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-1.5 text-sm min-w-[150px]"
+              onClick={() => {
+                const next = !showKeywordDropdown
+                setShowKeywordDropdown(next)
+              }}
+            >
+              <span>
+                {filterKeywords.length > 0
+                  ? `${filterKeywords.length} selected`
+                  : "Filter by keyword"}
+              </span>
+              <span className="ml-2">▼</span>
+            </button>
+
+            {showKeywordDropdown && (
+    <div className="absolute left-0 top-full mt-1 w-[90vw] sm:w-64 max-w-[90vw] bg-white border border-[#6b7db3] rounded-lg shadow-lg z-50 max-h-[60vh] overflow-y-auto">
+    <div className="p-2">
+                  {keywordsLoading && allKeywords.length === 0 ? (
+                    <div className="px-3 py-4 text-sm text-gray-500">
+                      Loading keywords…
+                    </div>
+                  ) : (
+                    <>
+                      {/* Keyword search input */}
+                      <div className="relative mb-2">
+                        <input
+                          type="text"
+                          placeholder="Search keywords..."
+                          className="w-full bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-3 py-1.5 text-sm"
+                          value={keywordSearchQuery}
+                          onChange={(e) =>
+                            setKeywordSearchQuery(e.target.value)
+                          }
+                        />
+                      </div>
+
+                      {/* Any / All toggle */}
+                      {filterKeywords.length > 0 && (
+                        <div className="mb-2 p-2 bg-[#e6edf7] rounded">
+                          <div className="flex items-center gap-4">
+                            <label className="flex items-center text-sm">
+                              <input
+                                type="radio"
+                                name="matchType"
+                                value="any"
+                                checked={keywordMatchType === "any"}
+                                onChange={(e) => {
+                                  setKeywordMatchType(e.target.value)
+                                  resetPagination()
+                                }}
+                                className="mr-1"
+                              />
+                              Has Any
+                            </label>
+                            <label className="flex items-center text-sm">
+                              <input
+                                type="radio"
+                                name="matchType"
+                                value="all"
+                                checked={keywordMatchType === "all"}
+                                onChange={(e) => {
+                                  setKeywordMatchType(e.target.value)
+                                  resetPagination()
+                                }}
+                                className="mr-1"
+                              />
+                              Has All
+                            </label>
+                          </div>
+                        </div>
+                      )}
+
+                      <button
+                        className="w-full text-left px-3 py-2 text-sm hover:bg-[#e6edf7] rounded mb-1"
+                        onClick={() => {
+                          setFilterKeywords([])
+                          setShowKeywordDropdown(false)
+                          setKeywordSearchQuery("")
+                          resetPagination()
+                        }}
+                      >
+                        Clear All Filters
+                      </button>
+
+                      <div className="max-h-[50vh] overflow-y-auto">
+                        {getFilteredKeywords().map((keyword, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center px-3 py-2"
+                          >
+                            <input
+                              type="checkbox"
+                              id={`keyword-${index}`}
+                              checked={filterKeywords.includes(keyword)}
+                              onChange={() => handleKeywordFilter(keyword)}
+                              className="mr-2"
+                            />
+                            <label
+                              htmlFor={`keyword-${index}`}
+                              className="text-sm cursor-pointer"
+                            >
+                              {keyword}
+                            </label>
+                          </div>
+                        ))}
+
+                        {getFilteredKeywords().length === 0 &&
+                          keywordSearchQuery && (
+                            <div className="px-3 py-2 text-sm text-gray-500">
+                              No keywords found matching "{keywordSearchQuery}"
+                            </div>
+                          )}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Start Date */}
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Start Date (MM/DD/YYYY)"
+              className="bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-1.5 text-sm min-w-[170px]"
+              value={startDateInput}
+              onChange={(e) => handleStartDateChange(e.target.value)}
+            />
+          </div>
+
+          {/* End Date */}
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="End Date (MM/DD/YYYY)"
+              className="bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-1.5 text-sm min-w-[170px]"
+              value={endDateInput}
+              onChange={(e) => handleEndDateChange(e.target.value)}
+            />
+          </div>
+
+                    {/* Month/Day */}
+<div className="relative">
+  <input
+    type="text"
+    placeholder="Month/Day (MM/DD)"
+    className="bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-1.5 text-sm min-w-[150px]"
+    value={monthDay}
+    onChange={(e) => handleMonthDayChange(e.target.value)}
+  />
+</div>
+
+{/* Standalone Calendar Button */}
+<div className="relative">
+  <button
+    onClick={() => setShowCalendar(true)}
+    className="flex items-center gap-2 bg-white text-[#8e3e3e] border border-[#8e3e3e] rounded-full px-4 py-1.5 text-sm hover:bg-[#f8d7da] transition-colors"
+    type="button"
+  >
+    <Calendar size={16} />
+    <span>Calendar</span>
+  </button>
+</div>
+
+{/* ✅ ADD THIS: Date Calculator Button */}
+<div className="relative">
+  <button
+    onClick={() => setShowDateCalc(true)}
+    className="flex items-center gap-2 bg-white text-[#8e3e3e] border border-[#8e3e3e] rounded-full px-4 py-1.5 text-sm hover:bg-[#f8d7da] transition-colors"
+    type="button"
+  >
+    <Clock size={16} />
+    <span>Date Calc</span>
+  </button>
+</div>
+          
+          {/* Search */}
+          <div className="relative flex-grow min-w-[200px]">
+            <form onSubmit={handleSearch} className="relative ml-2">
+              <input
+                type="text"
+                placeholder="Search any keywords"
+                className="w-full rounded-full py-1.5 pl-10 pr-4 text-sm bg-white border border-[#6b7db3] text-[#6b7db3]"
+                value={searchQuery}
+                onChange={handleSearchInputChange}
+                onKeyDown={handleSearchKeyPress}
+              />
+              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                <svg
+                  className="w-4 h-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="#6b7db3"
+                >
+                  <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z" />
+                </svg>
+              </div>
+            </form>
+          </div>
+
+          {/* View mode toggle */}
+          <div className="flex items-center gap-1 ml-auto">
+            <button
+              type="button"
+              className={`px-3 py-1 text-xs rounded-full border ${
+                viewMode === "grid"
+                  ? "bg-[#c25e5e] text-white border-[#c25e5e]"
+                  : "bg-white text-[#6b7db3] border-[#6b7db3]"
+              }`}
+              onClick={() => setViewMode("grid")}
+            >
+              Grid
+            </button>
+            <button
+              type="button"
+              className={`px-3 py-1 text-xs rounded-full border ${
+                viewMode === "compact"
+                  ? "bg-[#c25e5e] text-white border-[#c25e5e]"
+                  : "bg-white text-[#6b7db3] border-[#6b7db3] bg-white"
+              }`}
+              onClick={() => setViewMode("compact")}
+            >
+              Compact
+            </button>
+          </div>
+
+          {/* Reset Filters button */}
+          <button
+            className="flex items-center bg-white text-[#b91c1c] border border-[#b91c1c] rounded-full px-4 py-1.5 text-sm"
+            onClick={resetAllFilters}
+          >
+            Reset filters
+          </button>
+
+          {/* Clear keyword filters button (when some selected) */}
+          {filterKeywords.length > 0 && (
+            <div className="relative">
+              <button
+                className="flex items-center justify-between bg-[#b91c1c] text-white rounded-full px-4 py-1.5 text-sm"
+                onClick={() => {
+                  setFilterKeywords([])
+                  resetPagination()
+                }}
+              >
+                Clear {filterKeywords.length} Filter
+                {filterKeywords.length !== 1 ? "s" : ""}
+                <span className="ml-2">×</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+         
+                  {/* Ad block */}
+{import.meta.env.PROD && !loading && (posts.length > 0 || searchResults.length > 0) && (
+  <AdSlot
+  variant="leaderboard" 
+  maxWidthClass="max-w-6xl"
+  className="mb-2"
+/>
+)}
+
+      {/* Selected keywords chips */}
+      {filterKeywords.length > 0 && (
+        <div className="max-w-6xl mx-auto px-4 mb-4">
+          <div className="flex items-center flex-wrap gap-2">
+            <span className="text-sm text-[#6b7db3] font-medium">
+              Has {keywordMatchType === "all" ? "All" : "Any"}:
+            </span>
+            {filterKeywords.map((keyword, index) => (
+              <div
+                key={index}
+                className="bg-[#8a9ac7] text-white text-xs px-3 py-1 rounded-full flex items-center cursor-pointer hover:bg-[#6b7db3]"
+                onClick={() => {
+                  setFilterKeywords(filterKeywords.filter((k) => k !== keyword))
+                  resetPagination()
+                }}
+              >
+                {keyword}
+                <span className="ml-1 text-xs">×</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Main content / grids */}
+      {!loading && (
+        <div className="max-w-6xl mx-auto px-4">
+          {isSearchMode ? (
+            <>
+              {/* Search results header */}
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-serif text-[#8e3e3e] mb-2">
+                  Search Results for "{searchQuery}"
+                </h2>
+                <p className="text-[#8e3e3e] text-lg mb-4">
+                  {searchResults.length} result
+                  {searchResults.length !== 1 ? "s" : ""} found
+                </p>
+                <button
+                  onClick={clearSearch}
+                  className="bg-[#b91c1c] text-white rounded-full px-4 py-1.5 text-sm mb-6"
+                >
+                  Clear Search
+                </button>
+              </div>
+
+              {/* Search results list */}
+              {searchResults.length === 0 ? (
+  <div className="text-center py-12 text-[#b91c1c]">
+    No results found for "{searchQuery}"
+  </div>
+) : (
+  <>
+    {viewMode === "grid"
+      ? renderGridCards(searchResults)
+      : renderCompactArchive(searchResults)}
+
+    {(searchResults.length > searchRecordsPerPage || searchHasMore || searchOffsetIndex > 0)
+&& (
+      <div className="max-w-6xl mx-auto px-4 my-8 flex justify-center items-center gap-2">
+        <span
+          className={`text-sm ${
+            searchPage > 1 ? "text-[#bb6d6d] cursor-pointer" : "text-[#bb6d6d]/50"
+          }`}
+          onClick={searchPage > 1 ? handleSearchPreviousPage : undefined}
+        >
+          Previous Page
+        </span>
+
+        <button
+          className={`w-8 h-8 flex items-center justify-center rounded-full border border-[#bb6d6d] ${
+            searchPage > 1
+              ? "bg-[#e6edf7] text-[#bb6d6d]"
+              : "bg-[#e6edf7]/50 text-[#bb6d6d]/50"
+          }`}
+          onClick={searchPage > 1 ? handleSearchPreviousPage : undefined}
+          disabled={searchPage <= 1}
+        >
+          &lt;
+        </button>
+
+        <div className="mx-2 text-[#bb6d6d]">Page {searchPage}</div>
+
+        <button
+          className={`w-8 h-8 flex items-center justify-center rounded-full border border-[#bb6d6d] ${
+            searchHasMore
+              ? "bg-[#e6edf7] text-[#bb6d6d]"
+              : "bg-[#e6edf7]/50 text-[#bb6d6d]/50"
+          }`}
+          onClick={searchHasMore ? handleSearchNextPage : undefined}
+          disabled={!searchHasMore}
+        >
+          &gt;
+        </button>
+
+        <span
+          className={`text-sm ${
+            searchHasMore ? "text-[#bb6d6d] cursor-pointer" : "text-[#bb6d6d]/50"
+          }`}
+          onClick={searchHasMore ? handleSearchNextPage : undefined}
+        >
+          Next Page
+        </span>
+      </div>
+    )}
+  </>
+)}
+
+            </>
+          ) : posts.length === 0 ? (
+            <div className="text-center py-12 text-[#b91c1c]">
+              No posts found matching your criteria. Try different filters.
+            </div>
+          ) : viewMode === "grid" ? (
+            renderGridCards(posts)
+          ) : (
+            renderCompactArchive(posts)
+          )}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {!loading &&
+  !isSearchMode &&
+  (posts.length > (isFilterMode ? filterRecordsPerPage : recordsPerPage) || hasMore) && (
+          <div className="max-w-6xl mx-auto px-4 my-8 flex justify-center items-center gap-2">
+            <span
+              className={`text-sm ${
+                page > 1 ? "text-[#bb6d6d] cursor-pointer" : "text-[#bb6d6d]/50"
+              }`}
+              onClick={page > 1 ? handlePreviousPage : undefined}
+            >
+              Previous Page
+            </span>
+            <button
+              className={`w-8 h-8 flex items-center justify-center rounded-full border border-[#bb6d6d] ${
+                page > 1
+                  ? "bg-[#e6edf7] text-[#bb6d6d]"
+                  : "bg-[#e6edf7]/50 text-[#bb6d6d]/50"
+              }`}
+              onClick={page > 1 ? handlePreviousPage : undefined}
+              disabled={page <= 1}
+            >
+              &lt;
+            </button>
+            <div className="mx-2 text-[#bb6d6d]">Page {page}</div>
+            <button
+              className={`w-8 h-8 flex items-center justify-center rounded-full border border-[#bb6d6d] ${
+                hasMore
+                  ? "bg-[#e6edf7] text-[#bb6d6d]"
+                  : "bg-[#e6edf7]/50 text-[#bb6d6d]/50"
+              }`}
+              onClick={hasMore ? handleNextPage : undefined}
+              disabled={!hasMore}
+            >
+              &gt;
+            </button>
+            <span
+              className={`text-sm ${
+                hasMore ? "text-[#bb6d6d] cursor-pointer" : "text-[#bb6d6d]/50"
+              }`}
+              onClick={hasMore ? handleNextPage : undefined}
+            >
+              Next Page
+            </span>
+          </div>
+        )}
+
+            {/* View On This Day Button */}
+      <div className="max-w-6xl mx-auto px-4 mt-16">
+        <button
+          className="w-full bg-[#c25e5e] text-white py-3 rounded-full font-medium text-white"
+          onClick={() => {
+            navigate("/timeline")
+            window.scrollTo(0, 0)
+          }}
+        >
+          View On This Day
+        </button>
+      </div>
+      
+      {/* Calendar Modal */}
+<CalendarModal />
+
+{/* Date Calculator Modal */}
+{showDateCalc && (
   <DateCalculatorModal onClose={() => setShowDateCalc(false)} />
 )}
-        </div>
-      </section>
-    </>
+      
+      <br />
+    </div>
   )
 }
