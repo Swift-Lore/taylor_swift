@@ -1301,7 +1301,14 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
                   {records.map((record, index) => (
                     <div key={`mobile-${record.id}`} className="relative mb-4">
                       <div className="absolute left-1/2 top-4 w-6 h-[2px] bg-[#8a9ad4] -translate-x-1/2" />
-                      <TimelineCard record={record} index={index} />
+                      <TimelineCard
+  record={record}
+  index={index}
+  currentMonth={currentMonth}
+  currentDay={currentDay}
+  currentYear={currentYear}
+  isTorontoMode={isTorontoMode}
+/>
                     </div>
                   ))}
                 </div>
