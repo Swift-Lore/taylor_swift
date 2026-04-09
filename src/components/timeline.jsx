@@ -1338,7 +1338,14 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
                       }}
                     >
                       <div className="transform scale-[0.90] origin-top -translate-x-1/4">
-                        <TimelineCard record={record} index={index} />
+                        <TimelineCard
+  record={record}
+  index={index}
+  currentMonth={currentMonth}
+  currentDay={currentDay}
+  currentYear={currentYear}
+  isTorontoMode={isTorontoMode}
+/>
                       </div>
                     </div>
                   ))}
