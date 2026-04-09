@@ -194,19 +194,34 @@ const todayLabel = displayDate.toLocaleDateString("en-US", {
   const [isInitialLoad, setIsInitialLoad] = useState(true)
 
   useEffect(() => {
-    const returnTo = location.state?.returnTo
-    if (!returnTo) return
+  const returnTo = location.state?.returnTo
+  if (!returnTo) return
 
-    setCurrentMonth(returnTo.month)
-    setCurrentDay(returnTo.day)
-    setCurrentYear(returnTo.year)
-    setIsTorontoMode(!!returnTo.isTorontoMode)
+  setCurrentMonth(returnTo.month)
+  setCurrentDay(returnTo.day)
+  setCurrentYear(returnTo.year)
+  setIsTorontoMode(!!returnTo.isTorontoMode)
 
-    window.history.replaceState({}, document.title)
-  }, [location.state])
+  window.history.replaceState({}, document.title)
+}, [location.state])
 
-  // ===== SEO META TAGS UPDATE =====
-  useEffect(() => {
+useEffect(() => {
+  const returnTo = location.state?.returnTo
+
+  if (!returnTo) {
+    const today = new Date()
+    setCurrentMonth(today.getMonth() + 1)
+    setCurrentDay(today.getDate())
+    setCurrentYear(today.getFullYear())
+    setCalendarMonth(today.getMonth())
+    setCalendarYear(today.getFullYear())
+  }
+
+  setHasMounted(true)
+}, [location.state])
+
+// ===== SEO META TAGS UPDATE =====
+useEffect(() => {
     // Update page title
     document.title = `Swift-Lore - Taylor Swift Timeline | On This Day`
     
