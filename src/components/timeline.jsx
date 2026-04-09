@@ -174,6 +174,7 @@ function getRealDateFromTorontoDate(tnDate) {
 
 export default function Timeline() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [records, setRecords] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [showCalendar, setShowCalendar] = useState(false)
