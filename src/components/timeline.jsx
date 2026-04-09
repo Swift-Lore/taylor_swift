@@ -184,11 +184,6 @@ const [currentDay, setCurrentDay] = useState(1)
 const [currentYear, setCurrentYear] = useState(2026)
 const [hasMounted, setHasMounted] = useState(false)
 const displayDate = new Date(currentYear, currentMonth - 1, currentDay)
-const todayLabel = displayDate.toLocaleDateString("en-US", {
-  month: "short",
-  day: "2-digit",
-  year: "numeric",
-})
   const [showTNInfo, setShowTNInfo] = useState(false)
   const [showDateCalc, setShowDateCalc] = useState(false)
   const [isInitialLoad, setIsInitialLoad] = useState(true)
