@@ -766,7 +766,15 @@ const TimelineCard = ({ record, index }) => {
 
   return (
     <Link
-      to={`/post_details?id=${record.id}`}
+  to={`/post_details?id=${record.id}`}
+  state={{
+    returnTo: {
+      month: currentMonth,
+      day: currentDay,
+      year: currentYear,
+      isTorontoMode,
+    },
+  }}
       className="block relative hover:opacity-95 transition-opacity timeline-card"
       style={{ marginTop: index === 0 ? "17px" : "43px" }}
       draggable={false}
