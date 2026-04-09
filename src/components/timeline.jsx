@@ -1,7 +1,6 @@
 "use client"
 
 import { ChevronLeft, ChevronRight, Calendar, Star, Zap, Clock, HelpCircle } from "lucide-react"
-import { ChevronLeft, ChevronRight, Calendar, Star, Zap, Clock, HelpCircle } from "lucide-react"
 import { Button } from "./ui/Button"
 import { useNavigate, Link, useLocation } from "react-router-dom"
 import { useEffect, useState } from "react"
