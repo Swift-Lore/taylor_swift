@@ -348,7 +348,6 @@ const matchingRealLabel = matchingRealDate.toLocaleDateString("en-US", {
   setCurrentDay(today.getDate())
   setIsTorontoMode(false)
   setShowCalendar(false)
-  resetPagination()
 }
 
   const jumpToThisMonth = () => {
