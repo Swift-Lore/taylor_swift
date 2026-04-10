@@ -2,7 +2,7 @@
 
 import { ChevronLeft, ChevronRight, Calendar, Star, Zap, Clock, HelpCircle } from "lucide-react"
 import { Button } from "./ui/Button"
-import { useNavigate, Link } from "react-router-dom"
+import { useNavigate, Link, useSearchParams } from "react-router-dom"
 import { useEffect, useState } from "react"
 import axios from "axios"
 import "./timeline.css"
@@ -178,10 +178,23 @@ export default function Timeline() {
   const [showCalendar, setShowCalendar] = useState(false)
   const [dateEventsMap, setDateEventsMap] = useState({})
   const [isTorontoMode, setIsTorontoMode] = useState(false)
-  const today = new Date()
-  const [currentMonth, setCurrentMonth] = useState(today.getMonth() + 1)
-  const [currentDay, setCurrentDay] = useState(today.getDate())
-  const [currentYear, setCurrentYear] = useState(today.getFullYear())
+  const [searchParams, setSearchParams] = useSearchParams();
+  const today = new Date();
+
+  // This reads the date from the URL (?date=YYYY-MM-DD) if it exists
+  const getInitialDate = () => {
+    const dateParam = searchParams.get("date");
+    if (dateParam) {
+      const parsed = new Date(dateParam + 'T00:00:00');
+      if (!isNaN(parsed.getTime())) return parsed;
+    }
+    return today;
+  };
+
+  const initialDate = getInitialDate();
+  const [currentMonth, setCurrentMonth] = useState(initialDate.getMonth() + 1);
+  const [currentDay, setCurrentDay] = useState(initialDate.getDate());
+  const [currentYear, setCurrentYear] = useState(initialDate.getFullYear());
   const displayDate = new Date(currentYear, currentMonth - 1, currentDay)
   const todayLabel = today.toLocaleDateString("en-US", {
   month: "short",
@@ -236,6 +249,13 @@ export default function Timeline() {
       }
     }
   }, [])
+  
+  // This updates the URL whenever the date changes so "Back" works
+  useEffect(() => {
+    const formattedDate = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(currentDay).padStart(2, '0')}`;
+    // replace: true prevents the back button from getting "stuck" in a loop
+    setSearchParams({ date: formattedDate }, { replace: true });
+  }, [currentMonth, currentDay, currentYear, setSearchParams]);
   const torontoDate = getTorontoTimelineDate(displayDate)
 const matchingRealDate = getRealDateFromTorontoDate(displayDate)
 const matchingRealLabel = matchingRealDate.toLocaleDateString("en-US", {
@@ -329,14 +349,16 @@ const matchingRealLabel = matchingRealDate.toLocaleDateString("en-US", {
   }
 
   const jumpToToday = () => {
-  const today = new Date()
-  setCurrentYear(today.getFullYear())
-  setCurrentMonth(today.getMonth() + 1)
-  setCurrentDay(today.getDate())
-  setIsTorontoMode(false)
-  setShowCalendar(false)
-  resetPagination()
-}
+    const today = new Date();
+    setCurrentYear(today.getFullYear());
+    setCurrentMonth(today.getMonth() + 1);
+    setCurrentDay(today.getDate());
+    setIsTorontoMode(false);
+    setShowCalendar(false);
+    // If you have a resetPagination function, keep it, otherwise remove the next line
+    if (typeof resetPagination === 'function') resetPagination();
+    setSearchParams({}); // This clears the date from the URL
+  }
 
   const jumpToThisMonth = () => {
     const today = new Date()
