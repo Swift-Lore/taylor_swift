@@ -178,10 +178,23 @@ export default function Timeline() {
   const [showCalendar, setShowCalendar] = useState(false)
   const [dateEventsMap, setDateEventsMap] = useState({})
   const [isTorontoMode, setIsTorontoMode] = useState(false)
-  const today = new Date()
-  const [currentMonth, setCurrentMonth] = useState(today.getMonth() + 1)
-  const [currentDay, setCurrentDay] = useState(today.getDate())
-  const [currentYear, setCurrentYear] = useState(today.getFullYear())
+  const [searchParams, setSearchParams] = useSearchParams();
+  const today = new Date();
+
+  // This reads the date from the URL (?date=YYYY-MM-DD) if it exists
+  const getInitialDate = () => {
+    const dateParam = searchParams.get("date");
+    if (dateParam) {
+      const parsed = new Date(dateParam + 'T00:00:00');
+      if (!isNaN(parsed.getTime())) return parsed;
+    }
+    return today;
+  };
+
+  const initialDate = getInitialDate();
+  const [currentMonth, setCurrentMonth] = useState(initialDate.getMonth() + 1);
+  const [currentDay, setCurrentDay] = useState(initialDate.getDate());
+  const [currentYear, setCurrentYear] = useState(initialDate.getFullYear());
   const displayDate = new Date(currentYear, currentMonth - 1, currentDay)
   const todayLabel = today.toLocaleDateString("en-US", {
   month: "short",
