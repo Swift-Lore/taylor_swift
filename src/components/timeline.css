@@ -243,3 +243,12 @@ ins.adsbygoogle iframe {
   white-space: nowrap;
   border: 0;
 }
+/* If Google returns an unfilled ad, hide the white footer container */
+.w-full.bg-white\/75:has(ins[data-ad-status="unfilled"]) {
+  display: none !important;
+}
+
+/* Ensure the parent container doesn't leave a gap */
+.footer-ad-wrapper:has(ins[data-ad-status="unfilled"]) {
+  display: none !important;
+}
