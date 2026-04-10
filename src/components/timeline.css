@@ -171,39 +171,44 @@
   user-select: text !important;
 }
 
-/* ===== AD STYLING FIXES - PREVENT SKINNY ADS ===== */
-/* Add this section BEFORE the sr-only class */
+/* ===== AD STYLING FIXES - PREVENT BLEEDING & OVERLAP ===== */
 
 .ad-slot-container {
   width: 100%;
-  min-width: 300px;
+  min-width: 280px;
+  /* Ensure the container behaves as a physical box */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; 
 }
 
-.google-ad-wrapper {
-  width: 100% !important;
-  min-width: 300px !important;
-}
-
-/* Force Google Ads to respect container dimensions */
-ins.adsbygoogle[data-ad-status="unfilled"] {
-  display: none !important;
-}
-
+/* Force Google Ads to respect container dimensions and borders */
 ins.adsbygoogle {
   display: block !important;
   width: 100% !important;
-  min-width: 300px !important;
+  min-width: 280px !important;
   height: auto !important;
   min-height: 90px !important;
-  max-height: 600px !important;
+  max-height: 280px !important; /* Prevents ads from becoming giant skyscrapers in the footer */
   background: transparent !important;
+  /* This is the key for the footer fix: */
+  border-radius: 24px !important; 
+  overflow: hidden !important;
 }
 
-/* Fix for iframe rendering */
+/* Ensure the ad content itself doesn't "poke out" of your rounded containers */
 ins.adsbygoogle iframe {
-  min-width: 300px !important;
+  border-radius: 24px !important;
+  overflow: hidden !important;
   width: 100% !important;
-  height: auto !important;
+}
+
+/* Fix for the Timeline "On This Day" overlap */
+.on-this-day-header {
+  position: relative;
+  z-index: 10;
+  background-color: #e8ecf7; /* Match your site background to "cover" any bleed */
 }
 
 /* Prevent ad from being too skinny on mobile */
@@ -214,10 +219,11 @@ ins.adsbygoogle iframe {
   
   ins.adsbygoogle {
     min-width: 280px !important;
+    max-height: 250px !important; /* Keep mobile footer ads compact */
   }
 }
 
-/* Hide ad container when empty */
+/* Hide ad container when empty to recover space */
 .ad-slot-container:empty,
 .ad-slot-container:has(ins.adsbygoogle[data-ad-status="unfilled"]) {
   display: none !important;
