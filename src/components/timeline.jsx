@@ -956,11 +956,13 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
 
           {/* Ad block */}
 {import.meta.env.PROD && !isLoading && !isInitialLoad && records.length > 0 && (
-  <AdSlot
-  variant="leaderboard"
-  maxWidthClass="max-w-6xl"
-  className="mb-6 relative z-0"
-/>
+  <div className="w-full flex justify-center mb-4 min-h-[90px]"> 
+    <AdSlot
+      variant="leaderboard"
+      maxWidthClass="max-w-6xl"
+      className="relative z-10" 
+    />
+  </div>
 )}
           
           {/* ON THIS DAY Section */}
