@@ -86,42 +86,23 @@ function ErasTourShowsPage() {
 
 function App() {
   useEffect(() => {
-  if (!import.meta.env.PROD) return;
+    // We only load ads in the real live site, not the Bolt preview
+    if (!import.meta.env.PROD) return;
 
-  const consent = document.cookie.includes("websiteCookieConsent=true");
+    const hasConsent = document.cookie.includes("websiteCookieConsent=true");
+    if (!hasConsent) return;
 
-  if (!consent) {
-    console.log("No cookie consent yet - AdSense not loaded");
-    return;
-  }
-
-  console.log("Consent found - checking AdSense script...");
-
-  if (!document.querySelector('script[src*="pagead2.googlesyndication.com"]')) {
-    console.log("Loading AdSense script...");
-    const script = document.createElement("script");
-    script.src =
-      "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4534610257929133";
-    script.async = true;
-    script.crossOrigin = "anonymous";
-
-    script.onload = () => {
-      console.log("✅ AdSense script loaded successfully");
-      if (window.adsbygoogle) {
-        console.log("Initializing ads...");
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-      }
-    };
-
-    script.onerror = (e) => {
-      console.error("❌ Failed to load AdSense script:", e);
-    };
-
-    document.head.appendChild(script);
-  } else {
-    console.log("✅ AdSense script already loaded");
-  }
-}, []);
+    // Check if we already added the script so we don't do it twice
+    const existingScript = document.querySelector('script[src*="googlesyndication.com"]');
+    
+    if (!existingScript) {
+      const script = document.createElement("script");
+      script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4534610257929133";
+      script.async = true;
+      script.crossOrigin = "anonymous";
+      document.head.appendChild(script);
+    }
+  }, []);
   return (
     <>
       <Routes>
