@@ -6,7 +6,7 @@ export default function Footer() {
     <footer className="bg-gradient-to-b from-[#e8ecf7] to-[#b6c1e3] py-2">
       {/* Main footer content */}
       <div className="max-w-5xl mx-auto px-4 py-2">
-        <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-start justify-between min-h-0">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-stretch justify-between min-h-0">
           {/* About section */}
           <div className="bg-white/70 rounded-3xl shadow-sm px-4 py-2 md:px-5 md:py-3 w-full md:w-1/2 flex flex-col">
             <h2 className="text-sm md:text-base font-semibold text-[#5a2b60] tracking-wide mb-2 logo-glow">
@@ -50,19 +50,19 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Ad Container - FIXED TAGS */}
-          {import.meta.env.PROD && (
-            <div className="w-full md:w-1/2 flex min-h-[120px]">
-              <div className="w-full bg-white/75 rounded-3xl border border-[#f8dada] p-3 overflow-hidden flex items-center justify-center">
-                <AdSlot
-                  variant="leaderboard"
-                  maxWidthClass="max-w-full"
-                  noOuterPadding
-                  className="w-full"
-                />
-              </div>
-            </div>
-          )}
+          {/* Ad Container - Height Match Fix */}
+{import.meta.env.PROD && (
+  <div className="w-full md:w-1/2 flex">
+    <div className="w-full bg-white/75 rounded-3xl border border-[#f8dada] p-3 overflow-hidden flex items-center justify-center min-h-[150px]">
+      <AdSlot
+        variant="leaderboard"
+        maxWidthClass="max-w-full"
+        noOuterPadding
+        className="w-full"
+      />
+    </div>
+  </div>
+)}
         </div> {/* This closes the flex-row container */}
       </div> {/* This closes the max-w-5xl container */}
 
