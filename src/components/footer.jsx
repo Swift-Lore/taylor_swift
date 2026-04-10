@@ -50,19 +50,21 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Ad */}
-{import.meta.env.PROD && (
-  <div className="w-full md:w-1/2 flex min-h-[120px]"> {/* min-h keeps the footer from jumping */}
-    <div className="w-full bg-white/75 rounded-3xl border border-[#f8dada] p-2 md:p-3 overflow-hidden flex items-center justify-center">
-      <AdSlot
-        variant="leaderboard"
-        maxWidthClass="max-w-full"
-        noOuterPadding
-        className="w-full"
-      />
-    </div>
-  </div>
-)}
+          {/* Ad Container - FIXED TAGS */}
+          {import.meta.env.PROD && (
+            <div className="w-full md:w-1/2 flex min-h-[120px]">
+              <div className="w-full bg-white/75 rounded-3xl border border-[#f8dada] p-3 overflow-hidden flex items-center justify-center">
+                <AdSlot
+                  variant="leaderboard"
+                  maxWidthClass="max-w-full"
+                  noOuterPadding
+                  className="w-full"
+                />
+              </div>
+            </div>
+          )}
+        </div> {/* This closes the flex-row container */}
+      </div> {/* This closes the max-w-5xl container */}
 
       {/* Bottom bar */}
       <div className="bg-[#8a9ad4] py-2 px-4 text-center text-white">
@@ -70,21 +72,15 @@ export default function Footer() {
           <a href="/cookie-policy" className="text-white hover:text-gray-200 underline">
             Cookie Policy
           </a>
-
           <span className="mx-1">•</span>
-
           <a href="/about" className="text-white hover:text-gray-200 underline">
             About / Contact
           </a>
-
           <span className="mx-1">•</span>
-
           <a href="/privacy_policy" className="text-white hover:text-gray-200 underline">
             Privacy Policy
           </a>
-
           <span className="mx-1">•</span>
-
           <p className="mx-1">
             Copyright © 2025 Swift-Lore · Fan-made, not affiliated with Taylor Swift.
           </p>
