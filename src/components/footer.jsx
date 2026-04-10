@@ -50,19 +50,19 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Ad Container - FIXED TAGS */}
-          {import.meta.env.PROD && (
-            <div className="w-full md:w-1/2 flex min-h-[120px]">
-              <div className="w-full bg-white/75 rounded-3xl border border-[#f8dada] p-3 overflow-hidden flex items-center justify-center">
-                <AdSlot
-                  variant="leaderboard"
-                  maxWidthClass="max-w-full"
-                  noOuterPadding
-                  className="w-full"
-                />
-              </div>
-            </div>
-          )}
+          {/* Ad Container - Height Match Fix */}
+{import.meta.env.PROD && (
+  <div className="w-full md:w-1/2 flex">
+    <div className="w-full bg-white/75 rounded-3xl border border-[#f8dada] p-3 overflow-hidden flex items-center justify-center min-h-[150px]">
+      <AdSlot
+        variant="leaderboard"
+        maxWidthClass="max-w-full"
+        noOuterPadding
+        className="w-full"
+      />
+    </div>
+  </div>
+)}
         </div> {/* This closes the flex-row container */}
       </div> {/* This closes the max-w-5xl container */}
 
