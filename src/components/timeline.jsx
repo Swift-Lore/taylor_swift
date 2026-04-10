@@ -249,6 +249,13 @@ export default function Timeline() {
       }
     }
   }, [])
+  
+  // This updates the URL whenever the date changes so "Back" works
+  useEffect(() => {
+    const formattedDate = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(currentDay).padStart(2, '0')}`;
+    // replace: true prevents the back button from getting "stuck" in a loop
+    setSearchParams({ date: formattedDate }, { replace: true });
+  }, [currentMonth, currentDay, currentYear, setSearchParams]);
   const torontoDate = getTorontoTimelineDate(displayDate)
 const matchingRealDate = getRealDateFromTorontoDate(displayDate)
 const matchingRealLabel = matchingRealDate.toLocaleDateString("en-US", {
