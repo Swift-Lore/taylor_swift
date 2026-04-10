@@ -349,14 +349,16 @@ const matchingRealLabel = matchingRealDate.toLocaleDateString("en-US", {
   }
 
   const jumpToToday = () => {
-  const today = new Date()
-  setCurrentYear(today.getFullYear())
-  setCurrentMonth(today.getMonth() + 1)
-  setCurrentDay(today.getDate())
-  setIsTorontoMode(false)
-  setShowCalendar(false)
-  resetPagination()
-}
+    const today = new Date();
+    setCurrentYear(today.getFullYear());
+    setCurrentMonth(today.getMonth() + 1);
+    setCurrentDay(today.getDate());
+    setIsTorontoMode(false);
+    setShowCalendar(false);
+    // If you have a resetPagination function, keep it, otherwise remove the next line
+    if (typeof resetPagination === 'function') resetPagination();
+    setSearchParams({}); // This clears the date from the URL
+  }
 
   const jumpToThisMonth = () => {
     const today = new Date()
