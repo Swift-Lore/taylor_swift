@@ -51,7 +51,7 @@ export default function Footer() {
           </div>
 
           {/* Ad Container - Height Match Fix */}
-{(import.meta.env.PROD || true) && (
+{import.meta.env.PROD && (
   <div className="w-full md:w-1/2 flex">
     <div className="w-full bg-white/75 rounded-3xl border border-[#f8dada] p-3 overflow-hidden flex items-center justify-center min-h-[150px]">
       <AdSlot
