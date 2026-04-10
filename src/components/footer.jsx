@@ -51,18 +51,18 @@ export default function Footer() {
           </div>
 
           {/* Ad */}
-          {import.meta.env.PROD && (
-            <div className="w-full md:w-1/2 flex">
-              <AdSlot
-  variant="leaderboard"
-  maxWidthClass="max-w-full"
-  noOuterPadding
-  className="bg-white/75 rounded-3xl border border-[#f8dada] p-3"
-/>
-            </div>
-          )}
-        </div>
-      </div>
+{import.meta.env.PROD && (
+  <div className="w-full md:w-1/2 flex min-h-[120px]"> {/* min-h keeps the footer from jumping */}
+    <div className="w-full bg-white/75 rounded-3xl border border-[#f8dada] p-2 md:p-3 overflow-hidden flex items-center justify-center">
+      <AdSlot
+        variant="leaderboard"
+        maxWidthClass="max-w-full"
+        noOuterPadding
+        className="w-full"
+      />
+    </div>
+  </div>
+)}
 
       {/* Bottom bar */}
       <div className="bg-[#8a9ad4] py-2 px-4 text-center text-white">
