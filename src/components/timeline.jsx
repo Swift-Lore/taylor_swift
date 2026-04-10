@@ -966,7 +966,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
 )}
           
           {/* ON THIS DAY Section */}
-<div className="text-center mt-3 mb-1 flex-shrink-0 relative z-10">
+<div className="text-center mt-3 mb-1 flex-shrink-0">
   {/* Glowy header card */}
   <div className="relative w-full mb-2 md:mb-3 px-2">
     <div
