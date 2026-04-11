@@ -169,9 +169,8 @@ const domain = getDomainFromUrl(url);
     try {
 
         // ================== STRATEGY 1: Microlink API (Primary) ==================
-        // Microlink provides the most reliable previews with screenshot capability
-        // Get a free API key from https://microlink.io/
-        const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
+      if (!isProblematicDomain) {  
+      const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
         const microlinkUrl =
   `https://api.microlink.io/?url=${encodeURIComponent(url)}` +
   `&wait=3000` +
