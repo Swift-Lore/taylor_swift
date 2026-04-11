@@ -338,7 +338,8 @@
   display: flex;
   justify-content: center;
   width: 100%;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
+  align-items: flex-start; /* Ensures everything in this row aligns to the top */
 }
 
 .instagram-media {
@@ -346,9 +347,14 @@
   width: 100% !important;
   max-width: 540px !important;
   margin: 0 auto !important;
+  /* This height is crucial; if it's too short, the date disappears */
+  min-height: 580px !important; 
 }
 
-/* Ensure the iframe inside the Instagram block doesn't cut off the bottom date */
+/* Specific fix to prevent the bottom of the iframe from being cut off */
 .instagram-media iframe {
-  min-height: 450px !important;
+  width: 100% !important;
+  border-radius: 8px !important;
+  padding-bottom: 25px !important; 
+  display: block !important;
 }
