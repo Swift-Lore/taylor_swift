@@ -164,25 +164,25 @@ const domain = getDomainFromUrl(url);
 
   const fetchPreview = async () => {
     if (!isMounted) return;
-// 1. Check if we should skip Strategy 1 for specific problematic domains
-  const isProblematicDomain = domain.includes("tmz.com");
-    try {
 
-        // ================== STRATEGY 1: Microlink API (Primary) ==================
-      if (!isProblematicDomain) {  
-      const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
+    // 1. Check if we should skip Strategy 1 for problematic domains like TMZ
+    const isProblematicDomain = domain.includes("tmz.com");
+
+    try {
+      // ================== STRATEGY 1: Microlink API (Primary) ==================
+      // We skip this if it's a problematic domain so it falls through to fallbacks
+      if (!isProblematicDomain) {
+        const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
         const microlinkUrl =
-  `https://api.microlink.io/?url=${encodeURIComponent(url)}` +
-  `&wait=3000` +
-  `&screenshot=false` +
-  `&video=false&audio=false&iframe=false` +
-  `&palette=true&theme=light` +
-  (MICROLINK_API_KEY ? `&api_key=${MICROLINK_API_KEY}` : "");
+          `https://api.microlink.io/?url=${encodeURIComponent(url)}` +
+          `&wait=3000` +
+          `&screenshot=false` +
+          `&video=false&audio=false&iframe=false` +
+          `&palette=true&theme=light` +
+          (MICROLINK_API_KEY ? `&api_key=${MICROLINK_API_KEY}` : "");
 
         const microlinkResponse = await fetch(microlinkUrl, {
-          headers: {
-            'Accept': 'application/json',
-          },
+          headers: { 'Accept': 'application/json' },
           signal: AbortSignal.timeout(8000)
         });
 
@@ -192,194 +192,118 @@ const domain = getDomainFromUrl(url);
           if (isMounted && microlinkData.data) {
             const data = microlinkData.data;
             
-            // Process and clean the data
+            // Image processing logic
             const isLogoish = (u) => {
-  const s = String(u || "").toLowerCase();
-  return (
-    s.includes("logo") ||
-    s.includes("icon") ||
-    s.includes("favicon") ||
-    s.includes("apple-touch-icon") ||
-    s.includes("sprite") ||
-    s.includes("badge") ||
-    s.includes("brand")
-  );
-};
+              const s = String(u || "").toLowerCase();
+              return (s.includes("logo") || s.includes("icon") || s.includes("favicon"));
+            };
 
-const fallbackTitle = getFallbackTitleFromUrl(url, domain);
+            const ogImageUrl = data.image?.url || null;
+            const logoUrl = data.logo?.url || null;
+            let imageUrl = null;
+            let imageType = "none";
 
-const screenshotUrl = data.screenshot?.url || null;
-const ogImageUrl = data.image?.url || null;
-const logoUrl = data.logo?.url || null;
-
-let imageUrl = null;
-let imageType = "none";
-
-// Prefer real article/OG image first
-if (ogImageUrl && !isLogoish(ogImageUrl)) {
-  imageUrl = ogImageUrl;
-  imageType = "og";
-} else if (screenshotUrl) {
-  imageUrl = screenshotUrl;
-  imageType = "screenshot";
-} else if (ogImageUrl) {
-  imageUrl = ogImageUrl;
-  imageType = "logoish-og";
-} else if (logoUrl) {
-  imageUrl = logoUrl;
-  imageType = "logo";
-}
-
-console.log("PREVIEW DEBUG", {
-  url,
-  ogImage: ogImageUrl,
-  screenshot: screenshotUrl,
-  logo: logoUrl,
-  chosenImage: imageUrl,
-  imageType
-});
-            
-            // Ensure image URL is absolute
-            if (imageUrl && imageUrl.startsWith('//')) {
-              imageUrl = 'https:' + imageUrl;
-            } else if (imageUrl && imageUrl.startsWith('/')) {
-              imageUrl = `https://${domain}${imageUrl}`;
+            if (ogImageUrl && !isLogoish(ogImageUrl)) {
+              imageUrl = ogImageUrl;
+              imageType = "og";
+            } else if (logoUrl) {
+              imageUrl = logoUrl;
+              imageType = "logo";
             }
 
+            if (imageUrl && imageUrl.startsWith('//')) imageUrl = 'https:' + imageUrl;
+
+            // 2. Safety pause to let assets settle before rendering
             await new Promise(resolve => setTimeout(resolve, 300));
-            
-            setPreviewData({
-  title: data.title || getFallbackTitleFromUrl(url, domain),
-  description: data.description
-    ? (data.description.length > 150
-        ? data.description.substring(0, 147) + "..."
-        : data.description)
-    : "",
-  image: imageUrl || getFaviconUrl(domain),
-  domain: data.publisher || domain,
-  url: data.url || url,
-  author: data.author || "",
-  date: data.date || "",
-  isSiteFallback: false,
-  imageType
-});
-            return;
-          }
-        }
-        
-        // ================== STRATEGY 2: LinkPreview API (Fallback) ==================
-        // Alternative free API that works well
-        const linkPreviewUrl = `https://api.linkpreview.net/?key=${import.meta.env.VITE_LINKPREVIEW_API_KEY || '5b576'}&q=${encodeURIComponent(url)}`;
-        
-        const linkPreviewResponse = await fetch(linkPreviewUrl, {
-          signal: AbortSignal.timeout(5000)
-        });
 
-        if (linkPreviewResponse.ok) {
-          const linkPreviewData = await linkPreviewResponse.json();
-          
-          if (isMounted && linkPreviewData) {
             setPreviewData({
-              title: linkPreviewData.title || getFallbackTitleFromUrl(url, domain),
-              description: linkPreviewData.description ? 
-                          (linkPreviewData.description.length > 150 ? linkPreviewData.description.substring(0, 147) + '...' : linkPreviewData.description) : '',
-              image: linkPreviewData.image || getFaviconUrl(domain),
-              domain: linkPreviewData.url ? getDomainFromUrl(linkPreviewData.url) : domain,
-              url: linkPreviewData.url || url
+              title: data.title || getFallbackTitleFromUrl(url, domain),
+              description: data.description || "",
+              image: imageUrl || getFaviconUrl(domain),
+              domain: data.publisher || domain,
+              url: data.url || url,
+              author: data.author || "",
+              date: data.date || "",
+              isSiteFallback: false,
+              imageType
             });
-            return;
+            return; // 👈 This stops the function here if Strategy 1 succeeds
           }
         }
+      }
 
-        // ================== STRATEGY 3: Direct Open Graph Fetch with CORS Proxy ==================
-        // For sites that don't work with APIs
-        const corsProxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
-        
-        try {
-          const response = await fetch(corsProxyUrl, {
-            signal: AbortSignal.timeout(4000)
+      // ================== STRATEGY 2: LinkPreview API (Fallback) ==================
+      const linkPreviewUrl = `https://api.linkpreview.net/?key=${import.meta.env.VITE_LINKPREVIEW_API_KEY || '5b576'}&q=${encodeURIComponent(url)}`;
+      const linkPreviewResponse = await fetch(linkPreviewUrl, { signal: AbortSignal.timeout(5000) });
+
+      if (linkPreviewResponse.ok) {
+        const linkPreviewData = await linkPreviewResponse.json();
+        if (isMounted && linkPreviewData) {
+          setPreviewData({
+            title: linkPreviewData.title || getFallbackTitleFromUrl(url, domain),
+            description: linkPreviewData.description || '',
+            image: linkPreviewData.image || getFaviconUrl(domain),
+            domain: linkPreviewData.url ? getDomainFromUrl(linkPreviewData.url) : domain,
+            url: linkPreviewData.url || url
           });
-          
-          if (response.ok) {
-            const html = await response.text();
-            
-            // Parse Open Graph and meta tags
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            
-            const ogTitle = doc.querySelector('meta[property="og:title"]')?.content;
-            const ogDescription = doc.querySelector('meta[property="og:description"]')?.content;
-            const ogImage = doc.querySelector('meta[property="og:image"]')?.content;
-            const ogSiteName = doc.querySelector('meta[property="og:site_name"]')?.content;
-            
-            const metaTitle = doc.querySelector('title')?.textContent;
-            const metaDescription = doc.querySelector('meta[name="description"]')?.content;
-            const metaImage = doc.querySelector('link[rel="image_src"]')?.href;
-            
-            // Process image URL to ensure it's absolute
-            let finalImage = ogImage || metaImage;
-            if (finalImage) {
-              if (finalImage.startsWith('//')) {
-                finalImage = 'https:' + finalImage;
-              } else if (finalImage.startsWith('/')) {
-                finalImage = `https://${domain}${finalImage}`;
-              }
-            }
-            
-            // Build final title
-            let finalTitle = ogTitle || metaTitle;
-if (!finalTitle || finalTitle.trim() === '') {
-  finalTitle = getFallbackTitleFromUrl(url, domain);
-}
-            
-            // Build final description
-            let finalDescription = ogDescription || metaDescription || '';
-            if (finalDescription.length > 150) {
-              finalDescription = finalDescription.substring(0, 147) + '...';
-            }
-            
-            if (isMounted) {
-              setPreviewData({
-                title: finalTitle,
-                description: finalDescription,
-                image: finalImage || getFaviconUrl(domain),
-                domain: ogSiteName || domain,
-                url: url
-              });
-              return;
-            }
-          }
-        } catch (proxyError) {
-          console.log('CORS proxy failed for:', domain, proxyError);
+          return;
         }
-        // ================== STRATEGY 4: Site-specific fallback ==================
-        const siteConfigs = {
-          "justjared.com": {
-            title: "Just Jared - Celebrity News & Photos",
-            description: "Breaking celebrity news, photos, and entertainment updates",
-            image: "https://www.justjared.com/images/justjared-logo-new.png"
-          },
-          "people.com": {
-            title: "People Magazine",
-            description: "Breaking celebrity news, entertainment stories and exclusive interviews",
-            image: "https://people.com/thmb/7fBSYpC6a31D0Mq9B5WgSdIBUZU=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/people_logo-d5e9f7d1e7f34f9eb8e7c26b7bb40d5e.png"
-          },
-          "tmz.com": {
-  title: "TMZ Celebrity News",
-  description: "Breaking the biggest stories in celebrity and entertainment news.",
-  image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/TMZLogo.svg/1200px-TMZLogo.svg.png" 
-},
-          "etonline.com": {
-            title: "Entertainment Tonight",
-            description: "Entertainment news, celebrity interviews, and TV gossip",
-            image: "https://www.etonline.com/sites/etonline.com/files/et_logo_0.png"
-          },
-          "eonline.com": {
-            title: "E! Online",
-            description: "Celebrity news, entertainment news, and pop culture coverage",
-            image: "https://www.eonline.com/favicon.ico"
-          }
-        };
+      }
+
+      // ================== STRATEGY 4: Site-specific fallback ==================
+      // This is where TMZ will land now!
+      const siteConfigs = {
+        "justjared.com": {
+          title: "Just Jared - Celebrity News",
+          image: "https://www.justjared.com/images/justjared-logo-new.png"
+        },
+        "tmz.com": {
+          title: "TMZ Celebrity News",
+          description: "Breaking the biggest stories in celebrity and entertainment news.",
+          image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/TMZLogo.svg/1200px-TMZLogo.svg.png"
+        }
+      };
+
+      const siteKey = Object.keys(siteConfigs).find((key) => domain.includes(key));
+
+      if (siteKey && isMounted) {
+        const config = siteConfigs[siteKey];
+        setPreviewData({
+          title: config.title || getFallbackTitleFromUrl(url, domain),
+          description: config.description || "",
+          image: config.image,
+          domain: siteKey,
+          url: url,
+          isSiteFallback: true
+        });
+        return;
+      }
+
+      // Final generic fallback if everything above fails
+      if (isMounted) {
+        setPreviewData({
+          title: getFallbackTitleFromUrl(url, domain),
+          description: "",
+          image: getFaviconUrl(domain),
+          domain: domain,
+          url: url
+        });
+      }
+
+    } catch (error) {
+      console.log('Preview error:', error);
+      if (isMounted) {
+        setPreviewData({
+          title: getFallbackTitleFromUrl(url, domain),
+          image: getFaviconUrl(domain),
+          domain: domain,
+          url: url
+        });
+      }
+    } finally {
+      if (isMounted) setLoading(false);
+    }
+  };
 
         const siteKey = Object.keys(siteConfigs).find((key) =>
           domain.includes(key.replace("www.", ""))
