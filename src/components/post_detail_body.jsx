@@ -157,237 +157,142 @@ const [loading, setLoading] = useState(true);
 const domain = getDomainFromUrl(url);
 
   useEffect(() => {
-  let isMounted = true;
+    let isMounted = true;
+    setPreviewData(null);
+    setLoading(true);
 
-  setPreviewData(null);
-  setLoading(true);
+    const fetchPreview = async () => {
+      if (!isMounted) return;
 
-  const fetchPreview = async () => {
-    if (!isMounted) return;
+      // 1. Skip Strategy 1 for TMZ to avoid the "Error" card
+      const isProblematicDomain = domain.includes("tmz.com");
 
-    // 1. Check if we should skip Strategy 1 for problematic domains like TMZ
-    const isProblematicDomain = domain.includes("tmz.com");
+      try {
+        // ================== STRATEGY 1: Microlink API ==================
+        if (!isProblematicDomain) {
+          const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
+          const microlinkUrl =
+            `https://api.microlink.io/?url=${encodeURIComponent(url)}` +
+            `&wait=3000&screenshot=false&video=false&audio=false&iframe=false&palette=true&theme=light` +
+            (MICROLINK_API_KEY ? `&api_key=${MICROLINK_API_KEY}` : "");
 
-    try {
-      // ================== STRATEGY 1: Microlink API (Primary) ==================
-      if (!isProblematicDomain) {
-        const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
-        const microlinkUrl =
-          `https://api.microlink.io/?url=${encodeURIComponent(url)}` +
-          `&wait=3000` +
-          `&screenshot=false` +
-          `&video=false&audio=false&iframe=false` +
-          `&palette=true&theme=light` +
-          (MICROLINK_API_KEY ? `&api_key=${MICROLINK_API_KEY}` : "");
+          const microlinkResponse = await fetch(microlinkUrl, {
+            headers: { 'Accept': 'application/json' },
+            signal: AbortSignal.timeout(8000)
+          });
 
-        const microlinkResponse = await fetch(microlinkUrl, {
-          headers: { 'Accept': 'application/json' },
-          signal: AbortSignal.timeout(8000)
-        });
+          if (microlinkResponse.ok) {
+            const microlinkData = await microlinkResponse.json();
+            if (isMounted && microlinkData.data) {
+              const data = microlinkData.data;
+              const isLogoish = (u) => {
+                const s = String(u || "").toLowerCase();
+                return (s.includes("logo") || s.includes("icon") || s.includes("favicon"));
+              };
 
-        if (microlinkResponse.ok) {
-          const microlinkData = await microlinkResponse.json();
-          
-          if (isMounted && microlinkData.data) {
-            const data = microlinkData.data;
-            
-            const isLogoish = (u) => {
-              const s = String(u || "").toLowerCase();
-              return (s.includes("logo") || s.includes("icon") || s.includes("favicon"));
-            };
+              const ogImageUrl = data.image?.url || null;
+              const logoUrl = data.logo?.url || null;
+              let imageUrl = null;
+              let imageType = "none";
 
-            const ogImageUrl = data.image?.url || null;
-            const logoUrl = data.logo?.url || null;
-            let imageUrl = null;
-            let imageType = "none";
+              if (ogImageUrl && !isLogoish(ogImageUrl)) {
+                imageUrl = ogImageUrl;
+                imageType = "og";
+              } else if (logoUrl) {
+                imageUrl = logoUrl;
+                imageType = "logo";
+              }
 
-            if (ogImageUrl && !isLogoish(ogImageUrl)) {
-              imageUrl = ogImageUrl;
-              imageType = "og";
-            } else if (logoUrl) {
-              imageUrl = logoUrl;
-              imageType = "logo";
+              if (imageUrl && imageUrl.startsWith('//')) imageUrl = 'https:' + imageUrl;
+
+              // SAFETY PAUSE: Wait 300ms so assets can load
+              await new Promise(resolve => setTimeout(resolve, 300));
+
+              setPreviewData({
+                title: data.title || getFallbackTitleFromUrl(url, domain),
+                description: data.description || "",
+                image: imageUrl || getFaviconUrl(domain),
+                domain: data.publisher || domain,
+                url: data.url || url,
+                author: data.author || "",
+                date: data.date || "",
+                isSiteFallback: false,
+                imageType
+              });
+              return;
             }
-
-            if (imageUrl && imageUrl.startsWith('//')) imageUrl = 'https:' + imageUrl;
-
-            // 2. Safety pause to let assets settle before rendering
-            await new Promise(resolve => setTimeout(resolve, 300));
-
-            setPreviewData({
-              title: data.title || getFallbackTitleFromUrl(url, domain),
-              description: data.description || "",
-              image: imageUrl || getFaviconUrl(domain),
-              domain: data.publisher || domain,
-              url: data.url || url,
-              author: data.author || "",
-              date: data.date || "",
-              isSiteFallback: false,
-              imageType
-            });
-            return; // Successful Strategy 1 - Stop here
           }
         }
-      }
 
-      // ================== STRATEGY 2: LinkPreview API (Fallback) ==================
-      const linkPreviewUrl = `https://api.linkpreview.net/?key=${import.meta.env.VITE_LINKPREVIEW_API_KEY || '5b576'}&q=${encodeURIComponent(url)}`;
-      const linkPreviewResponse = await fetch(linkPreviewUrl, { signal: AbortSignal.timeout(5000) });
+        // ================== STRATEGY 2: Fallback API ==================
+        const linkPreviewUrl = `https://api.linkpreview.net/?key=${import.meta.env.VITE_LINKPREVIEW_API_KEY || '5b576'}&q=${encodeURIComponent(url)}`;
+        const lpRes = await fetch(linkPreviewUrl, { signal: AbortSignal.timeout(5000) });
 
-      if (linkPreviewResponse.ok) {
-        const linkPreviewData = await linkPreviewResponse.json();
-        if (isMounted && linkPreviewData) {
-          setPreviewData({
-            title: linkPreviewData.title || getFallbackTitleFromUrl(url, domain),
-            description: linkPreviewData.description || '',
-            image: linkPreviewData.image || getFaviconUrl(domain),
-            domain: linkPreviewData.url ? getDomainFromUrl(linkPreviewData.url) : domain,
-            url: linkPreviewData.url || url
-          });
-          return; // Successful Strategy 2 - Stop here
+        if (lpRes.ok) {
+          const lpData = await lpRes.json();
+          if (isMounted && lpData) {
+            setPreviewData({
+              title: lpData.title || getFallbackTitleFromUrl(url, domain),
+              description: lpData.description || '',
+              image: lpData.image || getFaviconUrl(domain),
+              domain: lpData.url ? getDomainFromUrl(lpData.url) : domain,
+              url: lpData.url || url
+            });
+            return;
+          }
         }
-      }
 
-      // ================== STRATEGY 4: Site-specific fallback ==================
-      const siteConfigs = {
-        "justjared.com": {
-          title: "Just Jared - Celebrity News",
-          image: "https://www.justjared.com/images/justjared-logo-new.png"
-        },
-        "tmz.com": {
-          title: "TMZ Celebrity News",
-          description: "Breaking the biggest stories in celebrity and entertainment news.",
-          image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/TMZLogo.svg/1200px-TMZLogo.svg.png"
-        }
-      };
+        // ================== STRATEGY 4: Branded Fixes ==================
+        const siteConfigs = {
+          "justjared.com": {
+            title: "Just Jared - Celebrity News",
+            image: "https://www.justjared.com/images/justjared-logo-new.png"
+          },
+          "tmz.com": {
+            title: "TMZ Celebrity News",
+            description: "Breaking the biggest stories in celebrity and entertainment news.",
+            image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/TMZLogo.svg/1200px-TMZLogo.svg.png"
+          }
+        };
 
-      const siteKey = Object.keys(siteConfigs).find((key) => domain.includes(key));
-
-      if (siteKey && isMounted) {
-        const config = siteConfigs[siteKey];
-        setPreviewData({
-          title: config.title || getFallbackTitleFromUrl(url, domain),
-          description: config.description || "",
-          image: config.image,
-          domain: siteKey,
-          url: url,
-          isSiteFallback: true
-        });
-        return;
-      }
-
-      // Final generic fallback if all else fails
-      if (isMounted) {
-        setPreviewData({
-          title: getFallbackTitleFromUrl(url, domain),
-          description: "",
-          image: getFaviconUrl(domain),
-          domain: domain,
-          url: url
-        });
-      }
-
-    } catch (error) {
-      console.log('Preview error:', error);
-      if (isMounted) {
-        setPreviewData({
-          title: getFallbackTitleFromUrl(url, domain),
-          image: getFaviconUrl(domain),
-          domain: domain,
-          url: url
-        });
-      }
-    } finally {
-      if (isMounted) setLoading(false);
-    }
-  };
-
-      const siteKey = Object.keys(siteConfigs).find((key) => domain.includes(key));
-
-      if (siteKey && isMounted) {
-        const config = siteConfigs[siteKey];
-        setPreviewData({
-          title: config.title || getFallbackTitleFromUrl(url, domain),
-          description: config.description || "",
-          image: config.image,
-          domain: siteKey,
-          url: url,
-          isSiteFallback: true
-        });
-        return;
-      }
-
-      // Final generic fallback if everything above fails
-      if (isMounted) {
-        setPreviewData({
-          title: getFallbackTitleFromUrl(url, domain),
-          description: "",
-          image: getFaviconUrl(domain),
-          domain: domain,
-          url: url
-        });
-      }
-
-    } catch (error) {
-      console.log('Preview error:', error);
-      if (isMounted) {
-        setPreviewData({
-          title: getFallbackTitleFromUrl(url, domain),
-          image: getFaviconUrl(domain),
-          domain: domain,
-          url: url
-        });
-      }
-    } finally {
-      if (isMounted) setLoading(false);
-    }
-  };
-
-        const siteKey = Object.keys(siteConfigs).find((key) =>
-          domain.includes(key.replace("www.", ""))
-        );
+        const siteKey = Object.keys(siteConfigs).find((key) => domain.includes(key));
 
         if (siteKey && isMounted) {
           const config = siteConfigs[siteKey];
           setPreviewData({
-  title: config.title || getFallbackTitleFromUrl(url, domain),
-  description: config.description,
-  image: config.image,
-  domain: siteKey,
-  url: url,
-  isSiteFallback: true
-});
+            title: config.title || getFallbackTitleFromUrl(url, domain),
+            description: config.description || "",
+            image: config.image,
+            domain: siteKey,
+            url: url,
+            isSiteFallback: true
+          });
           return;
         }
 
-        // ================== STRATEGY 5: Final generic fallback ==================
-if (isMounted) {
-  setPreviewData({
-    title: getFallbackTitleFromUrl(url, domain),
-    description: "",
-    image: getFaviconUrl(domain),
-    domain: domain,
-    url: url
-  });
-  return;
-}
+        // Final generic fallback
+        if (isMounted) {
+          setPreviewData({
+            title: getFallbackTitleFromUrl(url, domain),
+            description: "",
+            image: getFaviconUrl(domain),
+            domain: domain,
+            url: url
+          });
+        }
 
       } catch (error) {
-        console.log('Link preview error for', url, error);
-        
+        console.log('Preview error:', error);
         if (isMounted) {
-  setPreviewData({
-    title: getFallbackTitleFromUrl(url, domain),
-    description: '',
-    image: getFaviconUrl(domain),
-    domain: domain,
-    url: url
-  });
-}
-      } finally {
-        if (isMounted) {
-          setLoading(false);
+          setPreviewData({
+            title: getFallbackTitleFromUrl(url, domain),
+            image: getFaviconUrl(domain),
+            domain: domain,
+            url: url
+          });
         }
+      } finally {
+        if (isMounted) setLoading(false);
       }
     };
 
@@ -413,62 +318,53 @@ if (isMounted) {
       </div>
     );
   }
-const isFallbackFavicon = (imageUrl) => {
-  if (!imageUrl) return true;
-  const s = String(imageUrl).toLowerCase();
-  return s.includes("google.com/s2/favicons");
-};
 
-const hasUsableImage =
-  !!previewData?.image &&
-  !isFallbackFavicon(previewData.image) &&
-  !previewData?.isSiteFallback &&
-  (previewData?.imageType === "og" || previewData?.imageType === "screenshot");
-  
+  const isFallbackFavicon = (imageUrl) => {
+    if (!imageUrl) return true;
+    const s = String(imageUrl).toLowerCase();
+    return s.includes("google.com/s2/favicons");
+  };
+
+  const hasUsableImage =
+    !!previewData?.image &&
+    !isFallbackFavicon(previewData.image) &&
+    !previewData?.isSiteFallback &&
+    (previewData?.imageType === "og" || previewData?.imageType === "screenshot");
+
   if (!hasUsableImage) {
-  return (
-    <a
-      href={previewData.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
-    >
-      <div className="flex items-center gap-3">
-        <img
-          src={getFaviconUrl(domain)}
-          alt={domain}
-          className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm flex-shrink-0"
-        />
-        <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-[#8e3e3e] transition-colors">
-            {previewData.title}
-          </h3>
-          <div className="flex items-center justify-between mt-1">
-            <span className="text-xs text-gray-500 truncate">
-              {previewData.domain}
-            </span>
-            <span className="flex items-center gap-1 text-xs font-semibold text-[#8e3e3e]">
-              Read article
-              <svg
-                className="w-3 h-3 transform group-hover:translate-x-1 transition-transform"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M14 5l7 7m0 0l-7 7m7-7H3"
-                />
-              </svg>
-            </span>
+    return (
+      <a
+        href={previewData.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
+      >
+        <div className="flex items-center gap-3">
+          <img
+            src={getFaviconUrl(domain)}
+            alt={domain}
+            className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm flex-shrink-0"
+          />
+          <div className="flex-1 min-w-0">
+            <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-[#8e3e3e] transition-colors">
+              {previewData.title}
+            </h3>
+            <div className="flex items-center justify-between mt-1">
+              <span className="text-xs text-gray-500 truncate">
+                {previewData.domain}
+              </span>
+              <span className="flex items-center gap-1 text-xs font-semibold text-[#8e3e3e]">
+                Read article
+                <svg className="w-3 h-3 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </span>
+            </div>
           </div>
         </div>
-      </div>
-    </a>
-  );
-}
+      </a>
+    );
+  }
 
   return (
     <a
@@ -477,92 +373,52 @@ const hasUsableImage =
       rel="noopener noreferrer"
       className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
     >
-      {/* Thumbnail image with gradient overlay */}
       <div className="h-48 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 relative">
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-60 z-10"></div>
         <img
-  src={previewData.image}
-  alt={previewData.title}
-  /* Changing object-cover to object-contain ensures the WHOLE photo fits. 
-     p-2 adds a tiny bit of breathing room so the edges don't touch the border.
-  */
-  className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500 ease-out"
-  onError={(e) => {
-    // If image fails to load, replace with a nice favicon container
-    e.target.style.display = 'none';
-    const parent = e.target.parentElement;
-    
-    // Check if fallback already exists to prevent duplicates
-    if (parent.querySelector('.fallback-container')) return;
-
-    const fallback = document.createElement('div');
-    fallback.className = 'fallback-container w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#8e3e3e]/10 to-red-100';
-    
-    const favicon = document.createElement('img');
-    favicon.src = getFaviconUrl(domain);
-    favicon.className = 'w-12 h-12 mb-3 opacity-70';
-    favicon.alt = 'Website favicon';
-    
-    const domainText = document.createElement('span');
-    domainText.className = 'text-sm text-gray-500 font-medium';
-    domainText.textContent = domain.replace('www.', '');
-    
-    fallback.appendChild(favicon);
-    fallback.appendChild(domainText);
-    parent.appendChild(fallback);
-  }}
-/>
-        
-        {/* Hover gradient overlay */}
+          src={previewData.image}
+          alt={previewData.title}
+          className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500 ease-out"
+          onError={(e) => {
+            e.target.style.display = 'none';
+            const parent = e.target.parentElement;
+            if (parent.querySelector('.fallback-container')) return;
+            const fallback = document.createElement('div');
+            fallback.className = 'fallback-container w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#8e3e3e]/10 to-red-100';
+            const favicon = document.createElement('img');
+            favicon.src = getFaviconUrl(domain);
+            favicon.className = 'w-12 h-12 mb-3 opacity-70';
+            const domainText = document.createElement('span');
+            domainText.className = 'text-sm text-gray-500 font-medium';
+            domainText.textContent = domain.replace('www.', '');
+            fallback.appendChild(favicon);
+            fallback.appendChild(domainText);
+            parent.appendChild(fallback);
+          }}
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-[#8e3e3e]/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20"></div>
       </div>
-      
-      {/* Content area */}
       <div className="p-5">
         <div className="flex items-start gap-4">
-          {/* Favicon badge */}
           <div className="flex-shrink-0">
             <div className="relative">
-              <img
-                src={getFaviconUrl(domain)}
-                alt={domain}
-                className="w-8 h-8 rounded-lg border border-gray-200 shadow-sm"
-              />
+              <img src={getFaviconUrl(domain)} alt={domain} className="w-8 h-8 rounded-lg border border-gray-200 shadow-sm" />
               <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white"></div>
             </div>
           </div>
-          
-          {/* Text content */}
           <div className="flex-1 min-w-0">
-            {/* Title with gradient text on hover */}
             <h3 className="text-base font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#8e3e3e] group-hover:to-red-500 transition-all duration-300">
               {previewData.title}
             </h3>
-            
-            {/* Description */}
             {previewData.description && (
               <p className="text-sm text-gray-600 mb-3 line-clamp-2 leading-relaxed">
                 {previewData.description}
               </p>
             )}
-            
-            {/* Metadata row */}
             <div className="flex items-center justify-between pt-2 border-t border-gray-100">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-500 truncate">
-                  {previewData.domain}
-                </span>
-                {previewData.author && (
-                  <>
-                    <span className="text-gray-300">•</span>
-                    <span className="text-xs text-gray-400 truncate">
-                      {previewData.author}
-                    </span>
-                  </>
-                )}
+                <span className="text-xs font-medium text-gray-500 truncate">{previewData.domain}</span>
               </div>
-              
-              {/* CTA button */}
               <span className="flex items-center gap-1 text-xs font-semibold text-[#8e3e3e] group-hover:text-red-600 transition-colors">
                 Read article
                 <svg className="w-3 h-3 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -575,7 +431,6 @@ const hasUsableImage =
       </div>
     </a>
   );
-}
 
 function TwitterFallbackCard({ url }) {
   return (
