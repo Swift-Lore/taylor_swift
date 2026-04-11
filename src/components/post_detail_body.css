@@ -304,19 +304,13 @@
   align-items: flex-start; /* Ensures everything in this row aligns to the top */
 }
 
-/* Instagram Loading State Fix */
 .instagram-media {
-    min-width: 375px !important; 
-    width: 100% !important;
-    max-width: 540px !important;
-    margin: 0 auto !important;
-    /* Keeps the box smaller while loading */
-    min-height: 250px !important; 
-    /* Semi-transparent 'ghost' look instead of a solid white wall */
-    background: rgba(255, 255, 255, 0.1) !important;
-    border: 1px dashed #cbd5e1 !important;
-    border-radius: 12px !important;
-    transition: all 0.3s ease;
+  min-width: 326px !important;
+  width: 100% !important;
+  max-width: 540px !important;
+  margin: 0 auto !important;
+  /* This height is crucial; if it's too short, the date disappears */
+  min-height: 580px !important; 
 }
 
 /* Specific fix to prevent the bottom of the iframe from being cut off */
