@@ -363,9 +363,9 @@ if (!finalTitle || finalTitle.trim() === '') {
             image: "https://people.com/thmb/7fBSYpC6a31D0Mq9B5WgSdIBUZU=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/people_logo-d5e9f7d1e7f34f9eb8e7c26b7bb40d5e.png"
           },
           "tmz.com": {
-  title: "TMZ - Celebrity News",
-  description: "Breaking celebrity gossip and entertainment news from TMZ.",
-  image: "https://image.tmz.com/2021/01/26/tmz-logo-1200x630.jpg" // Updated to a reliable OG image URL
+  title: "TMZ Celebrity News",
+  description: "Breaking celebrity gossip and entertainment news.",
+  image: "https://image.tmz.com/2021/01/26/tmz-logo-1200x630.jpg"
 },
           "etonline.com": {
             title: "Entertainment Tonight",
