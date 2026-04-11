@@ -169,10 +169,7 @@ function LinkPreview({ url }) {
       try {
         if (!isProblematicDomain) {
           const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
-          const microlinkUrl =
-            `https://api.microlink.io/?url=${encodeURIComponent(url)}` +
-            `&wait=3000&screenshot=false&video=false&audio=false&iframe=false&palette=true&theme=light` +
-            (MICROLINK_API_KEY ? `&api_key=${MICROLINK_API_KEY}` : "");
+          const microlinkUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&ttl=2592000&proxy=true&palette=true`;
 
           const microlinkResponse = await fetch(microlinkUrl, {
             headers: { 'Accept': 'application/json' },
