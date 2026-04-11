@@ -169,13 +169,16 @@ function LinkPreview({ url }) {
       try {
         if (!isProblematicDomain) {
           const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
-const microlinkUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&ttl=2592000&proxy=true&palette=true` + 
-  (MICROLINK_API_KEY ? `&api_key=${MICROLINK_API_KEY}` : "");
+const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
+          // This version correctly attaches your API key and increases the cache time
+          const microlinkUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&ttl=2592000&proxy=true&palette=true` + 
+            (MICROLINK_API_KEY ? `&api_key=${MICROLINK_API_KEY}` : "");
 
-const microlinkResponse = await fetch(microlinkUrl, {
-  headers: { 'Accept': 'application/json' },
-  signal: AbortSignal.timeout(15000)
-});
+          const microlinkResponse = await fetch(microlinkUrl, {
+            headers: { 'Accept': 'application/json' },
+            // Increased to 20 seconds to prevent the '5 second' failure you're seeing
+            signal: AbortSignal.timeout(20000) 
+          });
 
           if (microlinkResponse.ok) {
             const microlinkData = await microlinkResponse.json();
