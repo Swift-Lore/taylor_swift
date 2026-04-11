@@ -173,7 +173,7 @@ const domain = getDomainFromUrl(url);
         const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
         const microlinkUrl =
   `https://api.microlink.io/?url=${encodeURIComponent(url)}` +
-  `&wait=1500` +
+  `&wait=3000` +
   `&screenshot=false` +
   `&video=false&audio=false&iframe=false` +
   `&palette=true&theme=light` +
