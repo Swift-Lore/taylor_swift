@@ -170,7 +170,6 @@ const domain = getDomainFromUrl(url);
 
     try {
       // ================== STRATEGY 1: Microlink API (Primary) ==================
-      // We skip this if it's a problematic domain so it falls through to fallbacks
       if (!isProblematicDomain) {
         const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
         const microlinkUrl =
@@ -192,7 +191,6 @@ const domain = getDomainFromUrl(url);
           if (isMounted && microlinkData.data) {
             const data = microlinkData.data;
             
-            // Image processing logic
             const isLogoish = (u) => {
               const s = String(u || "").toLowerCase();
               return (s.includes("logo") || s.includes("icon") || s.includes("favicon"));
@@ -227,7 +225,7 @@ const domain = getDomainFromUrl(url);
               isSiteFallback: false,
               imageType
             });
-            return; // 👈 This stops the function here if Strategy 1 succeeds
+            return; // Successful Strategy 1 - Stop here
           }
         }
       }
@@ -246,12 +244,11 @@ const domain = getDomainFromUrl(url);
             domain: linkPreviewData.url ? getDomainFromUrl(linkPreviewData.url) : domain,
             url: linkPreviewData.url || url
           });
-          return;
+          return; // Successful Strategy 2 - Stop here
         }
       }
 
       // ================== STRATEGY 4: Site-specific fallback ==================
-      // This is where TMZ will land now!
       const siteConfigs = {
         "justjared.com": {
           title: "Just Jared - Celebrity News",
@@ -263,6 +260,47 @@ const domain = getDomainFromUrl(url);
           image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/TMZLogo.svg/1200px-TMZLogo.svg.png"
         }
       };
+
+      const siteKey = Object.keys(siteConfigs).find((key) => domain.includes(key));
+
+      if (siteKey && isMounted) {
+        const config = siteConfigs[siteKey];
+        setPreviewData({
+          title: config.title || getFallbackTitleFromUrl(url, domain),
+          description: config.description || "",
+          image: config.image,
+          domain: siteKey,
+          url: url,
+          isSiteFallback: true
+        });
+        return;
+      }
+
+      // Final generic fallback if all else fails
+      if (isMounted) {
+        setPreviewData({
+          title: getFallbackTitleFromUrl(url, domain),
+          description: "",
+          image: getFaviconUrl(domain),
+          domain: domain,
+          url: url
+        });
+      }
+
+    } catch (error) {
+      console.log('Preview error:', error);
+      if (isMounted) {
+        setPreviewData({
+          title: getFallbackTitleFromUrl(url, domain),
+          image: getFaviconUrl(domain),
+          domain: domain,
+          url: url
+        });
+      }
+    } finally {
+      if (isMounted) setLoading(false);
+    }
+  };
 
       const siteKey = Object.keys(siteConfigs).find((key) => domain.includes(key));
 
