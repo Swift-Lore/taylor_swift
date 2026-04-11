@@ -921,7 +921,7 @@ const getEmbedJustifyClass = (count) => {
 
           {hasSources && (
             <div className="space-y-6">
-             {sourceImages.length > 0 && (
+              {sourceImages.length > 0 && (
                 <div className="image-only-grid flex flex-wrap gap-6 justify-start mb-8">
                   {sourceImages.map((url, index) => {
                     const isPinterest = isPinterestUrl(url);
@@ -979,36 +979,6 @@ const getEmbedJustifyClass = (count) => {
                       </a>
                     );
                   })}
-                </div>
-              )}
-
-  return (
-    <a
-      key={`img-${index}`}
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group relative flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-all"
-      style={{ width: "500px", height: "400px" }}
-    >
-      <img
-        src={url}
-        alt="Source"
-        className="max-w-full max-h-full object-contain cursor-pointer"
-        loading="lazy"
-      />
-      <span className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs p-1 opacity-0 group-hover:opacity-100 transition-opacity truncate text-center">
-        {(() => {
-          try {
-            return new URL(url).hostname.replace("www.", "");
-          } catch {
-            return "Source";
-          }
-        })()}
-      </span>
-    </a>
-  );
-})}
                 </div>
               )}
 
