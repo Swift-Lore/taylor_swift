@@ -164,7 +164,8 @@ const domain = getDomainFromUrl(url);
 
   const fetchPreview = async () => {
     if (!isMounted) return;
-
+// 1. Check if we should skip Strategy 1 for specific problematic domains
+  const isProblematicDomain = domain.includes("tmz.com");
     try {
 
         // ================== STRATEGY 1: Microlink API (Primary) ==================
