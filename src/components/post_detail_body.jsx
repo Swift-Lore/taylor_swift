@@ -246,6 +246,8 @@ console.log("PREVIEW DEBUG", {
               imageUrl = `https://${domain}${imageUrl}`;
             }
 
+            await new Promise(resolve => setTimeout(resolve, 300));
+            
             setPreviewData({
   title: data.title || getFallbackTitleFromUrl(url, domain),
   description: data.description
