@@ -1216,7 +1216,7 @@ if (isFacebook) {
                         border: "1px solid #dbdbdb",
                         boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                         margin: "0",
-                        width: "326px",
+                        width: "360px",
                         padding: "0",
                         display: "block"
                       }}
