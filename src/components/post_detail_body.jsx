@@ -921,61 +921,66 @@ const getEmbedJustifyClass = (count) => {
 
           {hasSources && (
             <div className="space-y-6">
-              {sourceImages.length > 0 && (
-                <div className="image-only-grid flex flex-wrap gap-6 justify-start">
+             {sourceImages.length > 0 && (
+                <div className="image-only-grid flex flex-wrap gap-6 justify-start mb-8">
                   {sourceImages.map((url, index) => {
-  const isPinterest = isPinterestUrl(url);
-  const pinId = getPinterestPinId(url);
+                    const isPinterest = isPinterestUrl(url);
+                    const pinId = getPinterestPinId(url);
+                    const domain = getDomainFromUrl(url);
 
-  if (isPinterest && pinId) {
-    return (
-      <div
-        key={`img-${index}`}
-        className="group relative bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-all"
-        style={{ width: "345px", height: "460px" }}
-      >
-        <iframe
-          src={`https://assets.pinterest.com/ext/embed.html?id=${pinId}`}
-          width="345"
-          height="460"
-          frameBorder="0"
-          scrolling="no"
-          style={{
-            display: "block",
-            width: "345px",
-            height: "460px",
-            border: "0",
-            overflow: "hidden"
-          }}
-        />
-      </div>
-    );
-  }
+                    if (isPinterest && pinId) {
+                      return (
+                        <div
+                          key={`img-${index}`}
+                          className="group relative bg-gray-100 rounded-xl overflow-hidden border border-gray-200 hover:shadow-lg transition-all duration-300 hover:border-red-400"
+                          style={{ width: "420px", height: "300px" }}
+                        >
+                          <iframe
+                            src={`https://assets.pinterest.com/ext/embed.html?id=${pinId}`}
+                            width="100%"
+                            height="100%"
+                            frameBorder="0"
+                            scrolling="no"
+                            style={{ border: "0", overflow: "hidden" }}
+                          />
+                        </div>
+                      );
+                    }
 
-  if (isPinterest) {
-    return (
-      <a
-        key={`img-${index}`}
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="group relative flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-all"
-        style={{ width: "345px", height: "220px" }}
-      >
-        <div className="flex items-center gap-3 px-4">
-          <img
-            src={getFaviconUrl("pinterest.com")}
-            alt="Pinterest"
-            className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm flex-shrink-0"
-          />
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-gray-900">Pinterest Pin</p>
-            <p className="text-xs text-gray-500 truncate">pinterest.com</p>
-          </div>
-        </div>
-      </a>
-    );
-  }
+                    return (
+                      <a
+                        key={`img-${index}`}
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group relative flex flex-col bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1"
+                        style={{ width: "420px", height: "300px" }}
+                        onClick={(e) => {
+                          // Prevent link click if you want the modal to open instead
+                          // e.preventDefault();
+                          // setSelectedImageIndex(sourceImages.indexOf(url) + (event.IMAGE?.length || 0));
+                          // setIsModalOpen(true);
+                        }}
+                      >
+                        <div className="h-full w-full overflow-hidden bg-gray-50">
+                          <img
+                            src={url}
+                            alt="Source Content"
+                            className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500"
+                            loading="lazy"
+                          />
+                        </div>
+                        <div className="absolute bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-gray-100 p-2 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                           <div className="flex items-center gap-2">
+                             <img src={getFaviconUrl(domain)} className="w-4 h-4" alt="icon" />
+                             <span className="text-xs font-medium text-gray-600 truncate">{domain}</span>
+                           </div>
+                        </div>
+                      </a>
+                    );
+                  })}
+                </div>
+              )}
 
   return (
     <a
