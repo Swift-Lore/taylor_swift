@@ -168,7 +168,6 @@ function LinkPreview({ url }) {
 
       try {
         if (!isProblematicDomain) {
-          const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
 const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
           // This version correctly attaches your API key and increases the cache time
           const microlinkUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&ttl=2592000&proxy=true&palette=true` + 
