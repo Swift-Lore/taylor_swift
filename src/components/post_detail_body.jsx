@@ -1186,38 +1186,43 @@ if (isFacebook) {
 
       {/* Instagram */}
       {event.INSTAGRAM && (
-  <section className="w-full px-4 mb-10">
-    <div
-      className={`flex flex-wrap gap-6 mt-2 max-w-[1400px] mx-auto ${getEmbedJustifyClass(
-        instagramUrls.length
-      )}`}
-    >
-      {instagramUrls.map((url, index) => (
-        <div
-          key={index}
-          className="instagram-container flex-shrink-0"
-          style={{ width: "320px" }}
-        >
-          <blockquote
-            className="instagram-media"
-            data-instgrm-permalink={url}
-            data-instgrm-version="14"
-            style={{
-              background: "#FFF",
-              borderRadius: "8px",
-              border: "1px solid #dbdbdb",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-              margin: "0",
-              width: "320px",
-              minWidth: "320px",
-              padding: "0",
-            }}
-          ></blockquote>
-        </div>
-      ))}
-    </div>
-  </section>
-)}
+        <section className="w-full px-4 mb-10">
+          <div
+            className={`flex flex-wrap gap-6 mt-2 max-w-[1400px] mx-auto ${getEmbedJustifyClass(
+              instagramUrls.length
+            )}`}
+          >
+            {instagramUrls.map((url, index) => (
+              <div
+                key={index}
+                className="instagram-wrapper"
+                style={{ width: "326px", minHeight: "400px" }}
+              >
+                <blockquote
+                  className="instagram-media"
+                  data-instgrm-captioned
+                  data-instgrm-permalink={url}
+                  data-instgrm-version="14"
+                  style={{
+                    background: "#FFF",
+                    borderRadius: "8px",
+                    border: "1px solid #dbdbdb",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                    margin: "0",
+                    width: "326px",
+                    padding: "0",
+                  }}
+                >
+                  {/* Fallback card shows ONLY if the post won't load */}
+                  <div style={{ padding: "20px" }}>
+                    <InstagramFallbackCard url={url} />
+                  </div>
+                </blockquote>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
                   {/* Twitter / X */}
       {event.TWITTER && (
