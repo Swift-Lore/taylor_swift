@@ -1192,34 +1192,50 @@ if (isFacebook) {
               instagramUrls.length
             )}`}
           >
-            {instagramUrls.map((url, index) => (
-              <div
-                key={index}
-                className="instagram-wrapper"
-                style={{ width: "326px", minHeight: "400px" }}
-              >
-                <blockquote
-                  className="instagram-media"
-                  data-instgrm-captioned
-                  data-instgrm-permalink={url}
-                  data-instgrm-version="14"
-                  style={{
-                    background: "#FFF",
-                    borderRadius: "8px",
-                    border: "1px solid #dbdbdb",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                    margin: "0",
-                    width: "326px",
-                    padding: "0",
-                  }}
+            {instagramUrls.map((url, index) => {
+              // We check if this is the problematic Travis Kelce post to show the card immediately
+              const isTravisPost = url.includes("DMgXbQ0yWqW");
+
+              return (
+                <div
+                  key={index}
+                  className="instagram-container flex flex-col items-center"
+                  style={{ width: "326px" }}
                 >
-                  {/* Fallback card shows ONLY if the post won't load */}
-                  <div style={{ padding: "20px" }}>
+                  {isTravisPost ? (
                     <InstagramFallbackCard url={url} />
-                  </div>
-                </blockquote>
-              </div>
-            ))}
+                  ) : (
+                    <blockquote
+                      className="instagram-media"
+                      data-instgrm-captioned
+                      data-instgrm-permalink={url}
+                      data-instgrm-version="14"
+                      style={{
+                        background: "#FFF",
+                        borderRadius: "8px",
+                        border: "1px solid #dbdbdb",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                        margin: "0",
+                        width: "326px",
+                        padding: "0",
+                        display: "block"
+                      }}
+                    >
+                      <div style={{ padding: "16px" }}>
+                        <a 
+                          href={url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-500 text-sm font-medium"
+                        >
+                          Loading Instagram post...
+                        </a>
+                      </div>
+                    </blockquote>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </section>
       )}
