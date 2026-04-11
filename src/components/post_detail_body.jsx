@@ -169,12 +169,13 @@ function LinkPreview({ url }) {
       try {
         if (!isProblematicDomain) {
           const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
-          const microlinkUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&ttl=2592000&proxy=true&palette=true`;
+const microlinkUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&ttl=2592000&proxy=true&palette=true` + 
+  (MICROLINK_API_KEY ? `&api_key=${MICROLINK_API_KEY}` : "");
 
-          const microlinkResponse = await fetch(microlinkUrl, {
-            headers: { 'Accept': 'application/json' },
-            signal: AbortSignal.timeout(8000)
-          });
+const microlinkResponse = await fetch(microlinkUrl, {
+  headers: { 'Accept': 'application/json' },
+  signal: AbortSignal.timeout(15000)
+});
 
           if (microlinkResponse.ok) {
             const microlinkData = await microlinkResponse.json();
