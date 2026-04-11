@@ -153,358 +153,161 @@ const getFallbackTitleFromUrl = (url, domain) => {
 
 function LinkPreview({ url }) {
   const [previewData, setPreviewData] = useState(null);
-const [loading, setLoading] = useState(true);
-const domain = getDomainFromUrl(url);
+  const [loading, setLoading] = useState(true);
+  const domain = getDomainFromUrl(url);
 
   useEffect(() => {
-  let isMounted = true;
+    let isMounted = true;
+    setPreviewData(null);
+    setLoading(true);
 
-  setPreviewData(null);
-  setLoading(true);
+    const fetchPreview = async () => {
+      if (!isMounted) return;
 
-  const fetchPreview = async () => {
-    if (!isMounted) return;
+      const isProblematicDomain = domain.includes("tmz.com");
 
-    try {
+      try {
+        if (!isProblematicDomain) {
+          const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
+          const microlinkUrl =
+            `https://api.microlink.io/?url=${encodeURIComponent(url)}` +
+            `&wait=3000&screenshot=false&video=false&audio=false&iframe=false&palette=true&theme=light` +
+            (MICROLINK_API_KEY ? `&api_key=${MICROLINK_API_KEY}` : "");
 
-        // ================== STRATEGY 1: Microlink API (Primary) ==================
-        // Microlink provides the most reliable previews with screenshot capability
-        // Get a free API key from https://microlink.io/
-        const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
-        const microlinkUrl =
-  `https://api.microlink.io/?url=${encodeURIComponent(url)}` +
-  `&wait=1500` +
-  `&screenshot=true` +
-  `&video=false&audio=false&iframe=false` +
-  `&palette=true&theme=light` +
-  (MICROLINK_API_KEY ? `&api_key=${MICROLINK_API_KEY}` : "");
-
-        const microlinkResponse = await fetch(microlinkUrl, {
-          headers: {
-            'Accept': 'application/json',
-          },
-          signal: AbortSignal.timeout(8000)
-        });
-
-        if (microlinkResponse.ok) {
-          const microlinkData = await microlinkResponse.json();
-          
-          if (isMounted && microlinkData.data) {
-            const data = microlinkData.data;
-            
-            // Process and clean the data
-            const isLogoish = (u) => {
-  const s = String(u || "").toLowerCase();
-  return (
-    s.includes("logo") ||
-    s.includes("icon") ||
-    s.includes("favicon") ||
-    s.includes("apple-touch-icon") ||
-    s.includes("sprite") ||
-    s.includes("badge") ||
-    s.includes("brand")
-  );
-};
-
-const fallbackTitle = getFallbackTitleFromUrl(url, domain);
-
-const screenshotUrl = data.screenshot?.url || null;
-const ogImageUrl = data.image?.url || null;
-const logoUrl = data.logo?.url || null;
-
-let imageUrl = null;
-let imageType = "none";
-
-// Prefer real article/OG image first
-if (ogImageUrl && !isLogoish(ogImageUrl)) {
-  imageUrl = ogImageUrl;
-  imageType = "og";
-} else if (screenshotUrl) {
-  imageUrl = screenshotUrl;
-  imageType = "screenshot";
-} else if (ogImageUrl) {
-  imageUrl = ogImageUrl;
-  imageType = "logoish-og";
-} else if (logoUrl) {
-  imageUrl = logoUrl;
-  imageType = "logo";
-}
-
-console.log("PREVIEW DEBUG", {
-  url,
-  ogImage: ogImageUrl,
-  screenshot: screenshotUrl,
-  logo: logoUrl,
-  chosenImage: imageUrl,
-  imageType
-});
-            
-            // Ensure image URL is absolute
-            if (imageUrl && imageUrl.startsWith('//')) {
-              imageUrl = 'https:' + imageUrl;
-            } else if (imageUrl && imageUrl.startsWith('/')) {
-              imageUrl = `https://${domain}${imageUrl}`;
-            }
-
-            setPreviewData({
-  title: data.title || getFallbackTitleFromUrl(url, domain),
-  description: data.description
-    ? (data.description.length > 150
-        ? data.description.substring(0, 147) + "..."
-        : data.description)
-    : "",
-  image: imageUrl || getFaviconUrl(domain),
-  domain: data.publisher || domain,
-  url: data.url || url,
-  author: data.author || "",
-  date: data.date || "",
-  isSiteFallback: false,
-  imageType
-});
-            return;
-          }
-        }
-        
-        // ================== STRATEGY 2: LinkPreview API (Fallback) ==================
-        // Alternative free API that works well
-        const linkPreviewUrl = `https://api.linkpreview.net/?key=${import.meta.env.VITE_LINKPREVIEW_API_KEY || '5b576'}&q=${encodeURIComponent(url)}`;
-        
-        const linkPreviewResponse = await fetch(linkPreviewUrl, {
-          signal: AbortSignal.timeout(5000)
-        });
-
-        if (linkPreviewResponse.ok) {
-          const linkPreviewData = await linkPreviewResponse.json();
-          
-          if (isMounted && linkPreviewData) {
-            setPreviewData({
-              title: linkPreviewData.title || getFallbackTitleFromUrl(url, domain),
-              description: linkPreviewData.description ? 
-                          (linkPreviewData.description.length > 150 ? linkPreviewData.description.substring(0, 147) + '...' : linkPreviewData.description) : '',
-              image: linkPreviewData.image || getFaviconUrl(domain),
-              domain: linkPreviewData.url ? getDomainFromUrl(linkPreviewData.url) : domain,
-              url: linkPreviewData.url || url
-            });
-            return;
-          }
-        }
-
-        // ================== STRATEGY 3: Direct Open Graph Fetch with CORS Proxy ==================
-        // For sites that don't work with APIs
-        const corsProxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
-        
-        try {
-          const response = await fetch(corsProxyUrl, {
-            signal: AbortSignal.timeout(4000)
+          const microlinkResponse = await fetch(microlinkUrl, {
+            headers: { 'Accept': 'application/json' },
+            signal: AbortSignal.timeout(8000)
           });
-          
-          if (response.ok) {
-            const html = await response.text();
-            
-            // Parse Open Graph and meta tags
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            
-            const ogTitle = doc.querySelector('meta[property="og:title"]')?.content;
-            const ogDescription = doc.querySelector('meta[property="og:description"]')?.content;
-            const ogImage = doc.querySelector('meta[property="og:image"]')?.content;
-            const ogSiteName = doc.querySelector('meta[property="og:site_name"]')?.content;
-            
-            const metaTitle = doc.querySelector('title')?.textContent;
-            const metaDescription = doc.querySelector('meta[name="description"]')?.content;
-            const metaImage = doc.querySelector('link[rel="image_src"]')?.href;
-            
-            // Process image URL to ensure it's absolute
-            let finalImage = ogImage || metaImage;
-            if (finalImage) {
-              if (finalImage.startsWith('//')) {
-                finalImage = 'https:' + finalImage;
-              } else if (finalImage.startsWith('/')) {
-                finalImage = `https://${domain}${finalImage}`;
-              }
-            }
-            
-            // Build final title
-            let finalTitle = ogTitle || metaTitle;
-if (!finalTitle || finalTitle.trim() === '') {
-  finalTitle = getFallbackTitleFromUrl(url, domain);
-}
-            
-            // Build final description
-            let finalDescription = ogDescription || metaDescription || '';
-            if (finalDescription.length > 150) {
-              finalDescription = finalDescription.substring(0, 147) + '...';
-            }
-            
-            if (isMounted) {
+
+          if (microlinkResponse.ok) {
+            const microlinkData = await microlinkResponse.json();
+            if (isMounted && microlinkData.data) {
+              const data = microlinkData.data;
+              const ogImageUrl = data.image?.url || null;
+              const logoUrl = data.logo?.url || null;
+              let imageUrl = ogImageUrl || logoUrl;
+
+              if (imageUrl && imageUrl.startsWith('//')) imageUrl = 'https:' + imageUrl;
+
+              await new Promise(resolve => setTimeout(resolve, 300));
+
               setPreviewData({
-                title: finalTitle,
-                description: finalDescription,
-                image: finalImage || getFaviconUrl(domain),
-                domain: ogSiteName || domain,
-                url: url
+                title: data.title || getFallbackTitleFromUrl(url, domain),
+                description: data.description || "",
+                image: imageUrl || getFaviconUrl(domain),
+                domain: data.publisher || domain,
+                url: data.url || url,
+                isSiteFallback: false
               });
               return;
             }
           }
-        } catch (proxyError) {
-          console.log('CORS proxy failed for:', domain, proxyError);
         }
-        // ================== STRATEGY 4: Site-specific fallback ==================
+
         const siteConfigs = {
           "justjared.com": {
-            title: "Just Jared - Celebrity News & Photos",
-            description: "Breaking celebrity news, photos, and entertainment updates",
+            title: "Just Jared - Celebrity News",
             image: "https://www.justjared.com/images/justjared-logo-new.png"
           },
-          "people.com": {
-            title: "People Magazine",
-            description: "Breaking celebrity news, entertainment stories and exclusive interviews",
-            image: "https://people.com/thmb/7fBSYpC6a31D0Mq9B5WgSdIBUZU=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/people_logo-d5e9f7d1e7f34f9eb8e7c26b7bb40d5e.png"
-          },
           "tmz.com": {
-            title: "TMZ - Celebrity News",
-            description: "Breaking celebrity gossip and entertainment news",
-            image: "https://tmz.ugc.zencdn.net/2019_TMZ_Logo_WhiteOrange.png?1"
-          },
-          "etonline.com": {
-            title: "Entertainment Tonight",
-            description: "Entertainment news, celebrity interviews, and TV gossip",
-            image: "https://www.etonline.com/sites/etonline.com/files/et_logo_0.png"
-          },
-          "eonline.com": {
-            title: "E! Online",
-            description: "Celebrity news, entertainment news, and pop culture coverage",
-            image: "https://www.eonline.com/favicon.ico"
+            title: "TMZ Celebrity News",
+            description: "Breaking the biggest stories in celebrity and entertainment news.",
+            image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/TMZLogo.svg/1200px-TMZLogo.svg.png"
           }
         };
 
-        const siteKey = Object.keys(siteConfigs).find((key) =>
-          domain.includes(key.replace("www.", ""))
-        );
+        const siteKey = Object.keys(siteConfigs).find((key) => domain.includes(key));
 
         if (siteKey && isMounted) {
           const config = siteConfigs[siteKey];
           setPreviewData({
-  title: getFallbackTitleFromUrl(url, domain),
-  description: config.description,
-  image: config.image,
-  domain: siteKey,
-  url: url,
-  isSiteFallback: true
-});
+            title: config.title || getFallbackTitleFromUrl(url, domain),
+            description: config.description || "",
+            image: config.image,
+            domain: siteKey,
+            url: url,
+            isSiteFallback: true
+          });
           return;
         }
 
-        // ================== STRATEGY 5: Final generic fallback ==================
-if (isMounted) {
-  setPreviewData({
-    title: getFallbackTitleFromUrl(url, domain),
-    description: "",
-    image: getFaviconUrl(domain),
-    domain: domain,
-    url: url
-  });
-  return;
-}
-
-      } catch (error) {
-        console.log('Link preview error for', url, error);
-        
         if (isMounted) {
-  setPreviewData({
-    title: getFallbackTitleFromUrl(url, domain),
-    description: '',
-    image: getFaviconUrl(domain),
-    domain: domain,
-    url: url
-  });
-}
-      } finally {
-        if (isMounted) {
-          setLoading(false);
+          setPreviewData({
+            title: getFallbackTitleFromUrl(url, domain),
+            description: "",
+            image: getFaviconUrl(domain),
+            domain: domain,
+            url: url
+          });
         }
+      } catch (error) {
+        if (isMounted) {
+          setPreviewData({
+            title: getFallbackTitleFromUrl(url, domain),
+            image: getFaviconUrl(domain),
+            domain: domain,
+            url: url
+          });
+        }
+      } finally {
+        if (isMounted) setLoading(false);
       }
     };
 
     fetchPreview();
-
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, [url, domain]);
 
   if (loading) {
     return (
       <div className="microlink-card block max-w-md mx-auto mb-4 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm animate-pulse">
-        <div className="h-40 bg-gradient-to-r from-gray-200 to-gray-300 animate-pulse"></div>
+        <div className="h-40 bg-gray-200 animate-pulse"></div>
         <div className="p-4">
           <div className="h-4 bg-gray-200 rounded mb-2 w-3/4 animate-pulse"></div>
           <div className="h-3 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-          <div className="flex items-center mt-3">
-            <div className="w-6 h-6 bg-gray-200 rounded-full mr-2 animate-pulse"></div>
-            <div className="h-3 bg-gray-200 rounded w-1/3 animate-pulse"></div>
-          </div>
         </div>
       </div>
     );
   }
-const isFallbackFavicon = (imageUrl) => {
-  if (!imageUrl) return true;
-  const s = String(imageUrl).toLowerCase();
-  return s.includes("google.com/s2/favicons");
-};
 
-const hasUsableImage =
-  !!previewData?.image &&
-  !isFallbackFavicon(previewData.image) &&
-  !previewData?.isSiteFallback &&
-  (previewData?.imageType === "og" || previewData?.imageType === "screenshot");
-  
+  const isFallbackFavicon = (imageUrl) => {
+    if (!imageUrl) return true;
+    const s = String(imageUrl).toLowerCase();
+    return s.includes("google.com/s2/favicons");
+  };
+
+  const hasUsableImage =
+    !!previewData?.image &&
+    !isFallbackFavicon(previewData.image) &&
+    !previewData?.isSiteFallback;
+
   if (!hasUsableImage) {
-  return (
-    <a
-      href={previewData.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
-    >
-      <div className="flex items-center gap-3">
-        <img
-          src={getFaviconUrl(domain)}
-          alt={domain}
-          className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm flex-shrink-0"
-        />
-        <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-[#8e3e3e] transition-colors">
-            {previewData.title}
-          </h3>
-          <div className="flex items-center justify-between mt-1">
-            <span className="text-xs text-gray-500 truncate">
-              {previewData.domain}
-            </span>
-            <span className="flex items-center gap-1 text-xs font-semibold text-[#8e3e3e]">
-              Read article
-              <svg
-                className="w-3 h-3 transform group-hover:translate-x-1 transition-transform"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M14 5l7 7m0 0l-7 7m7-7H3"
-                />
-              </svg>
-            </span>
+    return (
+      <a
+        href={previewData.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
+      >
+        <div className="flex items-center gap-3">
+          <img
+            src={getFaviconUrl(domain)}
+            alt={domain}
+            className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm flex-shrink-0"
+          />
+          <div className="flex-1 min-w-0">
+            <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-[#8e3e3e] transition-colors">
+              {previewData.title}
+            </h3>
+            <div className="flex items-center justify-between mt-1">
+              <span className="text-xs text-gray-500 truncate">{previewData.domain}</span>
+              <span className="flex items-center gap-1 text-xs font-semibold text-[#8e3e3e]">Read article →</span>
+            </div>
           </div>
         </div>
-      </div>
-    </a>
-  );
-}
+      </a>
+    );
+  }
 
   return (
     <a
@@ -513,94 +316,71 @@ const hasUsableImage =
       rel="noopener noreferrer"
       className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
     >
-      {/* Thumbnail image with gradient overlay */}
-      <div className="h-48 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 relative">
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-60 z-10"></div>
+      <div className="h-48 overflow-hidden bg-gray-100 relative">
         <img
           src={previewData.image}
           alt={previewData.title}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
+          className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500"
           onError={(e) => {
-            // If image fails to load, replace with favicon in a nice container
             e.target.style.display = 'none';
             const parent = e.target.parentElement;
-            
-            // Create a nice fallback container
+            if (parent.querySelector('.fallback-container')) return;
             const fallback = document.createElement('div');
-            fallback.className = 'w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#8e3e3e]/10 to-red-100';
-            
+            fallback.className = 'fallback-container w-full h-full flex flex-col items-center justify-center bg-gray-50';
             const favicon = document.createElement('img');
             favicon.src = getFaviconUrl(domain);
-            favicon.className = 'w-12 h-12 mb-3 opacity-70';
-            favicon.alt = 'Website favicon';
-            
+            favicon.className = 'w-12 h-12 mb-2 opacity-50';
             const domainText = document.createElement('span');
-            domainText.className = 'text-sm text-gray-500 font-medium';
-            domainText.textContent = domain.replace('www.', '');
-            
+            domainText.className = 'text-xs text-gray-400';
+            domainText.textContent = domain;
             fallback.appendChild(favicon);
             fallback.appendChild(domainText);
             parent.appendChild(fallback);
           }}
         />
-        
-        {/* Hover gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#8e3e3e]/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20"></div>
       </div>
-      
-      {/* Content area */}
       <div className="p-5">
         <div className="flex items-start gap-4">
-          {/* Favicon badge */}
-          <div className="flex-shrink-0">
-            <div className="relative">
-              <img
-                src={getFaviconUrl(domain)}
-                alt={domain}
-                className="w-8 h-8 rounded-lg border border-gray-200 shadow-sm"
-              />
-              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white"></div>
-            </div>
-          </div>
-          
-          {/* Text content */}
+          <img src={getFaviconUrl(domain)} alt={domain} className="w-8 h-8 rounded border" />
           <div className="flex-1 min-w-0">
-            {/* Title with gradient text on hover */}
-            <h3 className="text-base font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#8e3e3e] group-hover:to-red-500 transition-all duration-300">
+            <h3 className="text-base font-semibold text-gray-900 mb-1 line-clamp-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#8e3e3e] group-hover:to-red-500">
               {previewData.title}
             </h3>
-            
-            {/* Description */}
             {previewData.description && (
-              <p className="text-sm text-gray-600 mb-3 line-clamp-2 leading-relaxed">
-                {previewData.description}
-              </p>
+              <p className="text-sm text-gray-500 mb-3 line-clamp-2 leading-relaxed">{previewData.description}</p>
             )}
-            
-            {/* Metadata row */}
-            <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-500 truncate">
-                  {previewData.domain}
-                </span>
-                {previewData.author && (
-                  <>
-                    <span className="text-gray-300">•</span>
-                    <span className="text-xs text-gray-400 truncate">
-                      {previewData.author}
-                    </span>
-                  </>
-                )}
-              </div>
-              
-              {/* CTA button */}
-              <span className="flex items-center gap-1 text-xs font-semibold text-[#8e3e3e] group-hover:text-red-600 transition-colors">
-                Read article
-                <svg className="w-3 h-3 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </span>
+            <div className="flex items-center justify-between pt-2 border-t">
+              <span className="text-xs text-gray-400">{previewData.domain}</span>
+              <span className="text-xs font-semibold text-[#8e3e3e] group-hover:text-red-600 transition-colors">Read article →</span>
             </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  );
+}
+
+function InstagramFallbackCard({ url }) {
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
+    >
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-lg bg-gradient-to-tr from-[#f9ce67] via-[#e85a19] to-[#415dc3] flex items-center justify-center text-white shadow-sm flex-shrink-0">
+          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-[#8e3e3e] transition-colors">
+            View post on Instagram
+          </h3>
+          <div className="flex items-center justify-between mt-1">
+            <span className="text-xs text-gray-500 truncate">instagram.com</span>
+            <span className="flex items-center gap-1 text-xs font-semibold text-[#8e3e3e]">
+              Open post →
+            </span>
           </div>
         </div>
       </div>
@@ -1142,88 +922,63 @@ const getEmbedJustifyClass = (count) => {
           {hasSources && (
             <div className="space-y-6">
               {sourceImages.length > 0 && (
-                <div className="image-only-grid flex flex-wrap gap-6 justify-start">
+                <div className="image-only-grid flex flex-wrap gap-6 justify-start mb-8">
                   {sourceImages.map((url, index) => {
-  const isPinterest = isPinterestUrl(url);
-  const pinId = getPinterestPinId(url);
+                    const isPinterest = isPinterestUrl(url);
+                    const pinId = getPinterestPinId(url);
+                    const domain = getDomainFromUrl(url);
 
-  if (isPinterest && pinId) {
-    return (
-      <div
-        key={`img-${index}`}
-        className="group relative bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-all"
-        style={{ width: "345px", height: "460px" }}
-      >
-        <iframe
-          src={`https://assets.pinterest.com/ext/embed.html?id=${pinId}`}
-          width="345"
-          height="460"
-          frameBorder="0"
-          scrolling="no"
-          style={{
-            display: "block",
-            width: "345px",
-            height: "460px",
-            border: "0",
-            overflow: "hidden"
-          }}
-        />
-      </div>
-    );
-  }
+                    if (isPinterest && pinId) {
+                      return (
+                        <div
+                          key={`img-${index}`}
+                          className="group relative bg-gray-100 rounded-xl overflow-hidden border border-gray-200 hover:shadow-lg transition-all duration-300 hover:border-red-400"
+                          style={{ width: "420px", height: "300px" }}
+                        >
+                          <iframe
+                            src={`https://assets.pinterest.com/ext/embed.html?id=${pinId}`}
+                            width="100%"
+                            height="100%"
+                            frameBorder="0"
+                            scrolling="no"
+                            style={{ border: "0", overflow: "hidden" }}
+                          />
+                        </div>
+                      );
+                    }
 
-  if (isPinterest) {
-    return (
-      <a
-        key={`img-${index}`}
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="group relative flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-all"
-        style={{ width: "345px", height: "220px" }}
-      >
-        <div className="flex items-center gap-3 px-4">
-          <img
-            src={getFaviconUrl("pinterest.com")}
-            alt="Pinterest"
-            className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm flex-shrink-0"
-          />
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-gray-900">Pinterest Pin</p>
-            <p className="text-xs text-gray-500 truncate">pinterest.com</p>
-          </div>
-        </div>
-      </a>
-    );
-  }
-
-  return (
-    <a
-      key={`img-${index}`}
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group relative flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-all"
-      style={{ width: "500px", height: "400px" }}
-    >
-      <img
-        src={url}
-        alt="Source"
-        className="max-w-full max-h-full object-contain cursor-pointer"
-        loading="lazy"
-      />
-      <span className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs p-1 opacity-0 group-hover:opacity-100 transition-opacity truncate text-center">
-        {(() => {
-          try {
-            return new URL(url).hostname.replace("www.", "");
-          } catch {
-            return "Source";
-          }
-        })()}
-      </span>
-    </a>
-  );
-})}
+                    return (
+                      <a
+                        key={`img-${index}`}
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group relative flex flex-col bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1"
+                        style={{ width: "420px", height: "300px" }}
+                        onClick={(e) => {
+                          // Prevent link click if you want the modal to open instead
+                          // e.preventDefault();
+                          // setSelectedImageIndex(sourceImages.indexOf(url) + (event.IMAGE?.length || 0));
+                          // setIsModalOpen(true);
+                        }}
+                      >
+                        <div className="h-full w-full overflow-hidden bg-gray-50">
+                          <img
+                            src={url}
+                            alt="Source Content"
+                            className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500"
+                            loading="lazy"
+                          />
+                        </div>
+                        <div className="absolute bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-gray-100 p-2 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                           <div className="flex items-center gap-2">
+                             <img src={getFaviconUrl(domain)} className="w-4 h-4" alt="icon" />
+                             <span className="text-xs font-medium text-gray-600 truncate">{domain}</span>
+                           </div>
+                        </div>
+                      </a>
+                    );
+                  })}
                 </div>
               )}
 
@@ -1406,38 +1161,59 @@ if (isFacebook) {
 
       {/* Instagram */}
       {event.INSTAGRAM && (
-  <section className="w-full px-4 mb-10">
-    <div
-      className={`flex flex-wrap gap-6 mt-2 max-w-[1400px] mx-auto ${getEmbedJustifyClass(
-        instagramUrls.length
-      )}`}
-    >
-      {instagramUrls.map((url, index) => (
-        <div
-          key={index}
-          className="instagram-container flex-shrink-0"
-          style={{ width: "320px" }}
-        >
-          <blockquote
-            className="instagram-media"
-            data-instgrm-permalink={url}
-            data-instgrm-version="14"
-            style={{
-              background: "#FFF",
-              borderRadius: "8px",
-              border: "1px solid #dbdbdb",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-              margin: "0",
-              width: "320px",
-              minWidth: "320px",
-              padding: "0",
-            }}
-          ></blockquote>
-        </div>
-      ))}
-    </div>
-  </section>
-)}
+        <section className="w-full px-4 mb-10">
+          <div
+            className={`flex flex-wrap gap-6 mt-2 max-w-[1400px] mx-auto items-start ${getEmbedJustifyClass(
+              instagramUrls.length
+            )}`}
+          >
+            {instagramUrls.map((url, index) => {
+              // We check if this is the problematic Travis Kelce post to show the card immediately
+              const isTravisPost = url.includes("DMgXbQ0yWqW");
+
+              return (
+                <div
+                  key={index}
+                  className="instagram-container flex flex-col items-center"
+                  style={{ width: "326px" }}
+                >
+                  {isTravisPost ? (
+                    <InstagramFallbackCard url={url} />
+                  ) : (
+                    <blockquote
+                      className="instagram-media"
+                      data-instgrm-captioned
+                      data-instgrm-permalink={url}
+                      data-instgrm-version="14"
+                      style={{
+                        background: "#FFF",
+                        borderRadius: "8px",
+                        border: "1px solid #dbdbdb",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                        margin: "0",
+                        width: "326px",
+                        padding: "0",
+                        display: "block"
+                      }}
+                    >
+                      <div style={{ padding: "16px" }}>
+                        <a 
+                          href={url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-500 text-sm font-medium"
+                        >
+                          Loading Instagram post...
+                        </a>
+                      </div>
+                    </blockquote>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
                   {/* Twitter / X */}
       {event.TWITTER && (
