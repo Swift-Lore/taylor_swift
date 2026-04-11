@@ -151,7 +151,12 @@ const getFallbackTitleFromUrl = (url, domain) => {
   );
 };
 
-useEffect(() => {
+function LinkPreview({ url }) {
+  const [previewData, setPreviewData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const domain = getDomainFromUrl(url);
+
+  useEffect(() => {
     let isMounted = true;
     setPreviewData(null);
     setLoading(true);
@@ -295,15 +300,8 @@ useEffect(() => {
               {previewData.title}
             </h3>
             <div className="flex items-center justify-between mt-1">
-              <span className="text-xs text-gray-500 truncate">
-                {previewData.domain}
-              </span>
-              <span className="flex items-center gap-1 text-xs font-semibold text-[#8e3e3e]">
-                Read article
-                <svg className="w-3 h-3 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </span>
+              <span className="text-xs text-gray-500 truncate">{previewData.domain}</span>
+              <span className="flex items-center gap-1 text-xs font-semibold text-[#8e3e3e]">Read article →</span>
             </div>
           </div>
         </div>
@@ -361,72 +359,6 @@ useEffect(() => {
     </a>
   );
 }
-
-  return (
-    <a
-      href={previewData.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
-    >
-      <div className="h-48 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 relative">
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-60 z-10"></div>
-        <img
-          src={previewData.image}
-          alt={previewData.title}
-          className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500 ease-out"
-          onError={(e) => {
-            e.target.style.display = 'none';
-            const parent = e.target.parentElement;
-            if (parent.querySelector('.fallback-container')) return;
-            const fallback = document.createElement('div');
-            fallback.className = 'fallback-container w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#8e3e3e]/10 to-red-100';
-            const favicon = document.createElement('img');
-            favicon.src = getFaviconUrl(domain);
-            favicon.className = 'w-12 h-12 mb-3 opacity-70';
-            const domainText = document.createElement('span');
-            domainText.className = 'text-sm text-gray-500 font-medium';
-            domainText.textContent = domain.replace('www.', '');
-            fallback.appendChild(favicon);
-            fallback.appendChild(domainText);
-            parent.appendChild(fallback);
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#8e3e3e]/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20"></div>
-      </div>
-      <div className="p-5">
-        <div className="flex items-start gap-4">
-          <div className="flex-shrink-0">
-            <div className="relative">
-              <img src={getFaviconUrl(domain)} alt={domain} className="w-8 h-8 rounded-lg border border-gray-200 shadow-sm" />
-              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white"></div>
-            </div>
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="text-base font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#8e3e3e] group-hover:to-red-500 transition-all duration-300">
-              {previewData.title}
-            </h3>
-            {previewData.description && (
-              <p className="text-sm text-gray-600 mb-3 line-clamp-2 leading-relaxed">
-                {previewData.description}
-              </p>
-            )}
-            <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-500 truncate">{previewData.domain}</span>
-              </div>
-              <span className="flex items-center gap-1 text-xs font-semibold text-[#8e3e3e] group-hover:text-red-600 transition-colors">
-                Read article
-                <svg className="w-3 h-3 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </a>
-  );
 
 function TwitterFallbackCard({ url }) {
   return (
