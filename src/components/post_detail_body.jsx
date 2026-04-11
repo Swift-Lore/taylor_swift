@@ -690,14 +690,15 @@ useEffect(() => {
         script.async = true;
         document.body.appendChild(script);
       } else {
-        if (window.instgrm) {
-          window.instgrm.Embeds.process();
-        } else {
-          setTimeout(() => {
-            if (window.instgrm) window.instgrm.Embeds.process();
-          }, 1000);
-        }
-      }
+  if (window.instgrm) {
+    window.instgrm.Embeds.process();
+    setTimeout(() => window.instgrm.Embeds.process(), 1500);
+  } else {
+    setTimeout(() => {
+      if (window.instgrm) window.instgrm.Embeds.process();
+    }, 1000);
+  }
+}
     };
 
     const loadTwitterScript = () => {
