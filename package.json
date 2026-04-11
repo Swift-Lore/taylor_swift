@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "npx vite",
+    "fresh": "rm -rf node_modules package-lock.json && npm install --legacy-peer-deps && npx vite",
     "build": "npm install --legacy-peer-deps && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
