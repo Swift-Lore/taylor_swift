@@ -1188,7 +1188,7 @@ if (isFacebook) {
       {event.INSTAGRAM && (
         <section className="w-full px-4 mb-10">
           <div
-            className={`flex flex-wrap gap-6 mt-2 max-w-[1400px] mx-auto ${getEmbedJustifyClass(
+            className={`flex flex-wrap gap-6 mt-2 max-w-[1400px] mx-auto items-start ${getEmbedJustifyClass(
               instagramUrls.length
             )}`}
           >
