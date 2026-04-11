@@ -205,54 +205,23 @@
     }
 }
 
+/* Responsive adjustments for Unified Grid */
 @media (max-width: 900px) {
     .image-only-grid {
         justify-content: center;
     }
-
-    .image-only-grid a {
-        width: 350px;
-        /* Changed from 280px */
-        height: 280px;
-        /* Changed from 230px */
-    }
 }
 
 @media (max-width: 768px) {
-    .image-only-grid a {
-        width: 320px;
-        height: 260px;
-    }
-
-    .microlink-grid {
-        gap: 1rem;
+    .image-only-grid a, 
+    .image-only-grid .group {
+        width: 100% !important;
+        flex: 1 1 100%;
     }
 
     .microlink-grid > * {
-        width: 100%;
-        max-width: 100%;
+        width: 100% !important;
         flex: 1 1 100%;
-    }
-}
-
-@media (max-width: 640px) {
-    .image-only-grid a {
-        width: 100%;
-        max-width: 500px;
-        /* Changed from 380px */
-        height: 350px;
-        /* Changed from 280px */
-    }
-}
-
-@media (max-width: 480px) {
-    .image-only-grid a {
-        height: 300px;
-        /* Changed from 240px */
-    }
-
-    .image-only-grid {
-        gap: 16px;
     }
 }
 
