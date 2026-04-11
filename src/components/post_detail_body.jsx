@@ -174,7 +174,7 @@ const domain = getDomainFromUrl(url);
         const microlinkUrl =
   `https://api.microlink.io/?url=${encodeURIComponent(url)}` +
   `&wait=1500` +
-  `&screenshot=true` +
+  `&screenshot=false` +
   `&video=false&audio=false&iframe=false` +
   `&palette=true&theme=light` +
   (MICROLINK_API_KEY ? `&api_key=${MICROLINK_API_KEY}` : "");
