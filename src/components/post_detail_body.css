@@ -333,26 +333,28 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-/* Final Instagram Refinements */
+/* Force Instagram embed to respect its internal height and show the date/caption */
 .instagram-container {
   display: flex;
   justify-content: center;
   width: 100%;
   margin-bottom: 2rem;
-  align-items: flex-start;
+  align-items: flex-start; /* Ensures everything in this row aligns to the top */
 }
 
 .instagram-media {
-  /* Bumping width to 375px is usually the 'magic number' for the date to show */
-  min-width: 375px !important; 
+  min-width: 326px !important;
   width: 100% !important;
   max-width: 540px !important;
   margin: 0 auto !important;
-  min-height: 600px !important; 
+  /* This height is crucial; if it's too short, the date disappears */
+  min-height: 580px !important; 
 }
 
+/* Specific fix to prevent the bottom of the iframe from being cut off */
 .instagram-media iframe {
   width: 100% !important;
-  border-radius: 12px !important;
+  border-radius: 8px !important;
+  padding-bottom: 25px !important; 
   display: block !important;
 }
