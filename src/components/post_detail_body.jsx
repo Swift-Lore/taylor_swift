@@ -386,7 +386,7 @@ if (!finalTitle || finalTitle.trim() === '') {
         if (siteKey && isMounted) {
           const config = siteConfigs[siteKey];
           setPreviewData({
-  title: getFallbackTitleFromUrl(url, domain),
+  title: config.title || getFallbackTitleFromUrl(url, domain),
   description: config.description,
   image: config.image,
   domain: siteKey,
