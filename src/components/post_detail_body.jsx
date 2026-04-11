@@ -517,32 +517,37 @@ const hasUsableImage =
       <div className="h-48 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 relative">
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-60 z-10"></div>
         <img
-          src={previewData.image}
-          alt={previewData.title}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
-          onError={(e) => {
-            // If image fails to load, replace with favicon in a nice container
-            e.target.style.display = 'none';
-            const parent = e.target.parentElement;
-            
-            // Create a nice fallback container
-            const fallback = document.createElement('div');
-            fallback.className = 'w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#8e3e3e]/10 to-red-100';
-            
-            const favicon = document.createElement('img');
-            favicon.src = getFaviconUrl(domain);
-            favicon.className = 'w-12 h-12 mb-3 opacity-70';
-            favicon.alt = 'Website favicon';
-            
-            const domainText = document.createElement('span');
-            domainText.className = 'text-sm text-gray-500 font-medium';
-            domainText.textContent = domain.replace('www.', '');
-            
-            fallback.appendChild(favicon);
-            fallback.appendChild(domainText);
-            parent.appendChild(fallback);
-          }}
-        />
+  src={previewData.image}
+  alt={previewData.title}
+  /* Changing object-cover to object-contain ensures the WHOLE photo fits. 
+     p-2 adds a tiny bit of breathing room so the edges don't touch the border.
+  */
+  className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500 ease-out"
+  onError={(e) => {
+    // If image fails to load, replace with a nice favicon container
+    e.target.style.display = 'none';
+    const parent = e.target.parentElement;
+    
+    // Check if fallback already exists to prevent duplicates
+    if (parent.querySelector('.fallback-container')) return;
+
+    const fallback = document.createElement('div');
+    fallback.className = 'fallback-container w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#8e3e3e]/10 to-red-100';
+    
+    const favicon = document.createElement('img');
+    favicon.src = getFaviconUrl(domain);
+    favicon.className = 'w-12 h-12 mb-3 opacity-70';
+    favicon.alt = 'Website favicon';
+    
+    const domainText = document.createElement('span');
+    domainText.className = 'text-sm text-gray-500 font-medium';
+    domainText.textContent = domain.replace('www.', '');
+    
+    fallback.appendChild(favicon);
+    fallback.appendChild(domainText);
+    parent.appendChild(fallback);
+  }}
+/>
         
         {/* Hover gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#8e3e3e]/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20"></div>
