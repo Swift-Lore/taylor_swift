@@ -366,8 +366,8 @@ if (!finalTitle || finalTitle.trim() === '') {
           },
           "tmz.com": {
   title: "TMZ Celebrity News",
-  description: "Breaking celebrity gossip and entertainment news.",
-  image: "https://image.tmz.com/2021/01/26/tmz-logo-1200x630.jpg"
+  description: "Breaking the biggest stories in celebrity and entertainment news.",
+  image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/TMZLogo.svg/1200px-TMZLogo.svg.png" 
 },
           "etonline.com": {
             title: "Entertainment Tonight",
