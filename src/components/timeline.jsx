@@ -1235,7 +1235,14 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           )}
 
                     {/* Desktop Timeline – only show when there are events */}
-          {records.length > 0 && (
+  {isTorontoMode && records.some((r, i) => i > 0 && new Date(r.fields?.DATE).getFullYear() !== currentYear && new Date(records[i-1].fields?.DATE).getFullYear() === currentYear) && (
+            <div className="hidden md:flex justify-center my-3">
+              <span className="rounded-full bg-[#e8ecf7] px-4 py-1.5 text-xs text-[#6b7db3] border border-[#c5cae9] shadow-sm font-medium">
+                Other years on this date
+              </span>
+            </div>
+          )}        
+  {records.length > 0 && (
             <div className="hidden md:block min-h-0">
               <div className="relative flex justify-center">
                 <div className="absolute w-[2px] flex flex-col items-center h-full">
