@@ -975,29 +975,6 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
 </div>
 <div className={mobileView === "today" ? "block" : "hidden lg:block"}>
 
-            
-          {/* Homepage Intro for SEO / AdSense - hidden on mobile */}
-          <div className="hidden md:block max-w-4xl mx-auto mt-1 mb-2 px-3">
-            <div className="bg-white/70 border border-[#e3d5dd] rounded-xl shadow-sm px-4 py-3 md:px-6 md:py-3 text-center">
-              <h2 className="text-base md:text-lg font-semibold text-[#8e3e3e] mb-2">
-                Swift-Lore: Taylor Swift's Complete Career Timeline
-              </h2>
-              <div className="text-[#6b7db3] text-sm md:text-base leading-relaxed space-y-2">
-                <p>
-                  Swift-Lore is an independent, fan-run research archive documenting Taylor
-                  Swift's career from her earliest performances to the present day.
-                  Each entry is tied to a specific date, with context notes and source links.
-                </p>
-                <p>
-                  Browse by date, filter events, and follow her journey across albums and
-                  eras — from releases and award shows to interviews, paparazzi spots, and
-                  deep-cut easter eggs. The timeline currently tracks thousands of verified
-                  moments and is updated regularly.
-                </p>
-              </div>
-            </div>
-          </div>
-
           {/* Ad block */}
 {import.meta.env.PROD && !isLoading && !isInitialLoad && records.length > 0 && (
   <div className="w-full flex justify-center mb-4 min-h-[90px]"> 
