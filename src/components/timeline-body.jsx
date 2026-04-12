@@ -344,35 +344,31 @@ resetPagination()
 
   setKeywordsLoading(true);
   try {
-    const keywordSet = new Set();
+    let allRecords = [];
     let offset = undefined;
 
     do {
       const response = await axios.get(
-        "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+        "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Keywords",
         {
           headers: {
             Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
           },
           params: {
+            fields: ["Keywords"],
             pageSize: 100,
             offset,
-            fields: ["KEYWORDS"],
           },
         }
       );
-
-      response.data.records.forEach((record) => {
-        ;(record.fields.KEYWORDS || []).forEach((kw) => {
-          const cleaned = typeof kw === "string" ? kw.trim() : "";
-          if (cleaned) keywordSet.add(cleaned);
-        });
-      });
-
+      allRecords = allRecords.concat(response.data.records);
       offset = response.data.offset;
     } while (offset);
 
-    const keywords = Array.from(keywordSet).sort((a, b) => a.localeCompare(b));
+    const keywords = allRecords
+      .map(r => r.fields.Keywords)
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b));
     setAllKeywords(keywords);
     setKeywordsLoaded(true);
     

@@ -216,7 +216,7 @@ function LinkPreview({ url }) {
         href={previewData.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
+        className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-[#fff8f8] p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
       >
         <div className="flex items-center gap-3">
           <img
@@ -838,7 +838,7 @@ const getEmbedJustifyClass = (count) => {
       {(hasNotes || hasSources) && (
         <section className="max-w-4xl mx-auto px-4 mb-10">
           {hasNotes && (
-            <div className="text-sm md:text-base text-[#111827] leading-relaxed mb-6">
+            <div className="text-sm md:text-base text-[#111827] leading-relaxed mb-6 bg-white/70 rounded-xl p-4 border border-[#e3d5dd]">
               <span className="font-semibold">Notes: </span>
               {formatNotes(event.NOTES)}
             </div>
