@@ -536,7 +536,7 @@ const betweenRes = calculatorTab === "between" ? calcBetween() : null;
   </>
 )}
 
-            {tab === "calculator"
+            {tab === "calculator" && (
   <>
     <div className="flex gap-2 mb-4 min-w-0">
       <button
