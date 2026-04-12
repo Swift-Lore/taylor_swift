@@ -126,6 +126,8 @@ const [searchOffsetHistory, setSearchOffsetHistory] = useState([null])
 const [searchOffsetIndex, setSearchOffsetIndex] = useState(0)
 
     const [isFilterMode, setIsFilterMode] = useState(false)
+  const [debouncedStart, setDebouncedStart] = useState("")
+const [debouncedEnd, setDebouncedEnd] = useState("")
 
   // Calendar state
   const [showCalendar, setShowCalendar] = useState(false)
