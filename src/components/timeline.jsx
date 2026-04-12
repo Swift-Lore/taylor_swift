@@ -1389,8 +1389,13 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
         </div>
      </section>
 
-      {/* Recently + Upcoming sidebar */}
-      <div className="w-full bg-[#e8ecf7] px-2 md:px-6 pb-6">
+      {/* Recently + Upcoming sidebar - desktop only, floated right */}
+      <div className="hidden lg:block fixed right-4 top-[180px] w-[320px] z-10">
+        <RecentEvents />
+      </div>
+
+      {/* Mobile: Recently + Upcoming below timeline */}
+      <div className="lg:hidden w-full bg-[#e8ecf7] px-2 md:px-6 pb-6">
         <div className="container mx-auto max-w-md">
           <RecentEvents />
         </div>
