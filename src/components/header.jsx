@@ -73,7 +73,6 @@ export default function Header() {
 
       return `${month}-${day}-${year}`;
     } catch (error) {
-      console.error("Error formatting date:", error);
       return "";
     }
   };
