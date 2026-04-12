@@ -10,6 +10,7 @@ import "./timeline.css"
 import { SITE_UPDATES } from "./site-updates"
 import AdSlot from "./adslot"
 import DateCalculatorModal from "./DateCalculatorModal";
+import DateToolsModal from "./DateToolsModal";
 
 
 // ===== Toronto Theory Alternate Timeline (helper) =====
@@ -198,9 +199,10 @@ export default function Timeline() {
   const [currentYear, setCurrentYear] = useState(initialDate.getFullYear());
   const displayDate = new Date(currentYear, currentMonth - 1, currentDay)
   const [showTNInfo, setShowTNInfo] = useState(false)
-  const [showDateCalc, setShowDateCalc] = useState(false)
-  const [isInitialLoad, setIsInitialLoad] = useState(true)
-  const [mobileView, setMobileView] = useState("today")
+const [showDateCalc, setShowDateCalc] = useState(false)
+const [showDateTools, setShowDateTools] = useState(false)
+const [isInitialLoad, setIsInitialLoad] = useState(true)
+const [mobileView, setMobileView] = useState("today")
   
   // ===== SEO META TAGS UPDATE =====
   useEffect(() => {
@@ -641,12 +643,13 @@ const handlePreviousDay = () => {
         let filterFormula
       
         if (isTorontoMode) {
-          // In Toronto mode: show ONLY this specific year
-          filterFormula = `AND(MONTH({DATE}) = ${month}, DAY({DATE}) = ${day}, YEAR({DATE}) = ${year})`
-        } else {
-          // Normal mode: show this day across all years
-          filterFormula = `AND(MONTH({DATE}) = ${month}, DAY({DATE}) = ${day})`
-        }
+  // In TN mode, show the exact matching TN year first,
+  // plus all other matching month/day events underneath
+  filterFormula = `AND(MONTH({DATE}) = ${month}, DAY({DATE}) = ${day})`
+} else {
+  // Normal mode: show this day across all years
+  filterFormula = `AND(MONTH({DATE}) = ${month}, DAY({DATE}) = ${day})`
+}
       
         const response = await axios.get(
           "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
@@ -664,11 +667,31 @@ const handlePreviousDay = () => {
       }
 
             try {
-        setIsLoading(true)
-        const fetched = await fetchByDate()
-        setRecords(fetched)
-        setIsInitialLoad(false) // ← ADD THIS LINE
-      } catch (error) {
+  setIsLoading(true)
+  const fetched = await fetchByDate()
+
+  if (isTorontoMode) {
+    const exactYearRecords = fetched.filter((record) => {
+      const rawDate = record?.fields?.DATE
+      if (!rawDate) return false
+      const recordDate = new Date(rawDate)
+      return recordDate.getFullYear() === year
+    })
+
+    const otherYearRecords = fetched.filter((record) => {
+      const rawDate = record?.fields?.DATE
+      if (!rawDate) return false
+      const recordDate = new Date(rawDate)
+      return recordDate.getFullYear() !== year
+    })
+
+    setRecords([...exactYearRecords, ...otherYearRecords])
+  } else {
+    setRecords(fetched)
+  }
+
+  setIsInitialLoad(false)
+} catch (error) {
         console.error("Error fetching records:", error)
         setRecords([])
         setIsInitialLoad(false) // ← ADD THIS LINE
@@ -952,29 +975,6 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
 </div>
 <div className={mobileView === "today" ? "block" : "hidden lg:block"}>
 
-            
-          {/* Homepage Intro for SEO / AdSense - hidden on mobile */}
-          <div className="hidden md:block max-w-4xl mx-auto mt-1 mb-2 px-3">
-            <div className="bg-white/70 border border-[#e3d5dd] rounded-xl shadow-sm px-4 py-3 md:px-6 md:py-3 text-center">
-              <h2 className="text-base md:text-lg font-semibold text-[#8e3e3e] mb-2">
-                Swift-Lore: Taylor Swift's Complete Career Timeline
-              </h2>
-              <div className="text-[#6b7db3] text-sm md:text-base leading-relaxed space-y-2">
-                <p>
-                  Swift-Lore is an independent, fan-run research archive documenting Taylor
-                  Swift's career from her earliest performances to the present day.
-                  Each entry is tied to a specific date, with context notes and source links.
-                </p>
-                <p>
-                  Browse by date, filter events, and follow her journey across albums and
-                  eras — from releases and award shows to interviews, paparazzi spots, and
-                  deep-cut easter eggs. The timeline currently tracks thousands of verified
-                  moments and is updated regularly.
-                </p>
-              </div>
-            </div>
-          </div>
-
           {/* Ad block */}
 {import.meta.env.PROD && !isLoading && !isInitialLoad && records.length > 0 && (
   <div className="w-full flex justify-center mb-4 min-h-[90px]"> 
@@ -992,7 +992,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   <div className="relative w-full mt-4 mb-2 md:mb-3 px-2">
     <div
       className="
-        relative w-full max-w-md mx-auto px-3 py-2
+        relative w-full max-w-xl mx-auto px-6 py-4
         bg-gradient-to-b from-[#fdf6fb] via-[#fbeff7] to-[#f6e5f0]
         rounded-2xl
         border border-[#e6d2e1]
@@ -1000,16 +1000,12 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
       "
     >
       <div className="mx-auto text-center">
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-serif text-[#8e3e3e]">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-[#8e3e3e]">
           <span className="block tracking-wide">ON THIS DAY</span>
-          <span className="text-xs sm:text-sm md:text-base block mt-0.5 text-[#b4667f]">
+          <span className="text-sm sm:text-base md:text-lg block mt-1 text-[#b4667f]">
             across Taylor&apos;s eras
           </span>
         </h2>
-
-        <p className="mt-1 text-[#6b7db3] text-xs leading-relaxed px-1">
-          Explore what happened on this day across the years
-        </p>
       </div>
 
       {/* Side stars */}
@@ -1032,42 +1028,9 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   </div>
 
   {/* Date navigation container with properly positioned TN box */}
-  <div className="relative mt-0 md:mt-1 max-w-3xl mx-auto">
+  <div className="relative mt-0 md:mt-1 max-w-3xl mx-auto lg:mb-2">
     {/* Main date navigation - CENTERED (Date Calc does NOT affect centering) */}
 <div className="relative w-full">
-  {/* Mobile: Date Calc on its own row */}
-  <div className="flex justify-center mb-2 sm:hidden">
-    <Button
-      variant="secondary"
-      className="
-        rounded-full h-7 px-3
-        text-[10px]
-        flex items-center justify-center
-        min-w-[90px]
-      "
-      onClick={() => setShowDateCalc(true)}
-      title="Open date calculator"
-    >
-      Date Calc
-    </Button>
-  </div>
-
-  {/* Desktop/tablet: Date Calc pinned left, doesn't push center */}
-  <div className="hidden sm:block absolute left-0 top-1/2 -translate-y-1/2">
-    <Button
-      variant="secondary"
-      className="
-        rounded-full h-7 md:h-8 px-2 md:px-3
-        text-[10px] sm:text-xs
-        flex items-center justify-center
-        min-w-[90px]
-      "
-      onClick={() => setShowDateCalc(true)}
-      title="Open date calculator"
-    >
-      Date Calc
-    </Button>
-  </div>
 
   {/* TRUE centered row */}
   <div className="flex items-center justify-center gap-1 md:gap-2">
@@ -1090,8 +1053,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
       <div
         className="
           bg-white rounded-full
-          pl-3 sm:pl-4
-          pr-7 sm:pr-8
+          px-3 sm:px-4
           py-0.5
           min-w-[120px] sm:min-w-[140px]
           border border-[#b66b6b]
@@ -1105,20 +1067,6 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           })}
         </span>
       </div>
-
-      <button
-        onClick={() => setShowCalendar(true)}
-        className="
-          absolute right-1 sm:right-1.5
-          top-1/2 -translate-y-1/2
-          bg-white rounded-full p-0.5
-          shadow-sm border border-[#b66b6b]
-          hover:bg-[#f8d7da] transition-colors
-        "
-        title="Open calendar"
-      >
-        <Calendar size={12} className="text-[#8e3e3e]" />
-      </button>
     </div>
 
     <Button
@@ -1135,140 +1083,33 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
       <ChevronRight size={10} />
     </Button>
   </div>
+ <div className="flex justify-center mt-2">
+  <button
+    type="button"
+    onClick={() => setShowDateTools(true)}
+    className="rounded-full bg-[#8fa0cf] hover:bg-[#8396c9] text-white text-xs font-medium px-4 h-7 shadow-sm transition-colors whitespace-nowrap flex items-center gap-1.5"
+  >
+    <Calendar size={11} />
+    Date Tools
+  </button>
 </div>
-
-    {/* TN box - Desktop: positioned to right */}
-    <div
-      className="
-        hidden
-        lg:block lg:absolute lg:right-[-10px] lg:top-[-5px]
-      "
+  {isTorontoMode && (
+  <div className="flex justify-center mt-2">
+    <button
+      type="button"
+      onClick={() => {
+        setCurrentYear(matchingRealDate.getFullYear())
+        setCurrentMonth(matchingRealDate.getMonth() + 1)
+        setCurrentDay(matchingRealDate.getDate())
+        setIsTorontoMode(false)
+      }}
+      className="text-sm text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
     >
-      <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 w-56">
-        <Button
-          variant="outline"
-          className="
-            rounded-xl px-2 py-1
-            text-xs font-medium
-            border-[#b66b6b] text-[#8e3e3e]
-            bg-white/95 hover:bg-[#fbeff7]
-            w-full break-words whitespace-normal
-            flex items-center justify-center text-center
-          "
-          onClick={() => {
-  if (isTorontoMode) {
-    // FIXED: Go to the matching real date shown on the button, not today
-    setCurrentYear(matchingRealDate.getFullYear())
-    setCurrentMonth(matchingRealDate.getMonth() + 1)
-    setCurrentDay(matchingRealDate.getDate())
-    setIsTorontoMode(false)
-  } else {
-    setCurrentYear(torontoDate.getFullYear())
-    setCurrentMonth(torontoDate.getMonth() + 1)
-    setCurrentDay(torontoDate.getDate())
-    setIsTorontoMode(true)
-  }
-}}
-        >
-          {isTorontoMode ? (
-            <span className="font-semibold flex items-center">
-              <ChevronLeft size={12} className="mr-1" />
-              Return to: {matchingRealLabel}
-            </span>
-          ) : (
-            <span className="font-semibold flex flex-col leading-snug">
-              <span>Taylor Nation Timeline Date:</span>
-              <span className="text-[11px] mt-0.5">
-                {torontoDate.toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "2-digit",
-                  year: "numeric",
-                })}
-              </span>
-            </span>
-          )}
-        </Button>
-
-        <div className="mt-1 flex items-center justify-center gap-1 text-[11px]">
-          {isTorontoMode && (
-            <span className="text-[#6b7db3]">TN Timeline Mode</span>
-          )}
-          <button
-            type="button"
-            onClick={() => setShowTNInfo(true)}
-            className="inline-flex items-center text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
-          >
-            <HelpCircle size={10} className="mr-0.5" />
-            What is this?
-          </button>
-        </div>
-      </div>
-    </div>
-
-    {/* Mobile TN box - centered */}
-    <div className="mt-2 w-full md:mt-3 lg:hidden">
-      <div className="w-full flex justify-center">
-        <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 w-56">
-          <Button
-            variant="outline"
-            className="
-              rounded-xl px-2 py-1
-              text-xs font-medium
-              border-[#b66b6b] text-[#8e3e3e]
-              bg-white/95 hover:bg-[#fbeff7]
-              w-full break-words whitespace-normal
-              flex items-center justify-center text-center
-            "
-            onClick={() => {
-  if (isTorontoMode) {
-    // FIXED: Go to the matching real date shown on the button, not today
-    setCurrentYear(matchingRealDate.getFullYear())
-    setCurrentMonth(matchingRealDate.getMonth() + 1)
-    setCurrentDay(matchingRealDate.getDate())
-    setIsTorontoMode(false)
-  } else {
-    setCurrentYear(torontoDate.getFullYear())
-    setCurrentMonth(torontoDate.getMonth() + 1)
-    setCurrentDay(torontoDate.getDate())
-    setIsTorontoMode(true)
-  }
-}}
-          >
-            {isTorontoMode ? (
-              <span className="font-semibold flex items-center">
-                <ChevronLeft size={12} className="mr-1" />
-                Return to: {matchingRealLabel}
-              </span>
-            ) : (
-              <span className="font-semibold flex flex-col leading-snug">
-                <span>Taylor Nation Timeline Date:</span>
-                <span className="text-[11px] mt-0.5">
-                  {torontoDate.toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "2-digit",
-                    year: "numeric",
-                  })}
-                </span>
-              </span>
-            )}
-          </Button>
-
-          <div className="mt-1 flex items-center justify-center gap-1 text-[11px]">
-            {isTorontoMode && (
-              <span className="text-[#6b7db3]">TN Timeline Mode</span>
-            )}
-            <button
-              type="button"
-              onClick={() => setShowTNInfo(true)}
-              className="inline-flex items-center text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
-            >
-              <HelpCircle size={10} className="mr-0.5" />
-              What is this?
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+      ← Return to {matchingRealLabel}
+    </button>
+  </div>
+)}
+</div>
   </div>
 
   {/* 🌟 Global fixed-date holiday badge + Event Counter */}
@@ -1297,30 +1138,6 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
     </div>
   </div>
 )}
-
-    <div className="flex justify-center mt-0.5 mb-1 flex-shrink-0">
-      <div
-        className="
-          event-counter-pill
-          bg-white rounded-full px-2 py-0.5
-          border border-[#b66b6b] shadow-sm
-        "
-      >
-        <div className="flex items-center gap-1">
-          <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse" />
-                    <span className="event-counter-text text-[#8e3e3e] text-xs font-medium">
-            {isInitialLoad
-              ? `Loading ${SITE_UPDATES.totalEvents}+ events...`
-              : isLoading
-              ? "Loading events..."
-              : `${records.length} ${
-                  records.length === 1 ? "Event" : "Events"
-                } Found${isTorontoMode ? " (TN)" : ""}`}
-          </span>
-          <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse" />
-        </div>
-      </div>
-    </div>
   </div>
 </div>
             
@@ -1335,19 +1152,49 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
                 </div>
 
                 <div className="relative w-full max-w-xl mx-auto z-10 pt-2">
-                  {records.map((record, index) => (
-                    <div key={`mobile-${record.id}`} className="relative mb-4">
-                      <div className="absolute left-1/2 top-4 w-6 h-[2px] bg-[#8a9ad4] -translate-x-1/2" />
-                      <TimelineCard record={record} index={index} />
-                    </div>
-                  ))}
+                  {records.map((record, index) => {
+  const rawDate = record?.fields?.DATE
+  const recordYear = rawDate ? new Date(rawDate).getFullYear() : null
+  const isExactYear = recordYear === currentYear
+
+  const previousRecord = index > 0 ? records[index - 1] : null
+  const previousRawDate = previousRecord?.fields?.DATE
+  const previousYear = previousRawDate ? new Date(previousRawDate).getFullYear() : null
+  const previousWasExactYear = previousYear === currentYear
+
+  const showOtherYearsDivider =
+    isTorontoMode &&
+    index > 0 &&
+    !isExactYear &&
+    previousWasExactYear
+
+  return (
+    <div
+      key={`mobile-${record.id}`}
+      className="relative"
+      style={{ marginBottom: showOtherYearsDivider ? "10px" : "16px" }}
+    >
+      {showOtherYearsDivider && (
+        <div className="relative flex justify-center mb-2">
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[2px] h-8 bg-[#8a9ad4]" />
+          <span className="relative inline-block rounded-full bg-[#e8ecf7] border border-[#c5cae9] px-3 py-1 text-[11px] text-[#6b7db3] shadow-sm z-10" style={{ textDecoration: "none" }}>
+            Other years
+          </span>
+        </div>
+      )}
+
+      <div className="absolute left-1/2 top-4 w-6 h-[2px] bg-[#8a9ad4] -translate-x-1/2" />
+      <TimelineCard record={record} index={index} />
+    </div>
+  )
+})}
                 </div>
               </div>
             </div>
           )}
 
                     {/* Desktop Timeline – only show when there are events */}
-          {records.length > 0 && (
+  {records.length > 0 && (
             <div className="hidden md:block min-h-0">
               <div className="relative flex justify-center">
                 <div className="absolute w-[2px] flex flex-col items-center h-full">
@@ -1357,13 +1204,42 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
                 </div>
 
                 <div className="relative left-[37.5%] -translate-x-1/4 w-3/4">
-                  {records.map((record, index) => (
+                  {records.filter(r => !isTorontoMode || new Date(r.fields?.DATE).getFullYear() === currentYear).map((record, index) => (
                     <div
                       key={`desktop-${record.id}`}
                       className="relative transition-all duration-300"
-                      style={{
-                        marginTop: index === 0 ? "0" : "40px",
-                      }}
+                      style={{ marginTop: index === 0 ? "0" : "40px" }}
+                    >
+                      <div className="transform scale-[0.90] origin-top -translate-x-1/4">
+                        <TimelineCard record={record} index={index} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isTorontoMode && records.some(r => new Date(r.fields?.DATE).getFullYear() !== currentYear) && (
+            <div className="hidden md:flex justify-center my-4">
+              <span className="rounded-full bg-[#e8ecf7] px-4 py-1.5 text-xs text-[#6b7db3] border border-[#c5cae9] shadow-sm font-medium">
+                Other years
+              </span>
+            </div>
+          )}
+
+          {isTorontoMode && records.some(r => new Date(r.fields?.DATE).getFullYear() !== currentYear) && (
+            <div className="hidden md:block min-h-0">
+              <div className="relative flex justify-center">
+                <div className="absolute w-[2px] flex flex-col items-center h-full">
+                  <div className="w-[5px] bg-[#8a9ad4] h-full"></div>
+                </div>
+                <div className="relative left-[37.5%] -translate-x-1/4 w-3/4">
+                  {records.filter(r => new Date(r.fields?.DATE).getFullYear() !== currentYear).map((record, index) => (
+                    <div
+                      key={`desktop-other-${record.id}`}
+                      className="relative transition-all duration-300"
+                      style={{ marginTop: index === 0 ? "0" : "40px" }}
                     >
                       <div className="transform scale-[0.90] origin-top -translate-x-1/4">
                         <TimelineCard record={record} index={index} />
@@ -1407,15 +1283,29 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           </div>
           
           {/* Modals */}
-          <CalendarModal />
-          <TNInfoModal />
-          {showDateCalc && (
+<CalendarModal />
+<TNInfoModal />
+{showDateCalc && (
   <DateCalculatorModal onClose={() => setShowDateCalc(false)} />
+)}
+{showDateTools && (
+  <DateToolsModal
+    onClose={() => setShowDateTools(false)}
+    isTorontoMode={isTorontoMode}
+    setIsTorontoMode={setIsTorontoMode}
+    torontoDate={torontoDate}
+    matchingRealDate={matchingRealDate}
+    matchingRealLabel={matchingRealLabel}
+    setCurrentYear={setCurrentYear}
+    setCurrentMonth={setCurrentMonth}
+    setCurrentDay={setCurrentDay}
+    onShowTNInfo={() => setShowTNInfo(true)}
+  />
 )}
         </div>
           </div>{/* end mobileView today wrapper */}
           {/* Desktop sidebar */}
-          <div className="hidden lg:block w-[320px] shrink-0 pt-4">
+<div className="hidden lg:block w-[320px] shrink-0 pt-[140px]">
             <RecentEvents />
           </div>
         </div>
