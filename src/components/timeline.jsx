@@ -1388,7 +1388,12 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   <DateCalculatorModal onClose={() => setShowDateCalc(false)} />
 )}
         </div>
-     </section>
+          {/* Desktop sidebar */}
+          <div className="hidden lg:block w-[320px] shrink-0 pt-4">
+            <RecentEvents />
+          </div>
+        </div>
+      </section>
 
       {/* Mobile: Recently + Upcoming below timeline */}
       <div className="lg:hidden w-full bg-[#e8ecf7] px-2 md:px-6 pb-6">
