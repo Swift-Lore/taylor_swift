@@ -390,7 +390,7 @@ const betweenRes = calculatorTab === "between" ? calcBetween() : null;
             </button>
           </div>
 
-<div className="flex flex-col min-h-[400px]">
+<div className="min-h-[400px]">
             {tab === "calendar" && (
   <>
     <div className="flex gap-2 mb-4">
