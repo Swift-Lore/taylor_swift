@@ -1,5 +1,6 @@
 "use client"
 
+import RecentEvents from "./RecentEvents"
 import { ChevronLeft, ChevronRight, Calendar, Star, Zap, Clock, HelpCircle } from "lucide-react"
 import { Button } from "./ui/Button"
 import { useNavigate, Link, useSearchParams } from "react-router-dom"
