@@ -708,6 +708,11 @@ const betweenRes = calculatorTab === "between" ? calcBetween() : null;
             </div>
           )}
         </div>
+     <div className="flex justify-center mt-4">
+        <Button variant="secondary" onClick={onClose} className="rounded-full px-6 w-full max-w-xs">
+          Close
+        </Button>
+      </div>
       </>
     )}
 
