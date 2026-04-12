@@ -135,7 +135,6 @@ function App() {
         cookieName="websiteCookieConsent"
           sameSite="Lax"
         onAccept={() => {
-  console.log("Cookies accepted");
 }}
 onDecline={() => {
   console.log("Non-essential cookies rejected");
