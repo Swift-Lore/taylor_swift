@@ -200,6 +200,7 @@ export default function Timeline() {
   const [showTNInfo, setShowTNInfo] = useState(false)
   const [showDateCalc, setShowDateCalc] = useState(false)
   const [isInitialLoad, setIsInitialLoad] = useState(true)
+  const [mobileView, setMobileView] = useState("today")
   
   // ===== SEO META TAGS UPDATE =====
   useEffect(() => {
