@@ -933,15 +933,21 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           <div className="lg:hidden flex justify-center gap-2 pt-3 pb-1">
             <button
               onClick={() => setMobileView("today")}
-              className={`px-5 py-1.5 rounded-full text-sm font-medium transition-colors ${mobileView === "today" ? "bg-[#b66b6b] text-white" : "bg-white text-[#6b7db3] border border-[#6b7db3]"}`}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${mobileView === "today" ? "bg-[#b66b6b] text-white" : "bg-white text-[#6b7db3] border border-[#6b7db3]"}`}
             >
-              On This Day
+              Today
             </button>
             <button
               onClick={() => setMobileView("recently")}
-              className={`px-5 py-1.5 rounded-full text-sm font-medium transition-colors ${mobileView === "recently" ? "bg-[#8a9ac7] text-white" : "bg-white text-[#6b7db3] border border-[#6b7db3]"}`}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${mobileView === "recently" ? "bg-[#8a9ac7] text-white" : "bg-white text-[#6b7db3] border border-[#6b7db3]"}`}
             >
-              Recently
+              Recent
+            </button>
+            <button
+              onClick={() => setMobileView("dayssince")}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${mobileView === "dayssince" ? "bg-[#b66b6b] text-white" : "bg-white text-[#6b7db3] border border-[#6b7db3]"}`}
+            >
+              Days Since
             </button>
           </div>
 
@@ -1415,7 +1421,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
       </section>
 
       {/* Mobile: Recently + Upcoming below timeline */}
-      <div className={`lg:hidden w-full bg-[#e8ecf7] px-2 md:px-6 pb-6 ${mobileView === "recently" ? "block" : "hidden"}`}>
+      <div className={`lg:hidden w-full bg-[#e8ecf7] px-2 md:px-6 pb-6 ${mobileView === "recently" || mobileView === "dayssince" ? "block" : "hidden"}`}>
         <div className="container mx-auto max-w-md">
           <RecentEvents />
         </div>
