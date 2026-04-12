@@ -268,7 +268,7 @@ export default function SearchResults() {
         {results.length >= 50 && (
           <div className="text-center">
             <p className="text-[#8a9ad4] text-sm mb-4">
-              Showing first 50 results. Refine your search for more specific results.
+              Showing first 100 results. Refine your search for more specific results.
             </p>
           </div>
         )}
