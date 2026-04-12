@@ -198,9 +198,10 @@ export default function Timeline() {
   const [currentYear, setCurrentYear] = useState(initialDate.getFullYear());
   const displayDate = new Date(currentYear, currentMonth - 1, currentDay)
   const [showTNInfo, setShowTNInfo] = useState(false)
-  const [showDateCalc, setShowDateCalc] = useState(false)
-  const [isInitialLoad, setIsInitialLoad] = useState(true)
-  const [mobileView, setMobileView] = useState("today")
+const [showDateCalc, setShowDateCalc] = useState(false)
+const [showDateTools, setShowDateTools] = useState(false)
+const [isInitialLoad, setIsInitialLoad] = useState(true)
+const [mobileView, setMobileView] = useState("today")
   
   // ===== SEO META TAGS UPDATE =====
   useEffect(() => {
