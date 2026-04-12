@@ -227,4 +227,110 @@ export default function RecentEvents() {
             <span className="w-2 h-2 rounded-full bg-[#b66b6b] inline-block" />
             Days Since...
           </h3>
-          <div className="flex flex-col gap-3
+          <div className="flex flex-col gap-3">
+            {TRACKER_KEYS.map((key) => {
+              const record = trackerData[key]
+              if (!record) return null
+              const days = getDaysSince(record.fields?.DATE)
+              if (days === null) return null
+              return (
+                <Link
+                  key={key}
+                  to={`/post_details?id=${record.id}`}
+                  className="block bg-[#eef0fb] border border-[#c5cae9] rounded-xl p-3 hover:shadow-md hover:border-[#8a9ac7] transition-all duration-200"
+                  draggable={false}
+                  onDragStart={(e) => e.preventDefault()}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[11px] font-semibold text-[#6b7db3] uppercase tracking-wide">
+                      {TRACKER_LABELS[key]}
+                    </span>
+                    <span className="shrink-0 bg-[#b66b6b] text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                      {days}d ago
+                    </span>
+                  </div>
+                  <p className="text-[#3d3d6b] text-xs mt-1 line-clamp-1">
+                    {record.fields?.EVENT || ""}
+                  </p>
+                  <p className="text-[#8a9ac7] text-[10px] mt-0.5">
+                    {formatDate(record.fields?.DATE)}
+                  </p>
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Mobile: always show both sections (controlled by timeline.jsx tab) */}
+      <div className="lg:hidden flex flex-col gap-4">
+        {recent.length > 0 && (
+          <div className="bg-white/60 border border-[#c5cae9] rounded-2xl p-4 shadow-sm">
+            <h3 className="text-sm font-semibold text-[#3d3d6b] mb-3 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#8a9ac7] inline-block" />
+              Recently
+            </h3>
+            <div className="flex flex-col gap-2">
+              {recent.map((record) => (
+                <EventCard key={record.id} record={record} />
+              ))}
+            </div>
+          </div>
+        )}
+        {upcoming.length > 0 && (
+          <div className="bg-white/60 border border-[#c5cae9] rounded-2xl p-4 shadow-sm">
+            <h3 className="text-sm font-semibold text-[#3d3d6b] mb-3 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#b66b6b] inline-block" />
+              Upcoming
+            </h3>
+            <div className="flex flex-col gap-2">
+              {upcoming.map((record) => (
+                <EventCard key={record.id} record={record} />
+              ))}
+            </div>
+          </div>
+        )}
+        {hasTrackerData && (
+          <div className="bg-white/60 border border-[#c5cae9] rounded-2xl p-4 shadow-sm">
+            <h3 className="text-sm font-semibold text-[#3d3d6b] mb-3 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#b66b6b] inline-block" />
+              Days Since...
+            </h3>
+            <div className="flex flex-col gap-3">
+              {TRACKER_KEYS.map((key) => {
+                const record = trackerData[key]
+                if (!record) return null
+                const days = getDaysSince(record.fields?.DATE)
+                if (days === null) return null
+                return (
+                  <Link
+                    key={key}
+                    to={`/post_details?id=${record.id}`}
+                    className="block bg-[#eef0fb] border border-[#c5cae9] rounded-xl p-3 hover:shadow-md hover:border-[#8a9ac7] transition-all duration-200"
+                    draggable={false}
+                    onDragStart={(e) => e.preventDefault()}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-[11px] font-semibold text-[#6b7db3] uppercase tracking-wide">
+                        {TRACKER_LABELS[key]}
+                      </span>
+                      <span className="shrink-0 bg-[#b66b6b] text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                        {days}d ago
+                      </span>
+                    </div>
+                    <p className="text-[#3d3d6b] text-xs mt-1 line-clamp-1">
+                      {record.fields?.EVENT || ""}
+                    </p>
+                    <p className="text-[#8a9ac7] text-[10px] mt-0.5">
+                      {formatDate(record.fields?.DATE)}
+                    </p>
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
