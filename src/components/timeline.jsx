@@ -1113,6 +1113,22 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
     Calendar Tools
   </button>
 </div>
+  {isTorontoMode && (
+  <div className="flex justify-center mt-2">
+    <button
+      type="button"
+      onClick={() => {
+        setCurrentYear(matchingRealDate.getFullYear())
+        setCurrentMonth(matchingRealDate.getMonth() + 1)
+        setCurrentDay(matchingRealDate.getDate())
+        setIsTorontoMode(false)
+      }}
+      className="text-sm text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
+    >
+      ← Return to {matchingRealLabel}
+    </button>
+  </div>
+)}
 </div>
   </div>
 
