@@ -16,6 +16,76 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
     };
   }, []);
 
+const monthNames = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+
+const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+const getDaysInMonth = (month, year) => {
+  return new Date(year, month + 1, 0).getDate();
+};
+
+const getFirstDayOfMonth = (month, year) => {
+  return new Date(year, month, 1).getDay();
+};
+
+const generateCalendar = () => {
+  const daysInMonth = getDaysInMonth(calendarMonth, calendarYear);
+  const firstDay = getFirstDayOfMonth(calendarMonth, calendarYear);
+  const calendar = [];
+
+  for (let i = 0; i < firstDay; i++) {
+    calendar.push(null);
+  }
+
+  for (let i = 1; i <= daysInMonth; i++) {
+    calendar.push(i);
+  }
+
+  while (calendar.length < 42) {
+    calendar.push(null);
+  }
+
+  return calendar;
+};
+
+const navigateCalendarMonth = (direction) => {
+  if (direction === "prev") {
+    if (calendarMonth === 0) {
+      setCalendarMonth(11);
+      setCalendarYear(calendarYear - 1);
+    } else {
+      setCalendarMonth(calendarMonth - 1);
+    }
+  } else {
+    if (calendarMonth === 11) {
+      setCalendarMonth(0);
+      setCalendarYear(calendarYear + 1);
+    } else {
+      setCalendarMonth(calendarMonth + 1);
+    }
+  }
+};
+
+const jumpToThisMonth = () => {
+  const now = new Date();
+  setCalendarMonth(now.getMonth());
+  setCalendarYear(now.getFullYear());
+};
+
+const handleDateSelect = (day) => {
+  if (!day) return;
+
+  const selectedDate = new Date(calendarYear, calendarMonth, day);
+  const formattedDate = `${selectedDate.getFullYear()}-${String(
+    selectedDate.getMonth() + 1
+  ).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`;
+
+  window.location.search = `?date=${formattedDate}`;
+};
+  
   return (
     <>
       <div
