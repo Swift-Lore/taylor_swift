@@ -1379,7 +1379,6 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               View Full Timeline
             </Button>
           </div>
-          <RecentEvents />
           
           {/* Modals */}
           <CalendarModal />
