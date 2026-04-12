@@ -69,8 +69,6 @@ export default function SearchResults() {
           ? `AND(${searchConditions.join(', ')})`
           : searchConditions[0]
 
-        console.log('Search filter:', filterFormula) // Debug log
-
         const response = await axios.get(
           "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
           {
