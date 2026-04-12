@@ -1,29 +1,80 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
+import { ChevronLeft, ChevronRight, Star, Zap, Clock } from "lucide-react";
 import { Button } from "./ui/Button";
 
 export default function DateToolsModal({ onClose }) {
   const [tab, setTab] = useState("calendar");
-  const today = new Date();
-const [calendarMonth, setCalendarMonth] = useState(today.getMonth());
-const [calendarYear, setCalendarYear] = useState(today.getFullYear());
-const [selectedDate, setSelectedDate] = useState(today);
+  const getInitialSelectedDate = () => {
+  const params = new URLSearchParams(window.location.search);
+  const dateParam = params.get("date");
+
+  if (dateParam) {
+    const parsed = new Date(dateParam + "T00:00:00");
+    if (!isNaN(parsed.getTime())) return parsed;
+  }
+
+  return new Date();
+};
+
+const initialSelectedDate = getInitialSelectedDate();
+const today = new Date();
+
+const [calendarMonth, setCalendarMonth] = useState(initialSelectedDate.getMonth());
+const [calendarYear, setCalendarYear] = useState(initialSelectedDate.getFullYear());
+const [selectedDate, setSelectedDate] = useState(initialSelectedDate);
 const [dateEventsMap, setDateEventsMap] = useState({});
 
-  useEffect(() => {
-    const originalStyle = window.getComputedStyle(document.body).overflow;
-    document.body.style.overflow = "hidden";
+useEffect(() => {
+  const originalStyle = window.getComputedStyle(document.body).overflow;
+  document.body.style.overflow = "hidden";
 
-    return () => {
-      document.body.style.overflow = originalStyle;
-    };
-  }, []);
+  return () => {
+    document.body.style.overflow = originalStyle;
+  };
+}, []);
 
-const monthNames = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
-];
+useEffect(() => {
+  const fetchEventsForMonth = async (month, year) => {
+    try {
+      const response = await axios.get(
+        "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+        {
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+          },
+          params: {
+            filterByFormula: `AND(MONTH({DATE}) = ${month}, YEAR({DATE}) = ${year})`,
+            fields: ["DATE"],
+          },
+        }
+      );
 
-const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      const eventsMap = {};
+      response.data.records?.forEach((record) => {
+        const raw = record.fields.DATE;
+        if (!raw) return;
+
+        const [datePart] = raw.split("T");
+        const [yearStr, monthStr, dayStr] = datePart.split("-");
+        if (!yearStr || !monthStr || !dayStr) return;
+
+        const y = Number(yearStr);
+        const m = Number(monthStr);
+        const d = Number(dayStr);
+
+        const dateKey = `${y}-${m}-${d}`;
+        eventsMap[dateKey] = true;
+      });
+
+      setDateEventsMap((prev) => ({ ...prev, ...eventsMap }));
+    } catch (error) {
+      console.error("Error fetching calendar events:", error);
+    }
+  };
+
+  fetchEventsForMonth(calendarMonth + 1, calendarYear);
+}, [calendarMonth, calendarYear]);
 
 const getDaysInMonth = (month, year) => {
   return new Date(year, month + 1, 0).getDate();
@@ -53,6 +104,25 @@ const generateCalendar = () => {
   return calendar;
 };
 
+const hasEvents = (day) => {
+  if (!day) return false;
+  const dateKey = `${calendarYear}-${calendarMonth + 1}-${day}`;
+  return !!dateEventsMap[dateKey];
+};
+
+const handleDateSelect = (day) => {
+  if (!day) return;
+
+  const newSelectedDate = new Date(calendarYear, calendarMonth, day);
+  setSelectedDate(newSelectedDate);
+
+  const formattedDate = `${newSelectedDate.getFullYear()}-${String(
+    newSelectedDate.getMonth() + 1
+  ).padStart(2, "0")}-${String(newSelectedDate.getDate()).padStart(2, "0")}`;
+
+  window.location.search = `?date=${formattedDate}`;
+};
+
 const navigateCalendarMonth = (direction) => {
   if (direction === "prev") {
     if (calendarMonth === 0) {
@@ -77,16 +147,25 @@ const jumpToThisMonth = () => {
   setCalendarYear(now.getFullYear());
 };
 
-const handleDateSelect = (day) => {
-  if (!day) return;
+const jumpToToday = () => {
+  const now = new Date();
+  setSelectedDate(now);
+  setCalendarMonth(now.getMonth());
+  setCalendarYear(now.getFullYear());
 
-  const selectedDate = new Date(calendarYear, calendarMonth, day);
-  const formattedDate = `${selectedDate.getFullYear()}-${String(
-    selectedDate.getMonth() + 1
-  ).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`;
+  const formattedDate = `${now.getFullYear()}-${String(
+    now.getMonth() + 1
+  ).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 
   window.location.search = `?date=${formattedDate}`;
 };
+
+const monthNames = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+
+const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   
   return (
     <>
