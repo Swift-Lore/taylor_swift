@@ -909,7 +909,7 @@ const resetPagination = () => {
         >
           <div className="relative pt-1 flex flex-col">
             {/* date pill */}
-            <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 bg-[#8e3e3e] text-white text-xs font-medium px-2 py-1 rounded-full z-10">
+            <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 bg-[#b66b6b] text-white text-xs font-medium px-2 py-1 rounded-full z-10">
               {post.date}
             </div>
 
