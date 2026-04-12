@@ -35,7 +35,7 @@ const EventCard = ({ record }) => {
           ))}
         </div>
       )}
-    </div>
+    </Link>
   )
 }
 
