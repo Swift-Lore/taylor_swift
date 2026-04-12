@@ -1095,20 +1095,6 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           })}
         </span>
       </div>
-
-      <button
-        onClick={() => setShowDateTools(true)}
-        className="
-          absolute right-1 sm:right-1.5
-          top-1/2 -translate-y-1/2
-          bg-white rounded-full p-0.5
-          shadow-sm border border-[#b66b6b]
-          hover:bg-[#f8d7da] transition-colors
-        "
-        title="Open calendar"
-      >
-        <Calendar size={12} className="text-[#8e3e3e]" />
-      </button>
     </div>
 
     <Button
