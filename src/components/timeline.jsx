@@ -953,8 +953,8 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
 <div className={mobileView === "recently" || mobileView === "dayssince" ? "hidden lg:block" : ""}>
 
             
-          {/* Homepage Intro for SEO / AdSense - WIDER but same height */}
-          <div className="max-w-4xl mx-auto mt-1 mb-2 px-3">
+          {/* Homepage Intro for SEO / AdSense - hidden on mobile */}
+          <div className="hidden md:block max-w-4xl mx-auto mt-1 mb-2 px-3">
             <div className="bg-white/70 border border-[#e3d5dd] rounded-xl shadow-sm px-4 py-3 md:px-6 md:py-3 text-center">
               <h2 className="text-base md:text-lg font-semibold text-[#8e3e3e] mb-2">
                 Swift-Lore: Taylor Swift's Complete Career Timeline
