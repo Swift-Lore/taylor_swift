@@ -1115,61 +1115,6 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
 </div>
 </div>
 
-    <div className="hidden lg:flex justify-center mt-2">
-  <div className="text-xs text-[#6b7db3] flex items-center gap-2 flex-wrap justify-center">
-    {isTorontoMode ? (
-      <>
-        <span className="font-medium text-[#8e3e3e]">Viewing TN timeline</span>
-        <button
-          type="button"
-          onClick={() => {
-            setCurrentYear(matchingRealDate.getFullYear())
-            setCurrentMonth(matchingRealDate.getMonth() + 1)
-            setCurrentDay(matchingRealDate.getDate())
-            setIsTorontoMode(false)
-          }}
-          className="text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
-        >
-          Return to {matchingRealLabel}
-        </button>
-      </>
-    ) : (
-      <>
-        <span>
-          Taylor Nation Timeline:{" "}
-          <span className="font-medium text-[#8e3e3e]">
-            {torontoDate.toLocaleDateString("en-US", {
-              month: "short",
-              day: "2-digit",
-              year: "numeric",
-            })}
-          </span>
-        </span>
-        <button
-          type="button"
-          onClick={() => {
-            setCurrentYear(torontoDate.getFullYear())
-            setCurrentMonth(torontoDate.getMonth() + 1)
-            setCurrentDay(torontoDate.getDate())
-            setIsTorontoMode(true)
-          }}
-          className="text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
-        >
-          Switch
-        </button>
-        <button
-          type="button"
-          onClick={() => setShowTNInfo(true)}
-          className="inline-flex items-center text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
-        >
-          <HelpCircle size={10} className="mr-1" />
-          What is this?
-        </button>
-      </>
-    )}
-  </div>
-</div>
-
     {/* Mobile TN box - centered */}
     <div className="mt-2 w-full md:mt-3 lg:hidden">
       <div className="w-full flex justify-center">
