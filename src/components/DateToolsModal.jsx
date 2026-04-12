@@ -992,7 +992,7 @@ const betweenRes = calculatorTab === "between" ? calcBetween() : null;
       )}
     </div>
 
-    <div className="flex justify-center mt-16">
+    <div className="flex justify-center mt-4">
   <button
     type="button"
     onClick={() => setShowTNExplanation((prev) => !prev)}
