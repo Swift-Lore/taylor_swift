@@ -939,7 +939,7 @@ const betweenRes = calculatorTab === "between" ? calcBetween() : null;
             Currently Viewing
           </div>
           <div className="text-lg font-semibold text-[#8e3e3e] mb-3">
-            TN Timeline Mode
+            Taylor Nation Timeline Mode
           </div>
           <div className="text-sm text-[#6b7db3] mb-4">
   Real date:
