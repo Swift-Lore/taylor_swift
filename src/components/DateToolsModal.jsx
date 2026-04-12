@@ -166,6 +166,165 @@ const monthNames = [
 ];
 
 const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+// --- Calculator tabs/state ---
+const [calculatorTab, setCalculatorTab] = useState("between");
+const [includeEndDate, setIncludeEndDate] = useState(false);
+const [startBetween, setStartBetween] = useState("");
+const [endBetween, setEndBetween] = useState("");
+
+const [baseDate, setBaseDate] = useState(() => {
+  const t = new Date();
+  return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(
+    t.getDate()
+  ).padStart(2, "0")}`;
+});
+
+const [sign, setSign] = useState(1);
+const [deltaYears, setDeltaYears] = useState("");
+const [deltaMonths, setDeltaMonths] = useState("");
+const [deltaDays, setDeltaDays] = useState("");
+
+// --- Calculator helpers ---
+const toDateUTC = (yyyyMMdd) => {
+  if (!yyyyMMdd) return null;
+  const [y, m, d] = yyyyMMdd.split("-").map(Number);
+  if (!y || !m || !d) return null;
+  return new Date(Date.UTC(y, m - 1, d));
+};
+
+const formatMMDDYYYY = (dateObj) => {
+  if (!dateObj) return "";
+  const m = String(dateObj.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(dateObj.getUTCDate()).padStart(2, "0");
+  const y = dateObj.getUTCFullYear();
+  return `${m}/${d}/${y}`;
+};
+
+const todayISO = () => {
+  const t = new Date();
+  return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(
+    t.getDate()
+  ).padStart(2, "0")}`;
+};
+
+const lastDayOfMonthUTC = (year, monthIndex0) =>
+  new Date(Date.UTC(year, monthIndex0 + 1, 0)).getUTCDate();
+
+const addYearsUTC = (dateObj, yearsToAdd) => {
+  const y = dateObj.getUTCFullYear();
+  const m = dateObj.getUTCMonth();
+  const d = dateObj.getUTCDate();
+  const newY = y + yearsToAdd;
+  const maxD = lastDayOfMonthUTC(newY, m);
+  return new Date(Date.UTC(newY, m, Math.min(d, maxD)));
+};
+
+const addMonthsUTC = (dateObj, monthsToAdd) => {
+  const y = dateObj.getUTCFullYear();
+  const m = dateObj.getUTCMonth();
+  const d = dateObj.getUTCDate();
+
+  const total = m + monthsToAdd;
+  const newY = y + Math.floor(total / 12);
+  const newM = ((total % 12) + 12) % 12;
+
+  const maxD = lastDayOfMonthUTC(newY, newM);
+  return new Date(Date.UTC(newY, newM, Math.min(d, maxD)));
+};
+
+const addDaysUTC = (dateObj, daysToAdd) =>
+  new Date(dateObj.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
+
+const diffDaysUTC = (a, b) => {
+  const msPerDay = 24 * 60 * 60 * 1000;
+  return Math.round((b.getTime() - a.getTime()) / msPerDay);
+};
+
+const calcAddSubtract = () => {
+  const base = toDateUTC(baseDate);
+  if (!base) return null;
+
+  const y = parseInt(deltaYears || "0", 10) * sign;
+  const mo = parseInt(deltaMonths || "0", 10) * sign;
+  const da = parseInt(deltaDays || "0", 10) * sign;
+
+  if (Number.isNaN(y) || Number.isNaN(mo) || Number.isNaN(da)) return null;
+
+  let out = addYearsUTC(base, y);
+  out = addMonthsUTC(out, mo);
+  out = addDaysUTC(out, da);
+
+  return { base, out, totalDayShift: diffDaysUTC(base, out) };
+};
+
+const calcBetween = () => {
+  const start = toDateUTC(startBetween);
+  const end = toDateUTC(endBetween);
+  if (!start || !end) return null;
+
+  const isReversed = end.getTime() < start.getTime();
+  const earlier = isReversed ? end : start;
+  const later = isReversed ? start : end;
+
+  const totalDaysExclusive = diffDaysUTC(earlier, later);
+  const totalDays = totalDaysExclusive + (includeEndDate ? 1 : 0);
+  const finalTotalDays = isReversed ? -totalDays : totalDays;
+
+  let yCursor = new Date(earlier.getTime());
+  let yOnlyYears = 0;
+  while (addYearsUTC(yCursor, 1).getTime() <= later.getTime()) {
+    yCursor = addYearsUTC(yCursor, 1);
+    yOnlyYears += 1;
+  }
+  const yOnlyDays = diffDaysUTC(yCursor, later);
+
+  let cursor = new Date(earlier.getTime());
+
+  let years = 0;
+  while (addYearsUTC(cursor, 1).getTime() <= later.getTime()) {
+    cursor = addYearsUTC(cursor, 1);
+    years += 1;
+  }
+
+  let months = 0;
+  while (addMonthsUTC(cursor, 1).getTime() <= later.getTime()) {
+    cursor = addMonthsUTC(cursor, 1);
+    months += 1;
+  }
+
+  const days = diffDaysUTC(cursor, later);
+
+  const finalYears = isReversed ? -years : years;
+  const finalMonths = isReversed ? -months : months;
+  const finalDays = isReversed ? -days : days;
+  const totalMonths = years * 12 + months;
+  const finalTotalMonths = isReversed ? -totalMonths : totalMonths;
+
+  return {
+    start,
+    end,
+    isReversed,
+    earlier,
+    later,
+    totalDays: finalTotalDays,
+    yOnly: {
+      years: isReversed ? -yOnlyYears : yOnlyYears,
+      days: isReversed ? -yOnlyDays : yOnlyDays,
+    },
+    ymd: { years: finalYears, months: finalMonths, days: finalDays },
+    md: { months: finalTotalMonths, days: finalDays },
+  };
+};
+
+const swapDates = () => {
+  const temp = startBetween;
+  setStartBetween(endBetween);
+  setEndBetween(temp);
+};
+
+const addRes = calculatorTab === "add" ? calcAddSubtract() : null;
+const betweenRes = calculatorTab === "between" ? calcBetween() : null;
   
   return (
     <>
