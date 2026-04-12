@@ -1158,7 +1158,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
     ) : (
       <>
         <span>
-          TN timeline date:{" "}
+          Taylor Nation Timeline:{" "}
           <span className="font-medium text-[#8e3e3e]">
             {torontoDate.toLocaleDateString("en-US", {
               month: "short",
