@@ -288,22 +288,12 @@ export default function Header() {
                 onClick={handleLogoClick}
                 className="w-full max-w-[700px] cursor-pointer relative -mt-1 md:-mt-2"
               >
-                {/* Smaller decorative stars */}
-                <span className="absolute left-6 md:left-8 top-6 md:top-8 text-white/70 text-lg md:text-2xl twinkle">
-                  ✨
-                </span>
-                <span className="absolute right-8 md:right-12 top-4 md:top-6 text-white/70 text-xl md:text-3xl twinkle">
-                  ✨
-                </span>
-                <span className="absolute right-16 md:right-24 bottom-6 md:bottom-8 text-white/70 text-base md:text-xl twinkle">
-                  ✨
-                </span>
 
                 {/* Smaller logo */}
                 <img
                   src="/images/swift_lore.png"
                   alt="Swift-Lore"
-                  className="w-full h-auto object-contain max-h-[140px] md:max-h-[160px] logo-glow"
+                  className="w-full h-auto object-contain max-h-[100px] md:max-h-[120px] logo-glow"
                 />
               </button>
             </div>
@@ -311,7 +301,7 @@ export default function Header() {
             {/* Home / Eras hero content - more compact */}
             {showHero && (
               <div className="w-full md:w-2/5 flex flex-col items-center md:items-start gap-2 text-center md:text-left relative z-20">
-                <div className="w-full max-w-xs">
+                <div className="w-full max-w-sm">
                   <form onSubmit={handleSearch} className="relative">
                     <input
                       type="text"
@@ -329,7 +319,7 @@ export default function Header() {
   {/* Home button – show on About/Eras/etc, NOT on actual home page */}
   {!isHomePage && (
     <button
-      className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-4 py-1.5 font-semibold text-xs w-full sm:w-auto shadow-sm transition-colors whitespace-nowrap"
+      className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-2 font-semibold text-sm w-full sm:w-auto shadow-sm transition-colors whitespace-nowrap"
       onClick={() => navigate("/")}
     >
       Home
@@ -338,7 +328,7 @@ export default function Header() {
 
   {/* Full Timeline */}
   <button
-    className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-4 py-1.5 font-semibold text-xs w-full sm:w-auto shadow-sm transition-colors whitespace-nowrap"
+    className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-2 font-semibold text-sm w-full sm:w-auto shadow-sm transition-colors whitespace-nowrap"
     onClick={() => navigate("/posts")}
   >
     View Full Timeline
@@ -347,7 +337,7 @@ export default function Header() {
   {/* Eras Tour Shows – hide on the Eras page itself */}
   {!isErasPage && (
     <button
-      className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-4 py-1.5 font-semibold text-xs w-full sm:w-auto shadow-sm transition-colors whitespace-nowrap"
+      className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-2 font-semibold text-sm w-full sm:w-auto shadow-sm transition-colors whitespace-nowrap"
       onClick={() => navigate("/eras-tour-shows")}
     >
       Eras Tour Shows

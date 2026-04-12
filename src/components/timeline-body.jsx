@@ -126,6 +126,8 @@ const [searchOffsetHistory, setSearchOffsetHistory] = useState([null])
 const [searchOffsetIndex, setSearchOffsetIndex] = useState(0)
 
     const [isFilterMode, setIsFilterMode] = useState(false)
+  const [debouncedStart, setDebouncedStart] = useState("")
+const [debouncedEnd, setDebouncedEnd] = useState("")
 
   // Calendar state
   const [showCalendar, setShowCalendar] = useState(false)
@@ -452,6 +454,16 @@ useEffect(() => {
   }
 }, [monthDay])
 
+useEffect(() => {
+  const timer = setTimeout(() => setDebouncedStart(startDateInput), 600)
+  return () => clearTimeout(timer)
+}, [startDateInput])
+
+useEffect(() => {
+  const timer = setTimeout(() => setDebouncedEnd(endDateInput), 600)
+  return () => clearTimeout(timer)
+}, [endDateInput])
+  
 // filter keywords list (using dynamic list from Airtable)
 const getFilteredKeywords = () => {
   const source = allKeywords.length ? allKeywords : []
@@ -482,8 +494,8 @@ const getFilteredKeywords = () => {
       try {
         const clauses = []
 
-        const startISO = parseMMDDYYYYToISO(startDateInput)
-        const endISO = parseMMDDYYYYToISO(endDateInput)
+        const startISO = parseMMDDYYYYToISO(debouncedStart)
+        const endISO = parseMMDDYYYYToISO(debouncedEnd)
 
         // inclusive start: DATE >= startISO
         if (startISO) {
@@ -612,8 +624,8 @@ setPosts(formattedPosts)
     sortOrder,
     filterKeywords,
     keywordMatchType,
-    startDateInput,
-    endDateInput,
+    debouncedStart,
+    debouncedEnd,
     monthDay,
     searchQuery,
     offsetHistory,
@@ -656,13 +668,19 @@ useEffect(() => {
 const handleStartDateChange = (value) => {
   userInteractedRef.current = true
   setStartDateInput(value)
-  resetPagination()
+  // Only reset pagination when date is complete or cleared
+  if (value === "" || /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(value)) {
+    resetPagination()
+  }
 }
 
 const handleEndDateChange = (value) => {
   userInteractedRef.current = true
   setEndDateInput(value)
-  resetPagination()
+  // Only reset pagination when date is complete or cleared
+  if (value === "" || /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(value)) {
+    resetPagination()
+  }
 }
 
   // Search
@@ -905,17 +923,17 @@ const resetPagination = () => {
         <Link
           key={post.id}
           to={`/post_details?id=${post.id}`}
-          className="bg-[#ffe8e8] rounded-xl overflow-hidden border border-[#ffcaca] flex flex-col hover:shadow-lg transition-shadow duration-200 cursor-pointer h-full"
+          className="bg-[#ffe8e8] rounded-xl overflow-hidden border border-[#ffcaca] shadow-sm flex flex-col hover:shadow-lg transition-shadow duration-200 cursor-pointer h-full"
         >
           <div className="relative pt-1 flex flex-col">
             {/* date pill */}
-            <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 bg-white text-[#b91c1c] text-xs font-medium px-2 py-1 rounded-full z-10">
+            <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 bg-[#b66b6b] text-white text-xs font-medium px-2 py-1 rounded-full z-10">
               {post.date}
             </div>
 
             {/* title */}
-            <div className="px-4 pt-6 pb-2 mt-2">
-              <h3 className="text-[#b91c1c] font-medium text-sm text-center line-clamp-2">
+            <div className="px-4 pt-5 pb-1 mt-1">
+              <h3 className="text-[#8e3e3e]] font-medium text-sm text-center line-clamp-2">
                 {post.title}
               </h3>
             </div>
@@ -932,9 +950,9 @@ const resetPagination = () => {
             )}
           </div>
 
-          <div className="p-4 flex flex-col flex-grow">
+          <div className="px-4 pb-4 pt-2 flex flex-col flex-grow border-t border-[#ffcaca]">
             {post.notes && (
-              <div className="text-[#6b7db3] text-xs mb-2 line-clamp-2 whitespace-pre-line">
+              <div className="text-[#4b4b63] text-xs mb-2 line-clamp-4 whitespace-pre-line">
                 {post.notes}
               </div>
             )}
@@ -1232,7 +1250,6 @@ const CalendarModal = () => {
 
       {/* Filters */}
       <div className="max-w-6xl mx-auto px-4 mb-6">
-        {/* ... your existing filters code continues from here ... */}
         <div className="relative flex flex-wrap gap-2 py-4 items-center overflow-visible">
           {/* Sort By */}
           <div className="relative">
