@@ -1232,7 +1232,6 @@ const CalendarModal = () => {
 
       {/* Filters */}
       <div className="max-w-6xl mx-auto px-4 mb-6">
-        {/* ... your existing filters code continues from here ... */}
         <div className="relative flex flex-wrap gap-2 py-4 items-center overflow-visible">
           {/* Sort By */}
           <div className="relative">
