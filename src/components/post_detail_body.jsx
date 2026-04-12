@@ -838,7 +838,7 @@ const getEmbedJustifyClass = (count) => {
       {(hasNotes || hasSources) && (
         <section className="max-w-4xl mx-auto px-4 mb-10">
           {hasNotes && (
-            <div className="text-sm md:text-base text-[#111827] leading-relaxed mb-6">
+            <div className="text-sm md:text-base text-[#111827] leading-relaxed mb-6 bg-white/70 rounded-xl p-4 border border-[#e3d5dd]">
               <span className="font-semibold">Notes: </span>
               {formatNotes(event.NOTES)}
             </div>
