@@ -6,17 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import "./post_detail_body.css";
 import AdSlot from "./adslot";
 
-// YouTube video ID extractor
-const getYouTubeVideoId = (url) => {
-  if (!url) return null;
-  if (url.includes("shorts/")) {
-    return url.split("shorts/")[1];
-  } else if (url.includes("v=")) {
-    return url.split("v=")[1].split("&")[0];
-  }
-  return null;
-};
-
 // Image URL helper
 const isLikelyImage = (url) => {
   if (!url) return false;
