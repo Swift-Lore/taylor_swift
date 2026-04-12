@@ -656,13 +656,19 @@ useEffect(() => {
 const handleStartDateChange = (value) => {
   userInteractedRef.current = true
   setStartDateInput(value)
-  resetPagination()
+  // Only reset pagination when date is complete or cleared
+  if (value === "" || /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(value)) {
+    resetPagination()
+  }
 }
 
 const handleEndDateChange = (value) => {
   userInteractedRef.current = true
   setEndDateInput(value)
-  resetPagination()
+  // Only reset pagination when date is complete or cleared
+  if (value === "" || /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(value)) {
+    resetPagination()
+  }
 }
 
   // Search
