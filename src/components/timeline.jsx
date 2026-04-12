@@ -1,5 +1,6 @@
 "use client"
 
+import RecentEvents from "./RecentEvents"
 import { ChevronLeft, ChevronRight, Calendar, Star, Zap, Clock, HelpCircle } from "lucide-react"
 import { Button } from "./ui/Button"
 import { useNavigate, Link, useSearchParams } from "react-router-dom"
@@ -925,7 +926,8 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
       
       {/* Your existing visible timeline JSX */}
       <section className="w-full bg-[#e8ecf7] py-1 px-2 md:px-6 flex flex-col min-h-0">
-        <div className="container mx-auto flex flex-col min-h-0 flex-1">
+        <div className="container mx-auto flex flex-col lg:flex-row lg:gap-6 min-h-0 flex-1">
+          <div className="flex-1 min-w-0">
           {/* Homepage Intro for SEO / AdSense - WIDER but same height */}
           <div className="max-w-4xl mx-auto mt-1 mb-2 px-3">
             <div className="bg-white/70 border border-[#e3d5dd] rounded-xl shadow-sm px-4 py-3 md:px-6 md:py-3 text-center">
@@ -1378,7 +1380,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               View Full Timeline
             </Button>
           </div>
-
+          
           {/* Modals */}
           <CalendarModal />
           <TNInfoModal />
@@ -1386,7 +1388,19 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   <DateCalculatorModal onClose={() => setShowDateCalc(false)} />
 )}
         </div>
+          {/* Desktop sidebar */}
+          <div className="hidden lg:block w-[320px] shrink-0 pt-4">
+            <RecentEvents />
+          </div>
+        </div>
       </section>
+
+      {/* Mobile: Recently + Upcoming below timeline */}
+      <div className="lg:hidden w-full bg-[#e8ecf7] px-2 md:px-6 pb-6">
+        <div className="container mx-auto max-w-md">
+          <RecentEvents />
+        </div>
+      </div>
     </>
   )
 }
