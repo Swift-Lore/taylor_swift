@@ -164,9 +164,10 @@ function LinkPreview({ url }) {
     const fetchPreview = async () => {
       if (!isMounted) return;
 
+      // 1. Move the key to the top of the function so it's always available
+      const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
+
       try {
-        const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
-        
         const microlinkUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&ttl=2592000&proxy=true&palette=true` + 
           (MICROLINK_API_KEY ? `&api_key=${MICROLINK_API_KEY}` : "");
 
@@ -190,34 +191,26 @@ function LinkPreview({ url }) {
               url: data.url || url,
               isSiteFallback: false
             });
-            // THIS LINE BELOW WAS MISSING AND IS VITAL
             setLoading(false);
             return;
           }
         }
       } catch (error) {
-        console.error("Microlink fetch error:", error);
+        console.error("Microlink error:", error);
       }
 
-      // Fallback Logic
       if (!isMounted) return;
 
+      // 2. Fallback Logic: Forces a load state even for fallbacks to keep UI consistent
       const siteConfigs = {
-        "justjared.com": {
-          title: "Just Jared - Celebrity News",
-          image: "https://www.justjared.com/images/justjared-logo-new.png"
-        },
-        "tmz.com": {
-          title: "TMZ Celebrity News",
-          image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/TMZLogo.svg/1200px-TMZLogo.svg.png"
-        }
+        "justjared.com": { title: "Just Jared", image: "https://www.justjared.com/images/justjared-logo-new.png" },
+        "tmz.com": { title: "TMZ", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/TMZLogo.svg/1200px-TMZLogo.svg.png" }
       };
 
       const siteKey = Object.keys(siteConfigs).find((key) => domain.includes(key));
       
       setPreviewData({
         title: siteKey ? siteConfigs[siteKey].title : getFallbackTitleFromUrl(url, domain),
-        description: siteKey ? (siteConfigs[siteKey].description || "") : "",
         image: siteKey ? siteConfigs[siteKey].image : getFaviconUrl(domain),
         domain: siteKey || domain,
         url: url,
