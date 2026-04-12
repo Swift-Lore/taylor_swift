@@ -162,97 +162,37 @@ function LinkPreview({ url }) {
     setLoading(true);
 
     const fetchPreview = async () => {
-      if (!isMounted) return;
+  if (!isMounted) return;
 
-      const isProblematicDomain = domain.includes("tmz.com");
+  try {
+    const response = await fetch(`/api/og-preview?url=${encodeURIComponent(url)}`);
+    if (!response.ok) throw new Error('Failed');
 
-      try {
-        if (!isProblematicDomain) {
-          const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
-          const microlinkUrl =
-            `https://api.microlink.io/?url=${encodeURIComponent(url)}` +
-            `&wait=3000&screenshot=false&video=false&audio=false&iframe=false&palette=true&theme=light` +
-            (MICROLINK_API_KEY ? `&api_key=${MICROLINK_API_KEY}` : "");
+    const data = await response.json();
 
-          const microlinkResponse = await fetch(microlinkUrl, {
-            headers: { 'Accept': 'application/json' },
-            signal: AbortSignal.timeout(8000)
-          });
-
-          if (microlinkResponse.ok) {
-            const microlinkData = await microlinkResponse.json();
-            if (isMounted && microlinkData.data) {
-              const data = microlinkData.data;
-              const ogImageUrl = data.image?.url || null;
-              const logoUrl = data.logo?.url || null;
-              let imageUrl = ogImageUrl || logoUrl;
-
-              if (imageUrl && imageUrl.startsWith('//')) imageUrl = 'https:' + imageUrl;
-
-              await new Promise(resolve => setTimeout(resolve, 300));
-
-              setPreviewData({
-                title: data.title || getFallbackTitleFromUrl(url, domain),
-                description: data.description || "",
-                image: imageUrl || getFaviconUrl(domain),
-                domain: data.publisher || domain,
-                url: data.url || url,
-                isSiteFallback: false
-              });
-              return;
-            }
-          }
-        }
-
-        const siteConfigs = {
-          "justjared.com": {
-            title: "Just Jared - Celebrity News",
-            image: "https://www.justjared.com/images/justjared-logo-new.png"
-          },
-          "tmz.com": {
-            title: "TMZ Celebrity News",
-            description: "Breaking the biggest stories in celebrity and entertainment news.",
-            image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/TMZLogo.svg/1200px-TMZLogo.svg.png"
-          }
-        };
-
-        const siteKey = Object.keys(siteConfigs).find((key) => domain.includes(key));
-
-        if (siteKey && isMounted) {
-          const config = siteConfigs[siteKey];
-          setPreviewData({
-            title: config.title || getFallbackTitleFromUrl(url, domain),
-            description: config.description || "",
-            image: config.image,
-            domain: siteKey,
-            url: url,
-            isSiteFallback: true
-          });
-          return;
-        }
-
-        if (isMounted) {
-          setPreviewData({
-            title: getFallbackTitleFromUrl(url, domain),
-            description: "",
-            image: getFaviconUrl(domain),
-            domain: domain,
-            url: url
-          });
-        }
-      } catch (error) {
-        if (isMounted) {
-          setPreviewData({
-            title: getFallbackTitleFromUrl(url, domain),
-            image: getFaviconUrl(domain),
-            domain: domain,
-            url: url
-          });
-        }
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
+    if (isMounted) {
+      setPreviewData({
+        title: data.title || getFallbackTitleFromUrl(url, domain),
+        description: data.description || '',
+        image: data.image || getFaviconUrl(domain),
+        domain: data.domain || domain,
+        url: url,
+        isSiteFallback: false,
+      });
+    }
+  } catch (error) {
+    if (isMounted) {
+      setPreviewData({
+        title: getFallbackTitleFromUrl(url, domain),
+        image: getFaviconUrl(domain),
+        domain: domain,
+        url: url,
+      });
+    }
+  } finally {
+    if (isMounted) setLoading(false);
+  }
+};
 
     fetchPreview();
     return () => { isMounted = false; };

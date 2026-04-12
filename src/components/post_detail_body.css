@@ -295,28 +295,33 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-/* Force Instagram embed to respect its internal height and show the date/caption */
+/* Safe fix for loading state only - No width changes */
 .instagram-container {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  margin-bottom: 2rem;
-  align-items: flex-start; /* Ensures everything in this row aligns to the top */
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 2rem;
+    align-items: flex-start;
 }
 
 .instagram-media {
-  min-width: 326px !important;
-  width: 100% !important;
-  max-width: 540px !important;
-  margin: 0 auto !important;
-  /* This height is crucial; if it's too short, the date disappears */
-  min-height: 580px !important; 
+    /* Keeping your current width */
+    min-width: 326px !important; 
+    width: 100% !important;
+    max-width: 540px !important;
+    margin: 0 auto !important;
+    
+    /* Reduced min-height prevents the giant jump before the post loads */
+    min-height: 250px !important; 
+    
+    /* THE FIX: Semi-transparent background so it's not a solid white wall */
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px dashed #cbd5e1 !important;
+    border-radius: 12px !important;
 }
 
-/* Specific fix to prevent the bottom of the iframe from being cut off */
 .instagram-media iframe {
-  width: 100% !important;
-  border-radius: 8px !important;
-  padding-bottom: 25px !important; 
-  display: block !important;
+    width: 100% !important;
+    border-radius: 8px !important;
+    display: block !important;
 }
