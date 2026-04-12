@@ -1,6 +1,5 @@
 "use client"
 
-import RecentEvents from "./RecentEvents"
 import { ChevronLeft, ChevronRight, Calendar, Star, Zap, Clock, HelpCircle } from "lucide-react"
 import { Button } from "./ui/Button"
 import { useNavigate, Link, useSearchParams } from "react-router-dom"
@@ -197,10 +196,14 @@ export default function Timeline() {
   const [currentDay, setCurrentDay] = useState(initialDate.getDate());
   const [currentYear, setCurrentYear] = useState(initialDate.getFullYear());
   const displayDate = new Date(currentYear, currentMonth - 1, currentDay)
+  const todayLabel = today.toLocaleDateString("en-US", {
+  month: "short",
+  day: "2-digit",
+  year: "numeric",
+})
   const [showTNInfo, setShowTNInfo] = useState(false)
   const [showDateCalc, setShowDateCalc] = useState(false)
   const [isInitialLoad, setIsInitialLoad] = useState(true)
-  const [mobileView, setMobileView] = useState("today")
   
   // ===== SEO META TAGS UPDATE =====
   useEffect(() => {
@@ -353,6 +356,7 @@ const matchingRealLabel = matchingRealDate.toLocaleDateString("en-US", {
     setIsTorontoMode(false);
     setShowCalendar(false);
     // If you have a resetPagination function, keep it, otherwise remove the next line
+    if (typeof resetPagination === 'function') resetPagination();
     setSearchParams({}); // This clears the date from the URL
   }
 
@@ -927,13 +931,9 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
       
       {/* Your existing visible timeline JSX */}
       <section className="w-full bg-[#e8ecf7] py-1 px-2 md:px-6 flex flex-col min-h-0">
-        <div className="container mx-auto flex flex-col lg:flex-row lg:gap-6 min-h-0 flex-1">
-          <div className="flex-1 min-w-0">
-<div className={mobileView === "recently" || mobileView === "dayssince" ? "hidden lg:block" : ""}>
-
-            
-          {/* Homepage Intro for SEO / AdSense - hidden on mobile */}
-          <div className="hidden md:block max-w-4xl mx-auto mt-1 mb-2 px-3">
+        <div className="container mx-auto flex flex-col min-h-0 flex-1">
+          {/* Homepage Intro for SEO / AdSense - WIDER but same height */}
+          <div className="max-w-4xl mx-auto mt-1 mb-2 px-3">
             <div className="bg-white/70 border border-[#e3d5dd] rounded-xl shadow-sm px-4 py-3 md:px-6 md:py-3 text-center">
               <h2 className="text-base md:text-lg font-semibold text-[#8e3e3e] mb-2">
                 Swift-Lore: Taylor Swift's Complete Career Timeline
@@ -953,8 +953,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               </div>
             </div>
           </div>
-
-          {/* Ad block */}
+{/* Ad block */}
           {import.meta.env.PROD && !isLoading && !isInitialLoad && records.length > 0 && (
             <div className="w-full flex justify-center mb-4 min-h-[90px]"> 
               <AdSlot
@@ -989,9 +988,9 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
 
           {/* 2. This wrapper only hides the 'Today' content now, not the buttons */}
           <div className={mobileView === "recently" || mobileView === "dayssince" ? "hidden lg:block" : ""}>
-            
-            {/* ON THIS DAY Section */}
-            <div className="text-center mt-3 mb-1 flex-shrink-0">
+          
+          {/* ON THIS DAY Section */}
+<div className="text-center mt-3 mb-1 flex-shrink-0">
   {/* Glowy header card */}
   <div className="relative w-full mt-4 mb-2 md:mb-3 px-2">
     <div
@@ -1409,7 +1408,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               View Full Timeline
             </Button>
           </div>
-          
+
           {/* Modals */}
           <CalendarModal />
           <TNInfoModal />
@@ -1417,20 +1416,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   <DateCalculatorModal onClose={() => setShowDateCalc(false)} />
 )}
         </div>
-          </div>{/* end mobileView today wrapper */}
-          {/* Desktop sidebar */}
-          <div className="hidden lg:block w-[320px] shrink-0 pt-4">
-            <RecentEvents />
-          </div>
-        </div>
       </section>
-
-      {/* Mobile: Recently + Upcoming below timeline */}
-      <div className={`lg:hidden w-full bg-[#e8ecf7] px-2 md:px-6 pb-6 ${mobileView === "recently" || mobileView === "dayssince" ? "block" : "hidden"}`}>
-        <div className="container mx-auto max-w-md">
-          <RecentEvents mobileTab={mobileView} />
-        </div>
-      </div>
     </>
   )
 }
