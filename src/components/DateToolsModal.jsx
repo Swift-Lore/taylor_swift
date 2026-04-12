@@ -222,38 +222,52 @@ const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
           <div className="bg-[#eef0fb] border border-[#c5cae9] rounded-2xl p-4 mb-4">
             {tab === "calendar" && (
-  <div>
+  <>
     <div className="flex gap-2 mb-4">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={jumpToToday}
+        className="flex-1 text-xs py-1 h-auto"
+      >
+        <Clock size={12} className="mr-1" />
+        Today
+      </Button>
       <Button
         variant="outline"
         size="sm"
         onClick={jumpToThisMonth}
         className="flex-1 text-xs py-1 h-auto"
       >
+        <Zap size={12} className="mr-1" />
         This Month
       </Button>
     </div>
 
     <div className="flex items-center justify-between mb-2">
-      <button
-        type="button"
+      <Button
+        variant="ghost"
+        size="sm"
         onClick={() => navigateCalendarMonth("prev")}
-        className="p-2 rounded-full hover:bg-[#f8d7da] transition-colors"
+        className="p-2 hover:bg-[#f8d7da] transition-colors"
       >
-        ‹
-      </button>
+        <ChevronLeft size={18} className="text-[#8e3e3e]" />
+      </Button>
 
-      <div className="text-lg font-semibold text-[#8e3e3e]">
+      <div className="text-lg font-semibold text-[#8e3e3e] flex items-center gap-2">
+        <Star size={16} className="text-[#ffd700]" fill="#ffd700" />
         {monthNames[calendarMonth]} {calendarYear}
+        <Star size={16} className="text-[#ffd700]" fill="#ffd700" />
       </div>
 
-      <button
-        type="button"
+      <Button
+        variant="ghost"
+        size="sm"
         onClick={() => navigateCalendarMonth("next")}
-        className="p-2 rounded-full hover:bg-[#f8d7da] transition-colors"
+        className="p-2 hover:bg-[#f8d7da] transition-colors"
       >
-        ›
-      </button>
+        <ChevronRight size={18} className="text-[#8e3e3e]" />
+      </Button>
     </div>
 
     <div className="flex items-center justify-center gap-2 mb-4">
@@ -299,6 +313,25 @@ const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     <div className="grid grid-cols-7 gap-1">
       {generateCalendar().map((day, index) => {
         const isEmpty = !day;
+        let isSelected = false;
+
+        if (!isEmpty) {
+          isSelected =
+            day === selectedDate.getDate() &&
+            calendarMonth === selectedDate.getMonth() &&
+            calendarYear === selectedDate.getFullYear();
+        }
+
+        const baseClasses =
+          "relative h-8 rounded-lg text-sm font-medium transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center";
+
+        const visibilityClasses = isEmpty ? "invisible" : "";
+        const stateClasses = isSelected
+          ? "bg-[#8e3e3e] text-white shadow-md scale-105"
+          : "bg-white/80 text-[#8e3e3e] hover:bg-[#f8d7da]";
+        const borderClasses = hasEvents(day)
+          ? "border-2 border-[#e3b0b0]"
+          : "border border-transparent";
 
         return (
           <button
@@ -306,18 +339,37 @@ const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
             type="button"
             onClick={() => handleDateSelect(day)}
             disabled={isEmpty}
-            className={`relative h-8 rounded-lg text-sm font-medium flex items-center justify-center transition-all ${
-              isEmpty
-                ? "invisible"
-                : "bg-white/80 text-[#8e3e3e] hover:bg-[#f8d7da] border border-transparent"
-            }`}
+            className={`${baseClasses} ${visibilityClasses} ${stateClasses} ${borderClasses}`}
           >
-            {!isEmpty && <span>{day}</span>}
+            {!isEmpty && (
+              <span className="relative z-10">
+                {day}
+              </span>
+            )}
+            {hasEvents(day) && !isEmpty && (
+              <div className="absolute -top-1 -right-1 w-2 h-2 bg-[#8e3e3e] rounded-full" />
+            )}
           </button>
         );
       })}
     </div>
-  </div>
+
+    <div className="flex gap-2 justify-center mt-4">
+      <Button
+        variant="secondary"
+        onClick={onClose}
+        className="rounded-full px-6 flex-1"
+      >
+        Close
+      </Button>
+      <Button
+        onClick={jumpToToday}
+        className="rounded-full px-6 flex-1 bg-[#8e3e3e] hover:bg-[#7a3434]"
+      >
+        Go to Today
+      </Button>
+    </div>
+  </>
 )}
 
             {tab === "calculator" && (
