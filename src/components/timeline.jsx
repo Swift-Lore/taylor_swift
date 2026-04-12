@@ -1264,8 +1264,8 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   return (
     <>
       {showOtherYearsDivider && (
-        <div className="flex justify-center items-center my-4">
-            <span className="inline-block rounded-full bg-[#e8ecf7] px-3 py-1 text-[11px] text-[#6b7db3] border border-[#c5cae9] shadow-sm whitespace-nowrap">
+        <div className="relative w-full flex justify-center items-center my-6" style={{ left: "25%" }}>
+            <span className="inline-block rounded-full bg-[#e8ecf7] px-4 py-1.5 text-xs text-[#6b7db3] border border-[#c5cae9] shadow-sm whitespace-nowrap font-medium">
               Other years on this date
             </span>
           </div>
