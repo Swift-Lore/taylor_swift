@@ -1137,73 +1137,60 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   </div>
 </div>
 
-    {/* TN box - Desktop: positioned to right */}
-    <div
-      className="
-  hidden
-  lg:block lg:absolute lg:right-[-60px] lg:top-[-5px]
-"
-    >
-      <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 w-56">
-        <Button
-          variant="outline"
-          className="
-            rounded-xl px-2 py-1
-            text-xs font-medium
-            border-[#b66b6b] text-[#8e3e3e]
-            bg-white/95 hover:bg-[#fbeff7]
-            w-full break-words whitespace-normal
-            flex items-center justify-center text-center
-          "
+    <div className="hidden lg:flex justify-center mt-2">
+  <div className="text-xs text-[#6b7db3] flex items-center gap-2 flex-wrap justify-center">
+    {isTorontoMode ? (
+      <>
+        <span className="font-medium text-[#8e3e3e]">Viewing TN timeline</span>
+        <button
+          type="button"
           onClick={() => {
-  if (isTorontoMode) {
-    // FIXED: Go to the matching real date shown on the button, not today
-    setCurrentYear(matchingRealDate.getFullYear())
-    setCurrentMonth(matchingRealDate.getMonth() + 1)
-    setCurrentDay(matchingRealDate.getDate())
-    setIsTorontoMode(false)
-  } else {
-    setCurrentYear(torontoDate.getFullYear())
-    setCurrentMonth(torontoDate.getMonth() + 1)
-    setCurrentDay(torontoDate.getDate())
-    setIsTorontoMode(true)
-  }
-}}
+            setCurrentYear(matchingRealDate.getFullYear())
+            setCurrentMonth(matchingRealDate.getMonth() + 1)
+            setCurrentDay(matchingRealDate.getDate())
+            setIsTorontoMode(false)
+          }}
+          className="text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
         >
-          {isTorontoMode ? (
-            <span className="font-semibold flex items-center">
-              <ChevronLeft size={12} className="mr-1" />
-              Return to: {matchingRealLabel}
-            </span>
-          ) : (
-            <span className="font-semibold flex flex-col leading-snug">
-              <span>Taylor Nation Timeline Date:</span>
-              <span className="text-[11px] mt-0.5">
-                {torontoDate.toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "2-digit",
-                  year: "numeric",
-                })}
-              </span>
-            </span>
-          )}
-        </Button>
-
-        <div className="mt-1 flex items-center justify-center gap-1 text-[11px]">
-          {isTorontoMode && (
-            <span className="text-[#6b7db3]">TN Timeline Mode</span>
-          )}
-          <button
-            type="button"
-            onClick={() => setShowTNInfo(true)}
-            className="inline-flex items-center text-[10px] text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
-          >
-            <HelpCircle size={10} className="mr-0.5" />
-            What is this?
-          </button>
-        </div>
-      </div>
-    </div>
+          Return to {matchingRealLabel}
+        </button>
+      </>
+    ) : (
+      <>
+        <span>
+          TN timeline date:{" "}
+          <span className="font-medium text-[#8e3e3e]">
+            {torontoDate.toLocaleDateString("en-US", {
+              month: "short",
+              day: "2-digit",
+              year: "numeric",
+            })}
+          </span>
+        </span>
+        <button
+          type="button"
+          onClick={() => {
+            setCurrentYear(torontoDate.getFullYear())
+            setCurrentMonth(torontoDate.getMonth() + 1)
+            setCurrentDay(torontoDate.getDate())
+            setIsTorontoMode(true)
+          }}
+          className="text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
+        >
+          Switch
+        </button>
+        <button
+          type="button"
+          onClick={() => setShowTNInfo(true)}
+          className="inline-flex items-center text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
+        >
+          <HelpCircle size={10} className="mr-1" />
+          What is this?
+        </button>
+      </>
+    )}
+  </div>
+</div>
 
     {/* Mobile TN box - centered */}
     <div className="mt-2 w-full md:mt-3 lg:hidden">
