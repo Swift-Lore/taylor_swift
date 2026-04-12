@@ -167,13 +167,12 @@ function LinkPreview({ url }) {
       try {
         const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
         
-        // Removed the problematic check to force EVERY link to try and fetch a thumbnail
         const microlinkUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&ttl=2592000&proxy=true&palette=true` + 
           (MICROLINK_API_KEY ? `&api_key=${MICROLINK_API_KEY}` : "");
 
         const microlinkResponse = await fetch(microlinkUrl, {
           headers: { 'Accept': 'application/json' },
-          signal: AbortSignal.timeout(30000) // 30 seconds to prevent early fallback
+          signal: AbortSignal.timeout(30000)
         });
 
         if (microlinkResponse.ok) {
@@ -191,14 +190,16 @@ function LinkPreview({ url }) {
               url: data.url || url,
               isSiteFallback: false
             });
-            return; // Exit here if successful
+            // THIS LINE BELOW WAS MISSING AND IS VITAL
+            setLoading(false);
+            return;
           }
         }
       } catch (error) {
         console.error("Microlink fetch error:", error);
       }
 
-      // FALLBACK LOGIC: Only happens if the fetch above fails or times out
+      // Fallback Logic
       if (!isMounted) return;
 
       const siteConfigs = {
