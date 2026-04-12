@@ -926,12 +926,10 @@ const betweenRes = calculatorTab === "between" ? calcBetween() : null;
             {tab === "tn" && (
   <>
     <div className="bg-[#eef0fb] rounded-2xl p-4 border border-[#d3dceb] mb-4">
-      <div className="text-sm text-[#6b7db3] leading-relaxed text-center">
-        Taylor Nation jokingly suggested an alternate timeline tied to
-        <span className="font-semibold text-[#8e3e3e]"> Apr 25, 2019 </span>
-        and this tool lets you jump between the real date and that matching TN date.
-      </div>
-    </div>
+  <div className="text-sm text-[#6b7db3] leading-relaxed text-center">
+    Jump between the real date and the matching Taylor Nation timeline date.
+  </div>
+</div>
 
     <div className="bg-white rounded-2xl border border-[#e3b0b0] p-4 mb-4 text-center">
       {isTorontoMode ? (
