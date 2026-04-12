@@ -83,7 +83,6 @@ export default function SearchResults() {
           }
         )
 
-        console.log('Search results:', response.data.records) // Debug log
         setResults(response.data.records || [])
       } catch (error) {
         console.error("Error fetching search results:", error)
