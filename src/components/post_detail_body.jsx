@@ -166,8 +166,6 @@ function LinkPreview({ url }) {
 
       const isProblematicDomain = domain.includes("tmz.com");
 
-      
-
       try {
         const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
         if (!isProblematicDomain) {
