@@ -263,34 +263,38 @@ export default function RecentEvents({ mobileTab }) {
       )}
 
       {/* Mobile: controlled by mobileTab prop */}
-      <div className={mobileTab === "dayssince" ? "block lg:hidden" : mobileTab === "recently" ? "block lg:hidden" : "hidden"}>
-        {recent.length > 0 && (
-          <div className="bg-white/60 border border-[#c5cae9] rounded-2xl p-4 shadow-sm">
-            <h3 className="text-sm font-semibold text-[#3d3d6b] mb-3 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#8a9ac7] inline-block" />
-              Recently
-            </h3>
-            <div className="flex flex-col gap-2">
-              {recent.map((record) => (
-                <EventCard key={record.id} record={record} />
-              ))}
-            </div>
-          </div>
+      <div className="lg:hidden">
+        {mobileTab === "recently" && (
+          <>
+            {recent.length > 0 && (
+              <div className="bg-white/60 border border-[#c5cae9] rounded-2xl p-4 shadow-sm">
+                <h3 className="text-sm font-semibold text-[#3d3d6b] mb-3 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#8a9ac7] inline-block" />
+                  Recently
+                </h3>
+                <div className="flex flex-col gap-2">
+                  {recent.map((record) => (
+                    <EventCard key={record.id} record={record} />
+                  ))}
+                </div>
+              </div>
+            )}
+            {upcoming.length > 0 && (
+              <div className="bg-white/60 border border-[#c5cae9] rounded-2xl p-4 shadow-sm">
+                <h3 className="text-sm font-semibold text-[#3d3d6b] mb-3 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#b66b6b] inline-block" />
+                  Upcoming
+                </h3>
+                <div className="flex flex-col gap-2">
+                  {upcoming.map((record) => (
+                    <EventCard key={record.id} record={record} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
         )}
-        {upcoming.length > 0 && (
-          <div className="bg-white/60 border border-[#c5cae9] rounded-2xl p-4 shadow-sm">
-            <h3 className="text-sm font-semibold text-[#3d3d6b] mb-3 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#b66b6b] inline-block" />
-              Upcoming
-            </h3>
-            <div className="flex flex-col gap-2">
-              {upcoming.map((record) => (
-                <EventCard key={record.id} record={record} />
-              ))}
-            </div>
-          </div>
-        )}
-        {hasTrackerData && (
+        {mobileTab === "dayssince" && hasTrackerData && (
           <div className="bg-white/60 border border-[#c5cae9] rounded-2xl p-4 shadow-sm">
             <h3 className="text-sm font-semibold text-[#3d3d6b] mb-3 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#b66b6b] inline-block" />
