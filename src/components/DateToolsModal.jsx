@@ -970,8 +970,8 @@ const betweenRes = calculatorTab === "between" ? calcBetween() : null;
           <div className="text-sm text-[#6b7db3] mb-4">
 </div>
 
-          <Button
-            variant="secondary"
+          <button
+            type="button"
             onClick={() => {
               setCurrentYear(torontoDate.getFullYear());
               setCurrentMonth(torontoDate.getMonth() + 1);
@@ -979,10 +979,10 @@ const betweenRes = calculatorTab === "between" ? calcBetween() : null;
               setIsTorontoMode(true);
               onClose();
             }}
-            className="rounded-full px-6 w-full max-w-xs"
+            className="rounded-full px-6 py-2 text-sm font-medium bg-[#eef0fb] border border-[#c5cae9] text-[#3d3d6b] hover:bg-[#e0e4f7] transition-colors w-full max-w-xs"
           >
-            Switch to Taylor Nation Timeline Mode
-          </Button>
+            Switch to TN Timeline Mode
+          </button>
         </>
       )}
     </div>
