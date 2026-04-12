@@ -10,10 +10,30 @@ const formatDate = (dateString) => {
 }
 
 const EventCard = ({ record }) => {
+  const handleClick = (e) => {
+    const sel = window.getSelection()
+    if (sel && sel.toString().length > 0) {
+      e.preventDefault()
+    }
+  }
+
+  const handleCopy = (e) => {
+    const selection = window.getSelection()
+    if (!selection) return
+    const text = selection.toString()
+    if (!text) return
+    e.preventDefault()
+    e.clipboardData.setData("text/plain", text)
+  }
+
   return (
     <Link
       to={`/post_details?id=${record.id}`}
       className="block bg-[#eef0fb] border border-[#c5cae9] rounded-xl p-3 hover:shadow-md hover:border-[#8a9ac7] transition-all duration-200"
+      draggable={false}
+      onDragStart={(e) => e.preventDefault()}
+      onClick={handleClick}
+      onCopy={handleCopy}
     >
       <div className="flex items-start gap-2">
         <span className="shrink-0 bg-[#8a9ac7] text-white text-[10px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
