@@ -981,7 +981,7 @@ const betweenRes = calculatorTab === "between" ? calcBetween() : null;
             }}
             className="rounded-full px-6 w-full max-w-xs"
           >
-            Switch to TN Timeline
+            Switch to Taylor Nation Timeline Mode
           </Button>
         </>
       )}
