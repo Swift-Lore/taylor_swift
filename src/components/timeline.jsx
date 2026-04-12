@@ -1270,16 +1270,6 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
 
   return (
     <>
-      {showOtherYearsDivider && (
-        <div className="my-6" style={{ marginLeft: "calc(-37.5% + 12.5%)", marginRight: "calc(-37.5% + 12.5%)" }}>
-          <div className="flex justify-center">
-            <span className="inline-block rounded-full bg-[#e8ecf7] px-4 py-1.5 text-xs text-[#6b7db3] border border-[#c5cae9] shadow-sm whitespace-nowrap font-medium">
-              Other years on this date
-            </span>
-          </div>
-        </div>
-      )}
-
       <div
         key={`desktop-${record.id}`}
         className="relative transition-all duration-300"
