@@ -1297,30 +1297,6 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
     </div>
   </div>
 )}
-
-    <div className="flex justify-center mt-0.5 mb-1 flex-shrink-0">
-      <div
-        className="
-          event-counter-pill
-          bg-white rounded-full px-2 py-0.5
-          border border-[#b66b6b] shadow-sm
-        "
-      >
-        <div className="flex items-center gap-1">
-          <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse" />
-                    <span className="event-counter-text text-[#8e3e3e] text-xs font-medium">
-            {isInitialLoad
-              ? `Loading ${SITE_UPDATES.totalEvents}+ events...`
-              : isLoading
-              ? "Loading events..."
-              : `${records.length} ${
-                  records.length === 1 ? "Event" : "Events"
-                } Found${isTorontoMode ? " (TN)" : ""}`}
-          </span>
-          <div className="w-1.5 h-1.5 rounded-full bg-[#8e3e3e] animate-pulse" />
-        </div>
-      </div>
-    </div>
   </div>
 </div>
             
