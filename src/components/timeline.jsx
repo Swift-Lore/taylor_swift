@@ -925,7 +925,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
       
       {/* Your existing visible timeline JSX */}
       <section className="w-full bg-[#e8ecf7] py-1 px-2 md:px-6 flex flex-col min-h-0">
-        <div className="container mx-auto flex flex-col min-h-0 flex-1">
+        <div className="container mx-auto flex flex-col min-h-0 flex-1 lg:flex-row lg:items-start lg:gap-6">
           {/* Homepage Intro for SEO / AdSense - WIDER but same height */}
           <div className="max-w-4xl mx-auto mt-1 mb-2 px-3">
             <div className="bg-white/70 border border-[#e3d5dd] rounded-xl shadow-sm px-4 py-3 md:px-6 md:py-3 text-center">
