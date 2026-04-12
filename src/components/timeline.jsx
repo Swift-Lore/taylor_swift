@@ -1138,13 +1138,13 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
     </Button>
   </div>
  <div className="flex justify-center mt-2">
-  <Button
-    variant="secondary"
-    className="rounded-lg px-3 py-0.5 text-xs bg-[#dfe7f8] hover:bg-[#d2ddf4] text-[#5f729f] border border-[#c3d1ec] shadow-none h-8"
+  <button
+    type="button"
     onClick={() => setShowDateTools(true)}
+    className="rounded-full bg-[#8fa0cf] hover:bg-[#8396c9] text-white text-xs font-medium px-4 h-7 shadow-sm transition-colors whitespace-nowrap"
   >
     Calendar Tools
-  </Button>
+  </button>
 </div>
 </div>
 
