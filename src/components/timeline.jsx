@@ -196,11 +196,6 @@ export default function Timeline() {
   const [currentDay, setCurrentDay] = useState(initialDate.getDate());
   const [currentYear, setCurrentYear] = useState(initialDate.getFullYear());
   const displayDate = new Date(currentYear, currentMonth - 1, currentDay)
-  const todayLabel = today.toLocaleDateString("en-US", {
-  month: "short",
-  day: "2-digit",
-  year: "numeric",
-})
   const [showTNInfo, setShowTNInfo] = useState(false)
   const [showDateCalc, setShowDateCalc] = useState(false)
   const [isInitialLoad, setIsInitialLoad] = useState(true)
