@@ -1087,8 +1087,9 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   <button
     type="button"
     onClick={() => setShowDateTools(true)}
-    className="rounded-full bg-[#8fa0cf] hover:bg-[#8396c9] text-white text-xs font-medium px-4 h-7 shadow-sm transition-colors whitespace-nowrap"
+    className="rounded-full bg-[#8fa0cf] hover:bg-[#8396c9] text-white text-xs font-medium px-4 h-7 shadow-sm transition-colors whitespace-nowrap flex items-center gap-1.5"
   >
+    <Calendar size={11} />
     Date Tools
   </button>
 </div>
