@@ -973,8 +973,8 @@ const betweenRes = calculatorTab === "between" ? calcBetween() : null;
             })}
           </div>
           <div className="text-sm text-[#6b7db3] mb-4">
-            Jump to the matching TN timeline day for the currently selected date.
-          </div>
+  Matching date for the currently selected day.
+</div>
 
           <Button
             variant="secondary"
