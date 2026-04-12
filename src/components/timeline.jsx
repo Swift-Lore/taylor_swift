@@ -1264,7 +1264,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           {isTorontoMode && records.some(r => new Date(r.fields?.DATE).getFullYear() !== currentYear) && (
             <div className="hidden md:flex justify-center my-4">
               <span className="rounded-full bg-[#e8ecf7] px-4 py-1.5 text-xs text-[#6b7db3] border border-[#c5cae9] shadow-sm font-medium">
-                Other years on this date
+                Other years
               </span>
             </div>
           )}
