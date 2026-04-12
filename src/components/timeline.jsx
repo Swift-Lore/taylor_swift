@@ -929,6 +929,23 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
       <section className="w-full bg-[#e8ecf7] py-1 px-2 md:px-6 flex flex-col min-h-0">
         <div className="container mx-auto flex flex-col lg:flex-row lg:gap-6 min-h-0 flex-1">
           <div className="flex-1 min-w-0">
+          {/* Mobile view toggle */}
+          <div className="lg:hidden flex justify-center gap-2 pt-3 pb-1">
+            <button
+              onClick={() => setMobileView("today")}
+              className={`px-5 py-1.5 rounded-full text-sm font-medium transition-colors ${mobileView === "today" ? "bg-[#b66b6b] text-white" : "bg-white text-[#6b7db3] border border-[#6b7db3]"}`}
+            >
+              On This Day
+            </button>
+            <button
+              onClick={() => setMobileView("recently")}
+              className={`px-5 py-1.5 rounded-full text-sm font-medium transition-colors ${mobileView === "recently" ? "bg-[#8a9ac7] text-white" : "bg-white text-[#6b7db3] border border-[#6b7db3]"}`}
+            >
+              Recently
+            </button>
+          </div>
+
+          <div className={mobileView === "recently" ? "hidden lg:block" : ""}>
           {/* Homepage Intro for SEO / AdSense - WIDER but same height */}
           <div className="max-w-4xl mx-auto mt-1 mb-2 px-3">
             <div className="bg-white/70 border border-[#e3d5dd] rounded-xl shadow-sm px-4 py-3 md:px-6 md:py-3 text-center">
