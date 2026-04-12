@@ -1116,7 +1116,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
     onClick={() => setShowDateTools(true)}
     className="rounded-full bg-[#8fa0cf] hover:bg-[#8396c9] text-white text-xs font-medium px-4 h-7 shadow-sm transition-colors whitespace-nowrap"
   >
-    Calendar Tools
+    Date Tools
   </button>
 </div>
   {isTorontoMode && (
