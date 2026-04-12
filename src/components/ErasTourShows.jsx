@@ -183,8 +183,6 @@ export default function ErasTourShows() {
           ? data.records
           : [];
 
-        console.log("Raw Eras Tour shows:", rawArray.length, "records");
-
         const normalized = rawArray
           .map((item) => normalizeShow(item))
           .sort((a, b) => {
