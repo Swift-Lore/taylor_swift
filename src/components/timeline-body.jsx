@@ -454,6 +454,16 @@ useEffect(() => {
   }
 }, [monthDay])
 
+useEffect(() => {
+  const timer = setTimeout(() => setDebouncedStart(startDateInput), 600)
+  return () => clearTimeout(timer)
+}, [startDateInput])
+
+useEffect(() => {
+  const timer = setTimeout(() => setDebouncedEnd(endDateInput), 600)
+  return () => clearTimeout(timer)
+}, [endDateInput])
+  
 // filter keywords list (using dynamic list from Airtable)
 const getFilteredKeywords = () => {
   const source = allKeywords.length ? allKeywords : []
