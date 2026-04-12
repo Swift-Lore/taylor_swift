@@ -1266,14 +1266,17 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
       key={`desktop-${record.id}`}
       className="relative transition-all duration-300"
       style={{
-        marginTop: index === 0 ? "0" : "40px",
+        marginTop: index === 0 ? "0" : showOtherYearsDivider ? "22px" : "40px",
       }}
     >
       {showOtherYearsDivider && (
-        <div className="flex justify-center mb-4">
-          <span className="inline-block rounded-full bg-white border border-[#c5cae9] px-3 py-1 text-xs text-[#6b7db3] shadow-sm">
-            Events on this date in other years
-          </span>
+        <div className="absolute left-[41.67%] -translate-x-1/2 -top-4 z-20 flex items-center justify-center">
+          <div className="relative flex items-center justify-center">
+            <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-[2px] bg-[#8a9ad4]" />
+            <span className="relative inline-block rounded-full bg-[#e8ecf7] px-3 py-1 text-[11px] text-[#6b7db3] border border-[#c5cae9] shadow-sm whitespace-nowrap">
+              Events on this date in other years
+            </span>
+          </div>
         </div>
       )}
 
