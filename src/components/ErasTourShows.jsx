@@ -246,7 +246,6 @@ export default function ErasTourShows() {
 } while (offset);
 
         const normalized = allRecords.map((r) => normalizeOutfit(r));
-        console.log("Loaded outfits:", normalized.length);
         setOutfits(normalized);
       } catch (err) {
         console.error("ErasTourShows loadOutfits error:", err);
