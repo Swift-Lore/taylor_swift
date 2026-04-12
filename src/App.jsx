@@ -137,7 +137,6 @@ function App() {
         onAccept={() => {
 }}
 onDecline={() => {
-  console.log("Non-essential cookies rejected");
 }}
         style={{
           position: "fixed",
