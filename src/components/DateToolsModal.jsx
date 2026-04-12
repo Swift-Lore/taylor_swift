@@ -141,10 +141,103 @@ const handleDateSelect = (day) => {
 
           <div className="bg-[#eef0fb] border border-[#c5cae9] rounded-2xl p-4 mb-4">
             {tab === "calendar" && (
-              <div className="text-sm text-[#3d3d6b]">
-                Calendar tab placeholder
-              </div>
-            )}
+  <div>
+    <div className="flex gap-2 mb-4">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={jumpToThisMonth}
+        className="flex-1 text-xs py-1 h-auto"
+      >
+        This Month
+      </Button>
+    </div>
+
+    <div className="flex items-center justify-between mb-2">
+      <button
+        type="button"
+        onClick={() => navigateCalendarMonth("prev")}
+        className="p-2 rounded-full hover:bg-[#f8d7da] transition-colors"
+      >
+        ‹
+      </button>
+
+      <div className="text-lg font-semibold text-[#8e3e3e]">
+        {monthNames[calendarMonth]} {calendarYear}
+      </div>
+
+      <button
+        type="button"
+        onClick={() => navigateCalendarMonth("next")}
+        className="p-2 rounded-full hover:bg-[#f8d7da] transition-colors"
+      >
+        ›
+      </button>
+    </div>
+
+    <div className="flex items-center justify-center gap-2 mb-4">
+      <select
+        className="border border-[#e3b0b0] rounded-full px-3 py-1 text-xs text-[#8e3e3e] bg-white"
+        value={calendarMonth}
+        onChange={(e) => setCalendarMonth(Number(e.target.value))}
+      >
+        {monthNames.map((name, idx) => (
+          <option key={name} value={idx}>
+            {name}
+          </option>
+        ))}
+      </select>
+
+      <select
+        className="border border-[#e3b0b0] rounded-full px-3 py-1 text-xs text-[#8e3e3e] bg-white"
+        value={calendarYear}
+        onChange={(e) => setCalendarYear(Number(e.target.value))}
+      >
+        {Array.from(
+          { length: new Date().getFullYear() + 5 - 2006 + 1 },
+          (_, i) => 2006 + i
+        ).map((year) => (
+          <option key={year} value={year}>
+            {year}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <div className="grid grid-cols-7 gap-1 mb-2">
+      {dayNames.map((day) => (
+        <div
+          key={day}
+          className="text-center text-xs font-semibold text-[#6b7db3] py-1"
+        >
+          {day}
+        </div>
+      ))}
+    </div>
+
+    <div className="grid grid-cols-7 gap-1">
+      {generateCalendar().map((day, index) => {
+        const isEmpty = !day;
+
+        return (
+          <button
+            key={index}
+            type="button"
+            onClick={() => handleDateSelect(day)}
+            disabled={isEmpty}
+            className={`relative h-8 rounded-lg text-sm font-medium flex items-center justify-center transition-all ${
+              isEmpty
+                ? "invisible"
+                : "bg-white/80 text-[#8e3e3e] hover:bg-[#f8d7da] border border-transparent"
+            }`}
+          >
+            {!isEmpty && <span>{day}</span>}
+          </button>
+        );
+      })}
+    </div>
+  </div>
+)}
 
             {tab === "calculator" && (
               <div className="text-sm text-[#3d3d6b]">
