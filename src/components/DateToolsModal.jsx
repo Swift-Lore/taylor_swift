@@ -16,6 +16,7 @@ export default function DateToolsModal({
   onShowTNInfo,
 }) {
   const [tab, setTab] = useState("calendar");
+const [showTNExplanation, setShowTNExplanation] = useState(false);
   const getInitialSelectedDate = () => {
   const params = new URLSearchParams(window.location.search);
   const dateParam = params.get("date");
