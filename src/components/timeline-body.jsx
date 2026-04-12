@@ -905,7 +905,7 @@ const resetPagination = () => {
         <Link
           key={post.id}
           to={`/post_details?id=${post.id}`}
-          className="bg-[#ffe8e8] rounded-xl overflow-hidden border border-[#ffcaca] flex flex-col hover:shadow-lg transition-shadow duration-200 cursor-pointer h-full"
+          className="bg-[#ffe8e8] rounded-xl overflow-hidden border border-[#ffcaca] shadow-sm flex flex-col hover:shadow-lg transition-shadow duration-200 cursor-pointer h-full"
         >
           <div className="relative pt-1 flex flex-col">
             {/* date pill */}
