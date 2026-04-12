@@ -924,10 +924,99 @@ const betweenRes = calculatorTab === "between" ? calcBetween() : null;
 )}
 
             {tab === "tn" && (
-              <div className="text-sm text-[#3d3d6b]">
-                TN Timeline tab placeholder
-              </div>
-            )}
+  <>
+    <div className="bg-[#eef0fb] rounded-2xl p-4 border border-[#d3dceb] mb-4">
+      <div className="text-sm text-[#6b7db3] leading-relaxed text-center">
+        Taylor Nation jokingly suggested an alternate timeline tied to
+        <span className="font-semibold text-[#8e3e3e]"> Apr 25, 2019 </span>
+        and this tool lets you jump between the real date and that matching TN date.
+      </div>
+    </div>
+
+    <div className="bg-white rounded-2xl border border-[#e3b0b0] p-4 mb-4 text-center">
+      {isTorontoMode ? (
+        <>
+          <div className="text-xs font-semibold uppercase tracking-wide text-[#6b7db3] mb-2">
+            Currently Viewing
+          </div>
+          <div className="text-lg font-semibold text-[#8e3e3e] mb-3">
+            TN Timeline Mode
+          </div>
+          <div className="text-sm text-[#6b7db3] mb-4">
+            Matching real date:
+            <span className="font-semibold text-[#8e3e3e]"> {matchingRealLabel}</span>
+          </div>
+
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setCurrentYear(matchingRealDate.getFullYear());
+              setCurrentMonth(matchingRealDate.getMonth() + 1);
+              setCurrentDay(matchingRealDate.getDate());
+              setIsTorontoMode(false);
+              onClose();
+            }}
+            className="rounded-full px-6 w-full max-w-xs"
+          >
+            <ChevronLeft size={14} className="mr-1" />
+            Return to Real Date
+          </Button>
+        </>
+      ) : (
+        <>
+          <div className="text-xs font-semibold uppercase tracking-wide text-[#6b7db3] mb-2">
+            Taylor Nation Timeline Date
+          </div>
+          <div className="text-lg font-semibold text-[#8e3e3e] mb-3">
+            {torontoDate.toLocaleDateString("en-US", {
+              month: "short",
+              day: "2-digit",
+              year: "numeric",
+            })}
+          </div>
+          <div className="text-sm text-[#6b7db3] mb-4">
+            Jump to the matching TN timeline day for the currently selected date.
+          </div>
+
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setCurrentYear(torontoDate.getFullYear());
+              setCurrentMonth(torontoDate.getMonth() + 1);
+              setCurrentDay(torontoDate.getDate());
+              setIsTorontoMode(true);
+              onClose();
+            }}
+            className="rounded-full px-6 w-full max-w-xs"
+          >
+            Switch to TN Timeline
+          </Button>
+        </>
+      )}
+    </div>
+
+    <div className="flex justify-center mt-4">
+      <button
+        type="button"
+        onClick={onShowTNInfo}
+        className="inline-flex items-center text-sm text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
+      >
+        <HelpCircle size={14} className="mr-1" />
+        What is this?
+      </button>
+    </div>
+
+    <div className="flex justify-center mt-4">
+      <Button
+        variant="secondary"
+        onClick={onClose}
+        className="rounded-full px-6 w-full max-w-xs"
+      >
+        Close
+      </Button>
+    </div>
+  </>
+)}
           </div>
         </div>
       </div>
