@@ -9,7 +9,7 @@ import axios from "axios"
 import "./timeline.css"
 import { SITE_UPDATES } from "./site-updates"
 import AdSlot from "./adslot"
-import DateCalculatorModal from "./DateCalculatorModal"
+import DateCalculatorModal from "./DateCalculatorModal";
 import DateToolsModal from "./DateToolsModal";
 
 
@@ -1372,10 +1372,13 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           </div>
           
           {/* Modals */}
-          <CalendarModal />
-          <TNInfoModal />
-          {showDateCalc && (
+<CalendarModal />
+<TNInfoModal />
+{showDateCalc && (
   <DateCalculatorModal onClose={() => setShowDateCalc(false)} />
+)}
+{showDateTools && (
+  <DateToolsModal onClose={() => setShowDateTools(false)} />
 )}
         </div>
           </div>{/* end mobileView today wrapper */}
