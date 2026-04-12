@@ -524,7 +524,7 @@ const betweenRes = calculatorTab === "between" ? calcBetween() : null;
       })}
     </div>
 
-    <div className="flex justify-center mt-4">
+    <div className="mt-auto pt-4 flex justify-center">
   <Button
     variant="secondary"
     onClick={onClose}
@@ -536,7 +536,7 @@ const betweenRes = calculatorTab === "between" ? calcBetween() : null;
   </>
 )}
 
-            {tab === "calculator" && (
+            {tab === "calculator"
   <>
     <div className="flex gap-2 mb-4 min-w-0">
       <button
