@@ -1137,10 +1137,10 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
       <ChevronRight size={10} />
     </Button>
   </div>
-  <div className="flex justify-center mt-2">
+ <div className="flex justify-center mt-2">
   <Button
     variant="secondary"
-    className="rounded-md px-3 py-1 text-xs bg-[#dbe4f6] hover:bg-[#cdd9f0] text-[#5f729f] border border-[#b9c8e6] shadow-none"
+    className="rounded-lg px-3 py-0.5 text-xs bg-[#dfe7f8] hover:bg-[#d2ddf4] text-[#5f729f] border border-[#c3d1ec] shadow-none h-8"
     onClick={() => setShowDateTools(true)}
   >
     Calendar Tools
