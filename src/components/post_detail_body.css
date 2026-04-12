@@ -224,17 +224,6 @@
         flex: 1 1 100%;
     }
 }
-
-/* Debug styles - add class="debug" to parent elements to see constraints */
-.debug * {
-    box-shadow: 0 0 0 1px rgba(255, 0, 0, 0.2) !important;
-}
-
-.debug .image-only-grid,
-.debug .image-only-grid a,
-.debug .image-only-grid img {
-    box-shadow: 0 0 0 2px blue !important;
-}
 /* TIKTOK EMBED FIXES */
 .tiktok-wrapper {
   width: 100%;
