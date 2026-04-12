@@ -667,11 +667,31 @@ const handlePreviousDay = () => {
       }
 
             try {
-        setIsLoading(true)
-        const fetched = await fetchByDate()
-        setRecords(fetched)
-        setIsInitialLoad(false) // ← ADD THIS LINE
-      } catch (error) {
+  setIsLoading(true)
+  const fetched = await fetchByDate()
+
+  if (isTorontoMode) {
+    const exactYearRecords = fetched.filter((record) => {
+      const rawDate = record?.fields?.DATE
+      if (!rawDate) return false
+      const recordDate = new Date(rawDate)
+      return recordDate.getFullYear() === year
+    })
+
+    const otherYearRecords = fetched.filter((record) => {
+      const rawDate = record?.fields?.DATE
+      if (!rawDate) return false
+      const recordDate = new Date(rawDate)
+      return recordDate.getFullYear() !== year
+    })
+
+    setRecords([...exactYearRecords, ...otherYearRecords])
+  } else {
+    setRecords(fetched)
+  }
+
+  setIsInitialLoad(false)
+} catch (error) {
         console.error("Error fetching records:", error)
         setRecords([])
         setIsInitialLoad(false) // ← ADD THIS LINE
