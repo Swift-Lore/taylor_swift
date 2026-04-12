@@ -941,9 +941,9 @@ const betweenRes = calculatorTab === "between" ? calcBetween() : null;
             TN Timeline Mode
           </div>
           <div className="text-sm text-[#6b7db3] mb-4">
-            Matching real date:
-            <span className="font-semibold text-[#8e3e3e]"> {matchingRealLabel}</span>
-          </div>
+  Real date:
+  <span className="font-semibold text-[#8e3e3e]"> {matchingRealLabel}</span>
+</div>
 
           <Button
             variant="secondary"
