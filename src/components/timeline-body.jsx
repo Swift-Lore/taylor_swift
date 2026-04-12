@@ -344,20 +344,28 @@ resetPagination()
 
   setKeywordsLoading(true);
   try {
-    const response = await axios.get(
-      "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Keywords",
-      {
-        headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-        },
-        params: {
-          fields: ["Keywords"],
-          pageSize: 100,
-        },
-      }
-    );
+    let allRecords = [];
+    let offset = undefined;
 
-    const keywords = response.data.records
+    do {
+      const response = await axios.get(
+        "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Keywords",
+        {
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+          },
+          params: {
+            fields: ["Keywords"],
+            pageSize: 100,
+            offset,
+          },
+        }
+      );
+      allRecords = allRecords.concat(response.data.records);
+      offset = response.data.offset;
+    } while (offset);
+
+    const keywords = allRecords
       .map(r => r.fields.Keywords)
       .filter(Boolean)
       .sort((a, b) => a.localeCompare(b));
