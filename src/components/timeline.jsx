@@ -643,12 +643,13 @@ const handlePreviousDay = () => {
         let filterFormula
       
         if (isTorontoMode) {
-          // In Toronto mode: show ONLY this specific year
-          filterFormula = `AND(MONTH({DATE}) = ${month}, DAY({DATE}) = ${day}, YEAR({DATE}) = ${year})`
-        } else {
-          // Normal mode: show this day across all years
-          filterFormula = `AND(MONTH({DATE}) = ${month}, DAY({DATE}) = ${day})`
-        }
+  // In TN mode, show the exact matching TN year first,
+  // plus all other matching month/day events underneath
+  filterFormula = `AND(MONTH({DATE}) = ${month}, DAY({DATE}) = ${day})`
+} else {
+  // Normal mode: show this day across all years
+  filterFormula = `AND(MONTH({DATE}) = ${month}, DAY({DATE}) = ${day})`
+}
       
         const response = await axios.get(
           "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
