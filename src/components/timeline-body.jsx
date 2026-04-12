@@ -905,7 +905,7 @@ const resetPagination = () => {
         <Link
           key={post.id}
           to={`/post_details?id=${post.id}`}
-          className="bg-[#ffe8e8] rounded-xl overflow-hidden border border-[#ffcaca] shadow-sm flex flex-col hover:shadow-lg transition-shadow duration-200 cursor-pointer"
+          className="bg-[#ffe8e8] rounded-xl overflow-hidden border border-[#ffcaca] shadow-sm flex flex-col hover:shadow-lg transition-shadow duration-200 cursor-pointer h-full"
         >
           <div className="relative pt-1 flex flex-col">
             {/* date pill */}
@@ -914,7 +914,7 @@ const resetPagination = () => {
             </div>
 
             {/* title */}
-            <div className="px-4 pt-6 pb-2 mt-2 flex-1">
+            <div className="px-4 pt-5 pb-1 mt-1">
               <h3 className="text-[#8e3e3e]] font-medium text-sm text-center line-clamp-2">
                 {post.title}
               </h3>
@@ -932,7 +932,7 @@ const resetPagination = () => {
             )}
           </div>
 
-          <div className="p-4 flex flex-col flex-grow">
+          <div className="px-4 pb-4 pt-2 flex flex-col flex-grow border-t border-[#ffcaca]">
             {post.notes && (
               <div className="text-[#4b4b63] text-xs mb-2 line-clamp-4 whitespace-pre-line">
                 {post.notes}
