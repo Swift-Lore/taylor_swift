@@ -512,7 +512,6 @@ export default function PostDetailBody() {
   // Source link state
   const [sourceImages, setSourceImages] = useState([]);
   const [nonImageLinks, setNonImageLinks] = useState([]);
-  const [microlinkErrors, setMicrolinkErrors] = useState({});
 
   // Scroll to top on mount / id change
   useEffect(() => {
