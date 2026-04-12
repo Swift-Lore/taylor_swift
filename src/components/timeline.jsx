@@ -1235,13 +1235,6 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           )}
 
                     {/* Desktop Timeline – only show when there are events */}
-  {isTorontoMode && records.some((r, i) => i > 0 && new Date(r.fields?.DATE).getFullYear() !== currentYear && new Date(records[i-1].fields?.DATE).getFullYear() === currentYear) && (
-            <div className="hidden md:flex justify-center my-3">
-              <span className="rounded-full bg-[#e8ecf7] px-4 py-1.5 text-xs text-[#6b7db3] border border-[#c5cae9] shadow-sm font-medium">
-                Other years on this date
-              </span>
-            </div>
-          )}        
   {records.length > 0 && (
             <div className="hidden md:block min-h-0">
               <div className="relative flex justify-center">
@@ -1252,38 +1245,48 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
                 </div>
 
                 <div className="relative left-[37.5%] -translate-x-1/4 w-3/4">
-                  {records.map((record, index) => {
-  const rawDate = record?.fields?.DATE
-  const recordYear = rawDate ? new Date(rawDate).getFullYear() : null
-  const isExactYear = recordYear === currentYear
+                  {records.filter(r => !isTorontoMode || new Date(r.fields?.DATE).getFullYear() === currentYear).map((record, index) => (
+                    <div
+                      key={`desktop-${record.id}`}
+                      className="relative transition-all duration-300"
+                      style={{ marginTop: index === 0 ? "0" : "40px" }}
+                    >
+                      <div className="transform scale-[0.90] origin-top -translate-x-1/4">
+                        <TimelineCard record={record} index={index} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
-  const previousRecord = index > 0 ? records[index - 1] : null
-  const previousRawDate = previousRecord?.fields?.DATE
-  const previousYear = previousRawDate ? new Date(previousRawDate).getFullYear() : null
-  const previousWasExactYear = previousYear === currentYear
+          {isTorontoMode && records.some(r => new Date(r.fields?.DATE).getFullYear() !== currentYear) && (
+            <div className="hidden md:flex justify-center my-4">
+              <span className="rounded-full bg-[#e8ecf7] px-4 py-1.5 text-xs text-[#6b7db3] border border-[#c5cae9] shadow-sm font-medium">
+                Other years on this date
+              </span>
+            </div>
+          )}
 
-  const showOtherYearsDivider =
-    isTorontoMode &&
-    index > 0 &&
-    !isExactYear &&
-    previousWasExactYear
-
-  return (
-    <>
-      <div
-        key={`desktop-${record.id}`}
-        className="relative transition-all duration-300"
-        style={{
-          marginTop: index === 0 ? "0" : showOtherYearsDivider ? "10px" : "40px",
-        }}
-      >
-        <div className="transform scale-[0.90] origin-top -translate-x-1/4">
-          <TimelineCard record={record} index={index} />
-        </div>
-      </div>
-    </>
-  )
-})}
+          {isTorontoMode && records.some(r => new Date(r.fields?.DATE).getFullYear() !== currentYear) && (
+            <div className="hidden md:block min-h-0">
+              <div className="relative flex justify-center">
+                <div className="absolute w-[2px] flex flex-col items-center h-full">
+                  <div className="w-[5px] bg-[#8a9ad4] h-full"></div>
+                </div>
+                <div className="relative left-[37.5%] -translate-x-1/4 w-3/4">
+                  {records.filter(r => new Date(r.fields?.DATE).getFullYear() !== currentYear).map((record, index) => (
+                    <div
+                      key={`desktop-other-${record.id}`}
+                      className="relative transition-all duration-300"
+                      style={{ marginTop: index === 0 ? "0" : "40px" }}
+                    >
+                      <div className="transform scale-[0.90] origin-top -translate-x-1/4">
+                        <TimelineCard record={record} index={index} />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
