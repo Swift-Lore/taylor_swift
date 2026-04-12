@@ -81,11 +81,11 @@ export default function RecentEvents() {
   const [upcoming, setUpcoming] = useState([])
   const [trackerData, setTrackerData] = useState({})
   const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState("recent")
 
   useEffect(() => {
     const fetchEvents = async () => {
       const today = new Date().toISOString().split("T")[0]
-
       try {
         const trackerFetches = TRACKER_KEYS.map((key) =>
           axios.get(
@@ -163,74 +163,68 @@ export default function RecentEvents() {
   return (
     <div className="w-full lg:w-[340px] shrink-0 flex flex-col gap-4 px-2 lg:px-0 mt-4 lg:mt-0">
 
-      {/* Days Since panel */}
-      {hasTrackerData && (
+      {/* Desktop tab toggle */}
+      <div className="hidden lg:flex gap-2">
+        <button
+          onClick={() => setActiveTab("recent")}
+          className={`flex-1 py-1.5 rounded-full text-xs font-medium transition-colors ${
+            activeTab === "recent"
+              ? "bg-[#8a9ac7] text-white"
+              : "bg-white text-[#6b7db3] border border-[#c5cae9]"
+          }`}
+        >
+          Recent
+        </button>
+        <button
+          onClick={() => setActiveTab("dayssince")}
+          className={`flex-1 py-1.5 rounded-full text-xs font-medium transition-colors ${
+            activeTab === "dayssince"
+              ? "bg-[#b66b6b] text-white"
+              : "bg-white text-[#6b7db3] border border-[#c5cae9]"
+          }`}
+        >
+          Days Since
+        </button>
+      </div>
+
+      {/* Recent + Upcoming (desktop: tab controlled, mobile: always shown via timeline.jsx toggle) */}
+      {(activeTab === "recent") && (
+        <>
+          {recent.length > 0 && (
+            <div className="bg-white/60 border border-[#c5cae9] rounded-2xl p-4 shadow-sm">
+              <h3 className="text-sm font-semibold text-[#3d3d6b] mb-3 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#8a9ac7] inline-block" />
+                Recently
+              </h3>
+              <div className="flex flex-col gap-2">
+                {recent.map((record) => (
+                  <EventCard key={record.id} record={record} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {upcoming.length > 0 && (
+            <div className="bg-white/60 border border-[#c5cae9] rounded-2xl p-4 shadow-sm">
+              <h3 className="text-sm font-semibold text-[#3d3d6b] mb-3 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#b66b6b] inline-block" />
+                Upcoming
+              </h3>
+              <div className="flex flex-col gap-2">
+                {upcoming.map((record) => (
+                  <EventCard key={record.id} record={record} />
+                ))}
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Days Since (desktop: tab controlled) */}
+      {(activeTab === "dayssince") && hasTrackerData && (
         <div className="bg-white/60 border border-[#c5cae9] rounded-2xl p-4 shadow-sm">
           <h3 className="text-sm font-semibold text-[#3d3d6b] mb-3 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#b66b6b] inline-block" />
             Days Since...
           </h3>
-          <div className="flex flex-col gap-3">
-            {TRACKER_KEYS.map((key) => {
-              const record = trackerData[key]
-              if (!record) return null
-              const days = getDaysSince(record.fields?.DATE)
-              if (days === null) return null
-              return (
-                <Link
-                  key={key}
-                  to={`/post_details?id=${record.id}`}
-                  className="block bg-[#eef0fb] border border-[#c5cae9] rounded-xl p-3 hover:shadow-md hover:border-[#8a9ac7] transition-all duration-200"
-                  draggable={false}
-                  onDragStart={(e) => e.preventDefault()}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-[11px] font-semibold text-[#6b7db3] uppercase tracking-wide">
-                      {TRACKER_LABELS[key]}
-                    </span>
-                    <span className="shrink-0 bg-[#b66b6b] text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                      {days}d ago
-                    </span>
-                  </div>
-                  <p className="text-[#3d3d6b] text-xs mt-1 line-clamp-1">
-                    {record.fields?.EVENT || ""}
-                  </p>
-                </Link>
-              )
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Recently */}
-      {recent.length > 0 && (
-        <div className="bg-white/60 border border-[#c5cae9] rounded-2xl p-4 shadow-sm">
-          <h3 className="text-sm font-semibold text-[#3d3d6b] mb-3 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#8a9ac7] inline-block" />
-            Recently
-          </h3>
-          <div className="flex flex-col gap-2">
-            {recent.map((record) => (
-              <EventCard key={record.id} record={record} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Upcoming */}
-      {upcoming.length > 0 && (
-        <div className="bg-white/60 border border-[#c5cae9] rounded-2xl p-4 shadow-sm">
-          <h3 className="text-sm font-semibold text-[#3d3d6b] mb-3 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#b66b6b] inline-block" />
-            Upcoming
-          </h3>
-          <div className="flex flex-col gap-2">
-            {upcoming.map((record) => (
-              <EventCard key={record.id} record={record} />
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
+          <div className="flex flex-col gap-3
