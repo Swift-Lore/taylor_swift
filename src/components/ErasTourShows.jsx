@@ -193,8 +193,6 @@ export default function ErasTourShows() {
             return da - db;
           });
 
-        console.log("Final normalized shows:", normalized);
-
         setShows(normalized);
 
         if (normalized.length > 0) {
