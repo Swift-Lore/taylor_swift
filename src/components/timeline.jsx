@@ -965,7 +965,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
             </div>
           )}
 
-          {/* 1. Mobile view toggle is now OUTSIDE and ABOVE the hidden wrapper */}
+          {/* 1. Mobile view toggle - Moved OUTSIDE the hidden wrapper */}
           <div className="lg:hidden flex justify-center gap-2 pt-2 pb-4">
             <button
               onClick={() => setMobileView("today")}
@@ -987,8 +987,8 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
             </button>
           </div>
 
-          {/* 2. This wrapper only hides the 'Today' content now, not the buttons */}
-          <div className={mobileView === "recently" || mobileView === "dayssince" ? "hidden lg:block" : ""}>
+          {/* 2. This wrapper ONLY hides the 'Today' content now */}
+          <div className={mobileView === "recently" || mobileView === "dayssince" ? "hidden lg:block" : "block"}>
           
           {/* ON THIS DAY Section */}
 <div className="text-center mt-3 mb-1 flex-shrink-0">
