@@ -262,8 +262,8 @@ export default function RecentEvents() {
         </div>
       )}
 
-      {/* Mobile: always show both sections (controlled by timeline.jsx tab) */}
-      <div className="lg:hidden flex flex-col gap-4">
+      {/* Mobile: controlled by timeline.jsx tab - hidden here, shown via parent */}
+      <div className="hidden">
         {recent.length > 0 && (
           <div className="bg-white/60 border border-[#c5cae9] rounded-2xl p-4 shadow-sm">
             <h3 className="text-sm font-semibold text-[#3d3d6b] mb-3 flex items-center gap-2">
