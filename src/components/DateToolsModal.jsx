@@ -13,7 +13,6 @@ export default function DateToolsModal({
   setCurrentYear,
   setCurrentMonth,
   setCurrentDay,
-  onShowTNInfo,
 }) {
   const [tab, setTab] = useState("calendar");
 const [showTNExplanation, setShowTNExplanation] = useState(false);
