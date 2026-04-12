@@ -220,7 +220,7 @@ const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
             </button>
           </div>
 
-          <div className="bg-[#eef0fb] border border-[#c5cae9] rounded-2xl p-4 mb-4">
+          <div className="mb-4">
             {tab === "calendar" && (
   <>
     <div className="flex gap-2 mb-4">
