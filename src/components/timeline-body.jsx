@@ -1475,7 +1475,7 @@ const CalendarModal = () => {
               className={`px-3 py-1 text-xs rounded-full border ${
                 viewMode === "compact"
                   ? "bg-[#c25e5e] text-white border-[#c25e5e]"
-                  : "bg-white text-[#6b7db3] border-[#6b7db3] bg-white"
+                  : "bg-white text-[#6b7db3] border-[#6b7db3]"
               }`}
               onClick={() => setViewMode("compact")}
             >
