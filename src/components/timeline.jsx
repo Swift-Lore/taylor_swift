@@ -1137,6 +1137,15 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
       <ChevronRight size={10} />
     </Button>
   </div>
+  <div className="flex justify-center mt-2">
+  <Button
+    variant="secondary"
+    className="rounded-full px-4 py-1 text-sm bg-[#8a9ac7] hover:bg-[#6b7db3] text-white"
+    onClick={() => setShowDateTools(true)}
+  >
+    Tools
+  </Button>
+</div>
 </div>
 
     <div className="hidden lg:flex justify-center mt-2">
