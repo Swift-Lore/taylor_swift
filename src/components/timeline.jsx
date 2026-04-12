@@ -993,19 +993,22 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   {/* Glowy header card */}
   <div className="relative w-full mt-4 mb-2 md:mb-3 px-2">
     <div
-      className="
+      className={`
         relative w-full max-w-xl mx-auto px-6 py-4
-        bg-gradient-to-b from-[#fdf6fb] via-[#fbeff7] to-[#f6e5f0]
+        ${isTorontoMode
+          ? "bg-gradient-to-b from-[#eef0fb] via-[#e6eaf7] to-[#dde2f5] border-[#c5cae9]"
+          : "bg-gradient-to-b from-[#fdf6fb] via-[#fbeff7] to-[#f6e5f0] border-[#e6d2e1]"
+        }
         rounded-2xl
-        border border-[#e6d2e1]
+        border
         shadow-[0_8px_20px rgba(210,160,180,0.25)]
-      "
+      `}
     >
       <div className="mx-auto text-center">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-[#8e3e3e]">
+        <h2 className={`text-2xl sm:text-3xl md:text-4xl font-serif ${isTorontoMode ? "text-[#3d3d6b]" : "text-[#8e3e3e]"}`}>
           <span className="block tracking-wide">ON THIS DAY</span>
-          <span className="text-sm sm:text-base md:text-lg block mt-1 text-[#b4667f]">
-            across Taylor&apos;s eras
+          <span className={`text-sm sm:text-base md:text-lg block mt-1 ${isTorontoMode ? "text-[#6b7db3]" : "text-[#b4667f]"}`}>
+            {isTorontoMode ? "in the Taylor Nation timeline" : "across Taylor\u2019s eras"}
           </span>
         </h2>
       </div>
