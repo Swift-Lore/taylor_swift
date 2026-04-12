@@ -5,38 +5,53 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Cache-Control', 's-maxage=604800, stale-while-revalidate=86400');
 
-  // Hardcoded fallbacks for sites that block scrapers
-  const hardcoded = {
-    'justjared.com': {
-      title: 'Just Jared',
-      description: 'Celebrity news and gossip.',
-      image: 'https://www.justjared.com/wp-content/uploads/2020/05/jj-logo.jpg',
-    },
+  const domain = new URL(url).hostname.replace('www.', '');
+
+  // Helper to get title from URL slug as last resort
+  const titleFromSlug = () => {
+    const slug = new URL(url).pathname.split('/').filter(Boolean).pop() || '';
+    return slug
+      .replace(/[-_]/g, ' ')
+      .replace(/\b\w/g, c => c.toUpperCase())
+      .trim();
   };
 
-  try {
-    const domain = new URL(url).hostname.replace('www.', '');
+  // Just Jared — try Microlink first, fall back to slug + logo
+  if (domain.includes('justjared.com')) {
+    try {
+      const mlRes = await fetch(
+        `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=false&video=false`,
+        { signal: AbortSignal.timeout(5000) }
+      );
+      const mlData = await mlRes.json();
 
-    // Check hardcoded first
-    const hardcodedKey = Object.keys(hardcoded).find(k => domain.includes(k));
-    if (hardcodedKey) {
-      const fallback = hardcoded[hardcodedKey];
-      // Still try to get the real title from the URL slug
-      const slug = new URL(url).pathname.split('/').filter(Boolean).pop() || '';
-      const titleFromSlug = slug
-        .replace(/[-_]/g, ' ')
-        .replace(/\b\w/g, c => c.toUpperCase())
-        .trim();
-      return res.status(200).json({
-        title: titleFromSlug || fallback.title,
-        description: fallback.description,
-        image: fallback.image,
-        domain: hardcodedKey,
-      });
+      if (mlData?.data?.image?.url) {
+        return res.status(200).json({
+          title: mlData.data.title || titleFromSlug(),
+          description: mlData.data.description || 'Celebrity news and gossip.',
+          image: mlData.data.image.url,
+          domain: 'justjared.com',
+        });
+      }
+    } catch (e) {
+      // Microlink failed or rate limited — fall through to fallback
     }
 
+    // Fallback: slug title + JJ logo, no image
+    return res.status(200).json({
+      title: titleFromSlug(),
+      description: 'Celebrity news and gossip.',
+      image: null,
+      domain: 'justjared.com',
+    });
+  }
+
+  // All other sites — scrape OG tags directly
+  try {
     const response = await fetch(url, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1)' },
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      },
       signal: AbortSignal.timeout(5000),
     });
     const html = await response.text();
@@ -55,7 +70,6 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ title, description, image, domain });
   } catch (e) {
-    const domain = new URL(url).hostname.replace('www.', '');
-    return res.status(200).json({ title: '', description: '', image: null, domain });
+    return res.status(200).json({ title: titleFromSlug(), description: '', image: null, domain });
   }
 }
