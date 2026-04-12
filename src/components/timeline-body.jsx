@@ -915,7 +915,7 @@ const resetPagination = () => {
 
             {/* title */}
             <div className="px-4 pt-6 pb-2 mt-2">
-              <h3 className="text-[#b91c1c] font-medium text-sm text-center line-clamp-2">
+              <h3 className="text-[#8e3e3e]] font-medium text-sm text-center line-clamp-2">
                 {post.title}
               </h3>
             </div>
