@@ -995,15 +995,15 @@ const betweenRes = calculatorTab === "between" ? calcBetween() : null;
     </div>
 
     <div className="flex justify-center mt-4">
-      <button
-        type="button"
-        onClick={onShowTNInfo}
-        className="inline-flex items-center text-sm text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
-      >
-        <HelpCircle size={14} className="mr-1" />
-        What is this?
-      </button>
-    </div>
+  <button
+    type="button"
+    onClick={() => setShowTNExplanation((prev) => !prev)}
+    className="inline-flex items-center text-sm text-[#b66b6b] underline decoration-dotted hover:text-[#8e3e3e]"
+  >
+    <HelpCircle size={14} className="mr-1" />
+    {showTNExplanation ? "Hide explanation" : "What is this?"}
+  </button>
+</div>
 
     <div className="flex justify-center mt-4">
       <Button
