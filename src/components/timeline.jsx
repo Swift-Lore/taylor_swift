@@ -929,7 +929,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
       <section className="w-full bg-[#e8ecf7] py-1 px-2 md:px-6 flex flex-col min-h-0">
         <div className="container mx-auto flex flex-col lg:flex-row lg:gap-6 min-h-0 flex-1">
           <div className="flex-1 min-w-0">
-<div className={mobileView === "recently" || mobileView === "dayssince" ? "hidden lg:block" : ""}>
+<div className={mobileView === "today" ? "block" : "hidden lg:block"}>
 
             
           {/* Homepage Intro for SEO / AdSense - hidden on mobile */}
