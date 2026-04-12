@@ -1262,27 +1262,30 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
     previousWasExactYear
 
   return (
-    <div
-      key={`desktop-${record.id}`}
-      className="relative transition-all duration-300"
-      style={{
-        marginTop: index === 0 ? "0" : showOtherYearsDivider ? "26px" : "40px",
-      }}
-    >
+    <>
       {showOtherYearsDivider && (
-        <div className="absolute left-[41.67%] -translate-x-1/2 -top-3 z-20 flex items-center">
-          <div className="h-[2px] w-10 bg-[#8a9ad4]" />
-          <span className="mx-2 inline-block rounded-full bg-[#e8ecf7] px-2.5 py-0.5 text-[10px] text-[#6b7db3] border border-[#c5cae9] shadow-sm whitespace-nowrap">
-            Other years
-          </span>
-          <div className="h-[2px] w-10 bg-[#8a9ad4]" />
+        <div className="relative h-8 mb-2">
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[2px] h-8 bg-[#8a9ad4]" />
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <span className="inline-block rounded-full bg-[#e8ecf7] px-3 py-1 text-[11px] text-[#6b7db3] border border-[#c5cae9] shadow-sm whitespace-nowrap">
+              Other years
+            </span>
+          </div>
         </div>
       )}
 
-      <div className="transform scale-[0.90] origin-top -translate-x-1/4">
-        <TimelineCard record={record} index={index} />
+      <div
+        key={`desktop-${record.id}`}
+        className="relative transition-all duration-300"
+        style={{
+          marginTop: index === 0 ? "0" : showOtherYearsDivider ? "10px" : "40px",
+        }}
+      >
+        <div className="transform scale-[0.90] origin-top -translate-x-1/4">
+          <TimelineCard record={record} index={index} />
+        </div>
       </div>
-    </div>
+    </>
   )
 })}
                 </div>
