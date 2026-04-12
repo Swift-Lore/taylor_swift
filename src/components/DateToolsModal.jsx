@@ -968,7 +968,6 @@ const betweenRes = calculatorTab === "between" ? calcBetween() : null;
             })}
           </div>
           <div className="text-sm text-[#6b7db3] mb-4">
-  Matching date for the currently selected day.
 </div>
 
           <Button
