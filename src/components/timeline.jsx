@@ -1234,7 +1234,18 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   <DateCalculatorModal onClose={() => setShowDateCalc(false)} />
 )}
 {showDateTools && (
-  <DateToolsModal onClose={() => setShowDateTools(false)} />
+  <DateToolsModal
+    onClose={() => setShowDateTools(false)}
+    isTorontoMode={isTorontoMode}
+    setIsTorontoMode={setIsTorontoMode}
+    torontoDate={torontoDate}
+    matchingRealDate={matchingRealDate}
+    matchingRealLabel={matchingRealLabel}
+    setCurrentYear={setCurrentYear}
+    setCurrentMonth={setCurrentMonth}
+    setCurrentDay={setCurrentDay}
+    onShowTNInfo={() => setShowTNInfo(true)}
+  />
 )}
         </div>
           </div>{/* end mobileView today wrapper */}
