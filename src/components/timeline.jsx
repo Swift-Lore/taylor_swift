@@ -1032,7 +1032,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   </div>
 
   {/* Date navigation container with properly positioned TN box */}
-  <div className="relative mt-0 md:mt-1 max-w-3xl mx-auto">
+  <div className="relative mt-0 md:mt-1 max-w-3xl mx-auto lg:mb-10">
     {/* Main date navigation - CENTERED (Date Calc does NOT affect centering) */}
 <div className="relative w-full">
   {/* Mobile: Date Calc on its own row */}
