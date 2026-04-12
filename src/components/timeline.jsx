@@ -1037,22 +1037,6 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   <div className="relative mt-0 md:mt-1 max-w-3xl mx-auto lg:mb-2">
     {/* Main date navigation - CENTERED (Date Calc does NOT affect centering) */}
 <div className="relative w-full">
-  {/* Mobile: Date Calc on its own row */}
-  <div className="flex justify-center mb-2 sm:hidden">
-    <Button
-      variant="secondary"
-      className="
-        rounded-full h-7 px-3
-        text-[10px]
-        flex items-center justify-center
-        min-w-[90px]
-      "
-      onClick={() => setShowDateCalc(true)}
-      title="Open date calculator"
-    >
-      Date Calc
-    </Button>
-  </div>
 
   {/* Desktop/tablet: Date Calc pinned left, doesn't push center */}
   <div className="hidden sm:block absolute left-0 top-1/2 -translate-y-1/2">
