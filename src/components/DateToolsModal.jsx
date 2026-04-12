@@ -3,7 +3,18 @@ import axios from "axios";
 import { ChevronLeft, ChevronRight, Star, Zap, Clock, HelpCircle } from "lucide-react";
 import { Button } from "./ui/Button";
 
-export default function DateToolsModal({ onClose }) {
+export default function DateToolsModal({
+  onClose,
+  isTorontoMode,
+  setIsTorontoMode,
+  torontoDate,
+  matchingRealDate,
+  matchingRealLabel,
+  setCurrentYear,
+  setCurrentMonth,
+  setCurrentDay,
+  onShowTNInfo,
+}) {
   const [tab, setTab] = useState("calendar");
   const getInitialSelectedDate = () => {
   const params = new URLSearchParams(window.location.search);
