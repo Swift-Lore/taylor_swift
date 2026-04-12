@@ -166,9 +166,10 @@ function LinkPreview({ url }) {
 
       const isProblematicDomain = domain.includes("tmz.com");
 
-      const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
+      
 
       try {
+        const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
         if (!isProblematicDomain) {
           const microlinkUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&ttl=2592000&proxy=true&palette=true` + 
             (MICROLINK_API_KEY ? `&api_key=${MICROLINK_API_KEY}` : "");
