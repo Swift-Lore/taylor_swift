@@ -3,6 +3,9 @@ import { Button } from "./ui/Button";
 
 export default function DateToolsModal({ onClose }) {
   const [tab, setTab] = useState("calendar");
+  const today = new Date();
+const [calendarMonth, setCalendarMonth] = useState(today.getMonth());
+const [calendarYear, setCalendarYear] = useState(today.getFullYear());
 
   useEffect(() => {
     const originalStyle = window.getComputedStyle(document.body).overflow;
