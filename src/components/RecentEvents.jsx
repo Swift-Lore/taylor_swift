@@ -76,7 +76,7 @@ const TRACKER_LABELS = {
 
 const TRACKER_KEYS = Object.keys(TRACKER_LABELS)
 
-export default function RecentEvents() {
+export default function RecentEvents({ mobileTab }) {
   const [recent, setRecent] = useState([])
   const [upcoming, setUpcoming] = useState([])
   const [trackerData, setTrackerData] = useState({})
