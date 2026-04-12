@@ -8,7 +8,8 @@ import axios from "axios"
 import "./timeline.css"
 import { SITE_UPDATES } from "./site-updates"
 import AdSlot from "./adslot"
-import DateCalculatorModal from "./DateCalculatorModal";
+import DateCalculatorModal from "./DateCalculatorModal"
+import RecentEvents from "./RecentEvents";
 
 
 // ===== Toronto Theory Alternate Timeline (helper) =====
