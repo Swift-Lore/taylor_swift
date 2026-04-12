@@ -494,8 +494,8 @@ const getFilteredKeywords = () => {
       try {
         const clauses = []
 
-        const startISO = parseMMDDYYYYToISO(startDateInput)
-        const endISO = parseMMDDYYYYToISO(endDateInput)
+        const startISO = parseMMDDYYYYToISO(debouncedStart)
+        const endISO = parseMMDDYYYYToISO(debouncedEnd)
 
         // inclusive start: DATE >= startISO
         if (startISO) {
