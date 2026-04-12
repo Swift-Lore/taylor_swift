@@ -933,15 +933,21 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           <div className="lg:hidden flex justify-center gap-2 pt-3 pb-1">
             <button
               onClick={() => setMobileView("today")}
-              className={`px-5 py-1.5 rounded-full text-sm font-medium transition-colors ${mobileView === "today" ? "bg-[#b66b6b] text-white" : "bg-white text-[#6b7db3] border border-[#6b7db3]"}`}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${mobileView === "today" ? "bg-[#b66b6b] text-white" : "bg-white text-[#6b7db3] border border-[#6b7db3]"}`}
             >
-              On This Day
+              Today
             </button>
             <button
               onClick={() => setMobileView("recently")}
-              className={`px-5 py-1.5 rounded-full text-sm font-medium transition-colors ${mobileView === "recently" ? "bg-[#8a9ac7] text-white" : "bg-white text-[#6b7db3] border border-[#6b7db3]"}`}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${mobileView === "recently" ? "bg-[#8a9ac7] text-white" : "bg-white text-[#6b7db3] border border-[#6b7db3]"}`}
             >
-              Recently
+              Recent
+            </button>
+            <button
+              onClick={() => setMobileView("dayssince")}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${mobileView === "dayssince" ? "bg-[#b66b6b] text-white" : "bg-white text-[#6b7db3] border border-[#6b7db3]"}`}
+            >
+              Days Since
             </button>
           </div>
 
