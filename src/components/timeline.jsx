@@ -1140,9 +1140,9 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
     {/* TN box - Desktop: positioned to right */}
     <div
       className="
-        hidden
-        lg:block lg:absolute lg:right-[-10px] lg:top-[-5px]
-      "
+  hidden
+  lg:block lg:absolute lg:right-[-60px] lg:top-[-5px]
+"
     >
       <div className="bg-white/90 border border-[#e6d2e1] rounded-xl shadow-sm px-3 py-2 w-56">
         <Button
