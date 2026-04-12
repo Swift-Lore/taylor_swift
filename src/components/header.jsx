@@ -48,7 +48,6 @@ export default function Header() {
               setEventData(data.fields);
             }
           } catch (error) {
-            console.error("Error fetching event data for header:", error);
           }
         };
 
@@ -74,7 +73,6 @@ export default function Header() {
 
       return `${month}-${day}-${year}`;
     } catch (error) {
-      console.error("Error formatting date:", error);
       return "";
     }
   };

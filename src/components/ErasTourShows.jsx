@@ -183,8 +183,6 @@ export default function ErasTourShows() {
           ? data.records
           : [];
 
-        console.log("Raw Eras Tour shows:", rawArray.length, "records");
-
         const normalized = rawArray
           .map((item) => normalizeShow(item))
           .sort((a, b) => {
@@ -194,8 +192,6 @@ export default function ErasTourShows() {
               return 0;
             return da - db;
           });
-
-        console.log("Final normalized shows:", normalized);
 
         setShows(normalized);
 
@@ -250,7 +246,6 @@ export default function ErasTourShows() {
 } while (offset);
 
         const normalized = allRecords.map((r) => normalizeOutfit(r));
-        console.log("Loaded outfits:", normalized.length);
         setOutfits(normalized);
       } catch (err) {
         console.error("ErasTourShows loadOutfits error:", err);

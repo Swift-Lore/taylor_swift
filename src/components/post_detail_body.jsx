@@ -6,17 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import "./post_detail_body.css";
 import AdSlot from "./adslot";
 
-// YouTube video ID extractor
-const getYouTubeVideoId = (url) => {
-  if (!url) return null;
-  if (url.includes("shorts/")) {
-    return url.split("shorts/")[1];
-  } else if (url.includes("v=")) {
-    return url.split("v=")[1].split("&")[0];
-  }
-  return null;
-};
-
 // Image URL helper
 const isLikelyImage = (url) => {
   if (!url) return false;
@@ -512,7 +501,6 @@ export default function PostDetailBody() {
   // Source link state
   const [sourceImages, setSourceImages] = useState([]);
   const [nonImageLinks, setNonImageLinks] = useState([]);
-  const [microlinkErrors, setMicrolinkErrors] = useState({});
 
   // Scroll to top on mount / id change
   useEffect(() => {
@@ -571,9 +559,6 @@ export default function PostDetailBody() {
 
   setSourceImages(imageLinks);
   setNonImageLinks(otherLinks);
-}, [event]);
-useEffect(() => {
-  setMicrolinkErrors({});
 }, [event]);
   
   // Modal helpers

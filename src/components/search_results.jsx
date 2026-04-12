@@ -69,8 +69,6 @@ export default function SearchResults() {
           ? `AND(${searchConditions.join(', ')})`
           : searchConditions[0]
 
-        console.log('Search filter:', filterFormula) // Debug log
-
         const response = await axios.get(
           "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
           {
@@ -85,7 +83,6 @@ export default function SearchResults() {
           }
         )
 
-        console.log('Search results:', response.data.records) // Debug log
         setResults(response.data.records || [])
       } catch (error) {
         console.error("Error fetching search results:", error)
@@ -271,7 +268,7 @@ export default function SearchResults() {
         {results.length >= 50 && (
           <div className="text-center">
             <p className="text-[#8a9ad4] text-sm mb-4">
-              Showing first 50 results. Refine your search for more specific results.
+              Showing first 100 results. Refine your search for more specific results.
             </p>
           </div>
         )}
