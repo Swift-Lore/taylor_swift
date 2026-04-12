@@ -955,17 +955,18 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
           </div>
 
           {/* Ad block */}
-{import.meta.env.PROD && !isLoading && !isInitialLoad && records.length > 0 && (
-  <div className="w-full flex justify-center mb-4 min-h-[90px]"> 
-    <AdSlot
-      variant="leaderboard"
-      maxWidthClass="max-w-6xl"
-      className="relative z-10" 
-    />
-  </div>
-)}
-{/* Mobile view toggle - positioned above On This Day */}
-          <div className="lg:hidden flex justify-center gap-2 pt-2 pb-2">
+          {import.meta.env.PROD && !isLoading && !isInitialLoad && records.length > 0 && (
+            <div className="w-full flex justify-center mb-4 min-h-[90px]"> 
+              <AdSlot
+                variant="leaderboard"
+                maxWidthClass="max-w-6xl"
+                className="relative z-10" 
+              />
+            </div>
+          )}
+
+          {/* 1. Mobile view toggle is now OUTSIDE and ABOVE the hidden wrapper */}
+          <div className="lg:hidden flex justify-center gap-2 pt-2 pb-4">
             <button
               onClick={() => setMobileView("today")}
               className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${mobileView === "today" ? "bg-[#b66b6b] text-white" : "bg-white text-[#6b7db3] border border-[#6b7db3]"}`}
@@ -985,8 +986,13 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               Days Since
             </button>
           </div>
-          {/* ON THIS DAY Section */}
-<div className="text-center mt-3 mb-1 flex-shrink-0">
+
+          {/* 2. This wrapper only hides the 'Today' content now, not the buttons */}
+          <div className={mobileView === "recently" || mobileView === "dayssince" ? "hidden lg:block" : ""}>
+            
+            {/* ON THIS DAY Section */}
+            <div className="text-center mt-3 mb-1 flex-shrink-0">
+              {/* ... rest of your 'On This Day' code ... */}
   {/* Glowy header card */}
   <div className="relative w-full mt-4 mb-2 md:mb-3 px-2">
     <div
