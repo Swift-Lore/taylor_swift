@@ -1080,8 +1080,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
       <div
         className="
           bg-white rounded-full
-          pl-3 sm:pl-4
-          pr-7 sm:pr-8
+          px-3 sm:px-4
           py-0.5
           min-w-[120px] sm:min-w-[140px]
           border border-[#b66b6b]
