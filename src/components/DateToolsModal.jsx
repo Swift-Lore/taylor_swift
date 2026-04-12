@@ -378,16 +378,6 @@ const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
               </div>
             )}
           </div>
-
-          <div className="flex justify-end">
-            <Button
-              variant="secondary"
-              onClick={onClose}
-              className="rounded-full px-4"
-            >
-              Close
-            </Button>
-          </div>
         </div>
       </div>
     </>
