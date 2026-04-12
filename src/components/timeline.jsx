@@ -1304,7 +1304,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
         </div>
           </div>{/* end mobileView today wrapper */}
           {/* Desktop sidebar */}
-<div className="hidden lg:block w-[320px] shrink-0 pt-[280px]">
+<div className="hidden lg:block w-[320px] shrink-0 pt-[200px]">
             <RecentEvents />
           </div>
         </div>
