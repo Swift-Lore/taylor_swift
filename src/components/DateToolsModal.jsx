@@ -354,21 +354,15 @@ const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
       })}
     </div>
 
-    <div className="flex gap-2 justify-center mt-4">
-      <Button
-        variant="secondary"
-        onClick={onClose}
-        className="rounded-full px-6 flex-1"
-      >
-        Close
-      </Button>
-      <Button
-        onClick={jumpToToday}
-        className="rounded-full px-6 flex-1 bg-[#8e3e3e] hover:bg-[#7a3434]"
-      >
-        Go to Today
-      </Button>
-    </div>
+    <div className="flex justify-center mt-4">
+  <Button
+    variant="secondary"
+    onClick={onClose}
+    className="rounded-full px-6 w-full max-w-xs"
+  >
+    Close
+  </Button>
+</div>
   </>
 )}
 
