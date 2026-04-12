@@ -6,6 +6,8 @@ export default function DateToolsModal({ onClose }) {
   const today = new Date();
 const [calendarMonth, setCalendarMonth] = useState(today.getMonth());
 const [calendarYear, setCalendarYear] = useState(today.getFullYear());
+const [selectedDate, setSelectedDate] = useState(today);
+const [dateEventsMap, setDateEventsMap] = useState({});
 
   useEffect(() => {
     const originalStyle = window.getComputedStyle(document.body).overflow;
