@@ -1076,7 +1076,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
       </div>
 
       <button
-        onClick={() => setShowCalendar(true)}
+        onClick={() => setShowDateTools(true)}
         className="
           absolute right-1 sm:right-1.5
           top-1/2 -translate-y-1/2
