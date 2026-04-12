@@ -1240,19 +1240,44 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
                 </div>
 
                 <div className="relative left-[37.5%] -translate-x-1/4 w-3/4">
-                  {records.map((record, index) => (
-                    <div
-                      key={`desktop-${record.id}`}
-                      className="relative transition-all duration-300"
-                      style={{
-                        marginTop: index === 0 ? "0" : "40px",
-                      }}
-                    >
-                      <div className="transform scale-[0.90] origin-top -translate-x-1/4">
-                        <TimelineCard record={record} index={index} />
-                      </div>
-                    </div>
-                  ))}
+                  {records.map((record, index) => {
+  const rawDate = record?.fields?.DATE
+  const recordYear = rawDate ? new Date(rawDate).getFullYear() : null
+  const isExactYear = recordYear === currentYear
+
+  const previousRecord = index > 0 ? records[index - 1] : null
+  const previousRawDate = previousRecord?.fields?.DATE
+  const previousYear = previousRawDate ? new Date(previousRawDate).getFullYear() : null
+  const previousWasExactYear = previousYear === currentYear
+
+  const showOtherYearsDivider =
+    isTorontoMode &&
+    index > 0 &&
+    !isExactYear &&
+    previousWasExactYear
+
+  return (
+    <div
+      key={`desktop-${record.id}`}
+      className="relative transition-all duration-300"
+      style={{
+        marginTop: index === 0 ? "0" : "40px",
+      }}
+    >
+      {showOtherYearsDivider && (
+        <div className="flex justify-center mb-4">
+          <span className="inline-block rounded-full bg-white border border-[#c5cae9] px-3 py-1 text-xs text-[#6b7db3] shadow-sm">
+            Events on this date in other years
+          </span>
+        </div>
+      )}
+
+      <div className="transform scale-[0.90] origin-top -translate-x-1/4">
+        <TimelineCard record={record} index={index} />
+      </div>
+    </div>
+  )
+})}
                 </div>
               </div>
             </div>
