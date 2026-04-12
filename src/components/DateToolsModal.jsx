@@ -1004,6 +1004,36 @@ const betweenRes = calculatorTab === "between" ? calcBetween() : null;
     {showTNExplanation ? "Hide explanation" : "What is this?"}
   </button>
 </div>
+    {showTNExplanation && (
+  <div className="bg-[#eef0fb] rounded-2xl p-4 border border-[#d3dceb] mt-3 mb-4">
+    <div className="text-sm text-[#5c678f] leading-relaxed space-y-3">
+      <p>
+        On November 22, 2024, Taylor Nation tweeted about everyone being
+        &quot;back in Nashville that one morning on April 25th, 2019&quot; and
+        praised fans for their detective skills.
+      </p>
+
+      <p>
+        That post sparked a fan theory about a &quot;Taylor Nation timeline&quot;
+        — an alternate timeline that runs in parallel to the current date.
+      </p>
+
+      <p>
+        This tool shows the date that lines up with that alternate timeline so
+        you can jump between the real date and the matching TN date.
+      </p>
+
+      <a
+        href="https://x.com/taylornation13/status/1860097353564446759?s=20"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-block text-sm text-[#8a3f5b] underline decoration-dotted hover:text-[#6c3047]"
+      >
+        View the original Taylor Nation tweet
+      </a>
+    </div>
+  </div>
+)}
 
     <div className="flex justify-center mt-4">
       <Button
