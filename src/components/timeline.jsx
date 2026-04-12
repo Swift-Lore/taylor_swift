@@ -1,5 +1,6 @@
 "use client"
 
+import RecentEvents from "./RecentEvents"
 import { ChevronLeft, ChevronRight, Calendar, Star, Zap, Clock, HelpCircle } from "lucide-react"
 import { Button } from "./ui/Button"
 import { useNavigate, Link, useSearchParams } from "react-router-dom"
@@ -8,8 +9,7 @@ import axios from "axios"
 import "./timeline.css"
 import { SITE_UPDATES } from "./site-updates"
 import AdSlot from "./adslot"
-import DateCalculatorModal from "./DateCalculatorModal"
-import RecentEvents from "./RecentEvents";
+import DateCalculatorModal from "./DateCalculatorModal";
 
 
 // ===== Toronto Theory Alternate Timeline (helper) =====
