@@ -48,7 +48,6 @@ export default function Header() {
               setEventData(data.fields);
             }
           } catch (error) {
-            console.error("Error fetching event data for header:", error);
           }
         };
 
