@@ -1387,7 +1387,12 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   <DateCalculatorModal onClose={() => setShowDateCalc(false)} />
 )}
         </div>
-      </section>
+     </section>
+
+      {/* Recently + Upcoming sidebar */}
+      <div className="w-full bg-[#e8ecf7] px-2 md:px-6 pb-6">
+        <div className="container mx-auto max-w-md">
+          <RecentEvents />
+        </div>
+      </div>
     </>
-  )
-}
