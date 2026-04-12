@@ -934,7 +934,7 @@ const resetPagination = () => {
 
           <div className="p-4 flex flex-col flex-grow">
             {post.notes && (
-              <div className="text-[#4b4b63] text-xs mb-2 line-clamp-2 whitespace-pre-line">
+              <div className="text-[#4b4b63] text-xs mb-2 line-clamp-4 whitespace-pre-line">
                 {post.notes}
               </div>
             )}
