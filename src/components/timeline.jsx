@@ -1008,7 +1008,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
         <h2 className={`text-2xl sm:text-3xl md:text-4xl font-serif ${isTorontoMode ? "text-[#3d3d6b]" : "text-[#8e3e3e]"}`}>
           <span className="block tracking-wide">ON THIS DAY</span>
           <span className={`text-sm sm:text-base md:text-lg block mt-1 ${isTorontoMode ? "text-[#6b7db3]" : "text-[#b4667f]"}`}>
-            {isTorontoMode ? "in the Taylor Nation timeline" : "across Taylor\u2019s eras"}
+{isTorontoMode ? "in the Taylor Nation timeline" : "across Taylor Swift\u2019s eras"}
           </span>
         </h2>
       </div>
