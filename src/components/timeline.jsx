@@ -1210,10 +1210,15 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
     previousWasExactYear
 
   return (
-    <div key={`mobile-${record.id}`} className="relative mb-4">
+    <div
+      key={`mobile-${record.id}`}
+      className="relative"
+      style={{ marginBottom: showOtherYearsDivider ? "10px" : "16px" }}
+    >
       {showOtherYearsDivider && (
-        <div className="text-center mb-3">
-          <span className="inline-block rounded-full bg-white border border-[#c5cae9] px-3 py-1 text-xs text-[#6b7db3] shadow-sm">
+        <div className="relative flex justify-center mb-2">
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[2px] h-8 bg-[#8a9ad4]" />
+          <span className="relative inline-block rounded-full bg-[#e8ecf7] border border-[#c5cae9] px-3 py-1 text-[11px] text-[#6b7db3] shadow-sm">
             Events on this date in other years
           </span>
         </div>
@@ -1224,10 +1229,6 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
     </div>
   )
 })}
-                </div>
-              </div>
-            </div>
-          )}
 
                     {/* Desktop Timeline – only show when there are events */}
           {records.length > 0 && (
