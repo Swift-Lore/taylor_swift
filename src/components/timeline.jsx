@@ -1193,12 +1193,37 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
                 </div>
 
                 <div className="relative w-full max-w-xl mx-auto z-10 pt-2">
-                  {records.map((record, index) => (
-                    <div key={`mobile-${record.id}`} className="relative mb-4">
-                      <div className="absolute left-1/2 top-4 w-6 h-[2px] bg-[#8a9ad4] -translate-x-1/2" />
-                      <TimelineCard record={record} index={index} />
-                    </div>
-                  ))}
+                  {records.map((record, index) => {
+  const rawDate = record?.fields?.DATE
+  const recordYear = rawDate ? new Date(rawDate).getFullYear() : null
+  const isExactYear = recordYear === currentYear
+
+  const previousRecord = index > 0 ? records[index - 1] : null
+  const previousRawDate = previousRecord?.fields?.DATE
+  const previousYear = previousRawDate ? new Date(previousRawDate).getFullYear() : null
+  const previousWasExactYear = previousYear === currentYear
+
+  const showOtherYearsDivider =
+    isTorontoMode &&
+    index > 0 &&
+    !isExactYear &&
+    previousWasExactYear
+
+  return (
+    <div key={`mobile-${record.id}`} className="relative mb-4">
+      {showOtherYearsDivider && (
+        <div className="text-center mb-3">
+          <span className="inline-block rounded-full bg-white border border-[#c5cae9] px-3 py-1 text-xs text-[#6b7db3] shadow-sm">
+            Events on this date in other years
+          </span>
+        </div>
+      )}
+
+      <div className="absolute left-1/2 top-4 w-6 h-[2px] bg-[#8a9ad4] -translate-x-1/2" />
+      <TimelineCard record={record} index={index} />
+    </div>
+  )
+})}
                 </div>
               </div>
             </div>
