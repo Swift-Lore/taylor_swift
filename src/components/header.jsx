@@ -288,16 +288,6 @@ export default function Header() {
                 onClick={handleLogoClick}
                 className="w-full max-w-[700px] cursor-pointer relative -mt-1 md:-mt-2"
               >
-                {/* Smaller decorative stars */}
-                <span className="absolute left-6 md:left-8 top-6 md:top-8 text-white/70 text-lg md:text-2xl twinkle">
-                  ✨
-                </span>
-                <span className="absolute right-8 md:right-12 top-4 md:top-6 text-white/70 text-xl md:text-3xl twinkle">
-                  ✨
-                </span>
-                <span className="absolute right-16 md:right-24 bottom-6 md:bottom-8 text-white/70 text-base md:text-xl twinkle">
-                  ✨
-                </span>
 
                 {/* Smaller logo */}
                 <img
