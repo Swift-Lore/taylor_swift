@@ -555,8 +555,6 @@ if (isCompleteMonthDay(monthDay)) {
         const isFilterActive = clauses.length > 0
         setIsFilterMode(isFilterActive)
 
-        console.log("Airtable filter formula:", filterFormula || "(none)")
-
         const currentOffset = offsetHistory[currentOffsetIndex]
 
 const response = await axios.get(
