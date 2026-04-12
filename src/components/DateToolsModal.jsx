@@ -981,7 +981,7 @@ const betweenRes = calculatorTab === "between" ? calcBetween() : null;
             }}
             className="rounded-full px-6 py-2 text-sm font-medium bg-[#eef0fb] border border-[#c5cae9] text-[#3d3d6b] hover:bg-[#e0e4f7] transition-colors w-full max-w-xs"
           >
-            Switch to Taylor Nation Timeline Mode
+            Jump to date
           </button>
         </>
       )}
