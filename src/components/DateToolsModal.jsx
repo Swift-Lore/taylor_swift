@@ -1039,8 +1039,7 @@ const betweenRes = calculatorTab === "between" ? calcBetween() : null;
     </div>
   </>
 )}
-          </div>
-          </div>
+         </div>
         </div>
       </div>
     </>
