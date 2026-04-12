@@ -1415,7 +1415,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
       </section>
 
       {/* Mobile: Recently + Upcoming below timeline */}
-      <div className="lg:hidden w-full bg-[#e8ecf7] px-2 md:px-6 pb-6">
+      <div className={`lg:hidden w-full bg-[#e8ecf7] px-2 md:px-6 pb-6 ${mobileView === "recently" ? "block" : "hidden"}`}>
         <div className="container mx-auto max-w-md">
           <RecentEvents />
         </div>
