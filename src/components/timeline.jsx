@@ -992,7 +992,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   <div className="relative w-full mt-4 mb-2 md:mb-3 px-2">
     <div
       className="
-        relative w-full max-w-md mx-auto px-3 py-2
+        relative w-full max-w-xl mx-auto px-6 py-4
         bg-gradient-to-b from-[#fdf6fb] via-[#fbeff7] to-[#f6e5f0]
         rounded-2xl
         border border-[#e6d2e1]
@@ -1000,16 +1000,12 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
       "
     >
       <div className="mx-auto text-center">
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-serif text-[#8e3e3e]">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-[#8e3e3e]">
           <span className="block tracking-wide">ON THIS DAY</span>
-          <span className="text-xs sm:text-sm md:text-base block mt-0.5 text-[#b4667f]">
+          <span className="text-sm sm:text-base md:text-lg block mt-1 text-[#b4667f]">
             across Taylor&apos;s eras
           </span>
         </h2>
-
-        <p className="mt-1 text-[#6b7db3] text-xs leading-relaxed px-1">
-          Explore what happened on this day across the years
-        </p>
       </div>
 
       {/* Side stars */}
