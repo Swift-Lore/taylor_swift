@@ -164,92 +164,66 @@ function LinkPreview({ url }) {
     const fetchPreview = async () => {
       if (!isMounted) return;
 
-      const isProblematicDomain = domain.includes("tmz.com");
-
       try {
         const MICROLINK_API_KEY = import.meta.env.VITE_MICROLINK_API_KEY || '';
-        if (!isProblematicDomain) {
-          const microlinkUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&ttl=2592000&proxy=true&palette=true` + 
-            (MICROLINK_API_KEY ? `&api_key=${MICROLINK_API_KEY}` : "");
+        
+        // Removed the problematic check to force EVERY link to try and fetch a thumbnail
+        const microlinkUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&ttl=2592000&proxy=true&palette=true` + 
+          (MICROLINK_API_KEY ? `&api_key=${MICROLINK_API_KEY}` : "");
 
-          const microlinkResponse = await fetch(microlinkUrl, {
-            headers: { 'Accept': 'application/json' },
-            signal: AbortSignal.timeout(25000) 
-          });
+        const microlinkResponse = await fetch(microlinkUrl, {
+          headers: { 'Accept': 'application/json' },
+          signal: AbortSignal.timeout(30000) // 30 seconds to prevent early fallback
+        });
 
-          if (microlinkResponse.ok) {
-            const microlinkData = await microlinkResponse.json();
-            if (isMounted && microlinkData.data) {
-              const data = microlinkData.data;
-              const ogImageUrl = data.image?.url || null;
-              const logoUrl = data.logo?.url || null;
-              let imageUrl = ogImageUrl || logoUrl;
+        if (microlinkResponse.ok) {
+          const microlinkData = await microlinkResponse.json();
+          if (isMounted && microlinkData.data) {
+            const data = microlinkData.data;
+            let imageUrl = data.image?.url || data.logo?.url || null;
+            if (imageUrl && imageUrl.startsWith('//')) imageUrl = 'https:' + imageUrl;
 
-              if (imageUrl && imageUrl.startsWith('//')) imageUrl = 'https:' + imageUrl;
-
-              await new Promise(resolve => setTimeout(resolve, 300));
-
-              setPreviewData({
-                title: data.title || getFallbackTitleFromUrl(url, domain),
-                description: data.description || "",
-                image: imageUrl || getFaviconUrl(domain),
-                domain: data.publisher || domain,
-                url: data.url || url,
-                isSiteFallback: false
-              });
-              return;
-            }
+            setPreviewData({
+              title: data.title || getFallbackTitleFromUrl(url, domain),
+              description: data.description || "",
+              image: imageUrl || getFaviconUrl(domain),
+              domain: data.publisher || domain,
+              url: data.url || url,
+              isSiteFallback: false
+            });
+            return; // Exit here if successful
           }
-        }
-
-        const siteConfigs = {
-          "justjared.com": {
-            title: "Just Jared - Celebrity News",
-            image: "https://www.justjared.com/images/justjared-logo-new.png"
-          },
-          "tmz.com": {
-            title: "TMZ Celebrity News",
-            description: "Breaking the biggest stories in celebrity and entertainment news.",
-            image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/TMZLogo.svg/1200px-TMZLogo.svg.png"
-          }
-        };
-
-        const siteKey = Object.keys(siteConfigs).find((key) => domain.includes(key));
-
-        if (siteKey && isMounted) {
-          const config = siteConfigs[siteKey];
-          setPreviewData({
-            title: config.title || getFallbackTitleFromUrl(url, domain),
-            description: config.description || "",
-            image: config.image,
-            domain: siteKey,
-            url: url,
-            isSiteFallback: true
-          });
-          return;
-        }
-
-        if (isMounted) {
-          setPreviewData({
-            title: getFallbackTitleFromUrl(url, domain),
-            description: "",
-            image: getFaviconUrl(domain),
-            domain: domain,
-            url: url
-          });
         }
       } catch (error) {
-        if (isMounted) {
-          setPreviewData({
-            title: getFallbackTitleFromUrl(url, domain),
-            image: getFaviconUrl(domain),
-            domain: domain,
-            url: url
-          });
-        }
-      } finally {
-        if (isMounted) setLoading(false);
+        console.error("Microlink fetch error:", error);
       }
+
+      // FALLBACK LOGIC: Only happens if the fetch above fails or times out
+      if (!isMounted) return;
+
+      const siteConfigs = {
+        "justjared.com": {
+          title: "Just Jared - Celebrity News",
+          image: "https://www.justjared.com/images/justjared-logo-new.png"
+        },
+        "tmz.com": {
+          title: "TMZ Celebrity News",
+          image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/TMZLogo.svg/1200px-TMZLogo.svg.png"
+        }
+      };
+
+      const siteKey = Object.keys(siteConfigs).find((key) => domain.includes(key));
+      
+      setPreviewData({
+        title: siteKey ? siteConfigs[siteKey].title : getFallbackTitleFromUrl(url, domain),
+        description: siteKey ? (siteConfigs[siteKey].description || "") : "",
+        image: siteKey ? siteConfigs[siteKey].image : getFaviconUrl(domain),
+        domain: siteKey || domain,
+        url: url,
+        isSiteFallback: !!siteKey
+      });
+      
+      setLoading(false);
     };
 
     fetchPreview();
