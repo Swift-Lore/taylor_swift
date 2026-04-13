@@ -15,7 +15,7 @@
         {
           "type": "header",
           "key": "user-agent",
-          "value": "(?i).*(facebookexternalhit|twitterbot|linkedinbot|whatsapp|discordbot|slackbot|applebot|googlebot).*"
+          "value": "(?i).*(facebookexternalhit|twitterbot|linkedinbot|whatsapp|discordbot|slackbot|applebot|googlebot|bsky|Bluesky).*"
         }
       ]
     },
