@@ -140,6 +140,142 @@ const getFallbackTitleFromUrl = (url, domain) => {
   );
 };
 
+function AroundThisTime({ eventDate, currentPostId }) {
+  const navigate = useNavigate()
+  const [isOpen, setIsOpen] = useState(false)
+  const [events, setEvents] = useState({ before: [], sameDay: [], after: [] })
+  const [loading, setLoading] = useState(false)
+  const [fetched, setFetched] = useState(false)
+
+  const formatCardDate = (isoDate) => {
+    if (!isoDate) return ""
+    const d = new Date(isoDate)
+    return d.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric", timeZone: "UTC" })
+  }
+
+  const fetchEvents = async () => {
+    if (fetched) return
+    setLoading(true)
+    try {
+      const date = new Date(eventDate)
+      const before = new Date(date)
+      before.setUTCDate(before.getUTCDate() - 3)
+      const after = new Date(date)
+      after.setUTCDate(after.getUTCDate() + 3)
+      const fmt = (d) => d.toISOString().split("T")[0]
+      const res = await fetch(
+        `https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker?filterByFormula=AND(IS_AFTER({DATE},'${fmt(before)}'),IS_BEFORE({DATE},'${fmt(after)}'))&sort[0][field]=DATE&sort[0][direction]=asc&fields[]=DATE&fields[]=EVENT&fields[]=KEYWORDS`,
+        { headers: { Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}` } }
+      )
+      const data = await res.json()
+      const all = (data.records || []).filter(r => r.id !== currentPostId)
+      const eventDateStr = fmt(date)
+      const before3 = all.filter(r => r.fields?.DATE < eventDateStr).slice(-3)
+      const sameDay = all.filter(r => r.fields?.DATE?.startsWith(eventDateStr)).slice(0, 3)
+      const after3 = all.filter(r => r.fields?.DATE > eventDateStr).slice(0, 3)
+      setEvents({ before: before3, sameDay, after: after3 })
+      setFetched(true)
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleToggle = () => {
+    if (!isOpen && !fetched) fetchEvents()
+    setIsOpen(prev => !prev)
+  }
+
+  const total = events.before.length + events.sameDay.length + events.after.length
+
+  const EventCard = ({ record }) => {
+    const handleClick = (e) => {
+      const sel = window.getSelection()
+      if (sel && sel.toString().length > 0) e.preventDefault()
+    }
+    return (
+      <a
+        href={`/post_details?id=${record.id}`}
+        className="block w-full text-left bg-[#eef0fb] border border-[#c5cae9] rounded-xl p-3 hover:shadow-md hover:border-[#8a9ac7] transition-all duration-200"
+        draggable={false}
+        onDragStart={(e) => e.preventDefault()}
+        onClick={handleClick}
+      >
+        <span className="inline-block bg-[#8a9ac7] text-white text-[10px] font-medium px-2 py-0.5 rounded-full mb-2">
+          {formatCardDate(record.fields?.DATE)}
+        </span>
+        <p className="text-[#3d3d6b] font-medium text-xs leading-relaxed line-clamp-2">
+          {record.fields?.EVENT || "Untitled Event"}
+        </p>
+        {record.fields?.KEYWORDS?.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-2">
+            {record.fields.KEYWORDS.slice(0, 2).map((kw, i) => (
+              <span key={i} className="bg-[#c5cae9] text-[#3d3d6b] text-[10px] px-1.5 py-0.5 rounded-full">{kw}</span>
+            ))}
+          </div>
+        )}
+      </a>
+    )
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto px-4 mb-8">
+      <button
+        type="button"
+        onClick={handleToggle}
+        className="w-full flex items-center justify-between bg-white/70 border border-[#e3d5dd] rounded-xl px-4 py-3 hover:bg-white/90 transition-colors"
+      >
+        <span className="flex flex-col items-start">
+          <span className="text-sm font-semibold text-[#8e3e3e] flex items-center gap-2">
+            📅 Around This Time
+            {fetched && total > 0 && (
+              <span className="bg-[#8a9ac7] text-white text-[10px] px-2 py-0.5 rounded-full">{total}</span>
+            )}
+          </span>
+          <span className="text-[10px] text-[#6b7db3] mt-0.5">
+            {isOpen ? "Collapse" : "Expand to see other events around this time"}
+          </span>
+        </span>
+        <span className="text-[#8e3e3e] text-sm">{isOpen ? "▲" : "▼"}</span>
+      </button>
+
+      {isOpen && (
+        <div className="mt-3 bg-white/60 border border-[#c5cae9] rounded-xl p-4">
+          {loading ? (
+            <div className="flex justify-center py-4">
+              <div className="w-6 h-6 border-2 border-[#8a9ac7] border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : total === 0 ? (
+            <p className="text-center text-sm text-[#6b7db3] py-2">No nearby events found.</p>
+          ) : (
+            <div className="space-y-4">
+              {events.before.length > 0 && (
+                <div>
+                  <p className="text-[10px] uppercase tracking-wide text-[#6b7db3] font-semibold mb-2">Before</p>
+                  <div className="space-y-2">{events.before.map(r => <EventCard key={r.id} record={r} />)}</div>
+                </div>
+              )}
+              {events.sameDay.length > 0 && (
+                <div>
+                  <p className="text-[10px] uppercase tracking-wide text-[#6b7db3] font-semibold mb-2">Same Day</p>
+                  <div className="space-y-2">{events.sameDay.map(r => <EventCard key={r.id} record={r} />)}</div>
+                </div>
+              )}
+              {events.after.length > 0 && (
+                <div>
+                  <p className="text-[10px] uppercase tracking-wide text-[#6b7db3] font-semibold mb-2">After</p>
+                  <div className="space-y-2">{events.after.map(r => <EventCard key={r.id} record={r} />)}</div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function LinkPreview({ url }) {
   const [previewData, setPreviewData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -980,6 +1116,11 @@ if (isFacebook) {
         </section>
       )}
 
+{/* Around This Time */}
+      {event?.DATE && (
+        <AroundThisTime eventDate={event.DATE} currentPostId={postId} />
+      )}
+      
       {/* AdSense: Post Detail (inline) */}
       {import.meta.env.PROD && !!event && (
         <div className="max-w-4xl mx-auto px-4 mb-8">
