@@ -68,8 +68,17 @@ const blockedDomains = ['justjared.com', 'justjaredjr.com', 'people.com', 'thesu
         html.match(new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["']${property}["']`, 'i'));
       return match?.[1]?.trim() || '';
     };
-    const title = getMeta('og:title') || html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim() || '';
-    const description = getMeta('og:description') || getMeta('description');
+    const decodeEntities = (str) => str
+      .replace(/&quot;/g, '"')
+      .replace(/&#x27;/g, "'")
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(code))
+      .replace(/&apos;/g, "'")
+
+    const title = decodeEntities(getMeta('og:title') || html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim() || '');
+    const description = decodeEntities(getMeta('og:description') || getMeta('description'));
     let image = getMeta('og:image');
     if (image && image.startsWith('//')) image = 'https:' + image;
     return res.status(200).json({ title, description, image, domain });
