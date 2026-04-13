@@ -14,7 +14,7 @@ export default async function handler(req, res) {
   };
 
   // Sites that block scrapers — try Microlink first, fall back to slug
-const blockedDomains = ['justjared.com', 'justjaredjr.com', 'people.com'];
+const blockedDomains = ['justjared.com', 'justjaredjr.com', 'people.com', 'thesun.co.uk'];
   const blockedMatch = blockedDomains.find(d => domain.includes(d));
 
   if (blockedMatch) {
