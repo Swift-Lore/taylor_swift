@@ -9,6 +9,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/post_details",
+      "destination": "/api/og-event"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
