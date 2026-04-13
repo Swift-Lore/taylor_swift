@@ -9,9 +9,16 @@
       "destination": "/index.html"
     },
     {
-      "source": "/post_details",
-      "destination": "/api/og-event"
-    },
+  "source": "/post_details",
+  "destination": "/api/og-event",
+  "has": [
+    {
+      "type": "header",
+      "key": "user-agent",
+      "value": "(?i).*(facebookexternalhit|twitterbot|linkedinbot|whatsapp|discordbot|slackbot|applebot|googlebot).*"
+    }
+  ]
+}
     {
       "source": "/(.*)",
       "destination": "/index.html"

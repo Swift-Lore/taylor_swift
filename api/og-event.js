@@ -5,6 +5,15 @@ export default async function handler(req, res) {
     return res.redirect('/');
   }
 
+  // If real user (not a bot), redirect to the actual React app
+  const userAgent = req.headers['user-agent'] || '';
+  const isBot = /facebookexternalhit|twitterbot|linkedinbot|whatsapp|discordbot|slackbot|telegrambot|applebot|googlebot|iMessageBot/i.test(userAgent);
+  
+  if (!isBot) {
+    res.setHeader('Location', `/post_details?id=${id}`);
+    return res.status(302).end();
+  }
+
   try {
     const response = await fetch(
       `https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker/${id}`,
