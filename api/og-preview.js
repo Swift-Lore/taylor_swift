@@ -15,6 +15,17 @@ export default async function handler(req, res) {
 
   // Sites that block scrapers — try Microlink first, fall back to slug
 const blockedDomains = ['justjared.com', 'justjaredjr.com', 'people.com', 'thesun.co.uk'];
+  // If URL is a direct image file, return it directly as the preview
+  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+  const pathname = new URL(url).pathname.toLowerCase();
+  if (imageExtensions.some(ext => pathname.endsWith(ext))) {
+    return res.status(200).json({
+      title: titleFromSlug(),
+      description: '',
+      image: url,
+      domain,
+    });
+  }
   const blockedMatch = blockedDomains.find(d => domain.includes(d));
 
   if (blockedMatch) {
