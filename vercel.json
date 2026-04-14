@@ -13,7 +13,7 @@
       "destination": "/api/og-event"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!images|assets|favicon\\.ico|.*\\.(png|jpg|jpeg|gif|svg|webp|css|js|json|txt|xml|ico)).*)",
       "destination": "/index.html"
     }
   ],
