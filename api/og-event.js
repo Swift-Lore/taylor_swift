@@ -60,7 +60,7 @@ export default async function handler(req, res) {
   <p>Redirecting...</p>
 </body>
 </html>`;
-
+// updated
     res.setHeader('Content-Type', 'text/html');
     res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400');
     return res.status(200).send(html);
