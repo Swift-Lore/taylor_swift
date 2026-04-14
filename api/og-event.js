@@ -37,6 +37,7 @@ export default async function handler(req, res) {
       : 'https://swift-lore.com/images/star.png';
     const url = `https://swift-lore.com/post_details?id=${id}`;
 
+    
     const html = `<!DOCTYPE html>
 <html>
 <head>
