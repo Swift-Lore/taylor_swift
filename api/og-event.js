@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     res.setHeader('Location', `/post_details?id=${id}`);
     return res.status(302).end();
   }
-
+ 
   try {
     const response = await fetch(
       `https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker/${id}`,
