@@ -31,7 +31,10 @@ export default async function handler(req, res) {
         })
       : '';
     const description = date ? `${date} · Taylor Swift career archive` : 'Taylor Swift career archive';
-    const image = 'https://swift-lore.com/images/star.png';
+    const isBluesky = /cardyb|bsky|bluesky/i.test(userAgent);
+    const image = isBluesky
+      ? 'https://swift-lore.com/images/swift_lore.png'
+      : 'https://swift-lore.com/images/star.png';
     const url = `https://swift-lore.com/post_details?id=${id}`;
 
     const html = `<!DOCTYPE html>
