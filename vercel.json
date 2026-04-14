@@ -10,14 +10,7 @@
     },
     {
       "source": "/post_details",
-      "destination": "/api/og-event",
-      "has": [
-        {
-          "type": "header",
-          "key": "user-agent",
-          "value": "(?i).*(facebookexternalhit|twitterbot|linkedinbot|whatsapp|discordbot|slackbot|applebot|googlebot|bsky|Bluesky|Cardyb|card.syrup).*"
-        }
-      ]
+      "destination": "/api/og-event"
     },
     {
       "source": "/(.*)",
