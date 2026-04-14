@@ -7,9 +7,11 @@ export default async function handler(req, res) {
 
   // If real user (not a bot), redirect to the actual React app
   const userAgent = req.headers['user-agent'] || '';
-  const isBot = /facebookexternalhit|twitterbot|linkedinbot|whatsapp|discordbot|slackbot|telegrambot|applebot|googlebot|iMessageBot/i.test(userAgent);
-  
-  if (!isBot) {
+  const acceptHeader = req.headers['accept'] || '';
+  const isBot = /bot|crawler|spider|facebookexternalhit|twitterbot|linkedinbot|whatsapp|discordbot|slackbot|applebot|googlebot|cardyb|bsky|bluesky|preview|curl|python|node/i.test(userAgent);
+  const wantsHtml = acceptHeader.includes('text/html');
+
+  if (wantsHtml && !isBot) {
     res.setHeader('Location', `/post_details?id=${id}`);
     return res.status(302).end();
   }
