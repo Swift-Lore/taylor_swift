@@ -503,9 +503,6 @@ function InstagramEmbed({ url }) {
   useEffect(() => {
     let cancelled = false;
 
-    useEffect(() => {
-    let cancelled = false;
-
     const tryProcess = () => {
       if (window.instgrm?.Embeds) {
         window.instgrm.Embeds.process();
