@@ -1235,7 +1235,7 @@ if (isFacebook) {
           >
             {instagramUrls.map((url, index) => {
               // We check if this is the problematic Travis Kelce post to show the card immediately
-              const isTravisPost = url.includes("DMgXbQ0yWqW");
+const useFallback = url.includes("DMgXbQ0yWqW") || url.includes("DP5R6pwEXdY");
 
               return (
                 <div
