@@ -507,6 +507,7 @@ function InstagramEmbed({ url }) {
       try {
         const res = await fetch(`/api/ig-check?url=${encodeURIComponent(url)}`);
 const data = await res.json();
+console.log("IG check:", url, data);
 if (!cancelled) {
   setStatus(data.valid ? "valid" : "failed");
 }
