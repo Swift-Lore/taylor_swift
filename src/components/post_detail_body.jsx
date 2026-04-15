@@ -520,6 +520,8 @@ function InstagramEmbed({ url }) {
       }
     }, 300);
 
+console.log("iframe height:", iframe.offsetHeight);
+    
     // After 10 seconds, check if iframe rendered
     const failTimer = setTimeout(() => {
       if (cancelled) return;
