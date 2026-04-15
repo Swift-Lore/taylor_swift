@@ -503,26 +503,38 @@ function InstagramEmbed({ url }) {
   useEffect(() => {
     let cancelled = false;
 
+    useEffect(() => {
+    let cancelled = false;
+
     const tryProcess = () => {
       if (window.instgrm?.Embeds) {
         window.instgrm.Embeds.process();
+        return true;
       }
+      return false;
     };
 
-    tryProcess();
-    const retryTimer = setTimeout(tryProcess, 1000);
+    // Poll until instgrm is available, then process
+    let attempts = 0;
+    const pollInterval = setInterval(() => {
+      attempts += 1;
+      if (tryProcess() || attempts > 20) {
+        clearInterval(pollInterval);
+      }
+    }, 300);
 
+    // After 10 seconds, check if iframe rendered
     const failTimer = setTimeout(() => {
       if (cancelled) return;
       const iframe = containerRef.current?.querySelector("iframe");
       if (!iframe) {
         setFailed(true);
       }
-    }, 6000);
+    }, 10000);
 
     return () => {
       cancelled = true;
-      clearTimeout(retryTimer);
+      clearInterval(pollInterval);
       clearTimeout(failTimer);
     };
   }, [url]);
