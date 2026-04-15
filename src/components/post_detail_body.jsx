@@ -497,68 +497,43 @@ function TwitterFallbackCard({ url }) {
 }
 
 function InstagramEmbed({ url }) {
-  const [failed, setFailed] = useState(false);
-  const containerRef = useRef(null);
+  const [status, setStatus] = useState("loading"); // loading | valid | failed
 
   useEffect(() => {
     let cancelled = false;
 
-    const tryProcess = () => {
-      if (window.instgrm?.Embeds) {
-        window.instgrm.Embeds.process();
-        return true;
-      }
-      return false;
-    };
-
-    let attempts = 0;
-    const pollInterval = setInterval(() => {
-      attempts += 1;
-      if (tryProcess() || attempts > 20) {
-        clearInterval(pollInterval);
-      }
-    }, 300);
-
-    // Poll for iframe and check its src — error iframes have a specific src pattern
-    let checkAttempts = 0;
-    const checkInterval = setInterval(() => {
-      if (cancelled) { clearInterval(checkInterval); return; }
-      checkAttempts += 1;
-
-      const iframe = containerRef.current?.querySelector("iframe");
-      if (iframe) {
-        clearInterval(checkInterval);
-        const src = iframe.src || "";
-        // Instagram error embeds load a specific /embed/captioned/ URL with no shortcode match,
-        // OR the title attribute contains error text
-        const title = iframe.title || "";
-        if (
-          title.toLowerCase().includes("broken") ||
-          title.toLowerCase().includes("removed") ||
-          src.includes("instagram.com/embed/") && !src.includes("/p/") && !src.includes("/reel/") && !src.includes("/tv/")
-        ) {
-          setFailed(true);
+    const checkOembed = async () => {
+      try {
+        const res = await fetch(
+          `https://graph.facebook.com/v18.0/instagram_oembed?url=${encodeURIComponent(url)}&access_token=${import.meta.env.VITE_FACEBOOK_APP_TOKEN}`
+        );
+        if (!cancelled) {
+          setStatus(res.ok ? "valid" : "failed");
         }
+      } catch {
+        if (!cancelled) setStatus("failed");
       }
-
-      if (checkAttempts > 40) { // 20 seconds max
-        clearInterval(checkInterval);
-        const iframe = containerRef.current?.querySelector("iframe");
-        if (!iframe) setFailed(true);
-      }
-    }, 500);
-
-    return () => {
-      cancelled = true;
-      clearInterval(pollInterval);
-      clearInterval(checkInterval);
     };
+
+    checkOembed();
+    return () => { cancelled = true; };
   }, [url]);
 
-  if (failed) return <InstagramFallbackCard url={url} />;
+  if (status === "loading") {
+    return (
+      <div className="instagram-container flex flex-col items-center" style={{ width: "326px" }}>
+        <div className="w-full rounded-xl border border-gray-200 bg-white p-4 animate-pulse">
+          <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === "failed") return <InstagramFallbackCard url={url} />;
 
   return (
-    <div ref={containerRef} className="instagram-container flex flex-col items-center" style={{ width: "326px" }}>
+    <div className="instagram-container flex flex-col items-center" style={{ width: "326px" }}>
       <blockquote
         className="instagram-media"
         data-instgrm-captioned
@@ -576,12 +551,7 @@ function InstagramEmbed({ url }) {
         }}
       >
         <div style={{ padding: "16px" }}>
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 text-sm font-medium"
-          >
+          <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-500 text-sm font-medium">
             Loading Instagram post...
           </a>
         </div>
