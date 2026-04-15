@@ -543,7 +543,7 @@ function InstagramEmbed({ url }) {
           setFailed(true);
         }
       }
-    }, 10000);
+    }, 8000);
 
     return () => {
       cancelled = true;
