@@ -496,6 +496,74 @@ function TwitterFallbackCard({ url }) {
   );
 }
 
+function InstagramEmbed({ url }) {
+  const [failed, setFailed] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const tryProcess = () => {
+      if (window.instgrm?.Embeds) {
+        window.instgrm.Embeds.process();
+      }
+    };
+
+    tryProcess();
+    const retryTimer = setTimeout(tryProcess, 1000);
+
+    const failTimer = setTimeout(() => {
+      if (cancelled) return;
+      const iframe = containerRef.current?.querySelector("iframe");
+      if (!iframe) {
+        setFailed(true);
+      }
+    }, 6000);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(retryTimer);
+      clearTimeout(failTimer);
+    };
+  }, [url]);
+
+  if (failed) return <InstagramFallbackCard url={url} />;
+
+  return (
+    <div ref={containerRef} className="instagram-container flex flex-col items-center" style={{ width: "326px" }}>
+      <blockquote
+        className="instagram-media"
+        data-instgrm-captioned
+        data-instgrm-permalink={url}
+        data-instgrm-version="14"
+        style={{
+          background: "#FFF",
+          borderRadius: "8px",
+          border: "1px solid #dbdbdb",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          margin: "0",
+          width: "326px",
+          padding: "0",
+          display: "block"
+        }}
+      >
+        <div style={{ padding: "16px" }}>
+          
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 text-sm font-medium"
+          >
+            Loading Instagram post...
+          </a>
+        </div>
+      </blockquote>
+    </div>
+  );
+}
+
+function TwitterEmbed({ url }) {
+
 function TwitterEmbed({ url }) {
   const [failed, setFailed] = useState(false);
   const [checked, setChecked] = useState(false);
