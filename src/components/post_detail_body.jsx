@@ -503,6 +503,9 @@ function InstagramEmbed({ url }) {
   useEffect(() => {
     let cancelled = false;
 
+    useEffect(() => {
+    let cancelled = false;
+
     const tryProcess = () => {
       if (window.instgrm?.Embeds) {
         window.instgrm.Embeds.process();
@@ -511,7 +514,6 @@ function InstagramEmbed({ url }) {
       return false;
     };
 
-    // Poll until instgrm is available, then process
     let attempts = 0;
     const pollInterval = setInterval(() => {
       attempts += 1;
@@ -519,36 +521,40 @@ function InstagramEmbed({ url }) {
         clearInterval(pollInterval);
       }
     }, 300);
-    
-    // After 10 seconds, check if iframe rendered
-    const failTimer = setTimeout(() => {
-      if (cancelled) return;
+
+    // Poll for iframe and check its src — error iframes have a specific src pattern
+    let checkAttempts = 0;
+    const checkInterval = setInterval(() => {
+      if (cancelled) { clearInterval(checkInterval); return; }
+      checkAttempts += 1;
+
       const iframe = containerRef.current?.querySelector("iframe");
-      if (!iframe) {
-        setFailed(true);
-        return;
-      }
-      // Check if the iframe contains Instagram's own error message
-      try {
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
-        if (iframeDoc) {
-          const body = iframeDoc.body?.innerText || "";
-          if (body.includes("broken") || body.includes("removed")) {
-            setFailed(true);
-          }
-        }
-      } catch {
-        // cross-origin iframe, can't read — check height instead
-        if (iframe.offsetHeight < 300) {
+      if (iframe) {
+        clearInterval(checkInterval);
+        const src = iframe.src || "";
+        // Instagram error embeds load a specific /embed/captioned/ URL with no shortcode match,
+        // OR the title attribute contains error text
+        const title = iframe.title || "";
+        if (
+          title.toLowerCase().includes("broken") ||
+          title.toLowerCase().includes("removed") ||
+          src.includes("instagram.com/embed/") && !src.includes("/p/") && !src.includes("/reel/") && !src.includes("/tv/")
+        ) {
           setFailed(true);
         }
       }
-    }, 8000);
+
+      if (checkAttempts > 40) { // 20 seconds max
+        clearInterval(checkInterval);
+        const iframe = containerRef.current?.querySelector("iframe");
+        if (!iframe) setFailed(true);
+      }
+    }, 500);
 
     return () => {
       cancelled = true;
       clearInterval(pollInterval);
-      clearTimeout(failTimer);
+      clearInterval(checkInterval);
     };
   }, [url]);
 
