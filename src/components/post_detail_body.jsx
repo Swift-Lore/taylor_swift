@@ -519,8 +519,6 @@ function InstagramEmbed({ url }) {
         clearInterval(pollInterval);
       }
     }, 300);
-
-console.log("iframe height:", iframe.offsetHeight);
     
     // After 10 seconds, check if iframe rendered
     const failTimer = setTimeout(() => {
@@ -541,7 +539,7 @@ console.log("iframe height:", iframe.offsetHeight);
         }
       } catch {
         // cross-origin iframe, can't read — check height instead
-        if (iframe.offsetHeight < 100) {
+        if (iframe.offsetHeight < 300) {
           setFailed(true);
         }
       }
