@@ -548,7 +548,7 @@ function InstagramEmbed({ url }) {
         }}
       >
         <div style={{ padding: "16px" }}>
-          
+          <a
             href={url}
             target="_blank"
             rel="noopener noreferrer"
