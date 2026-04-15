@@ -505,12 +505,11 @@ function InstagramEmbed({ url }) {
 
     const checkOembed = async () => {
       try {
-        const res = await fetch(
-          `https://graph.facebook.com/v18.0/instagram_oembed?url=${encodeURIComponent(url)}&access_token=${import.meta.env.VITE_FACEBOOK_APP_TOKEN}`
-        );
-        if (!cancelled) {
-          setStatus(res.ok ? "valid" : "failed");
-        }
+        const res = await fetch(`/api/ig-check?url=${encodeURIComponent(url)}`);
+const data = await res.json();
+if (!cancelled) {
+  setStatus(data.valid ? "valid" : "failed");
+}
       } catch {
         if (!cancelled) setStatus("failed");
       }
