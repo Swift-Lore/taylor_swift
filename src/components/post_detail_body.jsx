@@ -497,7 +497,8 @@ function TwitterFallbackCard({ url }) {
 }
 
 function InstagramEmbed({ url }) {
-  const [status, setStatus] = useState("loading"); // loading | valid | failed
+  const [status, setStatus] = useState("loading");
+  const containerRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -519,6 +520,17 @@ function InstagramEmbed({ url }) {
     return () => { cancelled = true; };
   }, [url]);
 
+  // Once confirmed valid, trigger Instagram embed processing
+  useEffect(() => {
+    if (status !== "valid") return;
+    const timer = setTimeout(() => {
+      if (window.instgrm?.Embeds) {
+        window.instgrm.Embeds.process();
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [status]);
+
   if (status === "loading") {
     return (
       <div className="instagram-container flex flex-col items-center" style={{ width: "326px" }}>
@@ -533,7 +545,7 @@ function InstagramEmbed({ url }) {
   if (status === "failed") return <InstagramFallbackCard url={url} />;
 
   return (
-    <div className="instagram-container flex flex-col items-center" style={{ width: "326px" }}>
+    <div ref={containerRef} className="instagram-container flex flex-col items-center" style={{ width: "326px" }}>
       <blockquote
         className="instagram-media"
         data-instgrm-captioned
