@@ -526,6 +526,22 @@ function InstagramEmbed({ url }) {
       const iframe = containerRef.current?.querySelector("iframe");
       if (!iframe) {
         setFailed(true);
+        return;
+      }
+      // Check if the iframe contains Instagram's own error message
+      try {
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+        if (iframeDoc) {
+          const body = iframeDoc.body?.innerText || "";
+          if (body.includes("broken") || body.includes("removed")) {
+            setFailed(true);
+          }
+        }
+      } catch {
+        // cross-origin iframe, can't read — check height instead
+        if (iframe.offsetHeight < 100) {
+          setFailed(true);
+        }
       }
     }, 10000);
 
