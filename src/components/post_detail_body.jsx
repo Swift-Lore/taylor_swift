@@ -1226,60 +1226,19 @@ if (isFacebook) {
 
 
       {/* Instagram */}
-      {event.INSTAGRAM && (
-        <section className="w-full px-4 mb-10">
-          <div
-            className={`flex flex-wrap gap-6 mt-2 max-w-[1400px] mx-auto items-start ${getEmbedJustifyClass(
-              instagramUrls.length
-            )}`}
-          >
-            {instagramUrls.map((url, index) => {
-              // We check if this is the problematic Travis Kelce post to show the card immediately
-const isTravisPost = url.includes("DMgXbQ0yWqW") || url.includes("DP5R6pwEXdY");
-
-              return (
-                <div
-                  key={index}
-                  className="instagram-container flex flex-col items-center"
-                  style={{ width: "326px" }}
-                >
-                  {isTravisPost ? (
-                    <InstagramFallbackCard url={url} />
-                  ) : (
-                    <blockquote
-                      className="instagram-media"
-                      data-instgrm-captioned
-                      data-instgrm-permalink={url}
-                      data-instgrm-version="14"
-                      style={{
-                        background: "#FFF",
-                        borderRadius: "8px",
-                        border: "1px solid #dbdbdb",
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                        margin: "0",
-                        width: "326px",
-                        padding: "0",
-                        display: "block"
-                      }}
-                    >
-                      <div style={{ padding: "16px" }}>
-                        <a 
-                          href={url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-500 text-sm font-medium"
-                        >
-                          Loading Instagram post...
-                        </a>
-                      </div>
-                    </blockquote>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
+{event.INSTAGRAM && (
+  <section className="w-full px-4 mb-10">
+    <div
+      className={`flex flex-wrap gap-6 mt-2 max-w-[1400px] mx-auto items-start ${getEmbedJustifyClass(
+        instagramUrls.length
+      )}`}
+    >
+      {instagramUrls.map((url, index) => (
+        <InstagramEmbed key={index} url={url} />
+      ))}
+    </div>
+  </section>
+)}
 
                   {/* Twitter / X */}
       {event.TWITTER && (
