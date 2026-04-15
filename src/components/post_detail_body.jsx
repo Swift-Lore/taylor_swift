@@ -563,8 +563,6 @@ function InstagramEmbed({ url }) {
 }
 
 function TwitterEmbed({ url }) {
-
-function TwitterEmbed({ url }) {
   const [failed, setFailed] = useState(false);
   const [checked, setChecked] = useState(false);
   const containerRef = useRef(null);
