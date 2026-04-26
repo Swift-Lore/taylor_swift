@@ -689,49 +689,6 @@ function YouTubeEmbed({ videoId, url, index }) {
   );
 }
 
-  if (failed) {
-    return (
-      <a
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center gap-4 bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md hover:border-red-400 transition-all duration-200 group"
-      >
-        <div className="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center flex-shrink-0">
-          <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-          </svg>
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-gray-900 group-hover:text-[#8e3e3e] transition-colors">
-            Watch on YouTube
-          </p>
-          <p className="text-xs text-gray-500 mt-0.5">
-            Embedding disabled by video owner
-          </p>
-        </div>
-        <span className="text-xs font-semibold text-[#8e3e3e]">Watch →</span>
-      </a>
-    );
-  }
-
-  return (
-    <div className="w-full">
-      <div className="relative" style={{ paddingBottom: "56.25%" }}>
-        <iframe
-          src={`https://www.youtube.com/embed/${videoId}`}
-          title={`YouTube Video ${index + 1}`}
-          className="absolute top-0 left-0 w-full h-full rounded-xl"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          onError={() => setFailed(true)}
-        />
-      </div>
-    </div>
-  );
-}
-
 export default function PostDetailBody() {
   const navigate = useNavigate();
   const location = useLocation();
