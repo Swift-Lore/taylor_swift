@@ -625,7 +625,7 @@ function YouTubeEmbed({ videoId, url, index }) {
 
   if (failed) {
     return (
-      
+      <a
         href={url}
         target="_blank"
         rel="noopener noreferrer"
