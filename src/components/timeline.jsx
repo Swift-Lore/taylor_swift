@@ -815,6 +815,9 @@ const TimelineCard = ({ record, index }) => {
       onDragStart={(e) => e.preventDefault()}
       onClick={handleCardClick}
       onCopy={handleCardCopy}
+onMouseDown={(e) => {
+  if (e.button === 2) e.preventDefault()
+}}
     >
       <div className="relative">
         <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
