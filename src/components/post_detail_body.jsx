@@ -23,6 +23,21 @@ const isLikelyImage = (url) => {
   );
 };
 
+const isArchiveUrl = (url) => {
+  if (!url) return false;
+  const lower = url.toLowerCase();
+  return lower.includes("archive.today") || lower.includes("archive.ph") || lower.includes("archive.is");
+};
+
+const getOriginalFromArchiveUrl = (url) => {
+  try {
+    const match = url.match(/archive\.[a-z]+\/[^/]+\/(https?:\/\/.+)/i);
+    return match ? match[1] : null;
+  } catch {
+    return null;
+  }
+};
+
 // Simple helper to detect Getty URLs
 const isGettyUrl = (url) => {
   if (!url) return false;
@@ -281,36 +296,47 @@ function LinkPreview({ url }) {
   const [loading, setLoading] = useState(true);
   const domain = getDomainFromUrl(url);
 
+  const isArchive = isArchiveUrl(url);
+  const originalUrl = isArchive ? getOriginalFromArchiveUrl(url) : null;
+  const fetchUrl = originalUrl || url;
+
   useEffect(() => {
     let isMounted = true;
     setPreviewData(null);
     setLoading(true);
 
     const fetchPreview = async () => {
-  if (!isMounted) return;
+      if (!isMounted) return;
+
+      if (isArchive && !originalUrl) {
+        setLoading(false);
+        return;
+      }
 
   try {
-    const response = await fetch(`/api/og-preview?url=${encodeURIComponent(url)}`);
+    const response = await fetch(`/api/og-preview?url=${encodeURIComponent(fetchUrl)}`);
     if (!response.ok) throw new Error('Failed');
 
     const data = await response.json();
+    const resolvedDomain = getDomainFromUrl(fetchUrl);
 
     if (isMounted) {
       setPreviewData({
-        title: data.title || getFallbackTitleFromUrl(url, domain),
+        title: data.title || getFallbackTitleFromUrl(fetchUrl, resolvedDomain),
         description: data.description || '',
-        image: data.image || getFaviconUrl(domain),
-        domain: data.domain || domain,
+        image: data.image || getFaviconUrl(resolvedDomain),
+        domain: data.domain || resolvedDomain,
         url: url,
         isSiteFallback: false,
       });
     }
   } catch (error) {
+    const resolvedDomain = getDomainFromUrl(fetchUrl);
     if (isMounted) {
       setPreviewData({
-        title: getFallbackTitleFromUrl(url, domain),
-        image: getFaviconUrl(domain),
-        domain: domain,
+        title: getFallbackTitleFromUrl(fetchUrl, resolvedDomain),
+        image: getFaviconUrl(resolvedDomain),
+        domain: resolvedDomain,
         url: url,
       });
     }
@@ -323,6 +349,11 @@ function LinkPreview({ url }) {
     return () => { isMounted = false; };
   }, [url, domain]);
 
+if (isArchive && !originalUrl && !loading) {
+    return <ArchiveFallbackCard url={url} />;
+  }
+  if (isArchive && !originalUrl) return null;
+  
   if (loading) {
     return (
       <div className="microlink-card block max-w-md mx-auto mb-4 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm animate-pulse">
@@ -418,6 +449,34 @@ function LinkPreview({ url }) {
               <span className="text-xs text-gray-400">{previewData.domain}</span>
               <span className="text-xs font-semibold text-[#8e3e3e] group-hover:text-red-600 transition-colors">Read article →</span>
             </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  );
+}
+
+function ArchiveFallbackCard({ url, originalUrl }) {
+  const domain = originalUrl ? getDomainFromUrl(originalUrl) : null;
+
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-[#fff8f8] p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
+    >
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-lg bg-[#2c2c2c] flex items-center justify-center flex-shrink-0 text-white text-[9px] font-bold tracking-tight leading-tight text-center px-1">
+          ARCH<br/>IVE
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-semibold text-gray-900 line-clamp-1 group-hover:text-[#8e3e3e] transition-colors">
+            {domain ? `Archived article from ${domain}` : "Archived Article"}
+          </h3>
+          <div className="flex items-center justify-between mt-1">
+            <span className="text-xs text-gray-500 truncate">archive.today</span>
+            <span className="text-xs font-semibold text-[#8e3e3e]">Read archive →</span>
           </div>
         </div>
       </div>
@@ -1293,7 +1352,7 @@ if (isFacebook) {
           >
             {instagramUrls.map((url, index) => {
               // We check if this is the problematic Travis Kelce post to show the card immediately
-const isTravisPost = url.includes("DMgXbQ0yWqW") || url.includes("DP5R6pwEXdY") || url.includes("DPwLCrtjfR3");
+const isTravisPost = url.includes("DMgXbQ0yWqW") || url.includes("DP5R6pwEXdY") || url.includes("DPwLCrtjfR3") || url.includes("npJnb4ujGj");
 
               return (
                 <div
