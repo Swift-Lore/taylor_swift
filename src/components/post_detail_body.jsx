@@ -440,6 +440,34 @@ function LinkPreview({ url }) {
   );
 }
 
+function ArchiveFallbackCard({ url, originalUrl }) {
+  const domain = originalUrl ? getDomainFromUrl(originalUrl) : null;
+
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-[#fff8f8] p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
+    >
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-lg bg-[#2c2c2c] flex items-center justify-center flex-shrink-0 text-white text-[9px] font-bold tracking-tight leading-tight text-center px-1">
+          ARCH<br/>IVE
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-semibold text-gray-900 line-clamp-1 group-hover:text-[#8e3e3e] transition-colors">
+            {domain ? `Archived article from ${domain}` : "Archived Article"}
+          </h3>
+          <div className="flex items-center justify-between mt-1">
+            <span className="text-xs text-gray-500 truncate">archive.today</span>
+            <span className="text-xs font-semibold text-[#8e3e3e]">Read archive →</span>
+          </div>
+        </div>
+      </div>
+    </a>
+  );
+}
+
 function InstagramFallbackCard({ url }) {
   return (
     <a
