@@ -349,6 +349,11 @@ function LinkPreview({ url }) {
     return () => { isMounted = false; };
   }, [url, domain]);
 
+if (isArchive && !originalUrl && !loading) {
+    return <ArchiveFallbackCard url={url} />;
+  }
+  if (isArchive && !originalUrl) return null;
+  
   if (loading) {
     return (
       <div className="microlink-card block max-w-md mx-auto mb-4 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm animate-pulse">
