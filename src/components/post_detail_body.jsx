@@ -23,6 +23,21 @@ const isLikelyImage = (url) => {
   );
 };
 
+const isArchiveUrl = (url) => {
+  if (!url) return false;
+  const lower = url.toLowerCase();
+  return lower.includes("archive.today") || lower.includes("archive.ph") || lower.includes("archive.is");
+};
+
+const getOriginalFromArchiveUrl = (url) => {
+  try {
+    const match = url.match(/archive\.[a-z]+\/[^/]+\/(https?:\/\/.+)/i);
+    return match ? match[1] : null;
+  } catch {
+    return null;
+  }
+};
+
 // Simple helper to detect Getty URLs
 const isGettyUrl = (url) => {
   if (!url) return false;
