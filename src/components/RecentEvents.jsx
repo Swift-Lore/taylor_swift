@@ -93,7 +93,7 @@ export default function RecentEvents({ mobileTab }) {
             {
               headers: { Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}` },
               params: {
-                filterByFormula: `AND({TRACKER} = '${key}', IS_BEFORE({DATE}, DATEADD('${today}', 1, 'days')))`,
+                filterByFormula: `AND(FIND('${key}', ARRAYJOIN({TRACKER}, ',')), IS_BEFORE({DATE}, DATEADD('${today}', 1, 'days')))`,
                 sort: [{ field: "DATE", direction: "desc" }],
                 pageSize: 1,
                 fields: ["DATE", "EVENT", "KEYWORDS", "TRACKER"],
