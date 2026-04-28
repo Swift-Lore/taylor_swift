@@ -296,16 +296,25 @@ function LinkPreview({ url }) {
   const [loading, setLoading] = useState(true);
   const domain = getDomainFromUrl(url);
 
+  const isArchive = isArchiveUrl(url);
+  const originalUrl = isArchive ? getOriginalFromArchiveUrl(url) : null;
+  const fetchUrl = originalUrl || url;
+
   useEffect(() => {
     let isMounted = true;
     setPreviewData(null);
     setLoading(true);
 
     const fetchPreview = async () => {
-  if (!isMounted) return;
+      if (!isMounted) return;
+
+      if (isArchive && !originalUrl) {
+        setLoading(false);
+        return;
+      }
 
   try {
-    const response = await fetch(`/api/og-preview?url=${encodeURIComponent(url)}`);
+    const response = await fetch(`/api/og-preview?url=${encodeURIComponent(fetchUrl)}`);
     if (!response.ok) throw new Error('Failed');
 
     const data = await response.json();
