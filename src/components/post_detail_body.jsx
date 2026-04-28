@@ -318,23 +318,25 @@ function LinkPreview({ url }) {
     if (!response.ok) throw new Error('Failed');
 
     const data = await response.json();
+    const resolvedDomain = getDomainFromUrl(fetchUrl);
 
     if (isMounted) {
       setPreviewData({
-        title: data.title || getFallbackTitleFromUrl(url, domain),
+        title: data.title || getFallbackTitleFromUrl(fetchUrl, resolvedDomain),
         description: data.description || '',
-        image: data.image || getFaviconUrl(domain),
-        domain: data.domain || domain,
+        image: data.image || getFaviconUrl(resolvedDomain),
+        domain: data.domain || resolvedDomain,
         url: url,
         isSiteFallback: false,
       });
     }
   } catch (error) {
+    const resolvedDomain = getDomainFromUrl(fetchUrl);
     if (isMounted) {
       setPreviewData({
-        title: getFallbackTitleFromUrl(url, domain),
-        image: getFaviconUrl(domain),
-        domain: domain,
+        title: getFallbackTitleFromUrl(fetchUrl, resolvedDomain),
+        image: getFaviconUrl(resolvedDomain),
+        domain: resolvedDomain,
         url: url,
       });
     }
