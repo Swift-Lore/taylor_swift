@@ -387,10 +387,10 @@ if (isArchive && !originalUrl && !loading) {
       >
         <div className="flex items-center gap-3">
           <img
-            src={getFaviconUrl(domain)}
-            alt={domain}
-            className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm flex-shrink-0"
-          />
+  src={getFaviconUrl(previewData.domain || domain)}
+  alt={previewData.domain || domain}
+  className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm flex-shrink-0"
+/>
           <div className="flex-1 min-w-0">
             <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-[#8e3e3e] transition-colors">
               {previewData.title}
