@@ -227,7 +227,13 @@ pageSize: 4,
               Days Since...
             </h3>
             <div className="flex flex-col gap-3">
-              {TRACKER_KEYS.map((key) => {
+              {[...TRACKER_KEYS]
+                .sort((a, b) => {
+                  const daysA = getDaysSince(trackerData[a]?.fields?.DATE) ?? Infinity
+                  const daysB = getDaysSince(trackerData[b]?.fields?.DATE) ?? Infinity
+                  return daysA - daysB
+                })
+                .map((key) => {
                 const record = trackerData[key]
                 if (!record) return null
                 const days = getDaysSince(record.fields?.DATE)
@@ -256,6 +262,7 @@ pageSize: 4,
           </div>
         )}
       </div>
+
 
       {/* MOBILE VIEW LOGIC (Controlled by prop) */}
       <div className="lg:hidden">
@@ -297,7 +304,13 @@ pageSize: 4,
               Days Since...
             </h3>
             <div className="flex flex-col gap-3">
-              {TRACKER_KEYS.map((key) => {
+              {[...TRACKER_KEYS]
+                .sort((a, b) => {
+                  const daysA = getDaysSince(trackerData[a]?.fields?.DATE) ?? Infinity
+                  const daysB = getDaysSince(trackerData[b]?.fields?.DATE) ?? Infinity
+                  return daysA - daysB
+                })
+                .map((key) => {
                 const record = trackerData[key]
                 if (!record) return null
                 const days = getDaysSince(record.fields?.DATE)
