@@ -1352,7 +1352,7 @@ if (isFacebook) {
           >
             {instagramUrls.map((url, index) => {
               // We check if this is the problematic Travis Kelce post to show the card immediately
-const isTravisPost = url.includes("DMgXbQ0yWqW") || url.includes("DP5R6pwEXdY") || url.includes("DPwLCrtjfR3") || url.includes("npJnb4ujGj") || url.includes("DYQh2VaiJMj") || url.includes("DYQreT-sKHH") || url.includes("DYQBDNnCPDz");
+const isTravisPost = url.includes("DMgXbQ0yWqW") || url.includes("DP5R6pwEXdY") || url.includes("DPwLCrtjfR3") || url.includes("npJnb4ujGj") || url.includes("DYQh2VaiJMj") || url.includes("DYQreT-sKHH") || url.includes("DYQBDNnCPDz") || url.includes("DYa-wLaCA_-") || url.includes("DYa9NUfM9h5") || url.includes("DYY2w5stkw5") || url.includes("DYZC91nswcc") || url.includes("DYYTrAxCNtV") || url.includes("DYYSe2XJTEg") || url.includes("DYYhHB0stn_");
 
               return (
                 <div
