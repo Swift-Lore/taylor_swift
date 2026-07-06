@@ -155,69 +155,49 @@ const LinkPreview = ({ url }) => {
 };
 
 /* ------------------------------------------------------------------ */
-/*  Compact guest row — collapsed by default, expands on click         */
+/*  Guest card — full details always visible                           */
+/*  Rendered inside a CSS-columns (masonry) layout so a tall card      */
+/*  never forces its neighbor to stretch and leave a blank gap.        */
 /* ------------------------------------------------------------------ */
-const GuestRow = ({ record }) => {
+const GuestCard = ({ record }) => {
   const f = record.fields || {};
-  const [open, setOpen] = useState(false);
   const urls = splitUrls(f["URLS"]);
-  const hasDetails =
-    !!f["NOTES"] || !!f["CAPTION(S)"] || urls.length > 0;
 
   return (
-    <div className="bg-white/70 border border-[#c5cae9] rounded-lg overflow-hidden">
-      <button
-        type="button"
-        onClick={() => hasDetails && setOpen((o) => !o)}
-        className={`w-full flex items-center justify-between gap-3 px-4 py-2.5 text-left ${
-          hasDetails ? "cursor-pointer hover:bg-[#f4f6fc]" : "cursor-default"
-        }`}
-      >
-        <div className="flex items-center gap-2 min-w-0 flex-wrap">
-          <span className="text-[#3d3d6b] font-medium text-sm truncate">
-            {f["Name"] || "Unnamed Guest"}
-          </span>
+    <div className="bg-white/70 border border-[#c5cae9] rounded-2xl p-4 shadow-sm flex flex-col gap-2 break-inside-avoid mb-4">
+      <div className="flex items-start justify-between gap-2 flex-wrap">
+        <h3 className="text-[#3d3d6b] font-semibold text-base">
+          {f["Name"] || "Unnamed Guest"}
+        </h3>
+        <div className="flex gap-1.5 flex-wrap justify-end">
           {f["GUEST TYPE"] && (
-            <span className="bg-[#c5cae9] text-[#3d3d6b] text-[10px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
+            <span className="bg-[#c5cae9] text-[#3d3d6b] text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
               {f["GUEST TYPE"]}
             </span>
           )}
           {f["SPECIAL ROLE / MOMENT"] && (
-            <span className="bg-[#b66b6b] text-white text-[10px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
+            <span className="bg-[#b66b6b] text-white text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
               {f["SPECIAL ROLE / MOMENT"]}
             </span>
           )}
         </div>
-        {hasDetails && (
-          <span
-            className={`shrink-0 text-[#8a9ac7] text-xs transition-transform duration-150 ${
-              open ? "rotate-180" : ""
-            }`}
-          >
-            ▼
-          </span>
-        )}
-      </button>
+      </div>
 
-      {open && hasDetails && (
-        <div className="px-4 pb-4 pt-1 border-t border-[#e6edf7] flex flex-col gap-2">
-          {f["NOTES"] && (
-            <p className="text-sm text-[#6b7280] leading-relaxed">
-              {f["NOTES"]}
-            </p>
-          )}
-          {f["CAPTION(S)"] && (
-            <p className="text-sm italic text-[#3d3d6b] leading-relaxed border-l-2 border-[#c5cae9] pl-3">
-              {f["CAPTION(S)"]}
-            </p>
-          )}
-          {urls.length > 0 && (
-            <div className="flex flex-wrap gap-4 mt-1">
-              {urls.map((url, i) => (
-                <LinkPreview key={i} url={url} />
-              ))}
-            </div>
-          )}
+      {f["NOTES"] && (
+        <p className="text-sm text-[#6b7280] leading-relaxed">{f["NOTES"]}</p>
+      )}
+
+      {f["CAPTION(S)"] && (
+        <p className="text-sm italic text-[#3d3d6b] leading-relaxed border-l-2 border-[#c5cae9] pl-3">
+          {f["CAPTION(S)"]}
+        </p>
+      )}
+
+      {urls.length > 0 && (
+        <div className="flex flex-wrap gap-4 mt-2">
+          {urls.map((url, i) => (
+            <LinkPreview key={i} url={url} />
+          ))}
         </div>
       )}
     </div>
@@ -268,6 +248,7 @@ export default function WeddingPage() {
   const [activeTab, setActiveTab] = useState("guests"); // "guests" | "details"
   const [activeGuestTypes, setActiveGuestTypes] = useState([]); // empty = all
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef(null);
 
   /* Fetch ALL rows, paginating past Airtable's 100-record page limit */
@@ -350,7 +331,12 @@ export default function WeddingPage() {
   }, []);
 
   const guestRecords = useMemo(
-    () => records.filter((r) => r.fields?.["GUEST TYPE"]),
+    () =>
+      records
+        .filter((r) => r.fields?.["GUEST TYPE"])
+        .sort((a, b) =>
+          (a.fields["Name"] || "").localeCompare(b.fields["Name"] || "")
+        ),
     [records]
   );
 
@@ -366,17 +352,36 @@ export default function WeddingPage() {
   );
 
   const filteredGuests = useMemo(() => {
-    if (activeGuestTypes.length === 0) return guestRecords;
-    return guestRecords.filter((r) =>
-      activeGuestTypes.includes(r.fields["GUEST TYPE"])
-    );
-  }, [guestRecords, activeGuestTypes]);
+    let result = guestRecords;
+
+    if (activeGuestTypes.length > 0) {
+      result = result.filter((r) =>
+        activeGuestTypes.includes(r.fields["GUEST TYPE"])
+      );
+    }
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      result = result.filter((r) =>
+        (r.fields["Name"] || "").toLowerCase().includes(q)
+      );
+    }
+
+    return result;
+  }, [guestRecords, activeGuestTypes, searchQuery]);
 
   const toggleGuestType = (type) => {
     setActiveGuestTypes((prev) =>
       prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
     );
   };
+
+  const clearFilters = () => {
+    setActiveGuestTypes([]);
+    setSearchQuery("");
+  };
+
+  const hasActiveFilters = activeGuestTypes.length > 0 || searchQuery.trim();
 
   const guestTypeCounts = useMemo(() => {
     const counts = {};
@@ -429,8 +434,16 @@ export default function WeddingPage() {
           </div>
         ) : activeTab === "guests" ? (
           <>
-            {/* Guest type dropdown filter */}
-            <div className="flex justify-center mb-6">
+            {/* Search + guest type dropdown filter */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-6">
+              <input
+                type="text"
+                placeholder="Search guest name..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full sm:w-56 rounded-full py-1.5 px-4 text-sm bg-white text-[#3d3d6b] border border-[#6b7db3] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#fbb1c3]"
+              />
+
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setShowTypeDropdown((s) => !s)}
@@ -487,18 +500,35 @@ export default function WeddingPage() {
                   </div>
                 )}
               </div>
-            </div>
 
-            {/* Compact expandable guest rows */}
-            <div className="flex flex-col gap-2">
-              {filteredGuests.length > 0 ? (
-                filteredGuests.map((r) => <GuestRow key={r.id} record={r} />)
-              ) : (
-                <p className="text-center text-[#6b7280] italic py-6">
-                  No guests match that filter yet.
-                </p>
+              {hasActiveFilters && (
+                <button
+                  onClick={clearFilters}
+                  className="text-xs font-medium px-3 py-1.5 rounded-full bg-[#8e3e3e] text-white hover:bg-[#7a3434] transition-colors whitespace-nowrap"
+                >
+                  Clear Filters ✕
+                </button>
               )}
             </div>
+
+            {/* Result count */}
+            <p className="text-center text-xs text-[#6b7db3] mb-4">
+              Showing {filteredGuests.length} of {guestRecords.length} guests
+            </p>
+
+            {/* Guest cards — CSS columns masonry so uneven card heights
+                don't stretch neighboring cards or leave blank gaps */}
+            {filteredGuests.length > 0 ? (
+              <div className="columns-1 md:columns-2 gap-4">
+                {filteredGuests.map((r) => (
+                  <GuestCard key={r.id} record={r} />
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-[#6b7280] italic py-6">
+                No guests match that search/filter yet.
+              </p>
+            )}
           </>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
