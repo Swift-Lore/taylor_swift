@@ -124,6 +124,15 @@ function App() {
   />
 
   <Route path="/eras-tour-shows" element={<ErasTourShowsPage />} />
+
+  <Route
+    path="/wedding"
+    element={
+      <Layout showHero={false}>
+        <WeddingPage />
+      </Layout>
+    }
+  />
 </Routes>
 
       {/* Cookie banner stays once at the very bottom */}
