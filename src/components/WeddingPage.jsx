@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import axios from "axios";
 
 /* ------------------------------------------------------------------ */
@@ -82,7 +82,7 @@ const LinkPreview = ({ url }) => {
           border: "1px solid #dbdbdb",
           boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
           margin: "0",
-          width: "326px",
+          width: "300px",
           padding: "0",
         }}
       >
@@ -116,7 +116,7 @@ const LinkPreview = ({ url }) => {
       return (
         <div
           className="rounded-lg overflow-hidden shadow-sm border border-[#c5cae9]"
-          style={{ width: "326px", aspectRatio: "16/9" }}
+          style={{ width: "300px", aspectRatio: "16/9" }}
         >
           <iframe
             width="100%"
@@ -155,47 +155,69 @@ const LinkPreview = ({ url }) => {
 };
 
 /* ------------------------------------------------------------------ */
-/*  Guest card                                                         */
+/*  Compact guest row — collapsed by default, expands on click         */
 /* ------------------------------------------------------------------ */
-const GuestCard = ({ record }) => {
+const GuestRow = ({ record }) => {
   const f = record.fields || {};
+  const [open, setOpen] = useState(false);
   const urls = splitUrls(f["URLS"]);
+  const hasDetails =
+    !!f["NOTES"] || !!f["CAPTION(S)"] || urls.length > 0;
 
   return (
-    <div className="bg-white/70 border border-[#c5cae9] rounded-2xl p-4 shadow-sm flex flex-col gap-2">
-      <div className="flex items-start justify-between gap-2 flex-wrap">
-        <h3 className="text-[#3d3d6b] font-semibold text-base">
-          {f["Name"] || "Unnamed Guest"}
-        </h3>
-        <div className="flex gap-1.5 flex-wrap justify-end">
+    <div className="bg-white/70 border border-[#c5cae9] rounded-lg overflow-hidden">
+      <button
+        type="button"
+        onClick={() => hasDetails && setOpen((o) => !o)}
+        className={`w-full flex items-center justify-between gap-3 px-4 py-2.5 text-left ${
+          hasDetails ? "cursor-pointer hover:bg-[#f4f6fc]" : "cursor-default"
+        }`}
+      >
+        <div className="flex items-center gap-2 min-w-0 flex-wrap">
+          <span className="text-[#3d3d6b] font-medium text-sm truncate">
+            {f["Name"] || "Unnamed Guest"}
+          </span>
           {f["GUEST TYPE"] && (
-            <span className="bg-[#c5cae9] text-[#3d3d6b] text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
+            <span className="bg-[#c5cae9] text-[#3d3d6b] text-[10px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
               {f["GUEST TYPE"]}
             </span>
           )}
           {f["SPECIAL ROLE / MOMENT"] && (
-            <span className="bg-[#b66b6b] text-white text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
+            <span className="bg-[#b66b6b] text-white text-[10px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
               {f["SPECIAL ROLE / MOMENT"]}
             </span>
           )}
         </div>
-      </div>
+        {hasDetails && (
+          <span
+            className={`shrink-0 text-[#8a9ac7] text-xs transition-transform duration-150 ${
+              open ? "rotate-180" : ""
+            }`}
+          >
+            ▼
+          </span>
+        )}
+      </button>
 
-      {f["NOTES"] && (
-        <p className="text-sm text-[#6b7280] leading-relaxed">{f["NOTES"]}</p>
-      )}
-
-      {f["CAPTION(S)"] && (
-        <p className="text-sm italic text-[#3d3d6b] leading-relaxed border-l-2 border-[#c5cae9] pl-3">
-          {f["CAPTION(S)"]}
-        </p>
-      )}
-
-      {urls.length > 0 && (
-        <div className="flex flex-wrap gap-4 mt-2">
-          {urls.map((url, i) => (
-            <LinkPreview key={i} url={url} />
-          ))}
+      {open && hasDetails && (
+        <div className="px-4 pb-4 pt-1 border-t border-[#e6edf7] flex flex-col gap-2">
+          {f["NOTES"] && (
+            <p className="text-sm text-[#6b7280] leading-relaxed">
+              {f["NOTES"]}
+            </p>
+          )}
+          {f["CAPTION(S)"] && (
+            <p className="text-sm italic text-[#3d3d6b] leading-relaxed border-l-2 border-[#c5cae9] pl-3">
+              {f["CAPTION(S)"]}
+            </p>
+          )}
+          {urls.length > 0 && (
+            <div className="flex flex-wrap gap-4 mt-1">
+              {urls.map((url, i) => (
+                <LinkPreview key={i} url={url} />
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -203,7 +225,7 @@ const GuestCard = ({ record }) => {
 };
 
 /* ------------------------------------------------------------------ */
-/*  Article / Video card                                               */
+/*  Article / Video card (unchanged — these stay as cards)             */
 /* ------------------------------------------------------------------ */
 const CoverageCard = ({ record }) => {
   const f = record.fields || {};
@@ -245,6 +267,8 @@ export default function WeddingPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("guests"); // "guests" | "details"
   const [activeGuestTypes, setActiveGuestTypes] = useState([]); // empty = all
+  const [showTypeDropdown, setShowTypeDropdown] = useState(false);
+  const dropdownRef = useRef(null);
 
   /* Fetch ALL rows, paginating past Airtable's 100-record page limit */
   useEffect(() => {
@@ -314,6 +338,17 @@ export default function WeddingPage() {
     document.body.appendChild(tiktokScript);
   }, [records, activeTab, activeGuestTypes]);
 
+  /* Close the dropdown when clicking outside it */
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setShowTypeDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const guestRecords = useMemo(
     () => records.filter((r) => r.fields?.["GUEST TYPE"]),
     [records]
@@ -342,6 +377,15 @@ export default function WeddingPage() {
       prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
     );
   };
+
+  const guestTypeCounts = useMemo(() => {
+    const counts = {};
+    guestRecords.forEach((r) => {
+      const t = r.fields["GUEST TYPE"];
+      counts[t] = (counts[t] || 0) + 1;
+    });
+    return counts;
+  }, [guestRecords]);
 
   return (
     <div className="bg-[#e6edf7] py-8 md:py-12 min-h-screen">
@@ -375,54 +419,82 @@ export default function WeddingPage() {
         </div>
 
         {loading ? (
-          <div className="flex flex-col gap-4">
-            {[...Array(4)].map((_, i) => (
+          <div className="flex flex-col gap-3">
+            {[...Array(6)].map((_, i) => (
               <div
                 key={i}
-                className="bg-white/60 border border-[#c5cae9] rounded-2xl p-4 animate-pulse h-28"
+                className="bg-white/60 border border-[#c5cae9] rounded-lg p-4 animate-pulse h-12"
               />
             ))}
           </div>
         ) : activeTab === "guests" ? (
           <>
-            {/* Guest type filter chips */}
-            <div className="flex flex-wrap gap-2 justify-center mb-6">
-              <button
-                onClick={() => setActiveGuestTypes([])}
-                className={`text-xs font-medium px-3 py-1 rounded-full transition-colors ${
-                  activeGuestTypes.length === 0
-                    ? "bg-[#3d3d6b] text-white"
-                    : "bg-white text-[#6b7db3] border border-[#c5cae9]"
-                }`}
-              >
-                All ({guestRecords.length})
-              </button>
-              {GUEST_TYPES.map((type) => {
-                const count = guestRecords.filter(
-                  (r) => r.fields["GUEST TYPE"] === type
-                ).length;
-                if (count === 0) return null;
-                return (
-                  <button
-                    key={type}
-                    onClick={() => toggleGuestType(type)}
-                    className={`text-xs font-medium px-3 py-1 rounded-full transition-colors whitespace-nowrap ${
-                      activeGuestTypes.includes(type)
-                        ? "bg-[#3d3d6b] text-white"
-                        : "bg-white text-[#6b7db3] border border-[#c5cae9]"
-                    }`}
-                  >
-                    {type} ({count})
-                  </button>
-                );
-              })}
+            {/* Guest type dropdown filter */}
+            <div className="flex justify-center mb-6">
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setShowTypeDropdown((s) => !s)}
+                  className="flex items-center justify-between gap-2 bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-1.5 text-sm min-w-[220px]"
+                >
+                  <span>
+                    {activeGuestTypes.length > 0
+                      ? `${activeGuestTypes.length} type${
+                          activeGuestTypes.length > 1 ? "s" : ""
+                        } selected`
+                      : `Filter by guest type (${guestRecords.length})`}
+                  </span>
+                  <span className="ml-2">▼</span>
+                </button>
+
+                {showTypeDropdown && (
+                  <div className="absolute left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 top-full mt-1 w-[90vw] sm:w-72 max-w-[90vw] bg-white border border-[#6b7db3] rounded-lg shadow-lg z-50 max-h-[60vh] overflow-y-auto">
+                    <div className="p-2">
+                      <button
+                        className="w-full text-left px-3 py-2 text-sm hover:bg-[#e6edf7] rounded mb-1 font-medium text-[#3d3d6b]"
+                        onClick={() => setActiveGuestTypes([])}
+                      >
+                        All Guests ({guestRecords.length})
+                      </button>
+
+                      <div className="max-h-[50vh] overflow-y-auto">
+                        {GUEST_TYPES.filter((t) => guestTypeCounts[t]).map(
+                          (type) => (
+                            <div
+                              key={type}
+                              className="flex items-center px-3 py-2"
+                            >
+                              <input
+                                type="checkbox"
+                                id={`guest-type-${type}`}
+                                checked={activeGuestTypes.includes(type)}
+                                onChange={() => toggleGuestType(type)}
+                                className="mr-2"
+                              />
+                              <label
+                                htmlFor={`guest-type-${type}`}
+                                className="text-sm cursor-pointer flex-1"
+                              >
+                                {type}
+                              </label>
+                              <span className="text-xs text-gray-400">
+                                {guestTypeCounts[type]}
+                              </span>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Compact expandable guest rows */}
+            <div className="flex flex-col gap-2">
               {filteredGuests.length > 0 ? (
-                filteredGuests.map((r) => <GuestCard key={r.id} record={r} />)
+                filteredGuests.map((r) => <GuestRow key={r.id} record={r} />)
               ) : (
-                <p className="col-span-2 text-center text-[#6b7280] italic">
+                <p className="text-center text-[#6b7280] italic py-6">
                   No guests match that filter yet.
                 </p>
               )}
