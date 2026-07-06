@@ -344,15 +344,6 @@ export default function Header() {
       Eras Tour Shows
     </button>
   )}
-  {/* Eras Tour Shows – hide on the Eras page itself */}
-  {!isErasPage && (
-    <button
-      className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-2 font-semibold text-sm w-full sm:w-auto shadow-sm transition-colors whitespace-nowrap"
-      onClick={() => navigate("/eras-tour-shows")}
-    >
-      Eras Tour Shows
-    </button>
-  )}
 
   {/* T&T's Wedding – hide on the wedding page itself */}
   {!isWeddingPage && (
