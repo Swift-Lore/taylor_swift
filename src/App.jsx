@@ -11,6 +11,7 @@ import CookieConsent from "react-cookie-consent";
 import ErasTourShows from "./components/ErasTourShows";
 import AboutContact from "./components/AboutContact";
 import { useEffect } from 'react';
+import WeddingPage from "./components/WeddingPage";
 
 /* ------------ Shared layout ------------ */
 
