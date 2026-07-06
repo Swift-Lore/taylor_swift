@@ -11,6 +11,7 @@ export default function Header() {
   const isFullTimelinePage = location.pathname === "/posts";
   const isEventPage = location.pathname === "/post_details";
   const isErasPage = location.pathname === "/eras-tour-shows";
+  const isWeddingPage = location.pathname === "/wedding";
   const showHero = !isFullTimelinePage && !isEventPage;
   const isHomePage = location.pathname === "/";
 
