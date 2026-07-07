@@ -303,7 +303,7 @@ export default function WeddingPage() {
       s.async = true;
       document.body.appendChild(s);
     } else if (window.instgrm) {
-      window.instgrm.Embeds.process();
+      setTimeout(() => window.instgrm.Embeds.process(), 100);
     }
 
     if (!document.getElementById("twitter-embed-script")) {
@@ -325,7 +325,7 @@ export default function WeddingPage() {
     tiktokScript.src = `https://www.tiktok.com/embed.js?t=${timestamp}`;
     tiktokScript.async = true;
     document.body.appendChild(tiktokScript);
-  }, [records, activeTab, activeGuestTypes]);
+  }, [records, activeTab, activeGuestTypes, searchQuery]);
 
   /* Close the dropdown when clicking outside it */
   useEffect(() => {
