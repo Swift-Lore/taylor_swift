@@ -11,6 +11,7 @@ export default function Header() {
   const isFullTimelinePage = location.pathname === "/posts";
   const isEventPage = location.pathname === "/post_details";
   const isErasPage = location.pathname === "/eras-tour-shows";
+  const isWeddingPage = location.pathname === "/wedding";
   const showHero = !isFullTimelinePage && !isEventPage;
   const isHomePage = location.pathname === "/";
 
@@ -341,6 +342,16 @@ export default function Header() {
       onClick={() => navigate("/eras-tour-shows")}
     >
       Eras Tour Shows
+    </button>
+  )}
+
+  {/* T&T's Wedding – hide on the wedding page itself */}
+  {!isWeddingPage && (
+    <button
+      className="bg-[#b66b6b] text-white hover:bg-[#a55e5e] rounded-full px-5 py-2 font-semibold text-sm w-full sm:w-auto shadow-sm transition-colors whitespace-nowrap"
+      onClick={() => navigate("/wedding")}
+    >
+      T&amp;T's Wedding
     </button>
   )}
 </div>

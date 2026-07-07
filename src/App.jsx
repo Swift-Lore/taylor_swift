@@ -11,6 +11,7 @@ import CookieConsent from "react-cookie-consent";
 import ErasTourShows from "./components/ErasTourShows";
 import AboutContact from "./components/AboutContact";
 import { useEffect } from 'react';
+import WeddingPage from "./components/WeddingPage";
 
 /* ------------ Shared layout ------------ */
 
@@ -123,6 +124,15 @@ function App() {
   />
 
   <Route path="/eras-tour-shows" element={<ErasTourShowsPage />} />
+
+  <Route
+    path="/wedding"
+    element={
+      <Layout showHero={false}>
+        <WeddingPage />
+      </Layout>
+    }
+  />
 </Routes>
 
       {/* Cookie banner stays once at the very bottom */}
