@@ -191,10 +191,10 @@ const GuestCard = ({ record }) => {
       )}
 
       {f["CAPTION(S)"] && (
-        <p className="text-sm italic text-[#3d3d6b] leading-relaxed border-l-2 border-[#c5cae9] pl-3">
-          {f["CAPTION(S)"]}
-        </p>
-      )}
+  <p className="text-sm italic text-[#3d3d6b] leading-relaxed border-l-2 border-[#c5cae9] pl-3 whitespace-pre-line">
+    {f["CAPTION(S)"]}
+  </p>
+)}
 
       {urls.length > 0 && (
         <div className="flex flex-wrap gap-4 mt-2">
