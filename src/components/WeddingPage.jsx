@@ -187,7 +187,7 @@ const GuestCard = ({ record }) => {
       </div>
 
       {f["NOTES"] && (
-        <p className="text-sm text-[#6b7280] leading-relaxed">{f["NOTES"]}</p>
+        <p className="text-sm text-[#6b7280] leading-relaxed whitespace-pre-line">{f["NOTES"]}</p>
       )}
 
       {f["CAPTION(S)"] && (
@@ -228,7 +228,7 @@ const CoverageCard = ({ record }) => {
       </div>
 
       {f["NOTES"] && (
-        <p className="text-sm text-[#6b7280] leading-relaxed">{f["NOTES"]}</p>
+        <p className="text-sm text-[#6b7280] leading-relaxed whitespace-pre-line">{f["NOTES"]}</p>
       )}
 
       {urls.length > 0 && (
