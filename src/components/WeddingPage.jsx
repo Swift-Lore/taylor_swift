@@ -337,9 +337,16 @@ export default function WeddingPage() {
     () =>
       records
         .filter((r) => r.fields?.["GUEST TYPE"])
-        .sort((a, b) =>
-          (a.fields["Name"] || "").localeCompare(b.fields["Name"] || "")
-        ),
+        .sort((a, b) => {
+          const aHasUrls = splitUrls(a.fields["URLS"]).length > 0;
+          const bHasUrls = splitUrls(b.fields["URLS"]).length > 0;
+
+          // Guests with links float to the top as a group
+          if (aHasUrls !== bHasUrls) return aHasUrls ? -1 : 1;
+
+          // Within each group, sort alphabetically by name
+          return (a.fields["Name"] || "").localeCompare(b.fields["Name"] || "");
+        }),
     [records]
   );
 
