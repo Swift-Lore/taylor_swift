@@ -166,7 +166,7 @@ const GuestCard = ({ record }) => {
   const f = record.fields || {};
   const urls = splitUrls(f["URLS"]);
 
-  return (
+ return (
     <div className="bg-white/70 border border-[#c5cae9] rounded-2xl p-4 shadow-sm flex flex-col gap-2">
       <div className="flex items-start justify-between gap-2 flex-wrap">
         <h3 className="text-[#3d3d6b] font-semibold text-base">
@@ -181,10 +181,20 @@ const GuestCard = ({ record }) => {
         </div>
       </div>
 
+      {f["SPECIAL ROLE / MOMENT"] && (
+        <div className="bg-[#b66b6b]/10 border border-[#b66b6b]/30 rounded-lg px-3 py-2">
+          <p className="text-[10px] font-semibold text-[#b66b6b] uppercase tracking-wide mb-0.5">
+            Special Role
+          </p>
+          <p className="text-sm text-[#8e3e3e] leading-relaxed whitespace-pre-line">
+            {f["SPECIAL ROLE / MOMENT"]}
+          </p>
+        </div>
+      )}
+
       {f["NOTES"] && (
         <p className="text-sm text-[#6b7280] leading-relaxed whitespace-pre-line">{f["NOTES"]}</p>
       )}
-
       {f["CAPTION(S)"] && (
   <p className="text-sm italic text-[#3d3d6b] leading-relaxed border-l-2 border-[#c5cae9] pl-3 whitespace-pre-line">
     {f["CAPTION(S)"]}
