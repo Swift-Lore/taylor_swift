@@ -179,10 +179,10 @@ const GuestCard = ({ record }) => {
             </span>
           )}
           {f["SPECIAL ROLE / MOMENT"] && (
-            <span className="bg-[#b66b6b] text-white text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
-              {f["SPECIAL ROLE / MOMENT"]}
-            </span>
-          )}
+  <span className="bg-[#b66b6b] text-white text-[11px] font-medium px-2 py-1 rounded-lg whitespace-pre-line text-left">
+    {f["SPECIAL ROLE / MOMENT"]}
+  </span>
+)}
         </div>
       </div>
 
