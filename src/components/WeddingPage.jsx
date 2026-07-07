@@ -83,6 +83,7 @@ const LinkPreview = ({ url }) => {
           boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
           margin: "0",
           width: "300px",
+          minHeight: "500px",
           padding: "0",
         }}
       >
@@ -102,11 +103,13 @@ const LinkPreview = ({ url }) => {
 
   if (platform === "twitter") {
     return (
-      <blockquote className="twitter-tweet" data-theme="light">
-        <a href={url} target="_blank" rel="noopener noreferrer">
-          View post on X
-        </a>
-      </blockquote>
+      <div style={{ width: "300px", minHeight: "300px" }}>
+        <blockquote className="twitter-tweet" data-theme="light">
+          <a href={url} target="_blank" rel="noopener noreferrer">
+            View post on X
+          </a>
+        </blockquote>
+      </div>
     );
   }
 
@@ -164,7 +167,7 @@ const GuestCard = ({ record }) => {
   const urls = splitUrls(f["URLS"]);
 
   return (
-    <div className="bg-white/70 border border-[#c5cae9] rounded-2xl p-4 shadow-sm flex flex-col gap-2 break-inside-avoid mb-4">
+    <div className="bg-white/70 border border-[#c5cae9] rounded-2xl p-4 shadow-sm flex flex-col gap-2">
       <div className="flex items-start justify-between gap-2 flex-wrap">
         <h3 className="text-[#3d3d6b] font-semibold text-base">
           {f["Name"] || "Unnamed Guest"}
@@ -519,7 +522,7 @@ export default function WeddingPage() {
             {/* Guest cards — CSS columns masonry so uneven card heights
                 don't stretch neighboring cards or leave blank gaps */}
             {filteredGuests.length > 0 ? (
-              <div className="columns-1 md:columns-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                 {filteredGuests.map((r) => (
                   <GuestCard key={r.id} record={r} />
                 ))}
