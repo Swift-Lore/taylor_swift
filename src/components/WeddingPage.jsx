@@ -178,11 +178,6 @@ const GuestCard = ({ record }) => {
               {f["GUEST TYPE"]}
             </span>
           )}
-          {f["SPECIAL ROLE / MOMENT"] && (
-  <span className="bg-[#b66b6b] text-white text-[11px] font-medium px-2 py-1 rounded-lg whitespace-pre-line text-left">
-    {f["SPECIAL ROLE / MOMENT"]}
-  </span>
-)}
         </div>
       </div>
 
