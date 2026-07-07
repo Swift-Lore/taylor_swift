@@ -376,10 +376,11 @@ export default function WeddingPage() {
     }
 
     if (searchQuery.trim()) {
-      const q = searchQuery.trim().toLowerCase();
-      result = result.filter((r) =>
-        (r.fields["Name"] || "").toLowerCase().includes(q)
-      );
+      const searchWords = searchQuery.trim().toLowerCase().split(/\s+/);
+      result = result.filter((r) => {
+        const name = (r.fields["Name"] || "").toLowerCase();
+        return searchWords.every((word) => name.includes(word));
+      });
     }
 
     return result;
