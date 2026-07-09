@@ -91,6 +91,19 @@ const getFallbackTitleFromUrl = (url, domain) => {
 /*  Article/link preview card — fetches real OG title + image via the  */
 /*  same /api/og-preview endpoint your event pages already use.        */
 /* ------------------------------------------------------------------ */
+/* A slug like "dGFnOnJldXRlcnMuY29tLDIwMjY6bmV3c21sX1JDMlU2TUE0SzNBUw"
+   is a base64-style ID, not a real title — long, no spaces/dashes.
+   Anything that looks like this gets treated as "no usable title". */
+const isGarbageTitle = (title) => {
+  if (!title) return true;
+  const hasSpaces = /\s/.test(title);
+  const looksEncoded = !hasSpaces && title.length > 20;
+  return looksEncoded;
+};
+
+const prettyDomainName = (domain) =>
+  (domain || "").split(".")[0].replace(/\b\w/g, (c) => c.toUpperCase());
+
 const ArticlePreviewCard = ({ url }) => {
   const [previewData, setPreviewData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -107,20 +120,17 @@ const ArticlePreviewCard = ({ url }) => {
         );
         if (!response.ok) throw new Error("Failed");
         const data = await response.json();
+        const rawTitle = data.title || getFallbackTitleFromUrl(url, domain);
         if (isMounted) {
           setPreviewData({
-            title: data.title || getFallbackTitleFromUrl(url, domain),
+            title: isGarbageTitle(rawTitle) ? null : rawTitle,
             image: data.image || null,
             domain: data.domain || domain,
           });
         }
       } catch {
         if (isMounted) {
-          setPreviewData({
-            title: getFallbackTitleFromUrl(url, domain),
-            image: null,
-            domain,
-          });
+          setPreviewData({ title: null, image: null, domain });
         }
       } finally {
         if (isMounted) setLoading(false);
@@ -149,6 +159,31 @@ const ArticlePreviewCard = ({ url }) => {
   }
 
   const hasImage = !!previewData?.image;
+  const hasTitle = !!previewData?.title;
+
+  // Clean generic fallback — used whenever we couldn't get a real
+  // title/image (paywalled, JS-rendered, or bot-blocked pages).
+  if (!hasImage && !hasTitle) {
+    return (
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-3 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-0.5 group"
+        style={{ width: "300px" }}
+      >
+        <div className="w-10 h-10 rounded-lg bg-[#c5cae9] flex items-center justify-center flex-shrink-0 text-[#3d3d6b] font-semibold text-sm">
+          {prettyDomainName(previewData.domain).charAt(0) || "?"}
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-[#3d3d6b] group-hover:text-[#b66b6b] transition-colors">
+            View on {prettyDomainName(previewData.domain)}
+          </p>
+          <p className="text-xs text-gray-500 truncate">{previewData.domain}</p>
+        </div>
+      </a>
+    );
+  }
 
   return (
     <a
@@ -162,7 +197,7 @@ const ArticlePreviewCard = ({ url }) => {
         <div className="h-32 overflow-hidden bg-gray-100">
           <img
             src={previewData.image}
-            alt={previewData.title}
+            alt={previewData.title || previewData.domain}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             onError={(e) => {
               e.target.style.display = "none";
@@ -172,15 +207,13 @@ const ArticlePreviewCard = ({ url }) => {
       ) : null}
       <div className="p-3 flex items-center gap-2">
         {!hasImage && (
-          <img
-            src={getFaviconUrl(previewData.domain)}
-            alt={previewData.domain}
-            className="w-6 h-6 rounded flex-shrink-0"
-          />
+          <div className="w-8 h-8 rounded-lg bg-[#c5cae9] flex items-center justify-center flex-shrink-0 text-[#3d3d6b] font-semibold text-xs">
+            {prettyDomainName(previewData.domain).charAt(0) || "?"}
+          </div>
         )}
         <div className="min-w-0">
           <p className="text-sm font-semibold text-[#3d3d6b] line-clamp-2 group-hover:text-[#b66b6b] transition-colors">
-            {previewData.title}
+            {previewData.title || `View on ${prettyDomainName(previewData.domain)}`}
           </p>
           <p className="text-xs text-gray-500 truncate">{previewData.domain}</p>
         </div>
