@@ -63,6 +63,132 @@ const getYouTubeId = (url) => {
   return match ? match[1] : null;
 };
 
+const getDomainFromUrl = (url) => {
+  try {
+    return new URL(url).hostname.replace("www.", "");
+  } catch {
+    return "";
+  }
+};
+
+const getFaviconUrl = (domain) =>
+  `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+
+const getFallbackTitleFromUrl = (url, domain) => {
+  try {
+    const slug = new URL(url).pathname.split("/").filter(Boolean).pop() || "";
+    const cleaned = slug
+      .replace(/[-_]/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase())
+      .trim();
+    return cleaned || domain;
+  } catch {
+    return domain;
+  }
+};
+
+/* ------------------------------------------------------------------ */
+/*  Article/link preview card — fetches real OG title + image via the  */
+/*  same /api/og-preview endpoint your event pages already use.        */
+/* ------------------------------------------------------------------ */
+const ArticlePreviewCard = ({ url }) => {
+  const [previewData, setPreviewData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const domain = getDomainFromUrl(url);
+
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
+
+    const fetchPreview = async () => {
+      try {
+        const response = await fetch(
+          `/api/og-preview?url=${encodeURIComponent(url)}`
+        );
+        if (!response.ok) throw new Error("Failed");
+        const data = await response.json();
+        if (isMounted) {
+          setPreviewData({
+            title: data.title || getFallbackTitleFromUrl(url, domain),
+            image: data.image || null,
+            domain: data.domain || domain,
+          });
+        }
+      } catch {
+        if (isMounted) {
+          setPreviewData({
+            title: getFallbackTitleFromUrl(url, domain),
+            image: null,
+            domain,
+          });
+        }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    fetchPreview();
+    return () => {
+      isMounted = false;
+    };
+  }, [url, domain]);
+
+  if (loading) {
+    return (
+      <div
+        className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm animate-pulse"
+        style={{ width: "300px" }}
+      >
+        <div className="h-32 bg-gray-200" />
+        <div className="p-3">
+          <div className="h-3 bg-gray-200 rounded mb-2 w-3/4" />
+          <div className="h-2 bg-gray-200 rounded w-1/2" />
+        </div>
+      </div>
+    );
+  }
+
+  const hasImage = !!previewData?.image;
+
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-0.5 group"
+      style={{ width: "300px" }}
+    >
+      {hasImage ? (
+        <div className="h-32 overflow-hidden bg-gray-100">
+          <img
+            src={previewData.image}
+            alt={previewData.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            onError={(e) => {
+              e.target.style.display = "none";
+            }}
+          />
+        </div>
+      ) : null}
+      <div className="p-3 flex items-center gap-2">
+        {!hasImage && (
+          <img
+            src={getFaviconUrl(previewData.domain)}
+            alt={previewData.domain}
+            className="w-6 h-6 rounded flex-shrink-0"
+          />
+        )}
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-[#3d3d6b] line-clamp-2 group-hover:text-[#b66b6b] transition-colors">
+            {previewData.title}
+          </p>
+          <p className="text-xs text-gray-500 truncate">{previewData.domain}</p>
+        </div>
+      </div>
+    </a>
+  );
+};
+
 /* ------------------------------------------------------------------ */
 /*  Single link renderer — picks the right embed/card per platform     */
 /* ------------------------------------------------------------------ */
@@ -146,17 +272,8 @@ const LinkPreview = ({ url }) => {
     );
   }
 
-  // Generic article / fallback link
-  return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-flex items-center gap-1 text-sm font-medium text-[#6b7db3] hover:text-[#3d3d6b] underline underline-offset-2"
-    >
-      Read full link →
-    </a>
-  );
+  // Generic article / fallback link — real OG preview with image
+  return <ArticlePreviewCard url={url} />;
 };
 
 /* ------------------------------------------------------------------ */
