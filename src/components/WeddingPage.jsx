@@ -71,33 +71,35 @@ const LinkPreview = ({ url }) => {
 
   if (platform === "instagram") {
     return (
-      <blockquote
-        className="instagram-media"
-        data-instgrm-captioned
-        data-instgrm-permalink={url}
-        data-instgrm-version="14"
-        style={{
-          background: "#FFF",
-          borderRadius: "8px",
-          border: "1px solid #dbdbdb",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-          margin: "0",
-          width: "300px",
-          minHeight: "500px",
-          padding: "0",
-        }}
-      >
-        <div style={{ padding: "16px" }}>
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 text-sm font-medium"
-          >
-            View Instagram post
-          </a>
-        </div>
-      </blockquote>
+      <div style={{ zoom: 0.65, width: "300px" }}>
+        <blockquote
+          className="instagram-media"
+          data-instgrm-captioned
+          data-instgrm-permalink={url}
+          data-instgrm-version="14"
+          style={{
+            background: "#FFF",
+            borderRadius: "8px",
+            border: "1px solid #dbdbdb",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            margin: "0",
+            width: "300px",
+            minHeight: "500px",
+            padding: "0",
+          }}
+        >
+          <div style={{ padding: "16px" }}>
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 text-sm font-medium"
+            >
+              View Instagram post
+            </a>
+          </div>
+        </blockquote>
+      </div>
     );
   }
 
