@@ -6,15 +6,28 @@ export default async function handler(req, res) {
   const domain = new URL(url).hostname.replace('www.', '');
 
   const titleFromSlug = () => {
-    const slug = new URL(url).pathname.split('/').filter(Boolean).pop() || '';
-    return slug
-      .replace(/[-_]/g, ' ')
-      .replace(/\b\w/g, c => c.toUpperCase())
-      .trim();
-  };
+  const slug = new URL(url).pathname.split('/').filter(Boolean).pop() || '';
+  const cleaned = slug
+    .replace(/[-_]/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase())
+    .trim();
+
+  // If the slug had no dashes/underscores to split into real words,
+  // and it's long, it's almost certainly a base64/encoded ID — not a title.
+  const looksLikeGarbageId = !slug.includes('-') && !slug.includes('_') && slug.length > 20;
+
+  if (looksLikeGarbageId || cleaned.length < 3) {
+    const prettyDomain = domain
+      .split('.')[0]
+      .replace(/\b\w/g, c => c.toUpperCase());
+    return `View on ${prettyDomain}`;
+  }
+
+  return cleaned;
+};
 
   // Sites that block scrapers — try Microlink first, fall back to slug
-const blockedDomains = ['justjared.com', 'justjaredjr.com', 'people.com', 'thesun.co.uk', 'nytimes.com', 'wsj.com', 'ft.com', 'washingtonpost.com', 'theatlantic.com'];
+const blockedDomains = ['justjared.com', 'justjaredjr.com', 'people.com', 'thesun.co.uk', 'nytimes.com', 'wsj.com', 'ft.com', 'washingtonpost.com', 'theatlantic.com', 'reutersconnect.com', 'tmz.com', 'dailymail.com', 'today.com', 'thenews.com.pk', 'apple.news', 'usmagazine.com', 'eonline.com', 'pagesix.com', 'etonline.com', 'entertainmenttonight.com'];
   // If URL is a direct image file, return it directly as the preview
   const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
   const pathname = new URL(url).pathname.toLowerCase();
@@ -99,7 +112,30 @@ const blockedDomains = ['justjared.com', 'justjaredjr.com', 'people.com', 'thesu
     const description = decodeEntities(getMeta('og:description') || getMeta('description'));
     let image = getMeta('og:image');
     if (image && image.startsWith('//')) image = 'https:' + image;
-    return res.status(200).json({ title, description, image, domain });
+
+    // If direct scraping came back empty-handed on title AND image, this
+    // domain is likely JS-rendered or scraper-blocked too — try Microlink
+    // as a one-off fallback before giving up (covers sites not yet added
+    // to blockedDomains above).
+    if (!title && !image) {
+      try {
+        const mlRes = await fetch(
+          `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=false&video=false`,
+          { signal: AbortSignal.timeout(5000) }
+        );
+        const mlData = await mlRes.json();
+        if (mlData?.data?.image?.url || mlData?.data?.title) {
+          return res.status(200).json({
+            title: mlData.data.title || titleFromSlug(),
+            description: mlData.data.description || '',
+            image: mlData.data.image?.url || null,
+            domain,
+          });
+        }
+      } catch (e) {}
+    }
+
+    return res.status(200).json({ title: title || titleFromSlug(), description, image, domain });
   } catch (e) {
     return res.status(200).json({ title: titleFromSlug(), description: '', image: null, domain });
   }

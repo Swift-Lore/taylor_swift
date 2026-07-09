@@ -63,6 +63,326 @@ const getYouTubeId = (url) => {
   return match ? match[1] : null;
 };
 
+const getDomainFromUrl = (url) => {
+  try {
+    return new URL(url).hostname.replace("www.", "");
+  } catch {
+    return "";
+  }
+};
+
+const getFaviconUrl = (domain) =>
+  `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+
+const getFallbackTitleFromUrl = (url, domain) => {
+  try {
+    const pathname = new URL(url).pathname;
+    const parts = pathname.split("/").filter(Boolean);
+    const slug = parts[parts.length - 1] || "";
+
+    const cleaned = slug
+      .replace(/\.\w+$/, "")
+      .replace(/[-_]+\d+(?:[-_]\d+)*$/, "")
+      .replace(/[-_]+/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase())
+      .trim();
+
+    if (cleaned && cleaned.length > 3) {
+      return cleaned;
+    }
+  } catch {}
+
+  return (
+    domain.split(".")[0].charAt(0).toUpperCase() +
+    domain.split(".")[0].slice(1) +
+    " Article"
+  );
+};
+
+/* Archive.today handling — same as post_detail_body.jsx */
+const isArchiveUrl = (url) => {
+  if (!url) return false;
+  const lower = url.toLowerCase();
+  return (
+    lower.includes("archive.today") ||
+    lower.includes("archive.ph") ||
+    lower.includes("archive.is")
+  );
+};
+
+const getOriginalFromArchiveUrl = (url) => {
+  try {
+    const match = url.match(/archive\.[a-z]+\/[^/]+\/(https?:\/\/.+)/i);
+    return match ? match[1] : null;
+  } catch {
+    return null;
+  }
+};
+
+const isGettyUrl = (url) => {
+  if (!url) return false;
+  return url.toLowerCase().includes("gettyimages.com");
+};
+
+const isFacebookUrl = (url) => {
+  if (!url) return false;
+  const lower = url.toLowerCase();
+  return (
+    lower.includes("facebook.com") ||
+    lower.includes("fb.watch") ||
+    lower.includes("fb.com")
+  );
+};
+
+/* ------------------------------------------------------------------ */
+/*  Article/link preview card — matches the rich card used on the      */
+/*  event landing pages (post_detail_body.jsx): larger image, title,   */
+/*  description, and dedicated fallbacks for archive/Getty/Facebook.   */
+/* ------------------------------------------------------------------ */
+
+const KNOWN_BROKEN_PREVIEW_DOMAINS = ["reutersconnect.com"];
+
+const ArchiveFallbackCard = ({ url, originalUrl }) => {
+  const domain = originalUrl ? getDomainFromUrl(originalUrl) : null;
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="microlink-card block w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-[#fff8f8] p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-1 group"
+    >
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-lg bg-[#2c2c2c] flex items-center justify-center flex-shrink-0 text-white text-[9px] font-bold tracking-tight leading-tight text-center px-1">
+          ARCH
+          <br />
+          IVE
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-semibold text-gray-900 line-clamp-1 group-hover:text-[#8e3e3e] transition-colors">
+            {domain ? `Archived article from ${domain}` : "Archived Article"}
+          </h3>
+          <div className="flex items-center justify-between mt-1">
+            <span className="text-xs text-gray-500 truncate">archive.today</span>
+            <span className="text-xs font-semibold text-[#8e3e3e]">Read archive →</span>
+          </div>
+        </div>
+      </div>
+    </a>
+  );
+};
+
+const GettyCard = ({ url }) => (
+  <a
+    href={url}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="microlink-card block w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow"
+  >
+    <div className="flex items-center gap-3">
+      <div className="w-10 h-10 rounded bg-black flex items-center justify-center text-white text-xs font-semibold">
+        GETTY
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-[#8e3e3e] truncate">
+          View this photo on Getty Images
+        </p>
+        <p className="text-xs text-gray-500 truncate">gettyimages.com</p>
+      </div>
+    </div>
+  </a>
+);
+
+const FacebookCard = ({ url }) => (
+  <a
+    href={url}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="microlink-card block w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow"
+  >
+    <div className="flex items-center gap-3">
+      <img
+        src="https://www.facebook.com/images/fb_icon_325x325.png"
+        alt="Facebook"
+        className="w-10 h-10 rounded-lg"
+      />
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-[#8e3e3e] truncate">
+          View this post on Facebook
+        </p>
+        <p className="text-xs text-gray-500 truncate">facebook.com</p>
+      </div>
+    </div>
+  </a>
+);
+
+const ArticlePreviewCard = ({ url }) => {
+  const [previewData, setPreviewData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const isArchive = isArchiveUrl(url);
+  const originalUrl = isArchive ? getOriginalFromArchiveUrl(url) : null;
+  const fetchUrl = originalUrl || url;
+  const domain = getDomainFromUrl(fetchUrl);
+  const isKnownBroken = KNOWN_BROKEN_PREVIEW_DOMAINS.some((d) =>
+    domain.includes(d)
+  );
+
+  useEffect(() => {
+    let isMounted = true;
+    setPreviewData(null);
+    setLoading(true);
+
+    if (isArchive && !originalUrl) {
+      setLoading(false);
+      return;
+    }
+
+    if (isKnownBroken) {
+      setPreviewData({ title: null, image: null, domain });
+      setLoading(false);
+      return;
+    }
+
+    const fetchPreview = async () => {
+      try {
+        const response = await fetch(
+          `/api/og-preview?url=${encodeURIComponent(fetchUrl)}`
+        );
+        if (!response.ok) throw new Error("Failed");
+        const data = await response.json();
+        if (isMounted) {
+          setPreviewData({
+            title: data.title || getFallbackTitleFromUrl(fetchUrl, domain),
+            description: data.description || "",
+            image: data.image || null,
+            domain: data.domain || domain,
+          });
+        }
+      } catch {
+        if (isMounted) {
+          setPreviewData({
+            title: getFallbackTitleFromUrl(fetchUrl, domain),
+            description: "",
+            image: null,
+            domain,
+          });
+        }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    fetchPreview();
+    return () => {
+      isMounted = false;
+    };
+  }, [url, fetchUrl, domain, isArchive, originalUrl, isKnownBroken]);
+
+  if (isArchive && !originalUrl && !loading) {
+    return <ArchiveFallbackCard url={url} originalUrl={originalUrl} />;
+  }
+  if (isArchive && !originalUrl) return null;
+
+  if (loading) {
+    return (
+      <div className="microlink-card block w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm animate-pulse">
+        <div className="h-40 bg-gray-200" />
+        <div className="p-4">
+          <div className="h-4 bg-gray-200 rounded mb-2 w-3/4" />
+          <div className="h-3 bg-gray-200 rounded w-1/2" />
+        </div>
+      </div>
+    );
+  }
+
+  if (isKnownBroken) {
+    return (
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="microlink-card flex items-center gap-3 w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-white p-3 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-0.5 group"
+      >
+        <img
+          src={getFaviconUrl(previewData.domain)}
+          alt={previewData.domain}
+          className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm flex-shrink-0"
+        />
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-[#3d3d6b] group-hover:text-[#b66b6b] transition-colors">
+            View on {previewData.domain}
+          </p>
+          <p className="text-xs text-gray-500 truncate">{previewData.domain}</p>
+        </div>
+      </a>
+    );
+  }
+
+  const hasImage = !!previewData?.image;
+
+  if (!hasImage) {
+    return (
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="microlink-card block w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-[#fff8f8] p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-1 group"
+      >
+        <div className="flex items-center gap-3">
+          <img
+            src={getFaviconUrl(previewData.domain)}
+            alt={previewData.domain}
+            className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm flex-shrink-0"
+          />
+          <div className="flex-1 min-w-0">
+            <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-[#8e3e3e] transition-colors">
+              {previewData.title}
+            </h3>
+            <div className="flex items-center justify-between mt-1">
+              <span className="text-xs text-gray-500 truncate">{previewData.domain}</span>
+              <span className="text-xs font-semibold text-[#8e3e3e]">Read article →</span>
+            </div>
+          </div>
+        </div>
+      </a>
+    );
+  }
+
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="microlink-card block w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-1 group"
+    >
+      <div className="h-40 overflow-hidden bg-gray-100">
+        <img
+          src={previewData.image}
+          alt={previewData.title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          onError={(e) => {
+            e.target.style.display = "none";
+          }}
+        />
+      </div>
+      <div className="p-4">
+        <h3 className="text-sm font-semibold text-gray-900 mb-1 line-clamp-2 group-hover:text-[#8e3e3e] transition-colors">
+          {previewData.title}
+        </h3>
+        {previewData.description && (
+          <p className="text-xs text-gray-500 mb-2 line-clamp-2 leading-relaxed">
+            {previewData.description}
+          </p>
+        )}
+        <div className="flex items-center justify-between pt-2 border-t">
+          <span className="text-xs text-gray-400">{previewData.domain}</span>
+          <span className="text-xs font-semibold text-[#8e3e3e]">Read article →</span>
+        </div>
+      </div>
+    </a>
+  );
+};
+
 /* ------------------------------------------------------------------ */
 /*  Single link renderer — picks the right embed/card per platform     */
 /* ------------------------------------------------------------------ */
@@ -71,33 +391,35 @@ const LinkPreview = ({ url }) => {
 
   if (platform === "instagram") {
     return (
-      <blockquote
-        className="instagram-media"
-        data-instgrm-captioned
-        data-instgrm-permalink={url}
-        data-instgrm-version="14"
-        style={{
-          background: "#FFF",
-          borderRadius: "8px",
-          border: "1px solid #dbdbdb",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-          margin: "0",
-          width: "300px",
-          minHeight: "500px",
-          padding: "0",
-        }}
-      >
-        <div style={{ padding: "16px" }}>
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 text-sm font-medium"
-          >
-            View Instagram post
-          </a>
-        </div>
-      </blockquote>
+      <div style={{ zoom: 0.65, width: "300px" }}>
+        <blockquote
+          className="instagram-media"
+          data-instgrm-captioned
+          data-instgrm-permalink={url}
+          data-instgrm-version="14"
+          style={{
+            background: "#FFF",
+            borderRadius: "8px",
+            border: "1px solid #dbdbdb",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            margin: "0",
+            width: "300px",
+            minHeight: "500px",
+            padding: "0",
+          }}
+        >
+          <div style={{ padding: "16px" }}>
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 text-sm font-medium"
+            >
+              View Instagram post
+            </a>
+          </div>
+        </blockquote>
+      </div>
     );
   }
 
@@ -144,17 +466,11 @@ const LinkPreview = ({ url }) => {
     );
   }
 
-  // Generic article / fallback link
-  return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-flex items-center gap-1 text-sm font-medium text-[#6b7db3] hover:text-[#3d3d6b] underline underline-offset-2"
-    >
-      Read full link →
-    </a>
-  );
+  if (isGettyUrl(url)) return <GettyCard url={url} />;
+  if (isFacebookUrl(url)) return <FacebookCard url={url} />;
+
+  // Generic article / archive / fallback link — real OG preview with image
+  return <ArticlePreviewCard url={url} />;
 };
 
 /* ------------------------------------------------------------------ */
@@ -222,6 +538,18 @@ const GuestRow = ({ record }) => {
   const urls = splitUrls(f["URLS"]);
   const hasDetails =
     !!f["NOTES"] || !!f["CAPTION(S)"] || !!f["SPECIAL ROLE / MOMENT"] || urls.length > 0;
+
+  /* Expanding a row reveals new blockquotes that the page-level embed
+     effect never saw (it only fires on filter/tab/search changes) —
+     so tell Instagram/X to re-scan the page right when this opens. */
+  useEffect(() => {
+    if (!open) return;
+    const timer = setTimeout(() => {
+      if (window.instgrm) window.instgrm.Embeds.process();
+      if (window.twttr?.widgets) window.twttr.widgets.load();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [open]);
 
   return (
     <div className="bg-white/70 border border-[#c5cae9] rounded-lg overflow-hidden">
@@ -294,7 +622,7 @@ const GuestRow = ({ record }) => {
 };
 
 /* ------------------------------------------------------------------ */
-/*  Article / Video card (unchanged — these stay as cards)             */
+/*  Article / Video card — Wedding Details tab                         */
 /* ------------------------------------------------------------------ */
 const CoverageCard = ({ record }) => {
   const f = record.fields || {};
@@ -318,7 +646,7 @@ const CoverageCard = ({ record }) => {
       )}
 
       {urls.length > 0 && (
-        <div className="flex flex-wrap gap-4 mt-2">
+        <div className="flex flex-col gap-3 mt-2">
           {urls.map((url, i) => (
             <LinkPreview key={i} url={url} />
           ))}
@@ -662,7 +990,7 @@ export default function WeddingPage() {
             )}
           </>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             {coverageRecords.length > 0 ? (
               coverageRecords.map((r) => (
                 <CoverageCard key={r.id} record={r} />
