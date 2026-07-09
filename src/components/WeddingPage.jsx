@@ -384,6 +384,33 @@ const ArticlePreviewCard = ({ url }) => {
 };
 
 /* ------------------------------------------------------------------ */
+/*  TikTok — same simple approach as the event pages: drop the         */
+/*  blockquote on the page and let TikTok's own embed.js (loaded via   */
+/*  <script src>, not fetch) find and render it. A client-side fetch   */
+/*  to TikTok's oEmbed endpoint is blocked by CORS, so don't pre-check.*/
+/* ------------------------------------------------------------------ */
+const TikTokEmbed = ({ url }) => {
+  const cleanUrl = url.trim();
+  const videoId =
+    cleanUrl.split("/video/")[1]?.split("?")[0] ||
+    cleanUrl.split("/t/")[1]?.split("/")[0];
+  const canonicalUrl = videoId ? cleanUrl.split("?")[0] : cleanUrl;
+
+  return (
+    <blockquote
+      className="tiktok-embed"
+      cite={canonicalUrl}
+      data-video-id={videoId || undefined}
+      style={{ maxWidth: "300px", minWidth: "300px" }}
+    >
+      <a href={canonicalUrl} target="_blank" rel="noopener noreferrer">
+        View on TikTok
+      </a>
+    </blockquote>
+  );
+};
+
+/* ------------------------------------------------------------------ */
 /*  Single link renderer — picks the right embed/card per platform     */
 /* ------------------------------------------------------------------ */
 const LinkPreview = ({ url }) => {
@@ -457,23 +484,7 @@ const LinkPreview = ({ url }) => {
   }
 
   if (platform === "tiktok") {
-    const cleanUrl = url.trim();
-    const videoId =
-      cleanUrl.split("/video/")[1]?.split("?")[0] ||
-      cleanUrl.split("/t/")[1]?.split("/")[0];
-
-    return (
-      <blockquote
-        className="tiktok-embed"
-        cite={cleanUrl}
-        data-video-id={videoId || undefined}
-        style={{ maxWidth: "300px", minWidth: "300px" }}
-      >
-        <a href={cleanUrl} target="_blank" rel="noopener noreferrer">
-          View on TikTok
-        </a>
-      </blockquote>
-    );
+    return <TikTokEmbed url={url} />;
   }
 
   if (isGettyUrl(url)) return <GettyCard url={url} />;
