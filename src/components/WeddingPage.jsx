@@ -457,9 +457,19 @@ const LinkPreview = ({ url }) => {
   }
 
   if (platform === "tiktok") {
+    const cleanUrl = url.trim();
+    const videoId =
+      cleanUrl.split("/video/")[1]?.split("?")[0] ||
+      cleanUrl.split("/t/")[1]?.split("/")[0];
+
     return (
-      <blockquote className="tiktok-embed" cite={url} data-video-id="">
-        <a href={url} target="_blank" rel="noopener noreferrer">
+      <blockquote
+        className="tiktok-embed"
+        cite={cleanUrl}
+        data-video-id={videoId || undefined}
+        style={{ maxWidth: "300px", minWidth: "300px" }}
+      >
+        <a href={cleanUrl} target="_blank" rel="noopener noreferrer">
           View on TikTok
         </a>
       </blockquote>
