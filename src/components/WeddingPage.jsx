@@ -120,10 +120,20 @@ const ArticlePreviewCard = ({ url }) => {
         );
         if (!response.ok) throw new Error("Failed");
         const data = await response.json();
-        const rawTitle = data.title || getFallbackTitleFromUrl(url, domain);
+
+        let finalTitle;
+        if (data.title && data.title.trim()) {
+          // Real title came back from the API — trust it as-is, no
+          // garbage-check. Only slug-derived guesses get filtered.
+          finalTitle = data.title.trim();
+        } else {
+          const guessed = getFallbackTitleFromUrl(url, domain);
+          finalTitle = isGarbageTitle(guessed) ? null : guessed;
+        }
+
         if (isMounted) {
           setPreviewData({
-            title: isGarbageTitle(rawTitle) ? null : rawTitle,
+            title: finalTitle,
             image: data.image || null,
             domain: data.domain || domain,
           });
