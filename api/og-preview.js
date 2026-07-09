@@ -6,12 +6,25 @@ export default async function handler(req, res) {
   const domain = new URL(url).hostname.replace('www.', '');
 
   const titleFromSlug = () => {
-    const slug = new URL(url).pathname.split('/').filter(Boolean).pop() || '';
-    return slug
-      .replace(/[-_]/g, ' ')
-      .replace(/\b\w/g, c => c.toUpperCase())
-      .trim();
-  };
+  const slug = new URL(url).pathname.split('/').filter(Boolean).pop() || '';
+  const cleaned = slug
+    .replace(/[-_]/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase())
+    .trim();
+
+  // If the slug had no dashes/underscores to split into real words,
+  // and it's long, it's almost certainly a base64/encoded ID — not a title.
+  const looksLikeGarbageId = !slug.includes('-') && !slug.includes('_') && slug.length > 20;
+
+  if (looksLikeGarbageId || cleaned.length < 3) {
+    const prettyDomain = domain
+      .split('.')[0]
+      .replace(/\b\w/g, c => c.toUpperCase());
+    return `View on ${prettyDomain}`;
+  }
+
+  return cleaned;
+};
 
   // Sites that block scrapers — try Microlink first, fall back to slug
 const blockedDomains = ['justjared.com', 'justjaredjr.com', 'people.com', 'thesun.co.uk', 'nytimes.com', 'wsj.com', 'ft.com', 'washingtonpost.com', 'theatlantic.com', 'reutersconnect.com'];
