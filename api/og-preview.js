@@ -8,6 +8,7 @@ export default async function handler(req, res) {
   const titleFromSlug = () => {
   const slug = new URL(url).pathname.split('/').filter(Boolean).pop() || '';
   const cleaned = slug
+    .replace(/\.\w+$/, '')
     .replace(/[-_]/g, ' ')
     .replace(/\b\w/g, c => c.toUpperCase())
     .trim();
