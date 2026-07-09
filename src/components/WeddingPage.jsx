@@ -223,6 +223,18 @@ const GuestRow = ({ record }) => {
   const hasDetails =
     !!f["NOTES"] || !!f["CAPTION(S)"] || !!f["SPECIAL ROLE / MOMENT"] || urls.length > 0;
 
+  /* Expanding a row reveals new blockquotes that the page-level embed
+     effect never saw (it only fires on filter/tab/search changes) —
+     so tell Instagram/X to re-scan the page right when this opens. */
+  useEffect(() => {
+    if (!open) return;
+    const timer = setTimeout(() => {
+      if (window.instgrm) window.instgrm.Embeds.process();
+      if (window.twttr?.widgets) window.twttr.widgets.load();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [open]);
+
   return (
     <div className="bg-white/70 border border-[#c5cae9] rounded-lg overflow-hidden">
       <button
