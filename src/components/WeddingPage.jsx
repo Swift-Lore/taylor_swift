@@ -91,15 +91,11 @@ const getFallbackTitleFromUrl = (url, domain) => {
 /*  Article/link preview card — fetches real OG title + image via the  */
 /*  same /api/og-preview endpoint your event pages already use.        */
 /* ------------------------------------------------------------------ */
-/* A slug like "dGFnOnJldXRlcnMuY29tLDIwMjY6bmV3c21sX1JDMlU2TUE0SzNBUw"
-   is a base64-style ID, not a real title — long, no spaces/dashes.
-   Anything that looks like this gets treated as "no usable title". */
-const isGarbageTitle = (title) => {
-  if (!title) return true;
-  const hasSpaces = /\s/.test(title);
-  const looksEncoded = !hasSpaces && title.length > 20;
-  return looksEncoded;
-};
+
+// Domains known to return garbage/encoded titles instead of real ones
+// (e.g. login-gated or JS-rendered pages that can't be scraped). Add
+// more domains here as you spot them, without touching anything else.
+const KNOWN_BROKEN_PREVIEW_DOMAINS = ['reutersconnect.com'];
 
 const prettyDomainName = (domain) =>
   (domain || "").split(".")[0].replace(/\b\w/g, (c) => c.toUpperCase());
@@ -108,10 +104,22 @@ const ArticlePreviewCard = ({ url }) => {
   const [previewData, setPreviewData] = useState(null);
   const [loading, setLoading] = useState(true);
   const domain = getDomainFromUrl(url);
+  const isKnownBroken = KNOWN_BROKEN_PREVIEW_DOMAINS.some((d) =>
+    domain.includes(d)
+  );
 
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
+
+    // Known-broken domains skip the fetch entirely and always show
+    // the clean generic card — no point calling an API we know
+    // won't return anything usable for these.
+    if (isKnownBroken) {
+      setPreviewData({ title: null, image: null, domain });
+      setLoading(false);
+      return;
+    }
 
     const fetchPreview = async () => {
       try {
@@ -120,27 +128,20 @@ const ArticlePreviewCard = ({ url }) => {
         );
         if (!response.ok) throw new Error("Failed");
         const data = await response.json();
-
-        let finalTitle;
-        if (data.title && data.title.trim()) {
-          // Real title came back from the API — trust it as-is, no
-          // garbage-check. Only slug-derived guesses get filtered.
-          finalTitle = data.title.trim();
-        } else {
-          const guessed = getFallbackTitleFromUrl(url, domain);
-          finalTitle = isGarbageTitle(guessed) ? null : guessed;
-        }
-
         if (isMounted) {
           setPreviewData({
-            title: finalTitle,
+            title: data.title || getFallbackTitleFromUrl(url, domain),
             image: data.image || null,
             domain: data.domain || domain,
           });
         }
       } catch {
         if (isMounted) {
-          setPreviewData({ title: null, image: null, domain });
+          setPreviewData({
+            title: getFallbackTitleFromUrl(url, domain),
+            image: null,
+            domain,
+          });
         }
       } finally {
         if (isMounted) setLoading(false);
@@ -151,7 +152,7 @@ const ArticlePreviewCard = ({ url }) => {
     return () => {
       isMounted = false;
     };
-  }, [url, domain]);
+  }, [url, domain, isKnownBroken]);
 
   if (loading) {
     return (
@@ -168,12 +169,8 @@ const ArticlePreviewCard = ({ url }) => {
     );
   }
 
-  const hasImage = !!previewData?.image;
-  const hasTitle = !!previewData?.title;
-
-  // Clean generic fallback — used whenever we couldn't get a real
-  // title/image (paywalled, JS-rendered, or bot-blocked pages).
-  if (!hasImage && !hasTitle) {
+  // Known-broken domains always render the clean generic card
+  if (isKnownBroken) {
     return (
       <a
         href={url}
@@ -195,6 +192,8 @@ const ArticlePreviewCard = ({ url }) => {
     );
   }
 
+  const hasImage = !!previewData?.image;
+
   return (
     <a
       href={url}
@@ -207,7 +206,7 @@ const ArticlePreviewCard = ({ url }) => {
         <div className="h-32 overflow-hidden bg-gray-100">
           <img
             src={previewData.image}
-            alt={previewData.title || previewData.domain}
+            alt={previewData.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             onError={(e) => {
               e.target.style.display = "none";
@@ -217,22 +216,22 @@ const ArticlePreviewCard = ({ url }) => {
       ) : null}
       <div className="p-3 flex items-center gap-2">
         {!hasImage && (
-          <div className="w-8 h-8 rounded-lg bg-[#c5cae9] flex items-center justify-center flex-shrink-0 text-[#3d3d6b] font-semibold text-xs">
-            {prettyDomainName(previewData.domain).charAt(0) || "?"}
-          </div>
+          <img
+            src={getFaviconUrl(previewData.domain)}
+            alt={previewData.domain}
+            className="w-6 h-6 rounded flex-shrink-0"
+          />
         )}
         <div className="min-w-0">
           <p className="text-sm font-semibold text-[#3d3d6b] line-clamp-2 group-hover:text-[#b66b6b] transition-colors">
-            {previewData.title || `View on ${prettyDomainName(previewData.domain)}`}
+            {previewData.title}
           </p>
           <p className="text-xs text-gray-500 truncate">{previewData.domain}</p>
         </div>
       </div>
     </a>
   );
-};
-
-/* ------------------------------------------------------------------ */
+};* ------------------------------------------------------------------ */
 /*  Single link renderer — picks the right embed/card per platform     */
 /* ------------------------------------------------------------------ */
 const LinkPreview = ({ url }) => {
