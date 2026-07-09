@@ -72,49 +72,171 @@ const getDomainFromUrl = (url) => {
 };
 
 const getFaviconUrl = (domain) =>
-  `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+  `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
 
 const getFallbackTitleFromUrl = (url, domain) => {
   try {
-    const slug = new URL(url).pathname.split("/").filter(Boolean).pop() || "";
+    const pathname = new URL(url).pathname;
+    const parts = pathname.split("/").filter(Boolean);
+    const slug = parts[parts.length - 1] || "";
+
     const cleaned = slug
-      .replace(/[-_]/g, " ")
+      .replace(/\.\w+$/, "")
+      .replace(/[-_]+\d+(?:[-_]\d+)*$/, "")
+      .replace(/[-_]+/g, " ")
       .replace(/\b\w/g, (c) => c.toUpperCase())
       .trim();
-    return cleaned || domain;
+
+    if (cleaned && cleaned.length > 3) {
+      return cleaned;
+    }
+  } catch {}
+
+  return (
+    domain.split(".")[0].charAt(0).toUpperCase() +
+    domain.split(".")[0].slice(1) +
+    " Article"
+  );
+};
+
+/* Archive.today handling — same as post_detail_body.jsx */
+const isArchiveUrl = (url) => {
+  if (!url) return false;
+  const lower = url.toLowerCase();
+  return (
+    lower.includes("archive.today") ||
+    lower.includes("archive.ph") ||
+    lower.includes("archive.is")
+  );
+};
+
+const getOriginalFromArchiveUrl = (url) => {
+  try {
+    const match = url.match(/archive\.[a-z]+\/[^/]+\/(https?:\/\/.+)/i);
+    return match ? match[1] : null;
   } catch {
-    return domain;
+    return null;
   }
 };
 
+const isGettyUrl = (url) => {
+  if (!url) return false;
+  return url.toLowerCase().includes("gettyimages.com");
+};
+
+const isFacebookUrl = (url) => {
+  if (!url) return false;
+  const lower = url.toLowerCase();
+  return (
+    lower.includes("facebook.com") ||
+    lower.includes("fb.watch") ||
+    lower.includes("fb.com")
+  );
+};
+
 /* ------------------------------------------------------------------ */
-/*  Article/link preview card — fetches real OG title + image via the  */
-/*  same /api/og-preview endpoint your event pages already use.        */
+/*  Article/link preview card — matches the rich card used on the      */
+/*  event landing pages (post_detail_body.jsx): larger image, title,   */
+/*  description, and dedicated fallbacks for archive/Getty/Facebook.   */
 /* ------------------------------------------------------------------ */
 
-// Domains known to return garbage/encoded titles instead of real ones
-// (e.g. login-gated or JS-rendered pages that can't be scraped). Add
-// more domains here as you spot them, without touching anything else.
-const KNOWN_BROKEN_PREVIEW_DOMAINS = ['reutersconnect.com'];
+const KNOWN_BROKEN_PREVIEW_DOMAINS = ["reutersconnect.com"];
 
-const prettyDomainName = (domain) =>
-  (domain || "").split(".")[0].replace(/\b\w/g, (c) => c.toUpperCase());
+const ArchiveFallbackCard = ({ url, originalUrl }) => {
+  const domain = originalUrl ? getDomainFromUrl(originalUrl) : null;
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="microlink-card block w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-[#fff8f8] p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-1 group"
+    >
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-lg bg-[#2c2c2c] flex items-center justify-center flex-shrink-0 text-white text-[9px] font-bold tracking-tight leading-tight text-center px-1">
+          ARCH
+          <br />
+          IVE
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-semibold text-gray-900 line-clamp-1 group-hover:text-[#8e3e3e] transition-colors">
+            {domain ? `Archived article from ${domain}` : "Archived Article"}
+          </h3>
+          <div className="flex items-center justify-between mt-1">
+            <span className="text-xs text-gray-500 truncate">archive.today</span>
+            <span className="text-xs font-semibold text-[#8e3e3e]">Read archive →</span>
+          </div>
+        </div>
+      </div>
+    </a>
+  );
+};
+
+const GettyCard = ({ url }) => (
+  <a
+    href={url}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="microlink-card block w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow"
+  >
+    <div className="flex items-center gap-3">
+      <div className="w-10 h-10 rounded bg-black flex items-center justify-center text-white text-xs font-semibold">
+        GETTY
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-[#8e3e3e] truncate">
+          View this photo on Getty Images
+        </p>
+        <p className="text-xs text-gray-500 truncate">gettyimages.com</p>
+      </div>
+    </div>
+  </a>
+);
+
+const FacebookCard = ({ url }) => (
+  <a
+    href={url}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="microlink-card block w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow"
+  >
+    <div className="flex items-center gap-3">
+      <img
+        src="https://www.facebook.com/images/fb_icon_325x325.png"
+        alt="Facebook"
+        className="w-10 h-10 rounded-lg"
+      />
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-[#8e3e3e] truncate">
+          View this post on Facebook
+        </p>
+        <p className="text-xs text-gray-500 truncate">facebook.com</p>
+      </div>
+    </div>
+  </a>
+);
 
 const ArticlePreviewCard = ({ url }) => {
   const [previewData, setPreviewData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const domain = getDomainFromUrl(url);
+
+  const isArchive = isArchiveUrl(url);
+  const originalUrl = isArchive ? getOriginalFromArchiveUrl(url) : null;
+  const fetchUrl = originalUrl || url;
+  const domain = getDomainFromUrl(fetchUrl);
   const isKnownBroken = KNOWN_BROKEN_PREVIEW_DOMAINS.some((d) =>
     domain.includes(d)
   );
 
   useEffect(() => {
     let isMounted = true;
+    setPreviewData(null);
     setLoading(true);
 
-    // Known-broken domains skip the fetch entirely and always show
-    // the clean generic card — no point calling an API we know
-    // won't return anything usable for these.
+    if (isArchive && !originalUrl) {
+      setLoading(false);
+      return;
+    }
+
     if (isKnownBroken) {
       setPreviewData({ title: null, image: null, domain });
       setLoading(false);
@@ -124,13 +246,14 @@ const ArticlePreviewCard = ({ url }) => {
     const fetchPreview = async () => {
       try {
         const response = await fetch(
-          `/api/og-preview?url=${encodeURIComponent(url)}`
+          `/api/og-preview?url=${encodeURIComponent(fetchUrl)}`
         );
         if (!response.ok) throw new Error("Failed");
         const data = await response.json();
         if (isMounted) {
           setPreviewData({
-            title: data.title || getFallbackTitleFromUrl(url, domain),
+            title: data.title || getFallbackTitleFromUrl(fetchUrl, domain),
+            description: data.description || "",
             image: data.image || null,
             domain: data.domain || domain,
           });
@@ -138,7 +261,8 @@ const ArticlePreviewCard = ({ url }) => {
       } catch {
         if (isMounted) {
           setPreviewData({
-            title: getFallbackTitleFromUrl(url, domain),
+            title: getFallbackTitleFromUrl(fetchUrl, domain),
+            description: "",
             image: null,
             domain,
           });
@@ -152,39 +276,41 @@ const ArticlePreviewCard = ({ url }) => {
     return () => {
       isMounted = false;
     };
-  }, [url, domain, isKnownBroken]);
+  }, [url, fetchUrl, domain, isArchive, originalUrl, isKnownBroken]);
+
+  if (isArchive && !originalUrl && !loading) {
+    return <ArchiveFallbackCard url={url} originalUrl={originalUrl} />;
+  }
+  if (isArchive && !originalUrl) return null;
 
   if (loading) {
     return (
-      <div
-        className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm animate-pulse"
-        style={{ width: "300px" }}
-      >
-        <div className="h-32 bg-gray-200" />
-        <div className="p-3">
-          <div className="h-3 bg-gray-200 rounded mb-2 w-3/4" />
-          <div className="h-2 bg-gray-200 rounded w-1/2" />
+      <div className="microlink-card block w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm animate-pulse">
+        <div className="h-40 bg-gray-200" />
+        <div className="p-4">
+          <div className="h-4 bg-gray-200 rounded mb-2 w-3/4" />
+          <div className="h-3 bg-gray-200 rounded w-1/2" />
         </div>
       </div>
     );
   }
 
-  // Known-broken domains always render the clean generic card
   if (isKnownBroken) {
     return (
       <a
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-3 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-0.5 group"
-        style={{ width: "300px" }}
+        className="microlink-card flex items-center gap-3 w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-white p-3 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-0.5 group"
       >
-        <div className="w-10 h-10 rounded-lg bg-[#c5cae9] flex items-center justify-center flex-shrink-0 text-[#3d3d6b] font-semibold text-sm">
-          {prettyDomainName(previewData.domain).charAt(0) || "?"}
-        </div>
+        <img
+          src={getFaviconUrl(previewData.domain)}
+          alt={previewData.domain}
+          className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm flex-shrink-0"
+        />
         <div className="min-w-0">
           <p className="text-sm font-semibold text-[#3d3d6b] group-hover:text-[#b66b6b] transition-colors">
-            View on {prettyDomainName(previewData.domain)}
+            View on {previewData.domain}
           </p>
           <p className="text-xs text-gray-500 truncate">{previewData.domain}</p>
         </div>
@@ -194,39 +320,63 @@ const ArticlePreviewCard = ({ url }) => {
 
   const hasImage = !!previewData?.image;
 
+  if (!hasImage) {
+    return (
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="microlink-card block w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-[#fff8f8] p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-1 group"
+      >
+        <div className="flex items-center gap-3">
+          <img
+            src={getFaviconUrl(previewData.domain)}
+            alt={previewData.domain}
+            className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm flex-shrink-0"
+          />
+          <div className="flex-1 min-w-0">
+            <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-[#8e3e3e] transition-colors">
+              {previewData.title}
+            </h3>
+            <div className="flex items-center justify-between mt-1">
+              <span className="text-xs text-gray-500 truncate">{previewData.domain}</span>
+              <span className="text-xs font-semibold text-[#8e3e3e]">Read article →</span>
+            </div>
+          </div>
+        </div>
+      </a>
+    );
+  }
+
   return (
     <a
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-0.5 group"
-      style={{ width: "300px" }}
+      className="microlink-card block w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-1 group"
     >
-      {hasImage ? (
-        <div className="h-32 overflow-hidden bg-gray-100">
-          <img
-            src={previewData.image}
-            alt={previewData.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            onError={(e) => {
-              e.target.style.display = "none";
-            }}
-          />
-        </div>
-      ) : null}
-      <div className="p-3 flex items-center gap-2">
-        {!hasImage && (
-          <img
-            src={getFaviconUrl(previewData.domain)}
-            alt={previewData.domain}
-            className="w-6 h-6 rounded flex-shrink-0"
-          />
-        )}
-        <div className="min-w-0">
-          <p className="text-sm font-semibold text-[#3d3d6b] line-clamp-2 group-hover:text-[#b66b6b] transition-colors">
-            {previewData.title}
+      <div className="h-40 overflow-hidden bg-gray-100">
+        <img
+          src={previewData.image}
+          alt={previewData.title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          onError={(e) => {
+            e.target.style.display = "none";
+          }}
+        />
+      </div>
+      <div className="p-4">
+        <h3 className="text-sm font-semibold text-gray-900 mb-1 line-clamp-2 group-hover:text-[#8e3e3e] transition-colors">
+          {previewData.title}
+        </h3>
+        {previewData.description && (
+          <p className="text-xs text-gray-500 mb-2 line-clamp-2 leading-relaxed">
+            {previewData.description}
           </p>
-          <p className="text-xs text-gray-500 truncate">{previewData.domain}</p>
+        )}
+        <div className="flex items-center justify-between pt-2 border-t">
+          <span className="text-xs text-gray-400">{previewData.domain}</span>
+          <span className="text-xs font-semibold text-[#8e3e3e]">Read article →</span>
         </div>
       </div>
     </a>
@@ -316,7 +466,10 @@ const LinkPreview = ({ url }) => {
     );
   }
 
-  // Generic article / fallback link — real OG preview with image
+  if (isGettyUrl(url)) return <GettyCard url={url} />;
+  if (isFacebookUrl(url)) return <FacebookCard url={url} />;
+
+  // Generic article / archive / fallback link — real OG preview with image
   return <ArticlePreviewCard url={url} />;
 };
 
@@ -469,7 +622,7 @@ const GuestRow = ({ record }) => {
 };
 
 /* ------------------------------------------------------------------ */
-/*  Article / Video card (unchanged — these stay as cards)             */
+/*  Article / Video card — Wedding Details tab                         */
 /* ------------------------------------------------------------------ */
 const CoverageCard = ({ record }) => {
   const f = record.fields || {};
@@ -493,7 +646,7 @@ const CoverageCard = ({ record }) => {
       )}
 
       {urls.length > 0 && (
-        <div className="flex flex-wrap gap-4 mt-2">
+        <div className="flex flex-col gap-3 mt-2">
           {urls.map((url, i) => (
             <LinkPreview key={i} url={url} />
           ))}
@@ -837,7 +990,7 @@ export default function WeddingPage() {
             )}
           </>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             {coverageRecords.length > 0 ? (
               coverageRecords.map((r) => (
                 <CoverageCard key={r.id} record={r} />
