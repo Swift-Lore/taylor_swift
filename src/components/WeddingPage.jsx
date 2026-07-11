@@ -678,6 +678,39 @@ const CoverageCard = ({ record }) => {
 };
 
 /* ------------------------------------------------------------------ */
+/*  Guest Reaction card — Wedding Details tab, GUEST REACTIONS field   */
+/*  on guest rows (links to their own posts/interviews/articles about  */
+/*  the wedding, separate from the guest-sighting links in URLS).      */
+/* ------------------------------------------------------------------ */
+const GuestReactionCard = ({ record }) => {
+  const f = record.fields || {};
+  const urls = splitUrls(f["GUEST REACTIONS"]);
+
+  return (
+    <div className="bg-white/70 border border-[#c5cae9] rounded-2xl p-4 shadow-sm flex flex-col gap-2">
+      <div className="flex items-start justify-between gap-2 flex-wrap">
+        <h3 className="text-[#3d3d6b] font-semibold text-base">
+          {f["Name"] || "Unnamed Guest"}
+        </h3>
+        {f["GUEST TYPE"] && (
+          <span className="bg-[#c5cae9] text-[#3d3d6b] text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
+            {f["GUEST TYPE"]}
+          </span>
+        )}
+      </div>
+
+      {urls.length > 0 && (
+        <div className="flex flex-col gap-3 mt-2">
+          {urls.map((url, i) => (
+            <LinkPreview key={i} url={url} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ------------------------------------------------------------------ */
 /*  Main page                                                          */
 /* ------------------------------------------------------------------ */
 export default function WeddingPage() {
@@ -794,6 +827,16 @@ export default function WeddingPage() {
           (r.fields?.["URL TYPE"] === "Article" ||
             r.fields?.["URL TYPE"] === "Video")
       ),
+    [records]
+  );
+
+  const guestReactionRecords = useMemo(
+    () =>
+      records
+        .filter((r) => splitUrls(r.fields?.["GUEST REACTIONS"]).length > 0)
+        .sort((a, b) =>
+          (a.fields["Name"] || "").localeCompare(b.fields["Name"] || "")
+        ),
     [records]
   );
 
@@ -1011,16 +1054,42 @@ export default function WeddingPage() {
             )}
           </>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-            {coverageRecords.length > 0 ? (
-              coverageRecords.map((r) => (
-                <CoverageCard key={r.id} record={r} />
-              ))
-            ) : (
-              <p className="col-span-2 text-center text-[#6b7280] italic">
-                No articles or videos added yet.
-              </p>
-            )}
+          <div className="flex flex-col gap-10">
+            {/* Wedding coverage: articles & videos */}
+            <div>
+              <h2 className="text-lg font-serif text-[#3d3d6b] mb-4 text-center">
+                Articles &amp; Videos
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                {coverageRecords.length > 0 ? (
+                  coverageRecords.map((r) => (
+                    <CoverageCard key={r.id} record={r} />
+                  ))
+                ) : (
+                  <p className="col-span-2 text-center text-[#6b7280] italic">
+                    No articles or videos added yet.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Guest reactions: guests commenting on the wedding */}
+            <div>
+              <h2 className="text-lg font-serif text-[#3d3d6b] mb-4 text-center">
+                Guest Reactions
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                {guestReactionRecords.length > 0 ? (
+                  guestReactionRecords.map((r) => (
+                    <GuestReactionCard key={r.id} record={r} />
+                  ))
+                ) : (
+                  <p className="col-span-2 text-center text-[#6b7280] italic">
+                    No guest reactions added yet.
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </div>
