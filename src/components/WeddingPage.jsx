@@ -428,10 +428,29 @@ const TikTokEmbed = ({ url }) => {
   );
 };
 
+// Strips tracking params (igsh=, utm_source=, utm_campaign=, etc.) and
+// canonicalizes to Instagram's expected clean permalink format. Same
+// helper used successfully on the event pages — those tracking params
+// can confuse Instagram's embed resolution for some posts even though
+// most tolerate them fine, which is why some links load reliably and
+// others don't despite looking similar.
+const normalizeInstagramUrl = (raw) => {
+  if (!raw) return "";
+  const clean = raw.trim().split("?")[0];
+  const match = clean.match(
+    /instagram\.com\/(?:[^/]+\/)?(p|reel|tv)\/([^/?#]+)/i
+  );
+  if (!match) return raw; // fall back to the original if we can't parse it
+  const type = match[1].toLowerCase();
+  const shortcode = match[2];
+  return `https://www.instagram.com/${type}/${shortcode}/`;
+};
+
 const InstagramEmbed = ({ url }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [timedOut, setTimedOut] = useState(false);
   const elRef = useRef(null);
+  const embedUrl = normalizeInstagramUrl(url);
 
   // Only start loading once this embed is actually near the visible
   // area — not the instant it mounts. On Guest List's Card View,
@@ -527,7 +546,7 @@ const InstagramEmbed = ({ url }) => {
       <blockquote
         className="instagram-media"
         data-instgrm-captioned
-        data-instgrm-permalink={url}
+        data-instgrm-permalink={embedUrl}
         data-instgrm-version="14"
         style={{
           background: "#FFF",
