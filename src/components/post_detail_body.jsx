@@ -1,78 +1,26 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import "./post_detail_body.css";
 import AdSlot from "./adslot";
+import {
+  isLikelyImage,
+  isPinterestUrl,
+  getPinterestPinId,
+  getDomainFromUrl,
+  getFaviconUrl,
+  getYouTubeId,
+  normalizeInstagramUrl,
+  SourceLinkPreview,
+  PinterestEmbed,
+  InstagramEmbed,
+  TwitterEmbed,
+  YouTubeEmbed,
+  TikTokEmbed,
+} from "./shared/LinkEmbeds";
 
-// Image URL helper
-const isLikelyImage = (url) => {
-  if (!url) return false;
-  const lower = url.toLowerCase();
-  return (
-    /\.(jpg|jpeg|png|webp|gif)$/i.test(lower) ||
-    lower.includes("preview.redd.it") ||
-    lower.includes("hips.hearstapps.com") ||
-    lower.includes("resize=") ||
-    lower.includes("crop=smart") ||
-    lower.includes("imgur.com/") ||
-    lower.includes("media.tumblr.com") ||
-    lower.includes("imageproxy") ||
-    lower.includes("twimg.com/media/")
-  );
-};
-
-const isArchiveUrl = (url) => {
-  if (!url) return false;
-  const lower = url.toLowerCase();
-  return lower.includes("archive.today") || lower.includes("archive.ph") || lower.includes("archive.is");
-};
-
-const getOriginalFromArchiveUrl = (url) => {
-  try {
-    const match = url.match(/archive\.[a-z]+\/[^/]+\/(https?:\/\/.+)/i);
-    return match ? match[1] : null;
-  } catch {
-    return null;
-  }
-};
-
-// Simple helper to detect Getty URLs
-const isGettyUrl = (url) => {
-  if (!url) return false;
-  const lower = url.toLowerCase();
-  return lower.includes("gettyimages.com");
-};
-
-// Detect Facebook URLs
-const isFacebookUrl = (url) => {
-  if (!url) return false;
-  const lower = url.toLowerCase();
-  return (
-    lower.includes("facebook.com") ||
-    lower.includes("fb.watch") ||
-    lower.includes("fb.com")
-  );
-};
-
-// Detect Pinterest URLs
-const isPinterestUrl = (url) => {
-  if (!url) return false;
-  const lower = url.toLowerCase();
-  return (
-    lower.includes("pinterest.com/pin/") ||
-    lower.includes("pin.it/")
-  );
-};
-
-// Extract Pinterest pin ID
-const getPinterestPinId = (url) => {
-  if (!url) return null;
-
-  const match = url.match(/pinterest\.com\/pin\/(\d+)/i);
-  return match ? match[1] : null;
-};
 // Format DATE field as "Nov-07-2025" (force UTC so it doesn't shift by timezone)
 const formatEventDate = (isoDate) => {
   if (!isoDate) return "";
@@ -87,72 +35,6 @@ const formatEventDate = (isoDate) => {
   const year = d.getUTCFullYear();
 
   return `${month}-${day}-${year}`;
-};
-
-// Normalize Instagram URLs so embed.js is happy
-const normalizeInstagramUrl = (raw) => {
-  if (!raw) return "";
-
-  // Remove query params
-  const clean = raw.trim().split("?")[0];
-
-  // Try to extract shortcode + type
-  // Matches ALL of these:
-  // - instagram.com/p/SHORT/
-  // - instagram.com/reel/SHORT/
-  // - instagram.com/tv/SHORT/
-  // - instagram.com/user/p/SHORT/
-  const match = clean.match(
-    /instagram\.com\/(?:[^/]+\/)?(p|reel|tv)\/([^/?#]+)/i
-  );
-
-  if (!match) return ""; // bad URL
-
-  const type = match[1].toLowerCase();      // p | reel | tv
-  const shortcode = match[2];               // CP-xHUvn_Ve
-
-  // Canonical embed URL
-  return `https://www.instagram.com/${type}/${shortcode}/`;
-};
-
-// Helper to extract domain from URL for favicon
-const getDomainFromUrl = (url) => {
-  try {
-    const urlObj = new URL(url);
-    return urlObj.hostname.replace('www.', '');
-  } catch {
-    return 'website';
-  }
-};
-
-// Helper to get favicon
-const getFaviconUrl = (domain) => {
-  return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
-};
-
-const getFallbackTitleFromUrl = (url, domain) => {
-  try {
-    const pathname = new URL(url).pathname;
-    const parts = pathname.split("/").filter(Boolean);
-    const slug = parts[parts.length - 1] || "";
-
-    const cleaned = slug
-  .replace(/\.\w+$/, "")
-  .replace(/[-_]+\d+(?:[-_]\d+)*$/, "")
-  .replace(/[-_]+/g, " ")
-  .replace(/\b\w/g, (c) => c.toUpperCase())
-  .trim();
-
-    if (cleaned && cleaned.length > 3) {
-      return cleaned;
-    }
-  } catch {}
-
-  return (
-    domain.split(".")[0].charAt(0).toUpperCase() +
-    domain.split(".")[0].slice(1) +
-    " Article"
-  );
 };
 
 function AroundThisTime({ eventDate, currentPostId }) {
@@ -291,484 +173,6 @@ function AroundThisTime({ eventDate, currentPostId }) {
   )
 }
 
-function LinkPreview({ url }) {
-  const [previewData, setPreviewData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const domain = getDomainFromUrl(url);
-
-  const isArchive = isArchiveUrl(url);
-  const originalUrl = isArchive ? getOriginalFromArchiveUrl(url) : null;
-  const fetchUrl = originalUrl || url;
-
-  useEffect(() => {
-    let isMounted = true;
-    setPreviewData(null);
-    setLoading(true);
-
-    const fetchPreview = async () => {
-      if (!isMounted) return;
-
-      if (isArchive && !originalUrl) {
-        setLoading(false);
-        return;
-      }
-
-  try {
-    const response = await fetch(`/api/og-preview?url=${encodeURIComponent(fetchUrl)}`);
-    if (!response.ok) throw new Error('Failed');
-
-    const data = await response.json();
-    const resolvedDomain = getDomainFromUrl(fetchUrl);
-
-    if (isMounted) {
-      setPreviewData({
-        title: data.title || getFallbackTitleFromUrl(fetchUrl, resolvedDomain),
-        description: data.description || '',
-        image: data.image || getFaviconUrl(resolvedDomain),
-        domain: data.domain || resolvedDomain,
-        url: url,
-        isSiteFallback: false,
-      });
-    }
-  } catch (error) {
-    const resolvedDomain = getDomainFromUrl(fetchUrl);
-    if (isMounted) {
-      setPreviewData({
-        title: getFallbackTitleFromUrl(fetchUrl, resolvedDomain),
-        image: getFaviconUrl(resolvedDomain),
-        domain: resolvedDomain,
-        url: url,
-      });
-    }
-  } finally {
-    if (isMounted) setLoading(false);
-  }
-};
-
-    fetchPreview();
-    return () => { isMounted = false; };
-  }, [url, domain]);
-
-if (isArchive && !originalUrl && !loading) {
-    return <ArchiveFallbackCard url={url} />;
-  }
-  if (isArchive && !originalUrl) return null;
-  
-  if (loading) {
-    return (
-      <div className="microlink-card block max-w-md mx-auto mb-4 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm animate-pulse">
-        <div className="h-40 bg-gray-200 animate-pulse"></div>
-        <div className="p-4">
-          <div className="h-4 bg-gray-200 rounded mb-2 w-3/4 animate-pulse"></div>
-          <div className="h-3 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-        </div>
-      </div>
-    );
-  }
-
-  const isFallbackFavicon = (imageUrl) => {
-    if (!imageUrl) return true;
-    const s = String(imageUrl).toLowerCase();
-    return s.includes("google.com/s2/favicons");
-  };
-
-  const hasUsableImage =
-    !!previewData?.image &&
-    !isFallbackFavicon(previewData.image) &&
-    !previewData?.isSiteFallback;
-
-  if (!hasUsableImage) {
-    return (
-      <a
-        href={previewData.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-[#fff8f8] p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
-      >
-        <div className="flex items-center gap-3">
-          <img
-  src={getFaviconUrl(previewData.domain || domain)}
-  alt={previewData.domain || domain}
-  className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm flex-shrink-0"
-/>
-          <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-[#8e3e3e] transition-colors">
-              {previewData.title}
-            </h3>
-            <div className="flex items-center justify-between mt-1">
-              <span className="text-xs text-gray-500 truncate">{previewData.domain}</span>
-              <span className="flex items-center gap-1 text-xs font-semibold text-[#8e3e3e]">Read article →</span>
-            </div>
-          </div>
-        </div>
-      </a>
-    );
-  }
-
-  return (
-    <a
-      href={previewData.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
-    >
-      <div className="h-48 overflow-hidden bg-gray-100 relative">
-        <img
-          src={previewData.image}
-          alt={previewData.title}
-          className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500"
-          onError={(e) => {
-            e.target.style.display = 'none';
-            const parent = e.target.parentElement;
-            if (parent.querySelector('.fallback-container')) return;
-            const fallback = document.createElement('div');
-            fallback.className = 'fallback-container w-full h-full flex flex-col items-center justify-center bg-gray-50';
-            const favicon = document.createElement('img');
-            favicon.src = getFaviconUrl(domain);
-            favicon.className = 'w-12 h-12 mb-2 opacity-50';
-            const domainText = document.createElement('span');
-            domainText.className = 'text-xs text-gray-400';
-            domainText.textContent = domain;
-            fallback.appendChild(favicon);
-            fallback.appendChild(domainText);
-            parent.appendChild(fallback);
-          }}
-        />
-      </div>
-      <div className="p-5">
-        <div className="flex items-start gap-4">
-          <img src={getFaviconUrl(domain)} alt={domain} className="w-8 h-8 rounded border" />
-          <div className="flex-1 min-w-0">
-            <h3 className="text-base font-semibold text-gray-900 mb-1 line-clamp-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#8e3e3e] group-hover:to-red-500">
-              {previewData.title}
-            </h3>
-            {previewData.description && (
-              <p className="text-sm text-gray-500 mb-3 line-clamp-2 leading-relaxed">{previewData.description}</p>
-            )}
-            <div className="flex items-center justify-between pt-2 border-t">
-              <span className="text-xs text-gray-400">{previewData.domain}</span>
-              <span className="text-xs font-semibold text-[#8e3e3e] group-hover:text-red-600 transition-colors">Read article →</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </a>
-  );
-}
-
-function ArchiveFallbackCard({ url, originalUrl }) {
-  const domain = originalUrl ? getDomainFromUrl(originalUrl) : null;
-
-  return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-[#fff8f8] p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
-    >
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg bg-[#2c2c2c] flex items-center justify-center flex-shrink-0 text-white text-[9px] font-bold tracking-tight leading-tight text-center px-1">
-          ARCH<br/>IVE
-        </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-gray-900 line-clamp-1 group-hover:text-[#8e3e3e] transition-colors">
-            {domain ? `Archived article from ${domain}` : "Archived Article"}
-          </h3>
-          <div className="flex items-center justify-between mt-1">
-            <span className="text-xs text-gray-500 truncate">archive.today</span>
-            <span className="text-xs font-semibold text-[#8e3e3e]">Read archive →</span>
-          </div>
-        </div>
-      </div>
-    </a>
-  );
-}
-
-function InstagramFallbackCard({ url }) {
-  return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
-    >
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg bg-gradient-to-tr from-[#f9ce67] via-[#e85a19] to-[#415dc3] flex items-center justify-center text-white shadow-sm flex-shrink-0">
-          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-        </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-[#8e3e3e] transition-colors">
-            View post on Instagram
-          </h3>
-          <div className="flex items-center justify-between mt-1">
-            <span className="text-xs text-gray-500 truncate">instagram.com</span>
-            <span className="flex items-center gap-1 text-xs font-semibold text-[#8e3e3e]">
-              Open post →
-            </span>
-          </div>
-        </div>
-      </div>
-    </a>
-  );
-}
-
-// Accounts known to be currently suspended. When a tweet URL is from
-// one of these, the fallback card shows a note explaining why instead
-// of just silently failing to embed like any other broken link.
-const SUSPENDED_X_ACCOUNTS = ["thetsupdates", "swifferupdates"];
-
-const getSuspendedAccountNote = (url) => {
-  const match = url.match(/(?:twitter|x)\.com\/([^/]+)\/status\//i);
-  const handle = match ? match[1].toLowerCase() : null;
-  if (handle && SUSPENDED_X_ACCOUNTS.includes(handle)) {
-    return `@${handle} is currently suspended — this post may return if the account is reinstated.`;
-  }
-  return null;
-};
-
-function TwitterFallbackCard({ url }) {
-  const suspendedNote = getSuspendedAccountNote(url);
-
-  return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1 group"
-    >
-      <div className="flex items-center gap-3">
-        <img
-          src={getFaviconUrl("x.com")}
-          alt="X"
-          className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm flex-shrink-0"
-        />
-        <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-[#8e3e3e] transition-colors">
-            View post on X
-          </h3>
-          <div className="flex items-center justify-between mt-1">
-            <span className="text-xs text-gray-500 truncate">x.com</span>
-            <span className="flex items-center gap-1 text-xs font-semibold text-[#8e3e3e]">
-              Open post
-              <svg
-                className="w-3 h-3 transform group-hover:translate-x-1 transition-transform"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M14 5l7 7m0 0l-7 7m7-7H3"
-                />
-              </svg>
-            </span>
-          </div>
-        </div>
-      </div>
-      {suspendedNote && (
-        <p className="text-xs text-gray-500 italic mt-2 pt-2 border-t border-gray-100">
-          {suspendedNote}
-        </p>
-      )}
-    </a>
-  );
-}
-
-function TwitterEmbed({ url }) {
-  const [failed, setFailed] = useState(false);
-  const [checked, setChecked] = useState(false);
-  const containerRef = useRef(null);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const cleanUrl = url.trim().replace("x.com", "twitter.com");
-    const match = cleanUrl.match(/status\/(\d+)/);
-    const tweetId = match ? match[1] : null;
-
-    if (!tweetId) {
-      setFailed(true);
-      setChecked(true);
-      return;
-    }
-
-    const checkIfEmbeddable = async () => {
-      try {
-        const oembedUrl = `https://publish.twitter.com/oembed?omit_script=true&url=${encodeURIComponent(cleanUrl)}`;
-        const response = await fetch(oembedUrl);
-
-        if (!response.ok) {
-          if (!cancelled) {
-            setFailed(true);
-            setChecked(true);
-          }
-          return false;
-        }
-
-        if (!cancelled) {
-          setChecked(true);
-        }
-        return true;
-      } catch (error) {
-        if (!cancelled) {
-          setFailed(true);
-          setChecked(true);
-        }
-        return false;
-      }
-    };
-
-    const renderTweet = async () => {
-      try {
-        if (!window.twttr || !window.twttr.widgets || !containerRef.current) {
-          if (!cancelled) {
-            setFailed(true);
-          }
-          return;
-        }
-
-        containerRef.current.innerHTML = "";
-
-        await window.twttr.widgets.createTweet(tweetId, containerRef.current, {
-          align: "left",
-          theme: "light",
-          dnt: true,
-          conversation: "none",
-        });
-
-        if (!cancelled && !containerRef.current.querySelector("iframe")) {
-          setFailed(true);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setFailed(true);
-        }
-      }
-    };
-
-    const init = async () => {
-      const embeddable = await checkIfEmbeddable();
-      if (!embeddable || cancelled) return;
-
-      let attempts = 0;
-
-      const interval = setInterval(() => {
-        attempts += 1;
-
-        if (window.twttr && window.twttr.widgets) {
-          clearInterval(interval);
-          renderTweet();
-        } else if (attempts > 30) {
-          clearInterval(interval);
-          if (!cancelled) {
-            setFailed(true);
-          }
-        }
-      }, 300);
-    };
-
-    init();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [url]);
-
-  if (failed) {
-    return <TwitterFallbackCard url={url} />;
-  }
-
-  if (!checked) {
-    return (
-      <div
-        className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm animate-pulse"
-      >
-        <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-      </div>
-    );
-  }
-
-  return (
-    <div
-      className="twitter-container flex-shrink-0"
-      style={{ width: "320px" }}
-      ref={containerRef}
-    />
-  );
-}
-
-function YouTubeEmbed({ videoId, url, index }) {
-  const [status, setStatus] = useState("loading"); // loading | ok | failed
-
-  useEffect(() => {
-    const check = async () => {
-      try {
-        const res = await fetch(
-          `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`
-        );
-        if (res.ok) {
-          setStatus("ok");
-        } else {
-          setStatus("failed");
-        }
-      } catch {
-        setStatus("failed");
-      }
-    };
-    check();
-  }, [videoId]);
-
-  if (status === "loading") {
-    return (
-      <div className="w-full rounded-xl bg-gray-100 animate-pulse" style={{ paddingBottom: "56.25%", position: "relative" }} />
-    );
-  }
-
-  if (status === "failed") {
-    return (
-      <a
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center gap-4 bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md hover:border-red-400 transition-all duration-200 group"
-      >
-        <div className="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center flex-shrink-0">
-          <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-          </svg>
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-gray-900 group-hover:text-[#8e3e3e] transition-colors">
-            Watch on YouTube
-          </p>
-          <p className="text-xs text-gray-500 mt-0.5">
-            Embedding disabled by video owner
-          </p>
-        </div>
-        <span className="text-xs font-semibold text-[#8e3e3e]">Watch →</span>
-      </a>
-    );
-  }
-
-  return (
-    <div className="w-full">
-      <div className="relative" style={{ paddingBottom: "56.25%" }}>
-        <iframe
-          src={`https://www.youtube.com/embed/${videoId}`}
-          title={`YouTube Video ${index + 1}`}
-          className="absolute top-0 left-0 w-full h-full rounded-xl"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
-      </div>
-    </div>
-  );
-}
-
 export default function PostDetailBody() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -890,50 +294,27 @@ export default function PostDetailBody() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isModalOpen, selectedImageIndex, event?.IMAGE]);
 
-    // Social media embeds script loading (Instagram, Twitter)
+  // Instagram/X script loading — Instagram/X embeds now use the shared
+  // InstagramEmbed/TwitterEmbed components (lazy-loaded, self-healing),
+  // but the underlying platform scripts still need to be present on
+  // the page for those components to find and use.
   useEffect(() => {
     if (!event) return;
 
-    const loadInstagramScript = () => {
-      if (!document.getElementById("instagram-embed-script")) {
-        const script = document.createElement("script");
-        script.id = "instagram-embed-script";
-        script.src = "//www.instagram.com/embed.js";
-        script.async = true;
-        document.body.appendChild(script);
-      } else {
-        if (window.instgrm) {
-          window.instgrm.Embeds.process();
-        } else {
-          setTimeout(() => {
-            if (window.instgrm) window.instgrm.Embeds.process();
-          }, 1000);
-        }
-      }
-    };
-
-    const loadTwitterScript = () => {
-      if (window.twttr && window.twttr.widgets) {
-        window.twttr.widgets.load();
-      } else if (!document.getElementById("twitter-embed-script")) {
-        const script = document.createElement("script");
-        script.id = "twitter-embed-script";
-        script.src = "https://platform.twitter.com/widgets.js";
-        script.async = true;
-        script.onload = () => {
-          if (window.twttr?.widgets) window.twttr.widgets.load();
-        };
-        document.body.appendChild(script);
-      }
-    };
-
-    if (event.INSTAGRAM) {
-      loadInstagramScript();
-      setTimeout(loadInstagramScript, 500);
+    if (event.INSTAGRAM && !document.getElementById("instagram-embed-script")) {
+      const script = document.createElement("script");
+      script.id = "instagram-embed-script";
+      script.src = "//www.instagram.com/embed.js";
+      script.async = true;
+      document.body.appendChild(script);
     }
 
-    if (event.TWITTER) {
-      loadTwitterScript();
+    if (event.TWITTER && !document.getElementById("twitter-embed-script")) {
+      const script = document.createElement("script");
+      script.id = "twitter-embed-script";
+      script.src = "https://platform.twitter.com/widgets.js";
+      script.async = true;
+      document.body.appendChild(script);
     }
   }, [event]);
   
@@ -1009,7 +390,11 @@ useEffect(() => {
   }
 }, []);
  
-  // TikTok embed script loading
+  // TikTok embed script loading — needed globally since the shared
+  // TikTokEmbed component drops blockquotes but doesn't load the
+  // script itself (same reasoning as the Wedding page: TikTok's
+  // script only processes blockquotes present when it executes, so
+  // it has to be reloaded whenever new ones appear).
   useEffect(() => {
     if (!event?.TIKTOK) return;
 
@@ -1137,20 +522,12 @@ const twitterUrls = event?.TWITTER
 
                     if (isPinterest && pinId) {
                       return (
-                        <div
+                        <PinterestEmbed
                           key={`img-${index}`}
-                          className="group relative bg-gray-100 rounded-xl overflow-hidden border border-gray-200 hover:shadow-lg transition-all duration-300 hover:border-red-400"
-                          style={{ width: "420px", height: "300px" }}
-                        >
-                          <iframe
-                            src={`https://assets.pinterest.com/ext/embed.html?id=${pinId}`}
-                            width="100%"
-                            height="100%"
-                            frameBorder="0"
-                            scrolling="no"
-                            style={{ border: "0", overflow: "hidden" }}
-                          />
-                        </div>
+                          url={url}
+                          width={420}
+                          height={300}
+                        />
                       );
                     }
 
@@ -1162,12 +539,6 @@ const twitterUrls = event?.TWITTER
                         rel="noopener noreferrer"
                         className="group relative flex flex-col bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-red-400 hover:-translate-y-1"
                         style={{ width: "420px", height: "300px" }}
-                        onClick={(e) => {
-                          // Prevent link click if you want the modal to open instead
-                          // e.preventDefault();
-                          // setSelectedImageIndex(sourceImages.indexOf(url) + (event.IMAGE?.length || 0));
-                          // setIsModalOpen(true);
-                        }}
                       >
                         <div className="h-full w-full overflow-hidden bg-gray-50">
                           <img
@@ -1191,70 +562,9 @@ const twitterUrls = event?.TWITTER
 
               {nonImageLinks.length > 0 && (
                 <div className="microlink-grid" style={{ justifyContent: "center" }}>
-                  {nonImageLinks.map((url, index) => {
-                    const isGetty = isGettyUrl(url);
-const isFacebook = isFacebookUrl(url);
-
-if (isGetty) {
-                      // Clean, branded Getty card instead of Microlink
-                      return (
-                        <a
-                          key={`link-${index}`}
-                          href={url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded bg-black flex items-center justify-center text-white text-xs font-semibold">
-                              GETTY
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-[#8e3e3e] truncate">
-                                View this photo on Getty Images
-                              </p>
-                              <p className="text-xs text-gray-500 truncate">
-                                gettyimages.com
-                              </p>
-                            </div>
-                          </div>
-                        </a>
-                      );
-                    }
-
-if (isFacebook) {
-  return (
-    <a
-      key={`link-${index}`}
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="microlink-card block w-full max-w-md mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow"
-    >
-      <div className="flex items-center gap-3">
-        <img
-          src="https://www.facebook.com/images/fb_icon_325x325.png"
-          alt="Facebook"
-          className="w-10 h-10 rounded-lg"
-        />
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-[#8e3e3e] truncate">
-            View this post on Facebook
-          </p>
-          <p className="text-xs text-gray-500 truncate">
-            facebook.com
-          </p>
-        </div>
-      </div>
-    </a>
-  );
-}
-                  
-      // Non-Getty links: use our custom LinkPreview component
-                    return (
-                      <LinkPreview key={`link-${index}`} url={url} />
-                    );
-                  })}
+                  {nonImageLinks.map((url, index) => (
+                    <SourceLinkPreview key={`link-${index}`} url={url} />
+                  ))}
                 </div>
               )}
             </div>
@@ -1324,31 +634,7 @@ if (isFacebook) {
     >
       {event.YOUTUBE?.split(/,\s*|\s*\|\|\s*/).map((rawUrl, index) => {
         const url = rawUrl.trim();
-
-        // 🔥 Robust YouTube ID extractor — works for ALL formats
-        const getId = (input) => {
-          if (!input) return null;
-
-          // youtu.be short links
-          let m = input.match(/youtu\.be\/([^?&]+)/);
-          if (m) return m[1];
-
-          // standard watch URL
-          m = input.match(/[?&]v=([^?&]+)/);
-          if (m) return m[1];
-
-          // shorts
-          m = input.match(/shorts\/([^?&/]+)/);
-          if (m) return m[1];
-
-          // embed
-          m = input.match(/embed\/([^?&/]+)/);
-          if (m) return m[1];
-
-          return null;
-        };
-
-        const videoId = getId(url);
+        const videoId = getYouTubeId(url);
         if (!videoId) return null;
 
         return (
@@ -1363,53 +649,10 @@ if (isFacebook) {
       {/* Instagram */}
       {event.INSTAGRAM && (
         <section className="w-full px-4 mb-10">
-          <div
-            className="flex flex-wrap gap-6 mt-2 max-w-6xl mx-auto items-start justify-start"
-          >
-            {instagramUrls.map((url, index) => {
-              // We check if this is the problematic Travis Kelce post to show the card immediately
-const isTravisPost = url.includes("DMgXbQ0yWqW") || url.includes("DP5R6pwEXdY") || url.includes("DPwLCrtjfR3") || url.includes("npJnb4ujGj") || url.includes("DYQh2VaiJMj") || url.includes("DYQreT-sKHH") || url.includes("DYQBDNnCPDz") || url.includes("DYa-wLaCA_-") || url.includes("DYa9NUfM9h5") || url.includes("DYY2w5stkw5") || url.includes("DYZC91nswcc") || url.includes("DYYTrAxCNtV") || url.includes("DYYSe2XJTEg") || url.includes("DYYhHB0stn_") || url.includes("DYVkl8vx48D") || url.includes("DYVxBVsjRR9") || url.includes("DYVrCfuDI2r") || url.includes("DYWHUV9tlLU");
-
-              return (
-                <div
-                  key={index}
-                  className="instagram-container flex flex-col items-center"
-                  style={{ width: "326px" }}
-                >
-                  {isTravisPost ? (
-                    <InstagramFallbackCard url={url} />
-                  ) : (
-                    <blockquote
-                      className="instagram-media"
-                      data-instgrm-captioned
-                      data-instgrm-permalink={url}
-                      data-instgrm-version="14"
-                      style={{
-                        background: "#FFF",
-                        borderRadius: "8px",
-                        border: "1px solid #dbdbdb",
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                        margin: "0",
-                        width: "326px",
-                        padding: "0",
-                        display: "block"
-                      }}
-                    >
-                      <div style={{ padding: "16px" }}>
-                        <a 
-                          href={url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-500 text-sm font-medium"
-                        >
-                          Loading Instagram post...
-                        </a>
-                      </div>
-                    </blockquote>
-                  )}
-                </div>
-              );
-            })}
+          <div className="flex flex-wrap gap-6 mt-2 max-w-6xl mx-auto items-start justify-start">
+            {instagramUrls.map((url, index) => (
+              <InstagramEmbed key={index} url={url} />
+            ))}
           </div>
         </section>
       )}
@@ -1417,9 +660,7 @@ const isTravisPost = url.includes("DMgXbQ0yWqW") || url.includes("DP5R6pwEXdY") 
                   {/* Twitter / X */}
       {event.TWITTER && (
   <section className="w-full px-4 mb-10">
-    <div
-      className="flex flex-wrap gap-6 mt-2 max-w-6xl mx-auto items-start justify-start"
-    >
+    <div className="flex flex-wrap gap-6 mt-2 max-w-6xl mx-auto items-start justify-start">
       {twitterUrls.map((url, index) => (
         <TwitterEmbed key={index} url={url} />
       ))}
@@ -1434,20 +675,9 @@ const isTravisPost = url.includes("DMgXbQ0yWqW") || url.includes("DP5R6pwEXdY") 
             {event.TIKTOK.split(" || ").map((raw, index) => {
               const cleanUrl = raw.trim();
               if (!cleanUrl) return null;
-
-              const videoId =
-                cleanUrl.split("/video/")[1]?.split("?")[0] ||
-                cleanUrl.split("/t/")[1]?.split("/")[0];
-
               return (
                 <div key={index} className="tiktok-wrapper">
-                  <blockquote
-                    className="tiktok-embed"
-                    cite={cleanUrl}
-                    data-video-id={videoId || undefined}
-                  >
-                    <a href={cleanUrl}></a>
-                  </blockquote>
+                  <TikTokEmbed url={cleanUrl} />
                 </div>
               );
             })}
