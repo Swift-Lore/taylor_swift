@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef } from "react";
 import axios from "axios";
+import { LinkPreview, getPlatform } from "./shared/LinkEmbeds";
 
 /* ------------------------------------------------------------------ */
 /*  CONFIG — update these two if your base/table ever changes          */
@@ -32,7 +33,8 @@ const GUEST_TYPES = [
 ];
 
 /* ------------------------------------------------------------------ */
-/*  URL helpers — same detection pattern used on event pages           */
+/*  Wedding-specific: guests store multiple links in one URLS field,   */
+/*  separated by " || " — this is local to how this table is shaped.  */
 /* ------------------------------------------------------------------ */
 const splitUrls = (raw) =>
   !raw
@@ -42,743 +44,11 @@ const splitUrls = (raw) =>
         .map((u) => u.trim())
         .filter(Boolean);
 
-const getPlatform = (url) => {
-  const lower = url.toLowerCase();
-  if (lower.includes("instagram.com")) return "instagram";
-  if (
-    (lower.includes("twitter.com") || lower.includes("x.com")) &&
-    /\/status\/\d+/.test(lower)
-  )
-    return "twitter";
-  if (lower.includes("youtube.com") || lower.includes("youtu.be"))
-    return "youtube";
-  if (lower.includes("tiktok.com")) return "tiktok";
-  return "link";
-};
-
-const getYouTubeId = (url) => {
-  const match = url.match(
-    /(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([\w-]{11})/
-  );
-  return match ? match[1] : null;
-};
-
-const getDomainFromUrl = (url) => {
-  try {
-    return new URL(url).hostname.replace("www.", "");
-  } catch {
-    return "";
-  }
-};
-
-const getFaviconUrl = (domain) =>
-  `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
-
-const getFallbackTitleFromUrl = (url, domain) => {
-  try {
-    const pathname = new URL(url).pathname;
-    const parts = pathname.split("/").filter(Boolean);
-    const slug = (parts[parts.length - 1] || "").replace(/\.\w+$/, "");
-
-    const tokens = slug.split(/[-_]+/).filter(Boolean);
-
-    const isIdLikeToken = (t) => {
-      if (/^\d+$/.test(t)) return true;
-      if (t.length >= 6 && /\d/.test(t) && /[a-z]/i.test(t)) return true;
-      return false;
-    };
-
-    const realWords = tokens.filter((t) => !isIdLikeToken(t));
-
-    if (realWords.length < 3) return null;
-
-    const cleaned = realWords
-      .join(" ")
-      .replace(/\b\w/g, (c) => c.toUpperCase())
-      .trim();
-
-    if (cleaned.length < 10) return null;
-
-    return cleaned;
-  } catch {
-    return null;
-  }
-};
-
-const isArchiveUrl = (url) => {
-  if (!url) return false;
-  const lower = url.toLowerCase();
-  return (
-    lower.includes("archive.today") ||
-    lower.includes("archive.ph") ||
-    lower.includes("archive.is")
-  );
-};
-
-const getOriginalFromArchiveUrl = (url) => {
-  try {
-    const match = url.match(/archive\.[a-z]+\/[^/]+\/(https?:\/\/.+)/i);
-    return match ? match[1] : null;
-  } catch {
-    return null;
-  }
-};
-
-const isGettyUrl = (url) => {
-  if (!url) return false;
-  return url.toLowerCase().includes("gettyimages.com");
-};
-
-const isFacebookUrl = (url) => {
-  if (!url) return false;
-  const lower = url.toLowerCase();
-  return (
-    lower.includes("facebook.com") ||
-    lower.includes("fb.watch") ||
-    lower.includes("fb.com")
-  );
-};
-
-const KNOWN_BROKEN_PREVIEW_DOMAINS = ["reutersconnect.com"];
-
-const ArchiveFallbackCard = ({ url, originalUrl }) => {
-  const domain = originalUrl ? getDomainFromUrl(originalUrl) : null;
-  return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="microlink-card block w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-[#fff8f8] p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-1 group"
-    >
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg bg-[#2c2c2c] flex items-center justify-center flex-shrink-0 text-white text-[9px] font-bold tracking-tight leading-tight text-center px-1">
-          ARCH
-          <br />
-          IVE
-        </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-gray-900 line-clamp-1 group-hover:text-[#8e3e3e] transition-colors">
-            {domain ? `Archived article from ${domain}` : "Archived Article"}
-          </h3>
-          <div className="flex items-center justify-between mt-1">
-            <span className="text-xs text-gray-500 truncate">archive.today</span>
-            <span className="text-xs font-semibold text-[#8e3e3e]">Read archive →</span>
-          </div>
-        </div>
-      </div>
-    </a>
-  );
-};
-
-const GettyCard = ({ url }) => (
-  <a
-    href={url}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="microlink-card block w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow"
-  >
-    <div className="flex items-center gap-3">
-      <div className="w-10 h-10 rounded bg-black flex items-center justify-center text-white text-xs font-semibold">
-        GETTY
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-[#8e3e3e] truncate">
-          View this photo on Getty Images
-        </p>
-        <p className="text-xs text-gray-500 truncate">gettyimages.com</p>
-      </div>
-    </div>
-  </a>
-);
-
-const FacebookCard = ({ url }) => (
-  <a
-    href={url}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="microlink-card block w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow"
-  >
-    <div className="flex items-center gap-3">
-      <img
-        src="https://www.facebook.com/images/fb_icon_325x325.png"
-        alt="Facebook"
-        className="w-10 h-10 rounded-lg"
-      />
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-[#8e3e3e] truncate">
-          View this post on Facebook
-        </p>
-        <p className="text-xs text-gray-500 truncate">facebook.com</p>
-      </div>
-    </div>
-  </a>
-);
-
-const ArticlePreviewCard = ({ url }) => {
-  const [previewData, setPreviewData] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  const isArchive = isArchiveUrl(url);
-  const originalUrl = isArchive ? getOriginalFromArchiveUrl(url) : null;
-  const fetchUrl = originalUrl || url;
-  const domain = getDomainFromUrl(fetchUrl);
-  const isKnownBroken = KNOWN_BROKEN_PREVIEW_DOMAINS.some((d) =>
-    domain.includes(d)
-  );
-
-  useEffect(() => {
-    let isMounted = true;
-    setPreviewData(null);
-    setLoading(true);
-
-    if (isArchive && !originalUrl) {
-      setLoading(false);
-      return;
-    }
-
-    if (isKnownBroken) {
-      setPreviewData({ title: null, image: null, domain });
-      setLoading(false);
-      return;
-    }
-
-    const fetchPreview = async () => {
-      try {
-        const response = await fetch(
-          `/api/og-preview?url=${encodeURIComponent(fetchUrl)}`
-        );
-        if (!response.ok) throw new Error("Failed");
-        const data = await response.json();
-        if (isMounted) {
-          setPreviewData({
-            title: data.title || getFallbackTitleFromUrl(fetchUrl, domain),
-            description: data.description || "",
-            image: data.image || null,
-            domain: data.domain || domain,
-          });
-        }
-      } catch {
-        if (isMounted) {
-          setPreviewData({
-            title: getFallbackTitleFromUrl(fetchUrl, domain),
-            description: "",
-            image: null,
-            domain,
-          });
-        }
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
-
-    fetchPreview();
-    return () => {
-      isMounted = false;
-    };
-  }, [url, fetchUrl, domain, isArchive, originalUrl, isKnownBroken]);
-
-  if (isArchive && !originalUrl && !loading) {
-    return <ArchiveFallbackCard url={url} originalUrl={originalUrl} />;
-  }
-  if (isArchive && !originalUrl) return null;
-
-  if (loading) {
-    return (
-      <div className="microlink-card block w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm animate-pulse">
-        <div className="h-40 bg-gray-200" />
-        <div className="p-4">
-          <div className="h-4 bg-gray-200 rounded mb-2 w-3/4" />
-          <div className="h-3 bg-gray-200 rounded w-1/2" />
-        </div>
-      </div>
-    );
-  }
-
-  const hasImage = !!previewData?.image;
-  const hasTitle = !!previewData?.title;
-
-  if (!hasImage && !hasTitle) {
-    return (
-      <a
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="microlink-card flex items-center gap-3 w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-[#fff8f8] p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-1 group"
-      >
-        <img
-          src={getFaviconUrl(previewData.domain)}
-          alt={previewData.domain}
-          className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm flex-shrink-0"
-        />
-        <div className="min-w-0">
-          <p className="text-sm font-semibold text-[#3d3d6b] group-hover:text-[#b66b6b] transition-colors">
-            View on {previewData.domain}
-          </p>
-          <p className="text-xs text-gray-500 truncate">{previewData.domain}</p>
-        </div>
-      </a>
-    );
-  }
-
-  if (!hasImage) {
-    return (
-      <a
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="microlink-card block w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-[#fff8f8] p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-1 group"
-      >
-        <div className="flex items-center gap-3">
-          <img
-            src={getFaviconUrl(previewData.domain)}
-            alt={previewData.domain}
-            className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm flex-shrink-0"
-          />
-          <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-[#8e3e3e] transition-colors">
-              {previewData.title}
-            </h3>
-            <div className="flex items-center justify-between mt-1">
-              <span className="text-xs text-gray-500 truncate">{previewData.domain}</span>
-              <span className="text-xs font-semibold text-[#8e3e3e]">Read article →</span>
-            </div>
-          </div>
-        </div>
-      </a>
-    );
-  }
-
-  return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="microlink-card block w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-1 group"
-    >
-      <div className="h-40 overflow-hidden bg-gray-100">
-        <img
-          src={previewData.image}
-          alt={previewData.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          onError={(e) => {
-            e.target.style.display = "none";
-          }}
-        />
-      </div>
-      <div className="p-4">
-        <h3 className="text-sm font-semibold text-gray-900 mb-1 line-clamp-2 group-hover:text-[#8e3e3e] transition-colors">
-          {previewData.title}
-        </h3>
-        {previewData.description && (
-          <p className="text-xs text-gray-500 mb-2 line-clamp-2 leading-relaxed">
-            {previewData.description}
-          </p>
-        )}
-        <div className="flex items-center justify-between pt-2 border-t">
-          <span className="text-xs text-gray-400">{previewData.domain}</span>
-          <span className="text-xs font-semibold text-[#8e3e3e]">Read article →</span>
-        </div>
-      </div>
-    </a>
-  );
-};
-
-const TikTokEmbed = ({ url }) => {
-  const cleanUrl = url.trim().split("?")[0];
-  const videoIdMatch = cleanUrl.match(/\/video\/(\d+)/);
-  const videoId = videoIdMatch ? videoIdMatch[1] : null;
-
-  return (
-    <blockquote
-      className="tiktok-embed"
-      cite={cleanUrl}
-      data-video-id={videoId || undefined}
-      style={{ maxWidth: "300px", minWidth: "300px" }}
-    >
-      <a href={cleanUrl} target="_blank" rel="noopener noreferrer">
-        View on TikTok
-      </a>
-    </blockquote>
-  );
-};
-
-const normalizeInstagramUrl = (raw) => {
-  if (!raw) return "";
-  const clean = raw.trim().split("?")[0];
-  const match = clean.match(
-    /instagram\.com\/(?:[^/]+\/)?(p|reel|tv)\/([^/?#]+)/i
-  );
-  if (!match) return raw;
-  const type = match[1].toLowerCase();
-  const shortcode = match[2];
-  return `https://www.instagram.com/${type}/${shortcode}/`;
-};
-
-const KNOWN_BROKEN_INSTAGRAM_SHORTCODES = [
-  "DaYVulmEVS-",
-  "DaYbbcHR0_6",
-  "Daf7Ox8lUK8",
-  "DaYv34_GQ0muzqwM-XRGMMHuplb5YWc5FZXHBU0",
-  "DaZHhfAFsGf",
-  "DaYFg-4xWy7",
-  "DaYC1vDIAHk",
-  "Da4KnEBPXyA",
-  "DaYn_46j60r",
-  "DaWFolOjFD2",
-  "DadvTjnj1_F",
-  "DaYNeQhDj7C",
-  "DaYTZ17RPmI",
-  "Daak8VyFiP7",
-  "Dac-kQiDgrw",
-  "DaYHHblnJBN",
-  "DaYUukgRlJS",
-  "DaYGExuqtf_",
-  "DaalpkslSDf7ZmfMs7Adl3nSIZBgh8zZ_HoXGI0",
-];
-
-const getInstagramShortcode = (url) => {
-  const match = url.match(/instagram\.com\/(?:[^/]+\/)?(?:p|reel|tv)\/([^/?#]+)/i);
-  return match ? match[1] : null;
-};
-
-const InstagramFallbackLink = ({ url }) => (
-  <a
-    href={url}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-3 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-0.5 group"
-    style={{ width: "326px" }}
-  >
-    <div className="w-10 h-10 rounded-lg bg-gradient-to-tr from-[#f9ce67] via-[#e85a19] to-[#415dc3] flex items-center justify-center text-white shadow-sm flex-shrink-0">
-      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-      </svg>
-    </div>
-    <div className="min-w-0">
-      <p className="text-sm font-semibold text-[#3d3d6b] group-hover:text-[#b66b6b] transition-colors">
-        View Instagram post
-      </p>
-      <p className="text-xs text-gray-500 truncate">instagram.com</p>
-    </div>
-  </a>
-);
-
-const InstagramEmbed = ({ url }) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [timedOut, setTimedOut] = useState(false);
-  const elRef = useRef(null);
-  const embedUrl = normalizeInstagramUrl(url);
-  const shortcode = getInstagramShortcode(url);
-  const isKnownBroken =
-    shortcode && KNOWN_BROKEN_INSTAGRAM_SHORTCODES.includes(shortcode);
-
-  if (isKnownBroken) {
-    return <InstagramFallbackLink url={url} />;
-  }
-
-  useEffect(() => {
-    if (isVisible) return;
-    const el = elRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setIsVisible(true);
-      },
-      { rootMargin: "400px" }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [isVisible]);
-
-  useEffect(() => {
-    if (!isVisible) return;
-    setTimedOut(false);
-
-    let attempts = 0;
-    const maxAttempts = 20;
-    const interval = setInterval(() => {
-      attempts += 1;
-      const hasIframe = elRef.current?.querySelector("iframe");
-      if (hasIframe) {
-        clearInterval(interval);
-        return;
-      }
-      if (window.instgrm?.Embeds) {
-        window.instgrm.Embeds.process();
-      }
-      if (attempts >= maxAttempts) {
-        clearInterval(interval);
-        setTimedOut(true);
-      }
-    }, 300);
-
-    return () => clearInterval(interval);
-  }, [isVisible, url]);
-
-  if (!isVisible) {
-    return (
-      <div
-        ref={elRef}
-        style={{ width: "326px", minHeight: "200px" }}
-        className="rounded-lg border border-dashed border-[#c5cae9] bg-white/40"
-      />
-    );
-  }
-
-  if (timedOut) {
-    return <InstagramFallbackLink url={url} />;
-  }
-
-  return (
-    <div
-      ref={elRef}
-      className="instagram-container flex flex-col items-center"
-      style={{ width: "326px" }}
-    >
-      <blockquote
-        className="instagram-media"
-        data-instgrm-captioned
-        data-instgrm-permalink={embedUrl}
-        data-instgrm-version="14"
-        style={{
-          background: "#FFF",
-          borderRadius: "8px",
-          border: "1px solid #dbdbdb",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-          margin: "0",
-          width: "326px",
-          padding: "0",
-        }}
-      >
-        <div style={{ padding: "16px" }}>
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 text-sm font-medium"
-          >
-            View Instagram post
-          </a>
-        </div>
-      </blockquote>
-    </div>
-  );
-};
-
-// Accounts known to be currently suspended. When a tweet URL is from
-// one of these, the fallback card shows a note explaining why instead
-// of just silently failing to embed like any other broken link.
-const SUSPENDED_X_ACCOUNTS = ["thetsupdates", "swifferupdates"];
-
-const getSuspendedAccountNote = (url) => {
-  const match = url.match(/(?:twitter|x)\.com\/([^/]+)\/status\//i);
-  const handle = match ? match[1].toLowerCase() : null;
-  if (handle && SUSPENDED_X_ACCOUNTS.includes(handle)) {
-    return `@${handle} is currently suspended — this post may return if the account is reinstated.`;
-  }
-  return null;
-};
-
-const TwitterFallbackCard = ({ url }) => {
-  const suspendedNote = getSuspendedAccountNote(url);
-
-  return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="microlink-card block w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-1 group"
-    >
-      <div className="flex items-center gap-3">
-        <img
-          src={getFaviconUrl("x.com")}
-          alt="X"
-          className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm flex-shrink-0"
-        />
-        <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-[#8e3e3e] transition-colors">
-            View post on X
-          </h3>
-          <div className="flex items-center justify-between mt-1">
-            <span className="text-xs text-gray-500 truncate">x.com</span>
-            <span className="flex items-center gap-1 text-xs font-semibold text-[#8e3e3e]">
-              Open post
-              <svg
-                className="w-3 h-3 transform group-hover:translate-x-1 transition-transform"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M14 5l7 7m0 0l-7 7m7-7H3"
-                />
-              </svg>
-            </span>
-          </div>
-        </div>
-      </div>
-      {suspendedNote && (
-        <p className="text-xs text-gray-500 italic mt-2 pt-2 border-t border-gray-100">
-          {suspendedNote}
-        </p>
-      )}
-    </a>
-  );
-};
-
-const TwitterEmbed = ({ url }) => {
-  const [failed, setFailed] = useState(false);
-  const [checked, setChecked] = useState(false);
-  const containerRef = useRef(null);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const cleanUrl = url.trim().replace("x.com", "twitter.com");
-    const match = cleanUrl.match(/status\/(\d+)/);
-    const tweetId = match ? match[1] : null;
-
-    if (!tweetId) {
-      setFailed(true);
-      setChecked(true);
-      return;
-    }
-
-    const checkIfEmbeddable = async () => {
-      try {
-        const oembedUrl = `https://publish.twitter.com/oembed?omit_script=true&url=${encodeURIComponent(
-          cleanUrl
-        )}`;
-        const response = await fetch(oembedUrl);
-        if (!response.ok) {
-          if (!cancelled) {
-            setFailed(true);
-            setChecked(true);
-          }
-          return false;
-        }
-        if (!cancelled) setChecked(true);
-        return true;
-      } catch {
-        if (!cancelled) {
-          setFailed(true);
-          setChecked(true);
-        }
-        return false;
-      }
-    };
-
-    const renderTweet = async () => {
-      try {
-        if (!window.twttr || !window.twttr.widgets || !containerRef.current) {
-          if (!cancelled) setFailed(true);
-          return;
-        }
-        containerRef.current.innerHTML = "";
-        await window.twttr.widgets.createTweet(tweetId, containerRef.current, {
-          align: "left",
-          theme: "light",
-          dnt: true,
-          conversation: "none",
-        });
-        if (!cancelled && !containerRef.current.querySelector("iframe")) {
-          setFailed(true);
-        }
-      } catch {
-        if (!cancelled) setFailed(true);
-      }
-    };
-
-    const init = async () => {
-      const embeddable = await checkIfEmbeddable();
-      if (!embeddable || cancelled) return;
-
-      let attempts = 0;
-      const interval = setInterval(() => {
-        attempts += 1;
-        if (window.twttr && window.twttr.widgets) {
-          clearInterval(interval);
-          renderTweet();
-        } else if (attempts > 30) {
-          clearInterval(interval);
-          if (!cancelled) setFailed(true);
-        }
-      }, 300);
-    };
-
-    init();
-    return () => {
-      cancelled = true;
-    };
-  }, [url]);
-
-  if (failed) {
-    return <TwitterFallbackCard url={url} />;
-  }
-
-  if (!checked) {
-    return (
-      <div className="microlink-card block w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-white p-4 shadow-sm animate-pulse">
-        <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-      </div>
-    );
-  }
-
-  return (
-    <div
-      className="twitter-container flex-shrink-0"
-      style={{ width: "320px" }}
-      ref={containerRef}
-    />
-  );
-};
-
-const LinkPreview = ({ url }) => {
-  const platform = getPlatform(url);
-
-  if (platform === "instagram") {
-    return <InstagramEmbed url={url} />;
-  }
-
-  if (platform === "twitter") {
-    return <TwitterEmbed url={url} />;
-  }
-
-  if (platform === "youtube") {
-    const videoId = getYouTubeId(url);
-    if (videoId) {
-      return (
-        <div
-          className="rounded-lg overflow-hidden shadow-sm border border-[#c5cae9]"
-          style={{ width: "300px", aspectRatio: "16/9" }}
-        >
-          <iframe
-            width="100%"
-            height="100%"
-            src={`https://www.youtube.com/embed/${videoId}`}
-            title="YouTube video"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
-        </div>
-      );
-    }
-  }
-
-  if (platform === "tiktok") {
-    return <TikTokEmbed url={url} />;
-  }
-
-  if (isGettyUrl(url)) return <GettyCard url={url} />;
-  if (isFacebookUrl(url)) return <FacebookCard url={url} />;
-
-  return <ArticlePreviewCard url={url} />;
-};
-
+/* ------------------------------------------------------------------ */
+/*  Guest card — full details always visible (default view)            */
+/*  Rendered inside a CSS grid with items-start so uneven card heights */
+/*  don't stretch neighboring cards or leave blank gaps.               */
+/* ------------------------------------------------------------------ */
 const GuestCard = ({ record }) => {
   const f = record.fields || {};
   const urls = splitUrls(f["URLS"]);
@@ -829,6 +99,10 @@ const GuestCard = ({ record }) => {
   );
 };
 
+/* ------------------------------------------------------------------ */
+/*  Compact guest row — collapsed by default, expands on click.        */
+/*  Alternate view for browsing the list quickly.                      */
+/* ------------------------------------------------------------------ */
 const GuestRow = ({ record }) => {
   const f = record.fields || {};
   const [open, setOpen] = useState(false);
@@ -836,6 +110,9 @@ const GuestRow = ({ record }) => {
   const hasDetails =
     !!f["NOTES"] || !!f["CAPTION(S)"] || !!f["SPECIAL ROLE / MOMENT"] || urls.length > 0;
 
+  /* Expanding a row reveals new blockquotes that the page-level embed
+     effect never saw (it only fires on filter/tab/search changes) —
+     so tell Instagram/X to re-scan the page right when this opens. */
   useEffect(() => {
     if (!open) return;
     const timer = setTimeout(() => {
@@ -915,6 +192,11 @@ const GuestRow = ({ record }) => {
   );
 };
 
+/* ------------------------------------------------------------------ */
+/*  Wedding Details section — plain, page-level layout (matches the    */
+/*  event pages' SOURCES section) instead of a nested card-in-card.    */
+/*  Combines every row's links from this section into one flowing grid.*/
+/* ------------------------------------------------------------------ */
 const WeddingDetailsSection = ({
   title,
   records,
@@ -925,6 +207,10 @@ const WeddingDetailsSection = ({
   const allUrls = records.flatMap((r) => splitUrls(r.fields?.["URLS"]));
   const notes = records.map((r) => r.fields?.["NOTES"]).filter(Boolean);
 
+  // Embeds (Instagram/X/YouTube/TikTok) run much taller than article
+  // preview cards. Flexbox stretches every item in a row to match the
+  // tallest one, so keeping them in separate rows/groups stops a short
+  // article card from ballooning to match a tall embed beside it.
   const embedPlatforms = new Set(["instagram", "twitter", "youtube", "tiktok"]);
   const embedUrls = allUrls.filter((u) => embedPlatforms.has(getPlatform(u)));
   const articleUrls = allUrls.filter((u) => !embedPlatforms.has(getPlatform(u)));
@@ -973,22 +259,31 @@ const WeddingDetailsSection = ({
   );
 };
 
+/* ------------------------------------------------------------------ */
+/*  Main page                                                          */
+/* ------------------------------------------------------------------ */
 export default function WeddingPage() {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("guests");
+  const [activeTab, setActiveTab] = useState("guests"); // "guests" | "details"
+  // Tracks which tabs have ever been visited. Content only mounts the
+  // first time a tab is opened, then stays mounted (just hidden/shown)
+  // afterward — this avoids the "hidden panel never gets Instagram
+  // embeds processed" problem entirely, since a panel is only ever
+  // hidden AFTER its embeds already finished rendering, never before.
   const [visitedTabs, setVisitedTabs] = useState({ guests: true, details: false });
 
   const switchTab = (tab) => {
     setActiveTab(tab);
     setVisitedTabs((v) => (v[tab] ? v : { ...v, [tab]: true }));
   };
-  const [viewMode, setViewMode] = useState("card");
-  const [activeGuestTypes, setActiveGuestTypes] = useState([]);
+  const [viewMode, setViewMode] = useState("card"); // "card" | "compact" — card is default
+  const [activeGuestTypes, setActiveGuestTypes] = useState([]); // empty = all
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef(null);
 
+  /* Fetch ALL rows, paginating past Airtable's 100-record page limit */
   useEffect(() => {
     const fetchAll = async () => {
       setLoading(true);
@@ -1023,6 +318,11 @@ export default function WeddingPage() {
     fetchAll();
   }, []);
 
+  /* Kick off Instagram/X script downloads the instant the page mounts —
+     don't wait on the guest data fetch. This is what makes embeds on
+     event pages feel instant: the script is already loaded and parsed
+     by the time any blockquote exists in the DOM, instead of only
+     starting to download after all 200+ guest records have arrived. */
   useEffect(() => {
     if (!document.getElementById("instagram-embed-script")) {
       const s = document.createElement("script");
@@ -1039,8 +339,18 @@ export default function WeddingPage() {
       s.async = true;
       document.body.appendChild(s);
     }
+    // Note: TikTok's script is intentionally NOT loaded here — it only
+    // seems to process blockquotes present at the moment it executes
+    // (no reliable public "rescan" API like Instagram/X have), so it
+    // needs to be reloaded whenever new TikTok blockquotes are added.
+    // See the effect below.
   }, []);
 
+  /* Re-process embeds whenever the visible set changes. Instagram/X
+     just get told to rescan (scripts already loaded above). TikTok
+     has to be fully reloaded each time to pick up new blockquotes —
+     this does mean re-downloading it on every filter/search change,
+     but that's the tradeoff needed for it to reliably work at all. */
   useEffect(() => {
     const process = () => {
       if (window.instgrm) window.instgrm.Embeds.process();
@@ -1061,6 +371,7 @@ export default function WeddingPage() {
     return () => clearTimeout(timer);
   }, [records, activeTab, activeGuestTypes, searchQuery, viewMode]);
 
+  /* Close the dropdown when clicking outside it */
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -1079,13 +390,16 @@ export default function WeddingPage() {
           const aHasUrls = splitUrls(a.fields["URLS"]).length > 0;
           const bHasUrls = splitUrls(b.fields["URLS"]).length > 0;
 
+          // Guests with links float to the top as a group
           if (aHasUrls !== bHasUrls) return aHasUrls ? -1 : 1;
 
+          // Within each group, sort alphabetically by name
           return (a.fields["Name"] || "").localeCompare(b.fields["Name"] || "");
         }),
     [records]
   );
 
+  // All non-guest Article/Video rows
   const coverageRecords = useMemo(
     () =>
       records.filter(
@@ -1097,6 +411,10 @@ export default function WeddingPage() {
     [records]
   );
 
+  // Split coverage rows: the "couldn't attend" row gets its own section,
+  // everything else is general Wedding Details. Normalized match (strips
+  // punctuation/spacing/case) so curly vs straight apostrophes, extra
+  // spaces, etc. can't silently break the split.
   const normalizeForMatch = (s) => (s || "").toLowerCase().replace(/[^a-z]/g, "");
 
   const uninvitedRecords = useMemo(
@@ -1164,6 +482,7 @@ export default function WeddingPage() {
           T&amp;T&apos;s Wedding
         </h1>
 
+        {/* Tab toggle */}
         <div className="flex justify-center gap-2 mb-6">
           <button
             onClick={() => switchTab("guests")}
@@ -1187,6 +506,7 @@ export default function WeddingPage() {
           </button>
         </div>
 
+        {/* Card / Compact view toggle — only relevant on Guest List */}
         {activeTab === "guests" && !loading && (
           <div className="flex justify-center gap-1.5 mb-6">
             <button
@@ -1223,7 +543,12 @@ export default function WeddingPage() {
           </div>
         ) : (
           <div>
+            {/* Guest List is the default tab, so it's always mounted.
+                Simple hidden toggle is safe here since it was already
+                visible (and its embeds already processed) before any
+                hiding ever happens. */}
             <div className={activeTab === "guests" ? "" : "hidden"}>
+              {/* Search + guest type dropdown filter */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-6">
                 <input
                   type="text"
@@ -1300,10 +625,12 @@ export default function WeddingPage() {
                 )}
               </div>
 
+              {/* Result count */}
               <p className="text-center text-xs text-[#6b7db3] mb-4">
                 Showing {filteredGuests.length} of {guestRecords.length} guests
               </p>
 
+              {/* Guest list — Card view (grid) or Compact view (stacked rows) */}
               {filteredGuests.length > 0 ? (
                 viewMode === "card" ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
@@ -1325,6 +652,10 @@ export default function WeddingPage() {
               )}
             </div>
 
+            {/* Wedding Details only mounts the first time you actually
+                open the tab — its first visit has a brief real loading
+                moment (unavoidable network fetch), but it's only ever
+                hidden AFTER that succeeds, so embeds never get skipped. */}
             {visitedTabs.details && (
               <div className={activeTab === "details" ? "" : "hidden"}>
                 <div className="flex flex-col gap-10">
