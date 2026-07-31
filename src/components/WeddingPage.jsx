@@ -471,6 +471,7 @@ const KNOWN_BROKEN_INSTAGRAM_SHORTCODES = [
   "DaYHHblnJBN",
   "DaYUukgRlJS",
   "DaYGExuqtf_",
+  "DaalpkslSDf7ZmfMs7Adl3nSIZBgh8zZ_HoXGI0",
 ];
 
 const getInstagramShortcode = (url) => {
