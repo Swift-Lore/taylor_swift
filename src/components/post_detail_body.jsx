@@ -1053,9 +1053,6 @@ const twitterUrls = event?.TWITTER
       })
   : [];
 
-const getEmbedJustifyClass = (count) => {
-  return count >= 4 ? "justify-start" : "justify-center";
-};
   // ---- MAIN RENDER ----
   return (
     <div className="bg-[#e6edf7] py-8 md:py-12">
@@ -1346,9 +1343,7 @@ if (isFacebook) {
       {event.INSTAGRAM && (
         <section className="w-full px-4 mb-10">
           <div
-            className={`flex flex-wrap gap-6 mt-2 max-w-[1400px] mx-auto items-start ${getEmbedJustifyClass(
-              instagramUrls.length
-            )}`}
+            className="flex flex-wrap gap-6 mt-2 max-w-[1400px] mx-auto items-start justify-start"
           >
             {instagramUrls.map((url, index) => {
               // We check if this is the problematic Travis Kelce post to show the card immediately
@@ -1402,9 +1397,7 @@ const isTravisPost = url.includes("DMgXbQ0yWqW") || url.includes("DP5R6pwEXdY") 
       {event.TWITTER && (
   <section className="w-full px-4 mb-10">
     <div
-      className={`flex flex-wrap gap-6 mt-2 max-w-[1400px] mx-auto ${getEmbedJustifyClass(
-        twitterUrls.length
-      )}`}
+      className="flex flex-wrap gap-6 mt-2 max-w-[1400px] mx-auto items-start justify-start"
     >
       {twitterUrls.map((url, index) => (
         <TwitterEmbed key={index} url={url} />
