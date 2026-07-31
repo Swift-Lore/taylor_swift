@@ -1118,7 +1118,7 @@ const twitterUrls = event?.TWITTER
 
       {/* NOTES + SOURCES */}
       {(hasNotes || hasSources) && (
-        <section className="max-w-4xl mx-auto px-4 mb-10">
+        <section className="max-w-6xl mx-auto px-4 mb-10">
           {hasNotes && (
             <div className="text-sm md:text-base text-[#111827] leading-relaxed mb-6 bg-white/70 rounded-xl p-4 border border-[#e3d5dd]">
               <span className="font-semibold">Notes: </span>
@@ -1364,7 +1364,7 @@ if (isFacebook) {
       {event.INSTAGRAM && (
         <section className="w-full px-4 mb-10">
           <div
-            className="flex flex-wrap gap-6 mt-2 max-w-4xl mx-auto items-start justify-start"
+            className="flex flex-wrap gap-6 mt-2 max-w-6xl mx-auto items-start justify-start"
           >
             {instagramUrls.map((url, index) => {
               // We check if this is the problematic Travis Kelce post to show the card immediately
@@ -1418,7 +1418,7 @@ const isTravisPost = url.includes("DMgXbQ0yWqW") || url.includes("DP5R6pwEXdY") 
       {event.TWITTER && (
   <section className="w-full px-4 mb-10">
     <div
-      className="flex flex-wrap gap-6 mt-2 max-w-4xl mx-auto items-start justify-start"
+      className="flex flex-wrap gap-6 mt-2 max-w-6xl mx-auto items-start justify-start"
     >
       {twitterUrls.map((url, index) => (
         <TwitterEmbed key={index} url={url} />
