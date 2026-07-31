@@ -575,45 +575,31 @@ export const ArticlePreviewCard = ({ url }) => {
 
 /* ------------------------------------------------------------------ */
 /*  Pinterest embed (used inline wherever an image grid needs a live   */
-/*  Pinterest pin instead of a static screenshot). Uses Pinterest's    */
-/*  official data-pin-do markup + pinit.js (already loaded on both     */
-/*  pages) instead of a raw iframe — the raw iframe approach forces a  */
-/*  fixed box that doesn't match what Pinterest actually renders       */
-/*  inside it, causing mismatched borders/whitespace. The official     */
-/*  markup lets Pinterest size itself correctly.                       */
+/*  Pinterest pin instead of a static screenshot). Uses a plain iframe */
+/*  — Pinterest's official JS-widget approach (data-pin-do) directly   */
+/*  manipulates the DOM in ways React doesn't track, and in practice   */
+/*  that caused the built widget to detach and render somewhere else   */
+/*  entirely on the page (down near the footer) instead of staying     */
+/*  inline. An iframe is sandboxed and can't do that — it always       */
+/*  stays exactly where it's placed. No extra decorative border/       */
+/*  rounded-corner wrapper around it, since that mismatched what       */
+/*  Pinterest renders inside on its own.                               */
 /* ------------------------------------------------------------------ */
 
-export const PinterestEmbed = ({ url }) => {
+export const PinterestEmbed = ({ url, width = 420, height = 300 }) => {
   const pinId = getPinterestPinId(url);
-  const containerRef = useRef(null);
-
-  useEffect(() => {
-    if (!pinId) return;
-    // Re-run Pinterest's builder for pins added after the script's
-    // initial page-load scan (same reprocess pattern as Instagram/X).
-    const tryBuild = () => {
-      if (window.PinUtils?.build) {
-        window.PinUtils.build();
-        return true;
-      }
-      return false;
-    };
-    if (!tryBuild()) {
-      const interval = setInterval(() => {
-        if (tryBuild()) clearInterval(interval);
-      }, 300);
-      return () => clearInterval(interval);
-    }
-  }, [pinId]);
-
   if (!pinId) return null;
 
   return (
-    <div ref={containerRef} style={{ width: "auto" }}>
-      <a data-pin-do="embedPin" data-pin-width="medium" href={url}>
-        {url}
-      </a>
-    </div>
+    <iframe
+      src={`https://assets.pinterest.com/ext/embed.html?id=${pinId}`}
+      width={width}
+      height={height}
+      frameBorder="0"
+      scrolling="no"
+      style={{ border: "0", overflow: "hidden" }}
+      title="Pinterest pin"
+    />
   );
 };
 
