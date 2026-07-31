@@ -85,6 +85,27 @@ function ErasTourShowsPage() {
 
 /* ------------ App root ------------ */
 
+// Loads the AdSense script exactly once. Pulled out to its own function
+// so it can be called both on mount (covers returning visitors who
+// already have the consent cookie set before the app even loads) AND
+// from the cookie banner's onAccept handler (covers first-time visitors,
+// who by definition can only click "Accept" AFTER the page has already
+// mounted — the old mount-only useEffect never re-checked, so ads never
+// loaded for anyone accepting the banner live).
+function loadAdSenseScript() {
+  const existingScript = document.querySelector(
+    'script[src*="googlesyndication.com"]'
+  );
+  if (existingScript) return;
+
+  const script = document.createElement("script");
+  script.src =
+    "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4534610257929133";
+  script.async = true;
+  script.crossOrigin = "anonymous";
+  document.head.appendChild(script);
+}
+
 function App() {
   useEffect(() => {
     // We only load ads in the real live site, not the Bolt preview
@@ -93,16 +114,7 @@ function App() {
     const hasConsent = document.cookie.includes("websiteCookieConsent=true");
     if (!hasConsent) return;
 
-    // Check if we already added the script so we don't do it twice
-    const existingScript = document.querySelector('script[src*="googlesyndication.com"]');
-    
-    if (!existingScript) {
-      const script = document.createElement("script");
-      script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4534610257929133";
-      script.async = true;
-      script.crossOrigin = "anonymous";
-      document.head.appendChild(script);
-    }
+    loadAdSenseScript();
   }, []);
   return (
     <>
@@ -145,7 +157,9 @@ function App() {
         cookieName="websiteCookieConsent"
           sameSite="Lax"
         onAccept={() => {
-}}
+          if (!import.meta.env.PROD) return;
+          loadAdSenseScript();
+        }}
 onDecline={() => {
 }}
         style={{
