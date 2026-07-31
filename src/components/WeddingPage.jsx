@@ -428,6 +428,84 @@ const TikTokEmbed = ({ url }) => {
   );
 };
 
+const InstagramEmbed = ({ url }) => {
+  const [timedOut, setTimedOut] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    setTimedOut(false);
+    // If Instagram's script never swaps the blockquote for a real
+    // iframe within a few seconds, give up and show a clean link
+    // instead. This is the fix for embeds that hang forever with no
+    // error — most commonly a private account's post, which Instagram
+    // legitimately can't render but also never reports as failed.
+    const timer = setTimeout(() => {
+      const hasIframe = containerRef.current?.querySelector("iframe");
+      if (!hasIframe) setTimedOut(true);
+    }, 6000);
+    return () => clearTimeout(timer);
+  }, [url]);
+
+  if (timedOut) {
+    return (
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-3 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-0.5 group"
+        style={{ width: "326px" }}
+      >
+        <div className="w-10 h-10 rounded-lg bg-gradient-to-tr from-[#f9ce67] via-[#e85a19] to-[#415dc3] flex items-center justify-center text-white shadow-sm flex-shrink-0">
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+          </svg>
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-[#3d3d6b] group-hover:text-[#b66b6b] transition-colors">
+            View Instagram post
+          </p>
+          <p className="text-xs text-gray-500 truncate">instagram.com</p>
+        </div>
+      </a>
+    );
+  }
+
+  return (
+    <div
+      ref={containerRef}
+      className="instagram-container flex flex-col items-center"
+      style={{ width: "326px" }}
+    >
+      <blockquote
+        className="instagram-media"
+        data-instgrm-captioned
+        data-instgrm-permalink={url}
+        data-instgrm-version="14"
+        style={{
+          background: "#FFF",
+          borderRadius: "8px",
+          border: "1px solid #dbdbdb",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          margin: "0",
+          width: "326px",
+          padding: "0",
+        }}
+      >
+        <div style={{ padding: "16px" }}>
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 text-sm font-medium"
+          >
+            View Instagram post
+          </a>
+        </div>
+      </blockquote>
+    </div>
+  );
+};
+
 /* ------------------------------------------------------------------ */
 /*  Single link renderer — picks the right embed/card per platform     */
 /* ------------------------------------------------------------------ */
@@ -435,39 +513,7 @@ const LinkPreview = ({ url }) => {
   const platform = getPlatform(url);
 
   if (platform === "instagram") {
-    return (
-      <div
-        className="instagram-container flex flex-col items-center"
-        style={{ width: "326px" }}
-      >
-        <blockquote
-          className="instagram-media"
-          data-instgrm-captioned
-          data-instgrm-permalink={url}
-          data-instgrm-version="14"
-          style={{
-            background: "#FFF",
-            borderRadius: "8px",
-            border: "1px solid #dbdbdb",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-            margin: "0",
-            width: "326px",
-            padding: "0",
-          }}
-        >
-          <div style={{ padding: "16px" }}>
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-500 text-sm font-medium"
-            >
-              View Instagram post
-            </a>
-          </div>
-        </blockquote>
-      </div>
-    );
+    return <InstagramEmbed url={url} />;
   }
 
   if (platform === "twitter") {
@@ -809,24 +855,18 @@ export default function WeddingPage() {
       s.async = true;
       document.body.appendChild(s);
     }
-
-    if (!document.getElementById("tiktok-embed-script")) {
-      const s = document.createElement("script");
-      s.id = "tiktok-embed-script";
-      s.src = "https://www.tiktok.com/embed.js";
-      s.async = true;
-      document.body.appendChild(s);
-    }
+    // Note: TikTok's script is intentionally NOT loaded here — it only
+    // seems to process blockquotes present at the moment it executes
+    // (no reliable public "rescan" API like Instagram/X have), so it
+    // needs to be reloaded whenever new TikTok blockquotes are added.
+    // See the effect below.
   }, []);
 
-  /* Re-process embeds whenever the visible set changes — the scripts
-     are already loaded (effect above), so this just tells them to scan
-     the page for new blockquotes. Fires twice like the event pages do
-     (immediate + a follow-up beat later) to reliably catch everything.
-     TikTok's script auto-scans the DOM on its own via MutationObserver,
-     so unlike Instagram/X it doesn't need an explicit process() call —
-     and critically, it must NEVER be destroyed/recreated here, since
-     doing that on every keystroke is what caused the retry-storm bug. */
+  /* Re-process embeds whenever the visible set changes. Instagram/X
+     just get told to rescan (scripts already loaded above). TikTok
+     has to be fully reloaded each time to pick up new blockquotes —
+     this does mean re-downloading it on every filter/search change,
+     but that's the tradeoff needed for it to reliably work at all. */
   useEffect(() => {
     const process = () => {
       if (window.instgrm) window.instgrm.Embeds.process();
@@ -834,6 +874,15 @@ export default function WeddingPage() {
     };
     process();
     const timer = setTimeout(process, 500);
+
+    const timestamp = Date.now();
+    const existingTikTok = document.getElementById("tiktok-embed-script");
+    if (existingTikTok) existingTikTok.remove();
+    const tiktokScript = document.createElement("script");
+    tiktokScript.id = "tiktok-embed-script";
+    tiktokScript.src = `https://www.tiktok.com/embed.js?t=${timestamp}`;
+    tiktokScript.async = true;
+    document.body.appendChild(tiktokScript);
 
     return () => clearTimeout(timer);
   }, [records, activeTab, activeGuestTypes, searchQuery, viewMode]);
