@@ -7,9 +7,25 @@ export default async function handler(req, res) {
 
   const titleFromSlug = () => {
   const slug = new URL(url).pathname.split('/').filter(Boolean).pop() || '';
-  const cleaned = slug
-    .replace(/\.\w+$/, '')
-    .replace(/[-_]/g, ' ')
+  const withoutExt = slug.replace(/\.\w+$/, '');
+
+  // Split into tokens, then trim any trailing purely-numeric token (an
+  // internal tracking ID) AND, if the token right before it is the bare
+  // word "source" (People.com's convention: "...headline-source-1234567"),
+  // drop that too — it's the same tracking-suffix artifact, not real
+  // content. This only touches slug-derived text, never a real scraped
+  // og:title, so it can't accidentally cut a genuine headline that
+  // legitimately ends in the word "Source" as tabloid attribution.
+  const tokens = withoutExt.split(/[-_]+/).filter(Boolean);
+  while (tokens.length > 0 && /^\d+$/.test(tokens[tokens.length - 1])) {
+    tokens.pop();
+    if (tokens.length > 0 && tokens[tokens.length - 1].toLowerCase() === 'source') {
+      tokens.pop();
+    }
+  }
+
+  const cleaned = tokens
+    .join(' ')
     .replace(/\b\w/g, c => c.toUpperCase())
     .trim();
 
@@ -48,19 +64,21 @@ export default async function handler(req, res) {
   };
 
   // A handful of sites' own og:title tags include a trailing internal
-  // tracking/source ID (e.g. People.com: "...Source 7557276"). These
-  // are real, correctly-scraped titles — just with junk appended — so
-  // strip the known trailing pattern rather than discarding the title.
+  // tracking/source ID (e.g. "...Headline Source 7557276"). This is
+  // unambiguous junk — no real headline ends in "Source" followed by a
+  // raw ID number — so it's safe to strip. A BARE trailing "Source"
+  // with no digits is intentionally NOT touched here: that's a common,
+  // legitimate tabloid headline ending ("...Despite Report: Source",
+  // meaning "according to a source") and stripping it risked cutting
+  // real headlines. The People.com case that looked like a bare
+  // "Source" with no digits was actually our own slug-fallback (fixed
+  // in titleFromSlug above), not a real scraped title missing its ID.
   const cleanTrailingIdJunk = (title) => {
     if (!title) return title;
     return title
       // Handles "...Title Source 7557276", "...Title Source: 7557276",
       // "...Title (Source 7557276)", "...Title - Source: 7557276", etc.
       .replace(/\s*[-–—(]?\s*Source:?\s*\d{4,}\)?\s*$/i, '')
-      // Catches a bare trailing "Source" with no digits attached — can
-      // happen if something upstream (e.g. Microlink) already stripped
-      // the ID number but left the leading word behind.
-      .replace(/\s*[-–—(]?\s*Source:?\)?\s*$/i, '')
       .trim();
   };
 
