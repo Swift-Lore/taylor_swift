@@ -60,7 +60,27 @@ export default async function handler(req, res) {
       'one more step',
       'please wait',
       'checking your browser',
-    ].some((phrase) => lower === phrase || lower.startsWith(phrase));
+      'akamai',
+    ].some((phrase) => lower === phrase || lower.startsWith(phrase) || lower.includes(phrase));
+  };
+
+  // Microlink's own internal fallback, when IT also can't get a real
+  // title, is to just return the raw URL path unprocessed (e.g.
+  // "taylor-swift-pictured-wedding-travis-kelce-tour.html"). That's not
+  // a real headline — treat it the same as a missing title so our own
+  // clean slug-based title gets used instead.
+  const looksLikeRawSlugTitle = (title) => {
+    if (!title) return false;
+    const hyphenCount = (title.match(/-/g) || []).length;
+    return hyphenCount >= 3 && (/\.\w{2,4}$/.test(title.trim()) || !/\s/.test(title));
+  };
+
+  // A bot-block page's og:image is often hosted on the protection
+  // vendor's own branded domain (e.g. akamai.com), not the site's real
+  // image CDN — a simple, reasonably safe way to catch it.
+  const looksLikeBotBlockImage = (imageUrl) => {
+    if (!imageUrl) return false;
+    return /akamai|cloudflare/i.test(imageUrl);
   };
 
   // A handful of sites' own og:title tags include a trailing internal
@@ -123,13 +143,14 @@ const blockedDomains = ['justjared.com', 'justjaredjr.com', 'people.com', 'thesu
       );
       const mlData = await mlRes.json();
       const mlTitle = mlData?.data?.title;
-      if (mlData?.data?.image?.url) {
+      const mlImage = mlData?.data?.image?.url;
+      const titleIsUsable = mlTitle && !isBotChallengeTitle(mlTitle) && !looksLikeRawSlugTitle(mlTitle);
+      const imageIsUsable = mlImage && !looksLikeBotBlockImage(mlImage);
+      if (imageIsUsable) {
         return res.status(200).json({
-          title: cleanTrailingIdJunk(
-            !isBotChallengeTitle(mlTitle) ? mlTitle : null
-          ) || titleFromSlug(),
+          title: cleanTrailingIdJunk(titleIsUsable ? mlTitle : null) || titleFromSlug(),
           description: mlData.data.description || '',
-          image: mlData.data.image.url,
+          image: mlImage,
           domain: blockedMatch,
         });
       }
