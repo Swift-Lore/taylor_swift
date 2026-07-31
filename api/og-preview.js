@@ -27,8 +27,37 @@ export default async function handler(req, res) {
   return cleaned;
 };
 
+  // Titles that mean the scraper got a bot-challenge/interstitial page
+  // instead of the real article (Cloudflare "Verifying Device", etc.) —
+  // treat these exactly like an empty title so the code below falls
+  // through to the Microlink fallback instead of showing this junk.
+  const isBotChallengeTitle = (title) => {
+    if (!title) return false;
+    const lower = title.toLowerCase().trim();
+    return [
+      'verifying device',
+      'verifying you are human',
+      'just a moment',
+      'attention required',
+      'access denied',
+      'are you a human',
+      'one more step',
+      'please wait',
+      'checking your browser',
+    ].some((phrase) => lower === phrase || lower.startsWith(phrase));
+  };
+
+  // A handful of sites' own og:title tags include a trailing internal
+  // tracking/source ID (e.g. People.com: "...Source 7557276"). These
+  // are real, correctly-scraped titles — just with junk appended — so
+  // strip the known trailing pattern rather than discarding the title.
+  const cleanTrailingIdJunk = (title) => {
+    if (!title) return title;
+    return title.replace(/\s+Source\s+\d{4,}\s*$/i, '').trim();
+  };
+
   // Sites that block scrapers — try Microlink first, fall back to slug
-const blockedDomains = ['justjared.com', 'justjaredjr.com', 'people.com', 'thesun.co.uk', 'nytimes.com', 'wsj.com', 'ft.com', 'washingtonpost.com', 'theatlantic.com', 'reutersconnect.com', 'tmz.com', 'dailymail.com', 'today.com', 'thenews.com.pk', 'apple.news', 'usmagazine.com', 'eonline.com', 'pagesix.com', 'etonline.com', 'entertainmenttonight.com'];
+const blockedDomains = ['justjared.com', 'justjaredjr.com', 'people.com', 'thesun.co.uk', 'the-sun.com', 'nytimes.com', 'wsj.com', 'ft.com', 'washingtonpost.com', 'theatlantic.com', 'reutersconnect.com', 'tmz.com', 'dailymail.com', 'today.com', 'thenews.com.pk', 'apple.news', 'usmagazine.com', 'eonline.com', 'pagesix.com', 'etonline.com', 'entertainmenttonight.com'];
   // If URL is a direct image file, return it directly as the preview
   const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
   const pathname = new URL(url).pathname.toLowerCase();
@@ -67,9 +96,12 @@ const blockedDomains = ['justjared.com', 'justjaredjr.com', 'people.com', 'thesu
         { signal: AbortSignal.timeout(5000) }
       );
       const mlData = await mlRes.json();
+      const mlTitle = mlData?.data?.title;
       if (mlData?.data?.image?.url) {
         return res.status(200).json({
-          title: mlData.data.title || titleFromSlug(),
+          title: cleanTrailingIdJunk(
+            !isBotChallengeTitle(mlTitle) ? mlTitle : null
+          ) || titleFromSlug(),
           description: mlData.data.description || '',
           image: mlData.data.image.url,
           domain: blockedMatch,
@@ -109,10 +141,18 @@ const blockedDomains = ['justjared.com', 'justjaredjr.com', 'people.com', 'thesu
       .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(code))
       .replace(/&apos;/g, "'")
 
-    const title = decodeEntities(getMeta('og:title') || html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim() || '');
+    let title = decodeEntities(getMeta('og:title') || html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim() || '');
     const description = decodeEntities(getMeta('og:description') || getMeta('description'));
     let image = getMeta('og:image');
     if (image && image.startsWith('//')) image = 'https:' + image;
+
+    // A bot-challenge title (e.g. "Verifying Device") means we didn't
+    // actually get the real page — treat it as if scraping failed.
+    if (isBotChallengeTitle(title)) {
+      title = '';
+    }
+
+    title = cleanTrailingIdJunk(title);
 
     // If direct scraping came back empty-handed on title AND image, this
     // domain is likely JS-rendered or scraper-blocked too — try Microlink
@@ -125,9 +165,12 @@ const blockedDomains = ['justjared.com', 'justjaredjr.com', 'people.com', 'thesu
           { signal: AbortSignal.timeout(5000) }
         );
         const mlData = await mlRes.json();
-        if (mlData?.data?.image?.url || mlData?.data?.title) {
+        const mlTitle = cleanTrailingIdJunk(
+          !isBotChallengeTitle(mlData?.data?.title) ? mlData?.data?.title : null
+        );
+        if (mlData?.data?.image?.url || mlTitle) {
           return res.status(200).json({
-            title: mlData.data.title || titleFromSlug(),
+            title: mlTitle || titleFromSlug(),
             description: mlData.data.description || '',
             image: mlData.data.image?.url || null,
             domain,
