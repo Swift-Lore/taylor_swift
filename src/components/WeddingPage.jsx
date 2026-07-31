@@ -78,25 +78,35 @@ const getFallbackTitleFromUrl = (url, domain) => {
   try {
     const pathname = new URL(url).pathname;
     const parts = pathname.split("/").filter(Boolean);
-    const slug = parts[parts.length - 1] || "";
+    const slug = (parts[parts.length - 1] || "").replace(/\.\w+$/, "");
 
-    const cleaned = slug
-      .replace(/\.\w+$/, "")
-      .replace(/[-_]+\d+(?:[-_]\d+)*$/, "")
-      .replace(/[-_]+/g, " ")
+    const tokens = slug.split(/[-_]+/).filter(Boolean);
+
+    // Drop tokens that look like IDs rather than real words: pure
+    // numbers ("12013425"), or a mix of letters+digits 6+ chars long
+    // ("rcna353024", "6a4d953ce4b094d71e70f5a5") — these show up as
+    // article-ID fragments and never belong in a displayed headline.
+    const isIdLikeToken = (t) => {
+      if (/^\d+$/.test(t)) return true;
+      if (t.length >= 6 && /\d/.test(t) && /[a-z]/i.test(t)) return true;
+      return false;
+    };
+
+    const realWords = tokens.filter((t) => !isIdLikeToken(t));
+
+    if (realWords.length < 3) return null;
+
+    const cleaned = realWords
+      .join(" ")
       .replace(/\b\w/g, (c) => c.toUpperCase())
       .trim();
 
-    if (cleaned && cleaned.length > 3) {
-      return cleaned;
-    }
-  } catch {}
+    if (cleaned.length < 10) return null;
 
-  return (
-    domain.split(".")[0].charAt(0).toUpperCase() +
-    domain.split(".")[0].slice(1) +
-    " Article"
-  );
+    return cleaned;
+  } catch {
+    return null;
+  }
 };
 
 /* Archive.today handling — same as post_detail_body.jsx */
@@ -295,7 +305,13 @@ const ArticlePreviewCard = ({ url }) => {
     );
   }
 
-  if (isKnownBroken) {
+  const hasImage = !!previewData?.image;
+  const hasTitle = !!previewData?.title;
+
+  // No usable title AND no image — either a known-broken domain, or the
+  // URL slug was too garbled (IDs/hashes) to turn into a real headline.
+  // Same clean "View on Domain" treatment either way.
+  if (!hasImage && !hasTitle) {
     return (
       <a
         href={url}
@@ -317,8 +333,6 @@ const ArticlePreviewCard = ({ url }) => {
       </a>
     );
   }
-
-  const hasImage = !!previewData?.image;
 
   if (!hasImage) {
     return (
@@ -651,6 +665,14 @@ const WeddingDetailsSection = ({ title, records, emptyMessage }) => {
   const allUrls = records.flatMap((r) => splitUrls(r.fields?.["URLS"]));
   const notes = records.map((r) => r.fields?.["NOTES"]).filter(Boolean);
 
+  // Embeds (Instagram/X/YouTube/TikTok) run much taller than article
+  // preview cards. Flexbox stretches every item in a row to match the
+  // tallest one, so keeping them in separate rows/groups stops a short
+  // article card from ballooning to match a tall embed beside it.
+  const embedPlatforms = new Set(["instagram", "twitter", "youtube", "tiktok"]);
+  const embedUrls = allUrls.filter((u) => embedPlatforms.has(getPlatform(u)));
+  const articleUrls = allUrls.filter((u) => !embedPlatforms.has(getPlatform(u)));
+
   return (
     <div>
       <h2 className="text-lg font-serif text-[#3d3d6b] mb-4 text-center">
@@ -670,13 +692,23 @@ const WeddingDetailsSection = ({ title, records, emptyMessage }) => {
         </div>
       )}
 
-      {allUrls.length > 0 ? (
-        <div className="flex flex-wrap gap-6 justify-center">
-          {allUrls.map((url, i) => (
-            <LinkPreview key={i} url={url} />
+      {embedUrls.length > 0 && (
+        <div className="flex flex-wrap gap-6 justify-center items-start mb-8">
+          {embedUrls.map((url, i) => (
+            <LinkPreview key={`embed-${i}`} url={url} />
           ))}
         </div>
-      ) : (
+      )}
+
+      {articleUrls.length > 0 && (
+        <div className="flex flex-wrap gap-6 justify-center items-start">
+          {articleUrls.map((url, i) => (
+            <LinkPreview key={`article-${i}`} url={url} />
+          ))}
+        </div>
+      )}
+
+      {allUrls.length === 0 && (
         <p className="text-center text-[#6b7280] italic">{emptyMessage}</p>
       )}
     </div>
@@ -731,7 +763,11 @@ export default function WeddingPage() {
     fetchAll();
   }, []);
 
-  /* Re-process embed scripts whenever the visible set changes */
+  /* Kick off Instagram/X script downloads the instant the page mounts —
+     don't wait on the guest data fetch. This is what makes embeds on
+     event pages feel instant: the script is already loaded and parsed
+     by the time any blockquote exists in the DOM, instead of only
+     starting to download after all 200+ guest records have arrived. */
   useEffect(() => {
     if (!document.getElementById("instagram-embed-script")) {
       const s = document.createElement("script");
@@ -739,8 +775,6 @@ export default function WeddingPage() {
       s.src = "//www.instagram.com/embed.js";
       s.async = true;
       document.body.appendChild(s);
-    } else if (window.instgrm) {
-      setTimeout(() => window.instgrm.Embeds.process(), 100);
     }
 
     if (!document.getElementById("twitter-embed-script")) {
@@ -748,11 +782,21 @@ export default function WeddingPage() {
       s.id = "twitter-embed-script";
       s.src = "https://platform.twitter.com/widgets.js";
       s.async = true;
-      s.onload = () => window.twttr?.widgets?.load();
       document.body.appendChild(s);
-    } else if (window.twttr?.widgets) {
-      window.twttr.widgets.load();
     }
+  }, []);
+
+  /* Re-process embeds whenever the visible set changes — the scripts
+     are already loaded (effect above), so this just tells them to scan
+     the page for new blockquotes. Fires twice like the event pages do
+     (immediate + a follow-up beat later) to reliably catch everything. */
+  useEffect(() => {
+    const process = () => {
+      if (window.instgrm) window.instgrm.Embeds.process();
+      if (window.twttr?.widgets) window.twttr.widgets.load();
+    };
+    process();
+    const timer = setTimeout(process, 500);
 
     const timestamp = Date.now();
     const existingTikTok = document.getElementById("tiktok-embed-script");
@@ -762,6 +806,8 @@ export default function WeddingPage() {
     tiktokScript.src = `https://www.tiktok.com/embed.js?t=${timestamp}`;
     tiktokScript.async = true;
     document.body.appendChild(tiktokScript);
+
+    return () => clearTimeout(timer);
   }, [records, activeTab, activeGuestTypes, searchQuery, viewMode]);
 
   /* Close the dropdown when clicking outside it */
@@ -805,11 +851,15 @@ export default function WeddingPage() {
   );
 
   // Split coverage rows: the "couldn't attend" row gets its own section,
-  // everything else is general Wedding Details
+  // everything else is general Wedding Details. Normalized match (strips
+  // punctuation/spacing/case) so curly vs straight apostrophes, extra
+  // spaces, etc. can't silently break the split.
+  const normalizeForMatch = (s) => (s || "").toLowerCase().replace(/[^a-z]/g, "");
+
   const uninvitedRecords = useMemo(
     () =>
       coverageRecords.filter((r) =>
-        (r.fields?.["Name"] || "").toLowerCase().includes("couldn't attend")
+        normalizeForMatch(r.fields?.["Name"]).includes("couldntattend")
       ),
     [coverageRecords]
   );
@@ -817,7 +867,7 @@ export default function WeddingPage() {
   const generalDetailRecords = useMemo(
     () =>
       coverageRecords.filter(
-        (r) => !(r.fields?.["Name"] || "").toLowerCase().includes("couldn't attend")
+        (r) => !normalizeForMatch(r.fields?.["Name"]).includes("couldntattend")
       ),
     [coverageRecords]
   );
