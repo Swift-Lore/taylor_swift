@@ -429,22 +429,63 @@ const TikTokEmbed = ({ url }) => {
 };
 
 const InstagramEmbed = ({ url }) => {
+  const [isVisible, setIsVisible] = useState(false);
   const [timedOut, setTimedOut] = useState(false);
-  const containerRef = useRef(null);
+  const elRef = useRef(null);
+
+  // Only start loading once this embed is actually near the visible
+  // area — not the instant it mounts. On Guest List's Card View,
+  // potentially 100+ embeds mount at once; asking Instagram's script
+  // to process all of them simultaneously is what overwhelms it and
+  // causes many to time out. Loading only what's near-screen keeps
+  // the number trying to load at once small, regardless of list size.
+  useEffect(() => {
+    if (isVisible) return;
+    const el = elRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setIsVisible(true);
+      },
+      { rootMargin: "400px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [isVisible]);
 
   useEffect(() => {
+    if (!isVisible) return;
     setTimedOut(false);
+
+    // Nudge Instagram's script right away for this specific embed,
+    // rather than waiting for the next page-level batch process().
+    const kick = setTimeout(() => window.instgrm?.Embeds?.process(), 50);
+
     // If Instagram's script never swaps the blockquote for a real
     // iframe within a few seconds, give up and show a clean link
     // instead. This is the fix for embeds that hang forever with no
     // error — most commonly a private account's post, which Instagram
     // legitimately can't render but also never reports as failed.
     const timer = setTimeout(() => {
-      const hasIframe = containerRef.current?.querySelector("iframe");
+      const hasIframe = elRef.current?.querySelector("iframe");
       if (!hasIframe) setTimedOut(true);
     }, 6000);
-    return () => clearTimeout(timer);
-  }, [url]);
+
+    return () => {
+      clearTimeout(kick);
+      clearTimeout(timer);
+    };
+  }, [isVisible, url]);
+
+  if (!isVisible) {
+    return (
+      <div
+        ref={elRef}
+        style={{ width: "326px", minHeight: "200px" }}
+        className="rounded-lg border border-dashed border-[#c5cae9] bg-white/40"
+      />
+    );
+  }
 
   if (timedOut) {
     return (
@@ -472,7 +513,7 @@ const InstagramEmbed = ({ url }) => {
 
   return (
     <div
-      ref={containerRef}
+      ref={elRef}
       className="instagram-container flex flex-col items-center"
       style={{ width: "326px" }}
     >
