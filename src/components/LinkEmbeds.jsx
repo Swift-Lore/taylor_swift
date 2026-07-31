@@ -586,7 +586,7 @@ export const ArticlePreviewCard = ({ url }) => {
 /*  Pinterest renders inside on its own.                               */
 /* ------------------------------------------------------------------ */
 
-export const PinterestEmbed = ({ url, width = 420, height = 300 }) => {
+export const PinterestEmbed = ({ url, width = 300, height = 450 }) => {
   const pinId = getPinterestPinId(url);
   if (!pinId) return null;
 
