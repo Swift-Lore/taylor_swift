@@ -643,68 +643,41 @@ const GuestRow = ({ record }) => {
 };
 
 /* ------------------------------------------------------------------ */
-/*  Article / Video card — Wedding Details tab                         */
+/*  Wedding Details section — plain, page-level layout (matches the    */
+/*  event pages' SOURCES section) instead of a nested card-in-card.    */
+/*  Combines every row's links from this section into one flowing grid.*/
 /* ------------------------------------------------------------------ */
-const CoverageCard = ({ record }) => {
-  const f = record.fields || {};
-  const urls = splitUrls(f["URLS"]);
+const WeddingDetailsSection = ({ title, records, emptyMessage }) => {
+  const allUrls = records.flatMap((r) => splitUrls(r.fields?.["URLS"]));
+  const notes = records.map((r) => r.fields?.["NOTES"]).filter(Boolean);
 
   return (
-    <div className="bg-white/70 border border-[#c5cae9] rounded-2xl p-4 shadow-sm flex flex-col gap-2">
-      <div className="flex items-start justify-between gap-2 flex-wrap">
-        <h3 className="text-[#3d3d6b] font-semibold text-base">
-          {f["Name"] || "Untitled"}
-        </h3>
-        {f["URL TYPE"] && (
-          <span className="bg-[#8a9ac7] text-white text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
-            {f["URL TYPE"]}
-          </span>
-        )}
-      </div>
+    <div>
+      <h2 className="text-lg font-serif text-[#3d3d6b] mb-4 text-center">
+        {title}
+      </h2>
 
-      {f["NOTES"] && (
-        <p className="text-sm text-[#6b7280] leading-relaxed whitespace-pre-line">{f["NOTES"]}</p>
-      )}
-
-      {urls.length > 0 && (
-        <div className="flex flex-col gap-3 mt-2">
-          {urls.map((url, i) => (
-            <LinkPreview key={i} url={url} />
+      {notes.length > 0 && (
+        <div className="max-w-2xl mx-auto mb-6">
+          {notes.map((note, i) => (
+            <p
+              key={i}
+              className="text-sm text-[#6b7280] leading-relaxed whitespace-pre-line text-center mb-2"
+            >
+              {note}
+            </p>
           ))}
         </div>
       )}
-    </div>
-  );
-};
 
-/* ------------------------------------------------------------------ */
-/*  Guest Reaction card — Wedding Details tab, GUEST REACTIONS field   */
-/*  on guest rows (links to their own posts/interviews/articles about  */
-/*  the wedding, separate from the guest-sighting links in URLS).      */
-/* ------------------------------------------------------------------ */
-const GuestReactionCard = ({ record }) => {
-  const f = record.fields || {};
-  const urls = splitUrls(f["GUEST REACTIONS"]);
-
-  return (
-    <div className="bg-white/70 border border-[#c5cae9] rounded-2xl p-4 shadow-sm flex flex-col gap-2">
-      <div className="flex items-start justify-between gap-2 flex-wrap">
-        <h3 className="text-[#3d3d6b] font-semibold text-base">
-          {f["Name"] || "Unnamed Guest"}
-        </h3>
-        {f["GUEST TYPE"] && (
-          <span className="bg-[#c5cae9] text-[#3d3d6b] text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
-            {f["GUEST TYPE"]}
-          </span>
-        )}
-      </div>
-
-      {urls.length > 0 && (
-        <div className="flex flex-col gap-3 mt-2">
-          {urls.map((url, i) => (
+      {allUrls.length > 0 ? (
+        <div className="flex flex-wrap gap-6 justify-center">
+          {allUrls.map((url, i) => (
             <LinkPreview key={i} url={url} />
           ))}
         </div>
+      ) : (
+        <p className="text-center text-[#6b7280] italic">{emptyMessage}</p>
       )}
     </div>
   );
@@ -819,6 +792,7 @@ export default function WeddingPage() {
     [records]
   );
 
+  // All non-guest Article/Video rows
   const coverageRecords = useMemo(
     () =>
       records.filter(
@@ -830,14 +804,22 @@ export default function WeddingPage() {
     [records]
   );
 
-  const guestReactionRecords = useMemo(
+  // Split coverage rows: the "couldn't attend" row gets its own section,
+  // everything else is general Wedding Details
+  const uninvitedRecords = useMemo(
     () =>
-      records
-        .filter((r) => splitUrls(r.fields?.["GUEST REACTIONS"]).length > 0)
-        .sort((a, b) =>
-          (a.fields["Name"] || "").localeCompare(b.fields["Name"] || "")
-        ),
-    [records]
+      coverageRecords.filter((r) =>
+        (r.fields?.["Name"] || "").toLowerCase().includes("couldn't attend")
+      ),
+    [coverageRecords]
+  );
+
+  const generalDetailRecords = useMemo(
+    () =>
+      coverageRecords.filter(
+        (r) => !(r.fields?.["Name"] || "").toLowerCase().includes("couldn't attend")
+      ),
+    [coverageRecords]
   );
 
   const filteredGuests = useMemo(() => {
@@ -1055,41 +1037,16 @@ export default function WeddingPage() {
           </>
         ) : (
           <div className="flex flex-col gap-10">
-            {/* Wedding coverage: articles & videos */}
-            <div>
-              <h2 className="text-lg font-serif text-[#3d3d6b] mb-4 text-center">
-                Articles &amp; Videos
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-                {coverageRecords.length > 0 ? (
-                  coverageRecords.map((r) => (
-                    <CoverageCard key={r.id} record={r} />
-                  ))
-                ) : (
-                  <p className="col-span-2 text-center text-[#6b7280] italic">
-                    No articles or videos added yet.
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Guest reactions: guests commenting on the wedding */}
-            <div>
-              <h2 className="text-lg font-serif text-[#3d3d6b] mb-4 text-center">
-                Guest Reactions
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-                {guestReactionRecords.length > 0 ? (
-                  guestReactionRecords.map((r) => (
-                    <GuestReactionCard key={r.id} record={r} />
-                  ))
-                ) : (
-                  <p className="col-span-2 text-center text-[#6b7280] italic">
-                    No guest reactions added yet.
-                  </p>
-                )}
-              </div>
-            </div>
+            <WeddingDetailsSection
+              title="Wedding Details"
+              records={generalDetailRecords}
+              emptyMessage="No wedding details added yet."
+            />
+            <WeddingDetailsSection
+              title="Guests Who Couldn't Attend"
+              records={uninvitedRecords}
+              emptyMessage="Nothing added yet."
+            />
           </div>
         )}
       </div>
