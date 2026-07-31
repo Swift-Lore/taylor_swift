@@ -16,8 +16,13 @@ export default async function handler(req, res) {
   // content. This only touches slug-derived text, never a real scraped
   // og:title, so it can't accidentally cut a genuine headline that
   // legitimately ends in the word "Source" as tabloid attribution.
+  // A trailing token counts as an internal tracking ID if it's either
+  // purely numeric ("7557276") OR a short letter-prefix + digits, a
+  // common CMS pattern ("w212293", "a123456") — not just pure numbers.
+  const isTrailingIdToken = (t) => /^\d+$/.test(t) || /^[a-z]{1,3}\d{3,}$/i.test(t);
+
   const tokens = withoutExt.split(/[-_]+/).filter(Boolean);
-  while (tokens.length > 0 && /^\d+$/.test(tokens[tokens.length - 1])) {
+  while (tokens.length > 0 && isTrailingIdToken(tokens[tokens.length - 1])) {
     tokens.pop();
     if (tokens.length > 0 && tokens[tokens.length - 1].toLowerCase() === 'source') {
       tokens.pop();
