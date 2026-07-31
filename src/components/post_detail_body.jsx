@@ -522,12 +522,7 @@ const twitterUrls = event?.TWITTER
 
                     if (isPinterest && pinId) {
                       return (
-                        <PinterestEmbed
-                          key={`img-${index}`}
-                          url={url}
-                          width={420}
-                          height={300}
-                        />
+                        <PinterestEmbed key={`img-${index}`} url={url} />
                       );
                     }
 
