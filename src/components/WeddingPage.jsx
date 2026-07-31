@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef } from "react";
 import axios from "axios";
-import { LinkPreview, getPlatform } from "./shared/LinkEmbeds";
+import { LinkPreview, getPlatform } from "./LinkEmbeds";
 
 /* ------------------------------------------------------------------ */
 /*  CONFIG — update these two if your base/table ever changes          */
