@@ -990,126 +990,135 @@ export default function WeddingPage() {
               />
             ))}
           </div>
-        ) : activeTab === "guests" ? (
+        ) : (
           <>
-            {/* Search + guest type dropdown filter */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-6">
-              <input
-                type="text"
-                placeholder="Search guest name..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full sm:w-56 rounded-full py-1.5 px-4 text-sm bg-white text-[#3d3d6b] border border-[#6b7db3] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#fbb1c3]"
-              />
+            {/* Guest List — kept mounted even when hidden so switching
+                tabs is instant and nothing has to re-fetch/re-render */}
+            <div className={activeTab === "guests" ? "" : "hidden"}>
+              {/* Search + guest type dropdown filter */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-6">
+                <input
+                  type="text"
+                  placeholder="Search guest name..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full sm:w-56 rounded-full py-1.5 px-4 text-sm bg-white text-[#3d3d6b] border border-[#6b7db3] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#fbb1c3]"
+                />
 
-              <div className="relative" ref={dropdownRef}>
-                <button
-                  onClick={() => setShowTypeDropdown((s) => !s)}
-                  className="flex items-center justify-between gap-2 bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-1.5 text-sm min-w-[220px]"
-                >
-                  <span>
-                    {activeGuestTypes.length > 0
-                      ? `${activeGuestTypes.length} type${
-                          activeGuestTypes.length > 1 ? "s" : ""
-                        } selected`
-                      : `Filter by guest type (${guestRecords.length})`}
-                  </span>
-                  <span className="ml-2">▼</span>
-                </button>
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setShowTypeDropdown((s) => !s)}
+                    className="flex items-center justify-between gap-2 bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-1.5 text-sm min-w-[220px]"
+                  >
+                    <span>
+                      {activeGuestTypes.length > 0
+                        ? `${activeGuestTypes.length} type${
+                            activeGuestTypes.length > 1 ? "s" : ""
+                          } selected`
+                        : `Filter by guest type (${guestRecords.length})`}
+                    </span>
+                    <span className="ml-2">▼</span>
+                  </button>
 
-                {showTypeDropdown && (
-                  <div className="absolute left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 top-full mt-1 w-[90vw] sm:w-72 max-w-[90vw] bg-white border border-[#6b7db3] rounded-lg shadow-lg z-50 max-h-[60vh] overflow-y-auto">
-                    <div className="p-2">
-                      <button
-                        className="w-full text-left px-3 py-2 text-sm hover:bg-[#e6edf7] rounded mb-1 font-medium text-[#3d3d6b]"
-                        onClick={() => setActiveGuestTypes([])}
-                      >
-                        All Guests ({guestRecords.length})
-                      </button>
+                  {showTypeDropdown && (
+                    <div className="absolute left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 top-full mt-1 w-[90vw] sm:w-72 max-w-[90vw] bg-white border border-[#6b7db3] rounded-lg shadow-lg z-50 max-h-[60vh] overflow-y-auto">
+                      <div className="p-2">
+                        <button
+                          className="w-full text-left px-3 py-2 text-sm hover:bg-[#e6edf7] rounded mb-1 font-medium text-[#3d3d6b]"
+                          onClick={() => setActiveGuestTypes([])}
+                        >
+                          All Guests ({guestRecords.length})
+                        </button>
 
-                      <div className="max-h-[50vh] overflow-y-auto">
-                        {GUEST_TYPES.filter((t) => guestTypeCounts[t]).map(
-                          (type) => (
-                            <div
-                              key={type}
-                              className="flex items-center px-3 py-2"
-                            >
-                              <input
-                                type="checkbox"
-                                id={`guest-type-${type}`}
-                                checked={activeGuestTypes.includes(type)}
-                                onChange={() => toggleGuestType(type)}
-                                className="mr-2"
-                              />
-                              <label
-                                htmlFor={`guest-type-${type}`}
-                                className="text-sm cursor-pointer flex-1"
+                        <div className="max-h-[50vh] overflow-y-auto">
+                          {GUEST_TYPES.filter((t) => guestTypeCounts[t]).map(
+                            (type) => (
+                              <div
+                                key={type}
+                                className="flex items-center px-3 py-2"
                               >
-                                {type}
-                              </label>
-                              <span className="text-xs text-gray-400">
-                                {guestTypeCounts[type]}
-                              </span>
-                            </div>
-                          )
-                        )}
+                                <input
+                                  type="checkbox"
+                                  id={`guest-type-${type}`}
+                                  checked={activeGuestTypes.includes(type)}
+                                  onChange={() => toggleGuestType(type)}
+                                  className="mr-2"
+                                />
+                                <label
+                                  htmlFor={`guest-type-${type}`}
+                                  className="text-sm cursor-pointer flex-1"
+                                >
+                                  {type}
+                                </label>
+                                <span className="text-xs text-gray-400">
+                                  {guestTypeCounts[type]}
+                                </span>
+                              </div>
+                            )
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
+                </div>
+
+                {hasActiveFilters && (
+                  <button
+                    onClick={clearFilters}
+                    className="text-xs font-medium px-3 py-1.5 rounded-full bg-[#8e3e3e] text-white hover:bg-[#7a3434] transition-colors whitespace-nowrap"
+                  >
+                    Clear Filters ✕
+                  </button>
                 )}
               </div>
 
-              {hasActiveFilters && (
-                <button
-                  onClick={clearFilters}
-                  className="text-xs font-medium px-3 py-1.5 rounded-full bg-[#8e3e3e] text-white hover:bg-[#7a3434] transition-colors whitespace-nowrap"
-                >
-                  Clear Filters ✕
-                </button>
+              {/* Result count */}
+              <p className="text-center text-xs text-[#6b7db3] mb-4">
+                Showing {filteredGuests.length} of {guestRecords.length} guests
+              </p>
+
+              {/* Guest list — Card view (grid) or Compact view (stacked rows) */}
+              {filteredGuests.length > 0 ? (
+                viewMode === "card" ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                    {filteredGuests.map((r) => (
+                      <GuestCard key={r.id} record={r} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {filteredGuests.map((r) => (
+                      <GuestRow key={r.id} record={r} />
+                    ))}
+                  </div>
+                )
+              ) : (
+                <p className="text-center text-[#6b7280] italic py-6">
+                  No guests match that search/filter yet.
+                </p>
               )}
             </div>
 
-            {/* Result count */}
-            <p className="text-center text-xs text-[#6b7db3] mb-4">
-              Showing {filteredGuests.length} of {guestRecords.length} guests
-            </p>
-
-            {/* Guest list — Card view (grid) or Compact view (stacked rows) */}
-            {filteredGuests.length > 0 ? (
-              viewMode === "card" ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-                  {filteredGuests.map((r) => (
-                    <GuestCard key={r.id} record={r} />
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  {filteredGuests.map((r) => (
-                    <GuestRow key={r.id} record={r} />
-                  ))}
-                </div>
-              )
-            ) : (
-              <p className="text-center text-[#6b7280] italic py-6">
-                No guests match that search/filter yet.
-              </p>
-            )}
+            {/* Wedding Details — same "always mounted, hidden via CSS"
+                treatment so its embeds load in parallel with Guest
+                List's from the moment the page opens. */}
+            <div className={activeTab === "details" ? "" : "hidden"}>
+              <div className="flex flex-col gap-10">
+                <WeddingDetailsSection
+                  title="Wedding Details"
+                  records={generalDetailRecords}
+                  emptyMessage="No wedding details added yet."
+                  showTitle={false}
+                />
+                <WeddingDetailsSection
+                  title="Guests Who Couldn't Attend"
+                  records={uninvitedRecords}
+                  emptyMessage="Nothing added yet."
+                  titleClassName="text-2xl md:text-3xl font-serif text-[#8e3e3e] mb-6 text-center"
+                />
+              </div>
+            </div>
           </>
-        ) : (
-          <div className="flex flex-col gap-10">
-            <WeddingDetailsSection
-              title="Wedding Details"
-              records={generalDetailRecords}
-              emptyMessage="No wedding details added yet."
-              showTitle={false}
-            />
-            <WeddingDetailsSection
-              title="Guests Who Couldn't Attend"
-              records={uninvitedRecords}
-              emptyMessage="Nothing added yet."
-              titleClassName="text-2xl md:text-3xl font-serif text-[#8e3e3e] mb-6 text-center"
-            />
-          </div>
         )}
       </div>
     </div>
