@@ -732,6 +732,17 @@ export default function WeddingPage() {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("guests"); // "guests" | "details"
+  // Tracks which tabs have ever been visited. Content only mounts the
+  // first time a tab is opened, then stays mounted (just hidden/shown)
+  // afterward — this avoids the "hidden panel never gets Instagram
+  // embeds processed" problem entirely, since a panel is only ever
+  // hidden AFTER its embeds already finished rendering, never before.
+  const [visitedTabs, setVisitedTabs] = useState({ guests: true, details: false });
+
+  const switchTab = (tab) => {
+    setActiveTab(tab);
+    setVisitedTabs((v) => (v[tab] ? v : { ...v, [tab]: true }));
+  };
   const [viewMode, setViewMode] = useState("card"); // "card" | "compact" — card is default
   const [activeGuestTypes, setActiveGuestTypes] = useState([]); // empty = all
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
@@ -934,7 +945,7 @@ export default function WeddingPage() {
         {/* Tab toggle */}
         <div className="flex justify-center gap-2 mb-6">
           <button
-            onClick={() => setActiveTab("guests")}
+            onClick={() => switchTab("guests")}
             className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
               activeTab === "guests"
                 ? "bg-[#8a9ac7] text-white"
@@ -944,7 +955,7 @@ export default function WeddingPage() {
             Guest List
           </button>
           <button
-            onClick={() => setActiveTab("details")}
+            onClick={() => switchTab("details")}
             className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
               activeTab === "details"
                 ? "bg-[#b66b6b] text-white"
@@ -991,18 +1002,12 @@ export default function WeddingPage() {
             ))}
           </div>
         ) : (
-          <div className="relative">
-            {/* Guest List — kept mounted even when inactive so switching
-                tabs is instant. Uses absolute+opacity (not display:none)
-                because Instagram's embed script silently skips elements
-                with zero layout dimensions and never retries them. */}
-            <div
-              className={
-                activeTab === "guests"
-                  ? ""
-                  : "absolute top-0 left-0 w-full opacity-0 pointer-events-none -z-10"
-              }
-            >
+          <div>
+            {/* Guest List is the default tab, so it's always mounted.
+                Simple hidden toggle is safe here since it was already
+                visible (and its embeds already processed) before any
+                hiding ever happens. */}
+            <div className={activeTab === "guests" ? "" : "hidden"}>
               {/* Search + guest type dropdown filter */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-6">
                 <input
@@ -1107,31 +1112,28 @@ export default function WeddingPage() {
               )}
             </div>
 
-            {/* Wedding Details — same "always mounted, absolute+opacity
-                when inactive" treatment so its embeds load in parallel
-                with Guest List's from the moment the page opens. */}
-            <div
-              className={
-                activeTab === "details"
-                  ? ""
-                  : "absolute top-0 left-0 w-full opacity-0 pointer-events-none -z-10"
-              }
-            >
-              <div className="flex flex-col gap-10">
-                <WeddingDetailsSection
-                  title="Wedding Details"
-                  records={generalDetailRecords}
-                  emptyMessage="No wedding details added yet."
-                  showTitle={false}
-                />
-                <WeddingDetailsSection
-                  title="Guests Who Couldn't Attend"
-                  records={uninvitedRecords}
-                  emptyMessage="Nothing added yet."
-                  titleClassName="text-2xl md:text-3xl font-serif text-[#8e3e3e] mb-6 text-center"
-                />
+            {/* Wedding Details only mounts the first time you actually
+                open the tab — its first visit has a brief real loading
+                moment (unavoidable network fetch), but it's only ever
+                hidden AFTER that succeeds, so embeds never get skipped. */}
+            {visitedTabs.details && (
+              <div className={activeTab === "details" ? "" : "hidden"}>
+                <div className="flex flex-col gap-10">
+                  <WeddingDetailsSection
+                    title="Wedding Details"
+                    records={generalDetailRecords}
+                    emptyMessage="No wedding details added yet."
+                    showTitle={false}
+                  />
+                  <WeddingDetailsSection
+                    title="Guests Who Couldn't Attend"
+                    records={uninvitedRecords}
+                    emptyMessage="Nothing added yet."
+                    titleClassName="text-2xl md:text-3xl font-serif text-[#8e3e3e] mb-6 text-center"
+                  />
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
       </div>
