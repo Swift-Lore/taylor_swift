@@ -991,10 +991,18 @@ export default function WeddingPage() {
             ))}
           </div>
         ) : (
-          <>
-            {/* Guest List — kept mounted even when hidden so switching
-                tabs is instant and nothing has to re-fetch/re-render */}
-            <div className={activeTab === "guests" ? "" : "hidden"}>
+          <div className="relative">
+            {/* Guest List — kept mounted even when inactive so switching
+                tabs is instant. Uses absolute+opacity (not display:none)
+                because Instagram's embed script silently skips elements
+                with zero layout dimensions and never retries them. */}
+            <div
+              className={
+                activeTab === "guests"
+                  ? ""
+                  : "absolute top-0 left-0 w-full opacity-0 pointer-events-none -z-10"
+              }
+            >
               {/* Search + guest type dropdown filter */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-6">
                 <input
@@ -1099,10 +1107,16 @@ export default function WeddingPage() {
               )}
             </div>
 
-            {/* Wedding Details — same "always mounted, hidden via CSS"
-                treatment so its embeds load in parallel with Guest
-                List's from the moment the page opens. */}
-            <div className={activeTab === "details" ? "" : "hidden"}>
+            {/* Wedding Details — same "always mounted, absolute+opacity
+                when inactive" treatment so its embeds load in parallel
+                with Guest List's from the moment the page opens. */}
+            <div
+              className={
+                activeTab === "details"
+                  ? ""
+                  : "absolute top-0 left-0 w-full opacity-0 pointer-events-none -z-10"
+              }
+            >
               <div className="flex flex-col gap-10">
                 <WeddingDetailsSection
                   title="Wedding Details"
@@ -1118,7 +1132,7 @@ export default function WeddingPage() {
                 />
               </div>
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>
