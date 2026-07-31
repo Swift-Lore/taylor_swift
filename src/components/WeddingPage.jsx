@@ -452,7 +452,18 @@ const normalizeInstagramUrl = (raw) => {
 // shortcode here (the part after /p/ or /reel/, before the next /)
 // once you've confirmed it's genuinely broken, and it'll skip the
 // loading attempt entirely and show the clean link immediately.
-const KNOWN_BROKEN_INSTAGRAM_SHORTCODES = ["DaYVulmEVS-", "DaYbbcHR0_6"];
+const KNOWN_BROKEN_INSTAGRAM_SHORTCODES = [
+  "DaYVulmEVS-",
+  "DaYbbcHR0_6",
+  "Daf7Ox8lUK8",
+  "DaYv34_GQ0muzqwM-XRGMMHuplb5YWc5FZXHBU0",
+  "DaZHhfAFsGf",
+  "DaYFg-4xWy7",
+  "DaYC1vDIAHk",
+  "Da4KnEBPXyA",
+  "DaYn_46j60r",
+  "DaWFolOjFD2",
+];
 
 const getInstagramShortcode = (url) => {
   const match = url.match(/instagram\.com\/(?:[^/]+\/)?(?:p|reel|tv)\/([^/?#]+)/i);
