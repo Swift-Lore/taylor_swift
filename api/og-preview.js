@@ -143,13 +143,14 @@ const blockedDomains = ['justjared.com', 'justjaredjr.com', 'people.com', 'thesu
       );
       const mlData = await mlRes.json();
       const mlTitle = mlData?.data?.title;
-      if (mlData?.data?.image?.url) {
+      const mlImage = mlData?.data?.image?.url;
+      const titleIsUsable = mlTitle && !isBotChallengeTitle(mlTitle) && !looksLikeRawSlugTitle(mlTitle);
+      const imageIsUsable = mlImage && !looksLikeBotBlockImage(mlImage);
+      if (imageIsUsable) {
         return res.status(200).json({
-          title: cleanTrailingIdJunk(
-            !isBotChallengeTitle(mlTitle) ? mlTitle : null
-          ) || titleFromSlug(),
+          title: cleanTrailingIdJunk(titleIsUsable ? mlTitle : null) || titleFromSlug(),
           description: mlData.data.description || '',
-          image: mlData.data.image.url,
+          image: mlImage,
           domain: blockedMatch,
         });
       }
