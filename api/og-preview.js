@@ -53,7 +53,15 @@ export default async function handler(req, res) {
   // strip the known trailing pattern rather than discarding the title.
   const cleanTrailingIdJunk = (title) => {
     if (!title) return title;
-    return title.replace(/\s+Source\s+\d{4,}\s*$/i, '').trim();
+    return title
+      // Handles "...Title Source 7557276", "...Title Source: 7557276",
+      // "...Title (Source 7557276)", "...Title - Source: 7557276", etc.
+      .replace(/\s*[-–—(]?\s*Source:?\s*\d{4,}\)?\s*$/i, '')
+      // Catches a bare trailing "Source" with no digits attached — can
+      // happen if something upstream (e.g. Microlink) already stripped
+      // the ID number but left the leading word behind.
+      .replace(/\s*[-–—(]?\s*Source:?\)?\s*$/i, '')
+      .trim();
   };
 
   // Sites that block scrapers — try Microlink first, fall back to slug
