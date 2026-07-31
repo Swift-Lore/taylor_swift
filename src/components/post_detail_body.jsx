@@ -512,7 +512,23 @@ function InstagramFallbackCard({ url }) {
   );
 }
 
+// Accounts known to be currently suspended. When a tweet URL is from
+// one of these, the fallback card shows a note explaining why instead
+// of just silently failing to embed like any other broken link.
+const SUSPENDED_X_ACCOUNTS = ["thetsupdates", "swifferupdates"];
+
+const getSuspendedAccountNote = (url) => {
+  const match = url.match(/(?:twitter|x)\.com\/([^/]+)\/status\//i);
+  const handle = match ? match[1].toLowerCase() : null;
+  if (handle && SUSPENDED_X_ACCOUNTS.includes(handle)) {
+    return `@${handle} is currently suspended — this post may return if the account is reinstated.`;
+  }
+  return null;
+};
+
 function TwitterFallbackCard({ url }) {
+  const suspendedNote = getSuspendedAccountNote(url);
+
   return (
     <a
       href={url}
@@ -551,6 +567,11 @@ function TwitterFallbackCard({ url }) {
           </div>
         </div>
       </div>
+      {suspendedNote && (
+        <p className="text-xs text-gray-500 italic mt-2 pt-2 border-t border-gray-100">
+          {suspendedNote}
+        </p>
+      )}
     </a>
   );
 }
@@ -1053,9 +1074,6 @@ const twitterUrls = event?.TWITTER
       })
   : [];
 
-const getEmbedJustifyClass = (count) => {
-  return count >= 4 ? "justify-start" : "justify-center";
-};
   // ---- MAIN RENDER ----
   return (
     <div className="bg-[#e6edf7] py-8 md:py-12">
@@ -1100,7 +1118,7 @@ const getEmbedJustifyClass = (count) => {
 
       {/* NOTES + SOURCES */}
       {(hasNotes || hasSources) && (
-        <section className="max-w-4xl mx-auto px-4 mb-10">
+        <section className="max-w-6xl mx-auto px-4 mb-10">
           {hasNotes && (
             <div className="text-sm md:text-base text-[#111827] leading-relaxed mb-6 bg-white/70 rounded-xl p-4 border border-[#e3d5dd]">
               <span className="font-semibold">Notes: </span>
@@ -1111,7 +1129,7 @@ const getEmbedJustifyClass = (count) => {
           {hasSources && (
             <div className="space-y-6">
               {sourceImages.length > 0 && (
-                <div className="image-only-grid flex flex-wrap gap-6 justify-start mb-8">
+                <div className="image-only-grid flex flex-wrap gap-6 justify-center mb-8">
                   {sourceImages.map((url, index) => {
                     const isPinterest = isPinterestUrl(url);
                     const pinId = getPinterestPinId(url);
@@ -1172,7 +1190,7 @@ const getEmbedJustifyClass = (count) => {
               )}
 
               {nonImageLinks.length > 0 && (
-                <div className="microlink-grid">
+                <div className="microlink-grid" style={{ justifyContent: "center" }}>
                   {nonImageLinks.map((url, index) => {
                     const isGetty = isGettyUrl(url);
 const isFacebook = isFacebookUrl(url);
@@ -1346,9 +1364,7 @@ if (isFacebook) {
       {event.INSTAGRAM && (
         <section className="w-full px-4 mb-10">
           <div
-            className={`flex flex-wrap gap-6 mt-2 max-w-[1400px] mx-auto items-start ${getEmbedJustifyClass(
-              instagramUrls.length
-            )}`}
+            className="flex flex-wrap gap-6 mt-2 max-w-6xl mx-auto items-start justify-start"
           >
             {instagramUrls.map((url, index) => {
               // We check if this is the problematic Travis Kelce post to show the card immediately
@@ -1402,9 +1418,7 @@ const isTravisPost = url.includes("DMgXbQ0yWqW") || url.includes("DP5R6pwEXdY") 
       {event.TWITTER && (
   <section className="w-full px-4 mb-10">
     <div
-      className={`flex flex-wrap gap-6 mt-2 max-w-[1400px] mx-auto ${getEmbedJustifyClass(
-        twitterUrls.length
-      )}`}
+      className="flex flex-wrap gap-6 mt-2 max-w-6xl mx-auto items-start justify-start"
     >
       {twitterUrls.map((url, index) => (
         <TwitterEmbed key={index} url={url} />

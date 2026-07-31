@@ -82,10 +82,6 @@ const getFallbackTitleFromUrl = (url, domain) => {
 
     const tokens = slug.split(/[-_]+/).filter(Boolean);
 
-    // Drop tokens that look like IDs rather than real words: pure
-    // numbers ("12013425"), or a mix of letters+digits 6+ chars long
-    // ("rcna353024", "6a4d953ce4b094d71e70f5a5") — these show up as
-    // article-ID fragments and never belong in a displayed headline.
     const isIdLikeToken = (t) => {
       if (/^\d+$/.test(t)) return true;
       if (t.length >= 6 && /\d/.test(t) && /[a-z]/i.test(t)) return true;
@@ -109,7 +105,6 @@ const getFallbackTitleFromUrl = (url, domain) => {
   }
 };
 
-/* Archive.today handling — same as post_detail_body.jsx */
 const isArchiveUrl = (url) => {
   if (!url) return false;
   const lower = url.toLowerCase();
@@ -143,12 +138,6 @@ const isFacebookUrl = (url) => {
     lower.includes("fb.com")
   );
 };
-
-/* ------------------------------------------------------------------ */
-/*  Article/link preview card — matches the rich card used on the      */
-/*  event landing pages (post_detail_body.jsx): larger image, title,   */
-/*  description, and dedicated fallbacks for archive/Getty/Facebook.   */
-/* ------------------------------------------------------------------ */
 
 const KNOWN_BROKEN_PREVIEW_DOMAINS = ["reutersconnect.com"];
 
@@ -308,9 +297,6 @@ const ArticlePreviewCard = ({ url }) => {
   const hasImage = !!previewData?.image;
   const hasTitle = !!previewData?.title;
 
-  // No usable title AND no image — either a known-broken domain, or the
-  // URL slug was too garbled (IDs/hashes) to turn into a real headline.
-  // Same clean "View on Domain" treatment either way.
   if (!hasImage && !hasTitle) {
     return (
       <a
@@ -397,20 +383,8 @@ const ArticlePreviewCard = ({ url }) => {
   );
 };
 
-/* ------------------------------------------------------------------ */
-/*  TikTok — same simple approach as the event pages: drop the         */
-/*  blockquote on the page and let TikTok's own embed.js (loaded via   */
-/*  <script src>, not fetch) find and render it. A client-side fetch   */
-/*  to TikTok's oEmbed endpoint is blocked by CORS, so don't pre-check.*/
-/* ------------------------------------------------------------------ */
 const TikTokEmbed = ({ url }) => {
   const cleanUrl = url.trim().split("?")[0];
-
-  // Only /video/<numeric id> URLs give us a real, embeddable video ID.
-  // Short-link codes from /t/ or vm.tiktok.com (e.g. "ZP8GH2EU9") are
-  // NOT valid video IDs — passing one to data-video-id causes TikTok's
-  // embed endpoint to reject it with a 400 every time. For those, omit
-  // data-video-id entirely and let the script resolve from cite alone.
   const videoIdMatch = cleanUrl.match(/\/video\/(\d+)/);
   const videoId = videoIdMatch ? videoIdMatch[1] : null;
 
@@ -428,30 +402,18 @@ const TikTokEmbed = ({ url }) => {
   );
 };
 
-// Strips tracking params (igsh=, utm_source=, utm_campaign=, etc.) and
-// canonicalizes to Instagram's expected clean permalink format. Same
-// helper used successfully on the event pages — those tracking params
-// can confuse Instagram's embed resolution for some posts even though
-// most tolerate them fine, which is why some links load reliably and
-// others don't despite looking similar.
 const normalizeInstagramUrl = (raw) => {
   if (!raw) return "";
   const clean = raw.trim().split("?")[0];
   const match = clean.match(
     /instagram\.com\/(?:[^/]+\/)?(p|reel|tv)\/([^/?#]+)/i
   );
-  if (!match) return raw; // fall back to the original if we can't parse it
+  if (!match) return raw;
   const type = match[1].toLowerCase();
   const shortcode = match[2];
   return `https://www.instagram.com/${type}/${shortcode}/`;
 };
 
-// Posts confirmed to never embed — either Instagram itself has no
-// "Embed" option for them (owner disabled it), or Instagram's own
-// official embed code fails even outside this site. Add a post's
-// shortcode here (the part after /p/ or /reel/, before the next /)
-// once you've confirmed it's genuinely broken, and it'll skip the
-// loading attempt entirely and show the clean link immediately.
 const KNOWN_BROKEN_INSTAGRAM_SHORTCODES = [
   "DaYVulmEVS-",
   "DaYbbcHR0_6",
@@ -510,18 +472,10 @@ const InstagramEmbed = ({ url }) => {
   const isKnownBroken =
     shortcode && KNOWN_BROKEN_INSTAGRAM_SHORTCODES.includes(shortcode);
 
-  // Skip the whole loading dance for posts already confirmed broken —
-  // straight to the clean link, no dashed placeholder, no 6s wait.
   if (isKnownBroken) {
     return <InstagramFallbackLink url={url} />;
   }
 
-  // Only start loading once this embed is actually near the visible
-  // area — not the instant it mounts. On Guest List's Card View,
-  // potentially 100+ embeds mount at once; asking Instagram's script
-  // to process all of them simultaneously is what overwhelms it and
-  // causes many to time out. Loading only what's near-screen keeps
-  // the number trying to load at once small, regardless of list size.
   useEffect(() => {
     if (isVisible) return;
     const el = elRef.current;
@@ -540,14 +494,8 @@ const InstagramEmbed = ({ url }) => {
     if (!isVisible) return;
     setTimedOut(false);
 
-    // Keep retrying process() every 300ms instead of one or two
-    // fixed-delay guesses — this is what actually fixes the race
-    // condition for embeds visible on initial page load, where
-    // Instagram's script may still be mid-download/init when we'd
-    // otherwise have only tried once. Stops as soon as a real iframe
-    // appears (success) or after ~6s of no luck (fallback).
     let attempts = 0;
-    const maxAttempts = 20; // 20 * 300ms ≈ 6s
+    const maxAttempts = 20;
     const interval = setInterval(() => {
       attempts += 1;
       const hasIframe = elRef.current?.querySelector("iframe");
@@ -617,9 +565,178 @@ const InstagramEmbed = ({ url }) => {
   );
 };
 
-/* ------------------------------------------------------------------ */
-/*  Single link renderer — picks the right embed/card per platform     */
-/* ------------------------------------------------------------------ */
+// Accounts known to be currently suspended. When a tweet URL is from
+// one of these, the fallback card shows a note explaining why instead
+// of just silently failing to embed like any other broken link.
+const SUSPENDED_X_ACCOUNTS = ["thetsupdates", "swifferupdates"];
+
+const getSuspendedAccountNote = (url) => {
+  const match = url.match(/(?:twitter|x)\.com\/([^/]+)\/status\//i);
+  const handle = match ? match[1].toLowerCase() : null;
+  if (handle && SUSPENDED_X_ACCOUNTS.includes(handle)) {
+    return `@${handle} is currently suspended — this post may return if the account is reinstated.`;
+  }
+  return null;
+};
+
+const TwitterFallbackCard = ({ url }) => {
+  const suspendedNote = getSuspendedAccountNote(url);
+
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="microlink-card block w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-1 group"
+    >
+      <div className="flex items-center gap-3">
+        <img
+          src={getFaviconUrl("x.com")}
+          alt="X"
+          className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm flex-shrink-0"
+        />
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-[#8e3e3e] transition-colors">
+            View post on X
+          </h3>
+          <div className="flex items-center justify-between mt-1">
+            <span className="text-xs text-gray-500 truncate">x.com</span>
+            <span className="flex items-center gap-1 text-xs font-semibold text-[#8e3e3e]">
+              Open post
+              <svg
+                className="w-3 h-3 transform group-hover:translate-x-1 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M14 5l7 7m0 0l-7 7m7-7H3"
+                />
+              </svg>
+            </span>
+          </div>
+        </div>
+      </div>
+      {suspendedNote && (
+        <p className="text-xs text-gray-500 italic mt-2 pt-2 border-t border-gray-100">
+          {suspendedNote}
+        </p>
+      )}
+    </a>
+  );
+};
+
+const TwitterEmbed = ({ url }) => {
+  const [failed, setFailed] = useState(false);
+  const [checked, setChecked] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const cleanUrl = url.trim().replace("x.com", "twitter.com");
+    const match = cleanUrl.match(/status\/(\d+)/);
+    const tweetId = match ? match[1] : null;
+
+    if (!tweetId) {
+      setFailed(true);
+      setChecked(true);
+      return;
+    }
+
+    const checkIfEmbeddable = async () => {
+      try {
+        const oembedUrl = `https://publish.twitter.com/oembed?omit_script=true&url=${encodeURIComponent(
+          cleanUrl
+        )}`;
+        const response = await fetch(oembedUrl);
+        if (!response.ok) {
+          if (!cancelled) {
+            setFailed(true);
+            setChecked(true);
+          }
+          return false;
+        }
+        if (!cancelled) setChecked(true);
+        return true;
+      } catch {
+        if (!cancelled) {
+          setFailed(true);
+          setChecked(true);
+        }
+        return false;
+      }
+    };
+
+    const renderTweet = async () => {
+      try {
+        if (!window.twttr || !window.twttr.widgets || !containerRef.current) {
+          if (!cancelled) setFailed(true);
+          return;
+        }
+        containerRef.current.innerHTML = "";
+        await window.twttr.widgets.createTweet(tweetId, containerRef.current, {
+          align: "left",
+          theme: "light",
+          dnt: true,
+          conversation: "none",
+        });
+        if (!cancelled && !containerRef.current.querySelector("iframe")) {
+          setFailed(true);
+        }
+      } catch {
+        if (!cancelled) setFailed(true);
+      }
+    };
+
+    const init = async () => {
+      const embeddable = await checkIfEmbeddable();
+      if (!embeddable || cancelled) return;
+
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts += 1;
+        if (window.twttr && window.twttr.widgets) {
+          clearInterval(interval);
+          renderTweet();
+        } else if (attempts > 30) {
+          clearInterval(interval);
+          if (!cancelled) setFailed(true);
+        }
+      }, 300);
+    };
+
+    init();
+    return () => {
+      cancelled = true;
+    };
+  }, [url]);
+
+  if (failed) {
+    return <TwitterFallbackCard url={url} />;
+  }
+
+  if (!checked) {
+    return (
+      <div className="microlink-card block w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-white p-4 shadow-sm animate-pulse">
+        <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="twitter-container flex-shrink-0"
+      style={{ width: "320px" }}
+      ref={containerRef}
+    />
+  );
+};
+
 const LinkPreview = ({ url }) => {
   const platform = getPlatform(url);
 
@@ -628,15 +745,7 @@ const LinkPreview = ({ url }) => {
   }
 
   if (platform === "twitter") {
-    return (
-      <div style={{ width: "300px", minHeight: "300px" }}>
-        <blockquote className="twitter-tweet" data-theme="light">
-          <a href={url} target="_blank" rel="noopener noreferrer">
-            View post on X
-          </a>
-        </blockquote>
-      </div>
-    );
+    return <TwitterEmbed url={url} />;
   }
 
   if (platform === "youtube") {
@@ -667,15 +776,9 @@ const LinkPreview = ({ url }) => {
   if (isGettyUrl(url)) return <GettyCard url={url} />;
   if (isFacebookUrl(url)) return <FacebookCard url={url} />;
 
-  // Generic article / archive / fallback link — real OG preview with image
   return <ArticlePreviewCard url={url} />;
 };
 
-/* ------------------------------------------------------------------ */
-/*  Guest card — full details always visible (default view)            */
-/*  Rendered inside a CSS grid with items-start so uneven card heights */
-/*  don't stretch neighboring cards or leave blank gaps.               */
-/* ------------------------------------------------------------------ */
 const GuestCard = ({ record }) => {
   const f = record.fields || {};
   const urls = splitUrls(f["URLS"]);
@@ -726,10 +829,6 @@ const GuestCard = ({ record }) => {
   );
 };
 
-/* ------------------------------------------------------------------ */
-/*  Compact guest row — collapsed by default, expands on click.        */
-/*  Alternate view for browsing the list quickly.                      */
-/* ------------------------------------------------------------------ */
 const GuestRow = ({ record }) => {
   const f = record.fields || {};
   const [open, setOpen] = useState(false);
@@ -737,9 +836,6 @@ const GuestRow = ({ record }) => {
   const hasDetails =
     !!f["NOTES"] || !!f["CAPTION(S)"] || !!f["SPECIAL ROLE / MOMENT"] || urls.length > 0;
 
-  /* Expanding a row reveals new blockquotes that the page-level embed
-     effect never saw (it only fires on filter/tab/search changes) —
-     so tell Instagram/X to re-scan the page right when this opens. */
   useEffect(() => {
     if (!open) return;
     const timer = setTimeout(() => {
@@ -819,11 +915,6 @@ const GuestRow = ({ record }) => {
   );
 };
 
-/* ------------------------------------------------------------------ */
-/*  Wedding Details section — plain, page-level layout (matches the    */
-/*  event pages' SOURCES section) instead of a nested card-in-card.    */
-/*  Combines every row's links from this section into one flowing grid.*/
-/* ------------------------------------------------------------------ */
 const WeddingDetailsSection = ({
   title,
   records,
@@ -834,10 +925,6 @@ const WeddingDetailsSection = ({
   const allUrls = records.flatMap((r) => splitUrls(r.fields?.["URLS"]));
   const notes = records.map((r) => r.fields?.["NOTES"]).filter(Boolean);
 
-  // Embeds (Instagram/X/YouTube/TikTok) run much taller than article
-  // preview cards. Flexbox stretches every item in a row to match the
-  // tallest one, so keeping them in separate rows/groups stops a short
-  // article card from ballooning to match a tall embed beside it.
   const embedPlatforms = new Set(["instagram", "twitter", "youtube", "tiktok"]);
   const embedUrls = allUrls.filter((u) => embedPlatforms.has(getPlatform(u)));
   const articleUrls = allUrls.filter((u) => !embedPlatforms.has(getPlatform(u)));
@@ -886,31 +973,22 @@ const WeddingDetailsSection = ({
   );
 };
 
-/* ------------------------------------------------------------------ */
-/*  Main page                                                          */
-/* ------------------------------------------------------------------ */
 export default function WeddingPage() {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("guests"); // "guests" | "details"
-  // Tracks which tabs have ever been visited. Content only mounts the
-  // first time a tab is opened, then stays mounted (just hidden/shown)
-  // afterward — this avoids the "hidden panel never gets Instagram
-  // embeds processed" problem entirely, since a panel is only ever
-  // hidden AFTER its embeds already finished rendering, never before.
+  const [activeTab, setActiveTab] = useState("guests");
   const [visitedTabs, setVisitedTabs] = useState({ guests: true, details: false });
 
   const switchTab = (tab) => {
     setActiveTab(tab);
     setVisitedTabs((v) => (v[tab] ? v : { ...v, [tab]: true }));
   };
-  const [viewMode, setViewMode] = useState("card"); // "card" | "compact" — card is default
-  const [activeGuestTypes, setActiveGuestTypes] = useState([]); // empty = all
+  const [viewMode, setViewMode] = useState("card");
+  const [activeGuestTypes, setActiveGuestTypes] = useState([]);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef(null);
 
-  /* Fetch ALL rows, paginating past Airtable's 100-record page limit */
   useEffect(() => {
     const fetchAll = async () => {
       setLoading(true);
@@ -945,11 +1023,6 @@ export default function WeddingPage() {
     fetchAll();
   }, []);
 
-  /* Kick off Instagram/X script downloads the instant the page mounts —
-     don't wait on the guest data fetch. This is what makes embeds on
-     event pages feel instant: the script is already loaded and parsed
-     by the time any blockquote exists in the DOM, instead of only
-     starting to download after all 200+ guest records have arrived. */
   useEffect(() => {
     if (!document.getElementById("instagram-embed-script")) {
       const s = document.createElement("script");
@@ -966,18 +1039,8 @@ export default function WeddingPage() {
       s.async = true;
       document.body.appendChild(s);
     }
-    // Note: TikTok's script is intentionally NOT loaded here — it only
-    // seems to process blockquotes present at the moment it executes
-    // (no reliable public "rescan" API like Instagram/X have), so it
-    // needs to be reloaded whenever new TikTok blockquotes are added.
-    // See the effect below.
   }, []);
 
-  /* Re-process embeds whenever the visible set changes. Instagram/X
-     just get told to rescan (scripts already loaded above). TikTok
-     has to be fully reloaded each time to pick up new blockquotes —
-     this does mean re-downloading it on every filter/search change,
-     but that's the tradeoff needed for it to reliably work at all. */
   useEffect(() => {
     const process = () => {
       if (window.instgrm) window.instgrm.Embeds.process();
@@ -998,7 +1061,6 @@ export default function WeddingPage() {
     return () => clearTimeout(timer);
   }, [records, activeTab, activeGuestTypes, searchQuery, viewMode]);
 
-  /* Close the dropdown when clicking outside it */
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -1017,16 +1079,13 @@ export default function WeddingPage() {
           const aHasUrls = splitUrls(a.fields["URLS"]).length > 0;
           const bHasUrls = splitUrls(b.fields["URLS"]).length > 0;
 
-          // Guests with links float to the top as a group
           if (aHasUrls !== bHasUrls) return aHasUrls ? -1 : 1;
 
-          // Within each group, sort alphabetically by name
           return (a.fields["Name"] || "").localeCompare(b.fields["Name"] || "");
         }),
     [records]
   );
 
-  // All non-guest Article/Video rows
   const coverageRecords = useMemo(
     () =>
       records.filter(
@@ -1038,10 +1097,6 @@ export default function WeddingPage() {
     [records]
   );
 
-  // Split coverage rows: the "couldn't attend" row gets its own section,
-  // everything else is general Wedding Details. Normalized match (strips
-  // punctuation/spacing/case) so curly vs straight apostrophes, extra
-  // spaces, etc. can't silently break the split.
   const normalizeForMatch = (s) => (s || "").toLowerCase().replace(/[^a-z]/g, "");
 
   const uninvitedRecords = useMemo(
@@ -1109,7 +1164,6 @@ export default function WeddingPage() {
           T&amp;T&apos;s Wedding
         </h1>
 
-        {/* Tab toggle */}
         <div className="flex justify-center gap-2 mb-6">
           <button
             onClick={() => switchTab("guests")}
@@ -1133,7 +1187,6 @@ export default function WeddingPage() {
           </button>
         </div>
 
-        {/* Card / Compact view toggle — only relevant on Guest List */}
         {activeTab === "guests" && !loading && (
           <div className="flex justify-center gap-1.5 mb-6">
             <button
@@ -1170,12 +1223,7 @@ export default function WeddingPage() {
           </div>
         ) : (
           <div>
-            {/* Guest List is the default tab, so it's always mounted.
-                Simple hidden toggle is safe here since it was already
-                visible (and its embeds already processed) before any
-                hiding ever happens. */}
             <div className={activeTab === "guests" ? "" : "hidden"}>
-              {/* Search + guest type dropdown filter */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-6">
                 <input
                   type="text"
@@ -1252,12 +1300,10 @@ export default function WeddingPage() {
                 )}
               </div>
 
-              {/* Result count */}
               <p className="text-center text-xs text-[#6b7db3] mb-4">
                 Showing {filteredGuests.length} of {guestRecords.length} guests
               </p>
 
-              {/* Guest list — Card view (grid) or Compact view (stacked rows) */}
               {filteredGuests.length > 0 ? (
                 viewMode === "card" ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
@@ -1279,10 +1325,6 @@ export default function WeddingPage() {
               )}
             </div>
 
-            {/* Wedding Details only mounts the first time you actually
-                open the tab — its first visit has a brief real loading
-                moment (unavoidable network fetch), but it's only ever
-                hidden AFTER that succeeds, so embeds never get skipped. */}
             {visitedTabs.details && (
               <div className={activeTab === "details" ? "" : "hidden"}>
                 <div className="flex flex-col gap-10">
