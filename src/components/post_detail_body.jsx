@@ -1190,7 +1190,7 @@ const twitterUrls = event?.TWITTER
               )}
 
               {nonImageLinks.length > 0 && (
-                <div className="microlink-grid" style={{ maxWidth: "fit-content", margin: "0 auto" }}>
+                <div className="microlink-grid" style={{ justifyContent: "center" }}>
                   {nonImageLinks.map((url, index) => {
                     const isGetty = isGettyUrl(url);
 const isFacebook = isFacebookUrl(url);
