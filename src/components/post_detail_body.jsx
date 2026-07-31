@@ -19,7 +19,7 @@ import {
   TwitterEmbed,
   YouTubeEmbed,
   TikTokEmbed,
-} from "./LinkEmbeds";
+} from "./shared/LinkEmbeds";
 
 // Format DATE field as "Nov-07-2025" (force UTC so it doesn't shift by timezone)
 const formatEventDate = (isoDate) => {
@@ -522,12 +522,7 @@ const twitterUrls = event?.TWITTER
 
                     if (isPinterest && pinId) {
                       return (
-                        <PinterestEmbed
-                          key={`img-${index}`}
-                          url={url}
-                          width={420}
-                          height={300}
-                        />
+                        <PinterestEmbed key={`img-${index}`} url={url} />
                       );
                     }
 
