@@ -404,20 +404,24 @@ const ArticlePreviewCard = ({ url }) => {
 /*  to TikTok's oEmbed endpoint is blocked by CORS, so don't pre-check.*/
 /* ------------------------------------------------------------------ */
 const TikTokEmbed = ({ url }) => {
-  const cleanUrl = url.trim();
-  const videoId =
-    cleanUrl.split("/video/")[1]?.split("?")[0] ||
-    cleanUrl.split("/t/")[1]?.split("/")[0];
-  const canonicalUrl = videoId ? cleanUrl.split("?")[0] : cleanUrl;
+  const cleanUrl = url.trim().split("?")[0];
+
+  // Only /video/<numeric id> URLs give us a real, embeddable video ID.
+  // Short-link codes from /t/ or vm.tiktok.com (e.g. "ZP8GH2EU9") are
+  // NOT valid video IDs — passing one to data-video-id causes TikTok's
+  // embed endpoint to reject it with a 400 every time. For those, omit
+  // data-video-id entirely and let the script resolve from cite alone.
+  const videoIdMatch = cleanUrl.match(/\/video\/(\d+)/);
+  const videoId = videoIdMatch ? videoIdMatch[1] : null;
 
   return (
     <blockquote
       className="tiktok-embed"
-      cite={canonicalUrl}
+      cite={cleanUrl}
       data-video-id={videoId || undefined}
       style={{ maxWidth: "300px", minWidth: "300px" }}
     >
-      <a href={canonicalUrl} target="_blank" rel="noopener noreferrer">
+      <a href={cleanUrl} target="_blank" rel="noopener noreferrer">
         View on TikTok
       </a>
     </blockquote>
@@ -805,12 +809,24 @@ export default function WeddingPage() {
       s.async = true;
       document.body.appendChild(s);
     }
+
+    if (!document.getElementById("tiktok-embed-script")) {
+      const s = document.createElement("script");
+      s.id = "tiktok-embed-script";
+      s.src = "https://www.tiktok.com/embed.js";
+      s.async = true;
+      document.body.appendChild(s);
+    }
   }, []);
 
   /* Re-process embeds whenever the visible set changes — the scripts
      are already loaded (effect above), so this just tells them to scan
      the page for new blockquotes. Fires twice like the event pages do
-     (immediate + a follow-up beat later) to reliably catch everything. */
+     (immediate + a follow-up beat later) to reliably catch everything.
+     TikTok's script auto-scans the DOM on its own via MutationObserver,
+     so unlike Instagram/X it doesn't need an explicit process() call —
+     and critically, it must NEVER be destroyed/recreated here, since
+     doing that on every keystroke is what caused the retry-storm bug. */
   useEffect(() => {
     const process = () => {
       if (window.instgrm) window.instgrm.Embeds.process();
@@ -818,15 +834,6 @@ export default function WeddingPage() {
     };
     process();
     const timer = setTimeout(process, 500);
-
-    const timestamp = Date.now();
-    const existingTikTok = document.getElementById("tiktok-embed-script");
-    if (existingTikTok) existingTikTok.remove();
-    const tiktokScript = document.createElement("script");
-    tiktokScript.id = "tiktok-embed-script";
-    tiktokScript.src = `https://www.tiktok.com/embed.js?t=${timestamp}`;
-    tiktokScript.async = true;
-    document.body.appendChild(tiktokScript);
 
     return () => clearTimeout(timer);
   }, [records, activeTab, activeGuestTypes, searchQuery, viewMode]);
