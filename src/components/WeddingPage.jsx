@@ -457,24 +457,31 @@ const InstagramEmbed = ({ url }) => {
     if (!isVisible) return;
     setTimedOut(false);
 
-    // Nudge Instagram's script right away for this specific embed,
-    // rather than waiting for the next page-level batch process().
-    const kick = setTimeout(() => window.instgrm?.Embeds?.process(), 50);
-
-    // If Instagram's script never swaps the blockquote for a real
-    // iframe within a few seconds, give up and show a clean link
-    // instead. This is the fix for embeds that hang forever with no
-    // error — most commonly a private account's post, which Instagram
-    // legitimately can't render but also never reports as failed.
-    const timer = setTimeout(() => {
+    // Keep retrying process() every 300ms instead of one or two
+    // fixed-delay guesses — this is what actually fixes the race
+    // condition for embeds visible on initial page load, where
+    // Instagram's script may still be mid-download/init when we'd
+    // otherwise have only tried once. Stops as soon as a real iframe
+    // appears (success) or after ~6s of no luck (fallback).
+    let attempts = 0;
+    const maxAttempts = 20; // 20 * 300ms ≈ 6s
+    const interval = setInterval(() => {
+      attempts += 1;
       const hasIframe = elRef.current?.querySelector("iframe");
-      if (!hasIframe) setTimedOut(true);
-    }, 6000);
+      if (hasIframe) {
+        clearInterval(interval);
+        return;
+      }
+      if (window.instgrm?.Embeds) {
+        window.instgrm.Embeds.process();
+      }
+      if (attempts >= maxAttempts) {
+        clearInterval(interval);
+        setTimedOut(true);
+      }
+    }, 300);
 
-    return () => {
-      clearTimeout(kick);
-      clearTimeout(timer);
-    };
+    return () => clearInterval(interval);
   }, [isVisible, url]);
 
   if (!isVisible) {
