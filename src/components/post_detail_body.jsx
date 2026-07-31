@@ -512,7 +512,23 @@ function InstagramFallbackCard({ url }) {
   );
 }
 
+// Accounts known to be currently suspended. When a tweet URL is from
+// one of these, the fallback card shows a note explaining why instead
+// of just silently failing to embed like any other broken link.
+const SUSPENDED_X_ACCOUNTS = ["thetsupdates", "swifferupdates"];
+
+const getSuspendedAccountNote = (url) => {
+  const match = url.match(/(?:twitter|x)\.com\/([^/]+)\/status\//i);
+  const handle = match ? match[1].toLowerCase() : null;
+  if (handle && SUSPENDED_X_ACCOUNTS.includes(handle)) {
+    return `@${handle} is currently suspended — this post may return if the account is reinstated.`;
+  }
+  return null;
+};
+
 function TwitterFallbackCard({ url }) {
+  const suspendedNote = getSuspendedAccountNote(url);
+
   return (
     <a
       href={url}
@@ -551,6 +567,11 @@ function TwitterFallbackCard({ url }) {
           </div>
         </div>
       </div>
+      {suspendedNote && (
+        <p className="text-xs text-gray-500 italic mt-2 pt-2 border-t border-gray-100">
+          {suspendedNote}
+        </p>
+      )}
     </a>
   );
 }
@@ -1343,7 +1364,7 @@ if (isFacebook) {
       {event.INSTAGRAM && (
         <section className="w-full px-4 mb-10">
           <div
-            className="flex flex-wrap gap-6 mt-2 max-w-[1400px] mx-auto items-start justify-start"
+            className="flex flex-wrap gap-6 mt-2 max-w-4xl mx-auto items-start justify-start"
           >
             {instagramUrls.map((url, index) => {
               // We check if this is the problematic Travis Kelce post to show the card immediately
@@ -1397,7 +1418,7 @@ const isTravisPost = url.includes("DMgXbQ0yWqW") || url.includes("DP5R6pwEXdY") 
       {event.TWITTER && (
   <section className="w-full px-4 mb-10">
     <div
-      className="flex flex-wrap gap-6 mt-2 max-w-[1400px] mx-auto items-start justify-start"
+      className="flex flex-wrap gap-6 mt-2 max-w-4xl mx-auto items-start justify-start"
     >
       {twitterUrls.map((url, index) => (
         <TwitterEmbed key={index} url={url} />
