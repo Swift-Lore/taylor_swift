@@ -78,25 +78,35 @@ const getFallbackTitleFromUrl = (url, domain) => {
   try {
     const pathname = new URL(url).pathname;
     const parts = pathname.split("/").filter(Boolean);
-    const slug = parts[parts.length - 1] || "";
+    const slug = (parts[parts.length - 1] || "").replace(/\.\w+$/, "");
 
-    const cleaned = slug
-      .replace(/\.\w+$/, "")
-      .replace(/[-_]+\d+(?:[-_]\d+)*$/, "")
-      .replace(/[-_]+/g, " ")
+    const tokens = slug.split(/[-_]+/).filter(Boolean);
+
+    // Drop tokens that look like IDs rather than real words: pure
+    // numbers ("12013425"), or a mix of letters+digits 6+ chars long
+    // ("rcna353024", "6a4d953ce4b094d71e70f5a5") — these show up as
+    // article-ID fragments and never belong in a displayed headline.
+    const isIdLikeToken = (t) => {
+      if (/^\d+$/.test(t)) return true;
+      if (t.length >= 6 && /\d/.test(t) && /[a-z]/i.test(t)) return true;
+      return false;
+    };
+
+    const realWords = tokens.filter((t) => !isIdLikeToken(t));
+
+    if (realWords.length < 3) return null;
+
+    const cleaned = realWords
+      .join(" ")
       .replace(/\b\w/g, (c) => c.toUpperCase())
       .trim();
 
-    if (cleaned && cleaned.length > 3) {
-      return cleaned;
-    }
-  } catch {}
+    if (cleaned.length < 10) return null;
 
-  return (
-    domain.split(".")[0].charAt(0).toUpperCase() +
-    domain.split(".")[0].slice(1) +
-    " Article"
-  );
+    return cleaned;
+  } catch {
+    return null;
+  }
 };
 
 /* Archive.today handling — same as post_detail_body.jsx */
@@ -295,13 +305,19 @@ const ArticlePreviewCard = ({ url }) => {
     );
   }
 
-  if (isKnownBroken) {
+  const hasImage = !!previewData?.image;
+  const hasTitle = !!previewData?.title;
+
+  // No usable title AND no image — either a known-broken domain, or the
+  // URL slug was too garbled (IDs/hashes) to turn into a real headline.
+  // Same clean "View on Domain" treatment either way.
+  if (!hasImage && !hasTitle) {
     return (
       <a
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        className="microlink-card flex items-center gap-3 w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-white p-3 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-0.5 group"
+        className="microlink-card flex items-center gap-3 w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-[#fff8f8] p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-1 group"
       >
         <img
           src={getFaviconUrl(previewData.domain)}
@@ -317,8 +333,6 @@ const ArticlePreviewCard = ({ url }) => {
       </a>
     );
   }
-
-  const hasImage = !!previewData?.image;
 
   if (!hasImage) {
     return (
@@ -418,7 +432,10 @@ const LinkPreview = ({ url }) => {
 
   if (platform === "instagram") {
     return (
-      <div style={{ zoom: 0.65, width: "300px" }}>
+      <div
+        className="instagram-container flex flex-col items-center"
+        style={{ width: "326px" }}
+      >
         <blockquote
           className="instagram-media"
           data-instgrm-captioned
@@ -430,8 +447,7 @@ const LinkPreview = ({ url }) => {
             border: "1px solid #dbdbdb",
             boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
             margin: "0",
-            width: "300px",
-            minHeight: "500px",
+            width: "326px",
             padding: "0",
           }}
         >
@@ -643,35 +659,67 @@ const GuestRow = ({ record }) => {
 };
 
 /* ------------------------------------------------------------------ */
-/*  Article / Video card — Wedding Details tab                         */
+/*  Wedding Details section — plain, page-level layout (matches the    */
+/*  event pages' SOURCES section) instead of a nested card-in-card.    */
+/*  Combines every row's links from this section into one flowing grid.*/
 /* ------------------------------------------------------------------ */
-const CoverageCard = ({ record }) => {
-  const f = record.fields || {};
-  const urls = splitUrls(f["URLS"]);
+const WeddingDetailsSection = ({
+  title,
+  records,
+  emptyMessage,
+  showTitle = true,
+  titleClassName = "text-lg font-serif text-[#3d3d6b] mb-4 text-center",
+}) => {
+  const allUrls = records.flatMap((r) => splitUrls(r.fields?.["URLS"]));
+  const notes = records.map((r) => r.fields?.["NOTES"]).filter(Boolean);
+
+  // Embeds (Instagram/X/YouTube/TikTok) run much taller than article
+  // preview cards. Flexbox stretches every item in a row to match the
+  // tallest one, so keeping them in separate rows/groups stops a short
+  // article card from ballooning to match a tall embed beside it.
+  const embedPlatforms = new Set(["instagram", "twitter", "youtube", "tiktok"]);
+  const embedUrls = allUrls.filter((u) => embedPlatforms.has(getPlatform(u)));
+  const articleUrls = allUrls.filter((u) => !embedPlatforms.has(getPlatform(u)));
 
   return (
-    <div className="bg-white/70 border border-[#c5cae9] rounded-2xl p-4 shadow-sm flex flex-col gap-2">
-      <div className="flex items-start justify-between gap-2 flex-wrap">
-        <h3 className="text-[#3d3d6b] font-semibold text-base">
-          {f["Name"] || "Untitled"}
-        </h3>
-        {f["URL TYPE"] && (
-          <span className="bg-[#8a9ac7] text-white text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
-            {f["URL TYPE"]}
-          </span>
-        )}
-      </div>
+    <div>
+      {showTitle && <h2 className={titleClassName}>{title}</h2>}
 
-      {f["NOTES"] && (
-        <p className="text-sm text-[#6b7280] leading-relaxed whitespace-pre-line">{f["NOTES"]}</p>
-      )}
-
-      {urls.length > 0 && (
-        <div className="flex flex-col gap-3 mt-2">
-          {urls.map((url, i) => (
-            <LinkPreview key={i} url={url} />
+      {notes.length > 0 && (
+        <div className="max-w-2xl mx-auto mb-6">
+          {notes.map((note, i) => (
+            <p
+              key={i}
+              className="text-sm text-[#6b7280] leading-relaxed whitespace-pre-line text-center mb-2"
+            >
+              {note}
+            </p>
           ))}
         </div>
+      )}
+
+      {embedUrls.length > 0 && (
+        <div className="max-w-[1400px] mx-auto mb-8">
+          <div className="flex flex-wrap gap-6 justify-start items-start">
+            {embedUrls.map((url, i) => (
+              <LinkPreview key={`embed-${i}`} url={url} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {articleUrls.length > 0 && (
+        <div className="max-w-[1400px] mx-auto">
+          <div className="flex flex-wrap gap-6 justify-start items-start">
+            {articleUrls.map((url, i) => (
+              <LinkPreview key={`article-${i}`} url={url} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {allUrls.length === 0 && (
+        <p className="text-center text-[#6b7280] italic">{emptyMessage}</p>
       )}
     </div>
   );
@@ -684,6 +732,17 @@ export default function WeddingPage() {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("guests"); // "guests" | "details"
+  // Tracks which tabs have ever been visited. Content only mounts the
+  // first time a tab is opened, then stays mounted (just hidden/shown)
+  // afterward — this avoids the "hidden panel never gets Instagram
+  // embeds processed" problem entirely, since a panel is only ever
+  // hidden AFTER its embeds already finished rendering, never before.
+  const [visitedTabs, setVisitedTabs] = useState({ guests: true, details: false });
+
+  const switchTab = (tab) => {
+    setActiveTab(tab);
+    setVisitedTabs((v) => (v[tab] ? v : { ...v, [tab]: true }));
+  };
   const [viewMode, setViewMode] = useState("card"); // "card" | "compact" — card is default
   const [activeGuestTypes, setActiveGuestTypes] = useState([]); // empty = all
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
@@ -725,7 +784,11 @@ export default function WeddingPage() {
     fetchAll();
   }, []);
 
-  /* Re-process embed scripts whenever the visible set changes */
+  /* Kick off Instagram/X script downloads the instant the page mounts —
+     don't wait on the guest data fetch. This is what makes embeds on
+     event pages feel instant: the script is already loaded and parsed
+     by the time any blockquote exists in the DOM, instead of only
+     starting to download after all 200+ guest records have arrived. */
   useEffect(() => {
     if (!document.getElementById("instagram-embed-script")) {
       const s = document.createElement("script");
@@ -733,8 +796,6 @@ export default function WeddingPage() {
       s.src = "//www.instagram.com/embed.js";
       s.async = true;
       document.body.appendChild(s);
-    } else if (window.instgrm) {
-      setTimeout(() => window.instgrm.Embeds.process(), 100);
     }
 
     if (!document.getElementById("twitter-embed-script")) {
@@ -742,11 +803,21 @@ export default function WeddingPage() {
       s.id = "twitter-embed-script";
       s.src = "https://platform.twitter.com/widgets.js";
       s.async = true;
-      s.onload = () => window.twttr?.widgets?.load();
       document.body.appendChild(s);
-    } else if (window.twttr?.widgets) {
-      window.twttr.widgets.load();
     }
+  }, []);
+
+  /* Re-process embeds whenever the visible set changes — the scripts
+     are already loaded (effect above), so this just tells them to scan
+     the page for new blockquotes. Fires twice like the event pages do
+     (immediate + a follow-up beat later) to reliably catch everything. */
+  useEffect(() => {
+    const process = () => {
+      if (window.instgrm) window.instgrm.Embeds.process();
+      if (window.twttr?.widgets) window.twttr.widgets.load();
+    };
+    process();
+    const timer = setTimeout(process, 500);
 
     const timestamp = Date.now();
     const existingTikTok = document.getElementById("tiktok-embed-script");
@@ -756,6 +827,8 @@ export default function WeddingPage() {
     tiktokScript.src = `https://www.tiktok.com/embed.js?t=${timestamp}`;
     tiktokScript.async = true;
     document.body.appendChild(tiktokScript);
+
+    return () => clearTimeout(timer);
   }, [records, activeTab, activeGuestTypes, searchQuery, viewMode]);
 
   /* Close the dropdown when clicking outside it */
@@ -786,6 +859,7 @@ export default function WeddingPage() {
     [records]
   );
 
+  // All non-guest Article/Video rows
   const coverageRecords = useMemo(
     () =>
       records.filter(
@@ -795,6 +869,28 @@ export default function WeddingPage() {
             r.fields?.["URL TYPE"] === "Video")
       ),
     [records]
+  );
+
+  // Split coverage rows: the "couldn't attend" row gets its own section,
+  // everything else is general Wedding Details. Normalized match (strips
+  // punctuation/spacing/case) so curly vs straight apostrophes, extra
+  // spaces, etc. can't silently break the split.
+  const normalizeForMatch = (s) => (s || "").toLowerCase().replace(/[^a-z]/g, "");
+
+  const uninvitedRecords = useMemo(
+    () =>
+      coverageRecords.filter((r) =>
+        normalizeForMatch(r.fields?.["Name"]).includes("couldntattend")
+      ),
+    [coverageRecords]
+  );
+
+  const generalDetailRecords = useMemo(
+    () =>
+      coverageRecords.filter(
+        (r) => !normalizeForMatch(r.fields?.["Name"]).includes("couldntattend")
+      ),
+    [coverageRecords]
   );
 
   const filteredGuests = useMemo(() => {
@@ -841,7 +937,7 @@ export default function WeddingPage() {
 
   return (
     <div className="bg-[#e6edf7] py-8 md:py-12 min-h-screen">
-      <div className="max-w-5xl mx-auto px-4">
+      <div className="max-w-6xl mx-auto px-4">
         <h1 className="text-2xl md:text-3xl font-serif text-[#8e3e3e] text-center mb-6">
           T&amp;T&apos;s Wedding
         </h1>
@@ -849,7 +945,7 @@ export default function WeddingPage() {
         {/* Tab toggle */}
         <div className="flex justify-center gap-2 mb-6">
           <button
-            onClick={() => setActiveTab("guests")}
+            onClick={() => switchTab("guests")}
             className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
               activeTab === "guests"
                 ? "bg-[#8a9ac7] text-white"
@@ -859,7 +955,7 @@ export default function WeddingPage() {
             Guest List
           </button>
           <button
-            onClick={() => setActiveTab("details")}
+            onClick={() => switchTab("details")}
             className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
               activeTab === "details"
                 ? "bg-[#b66b6b] text-white"
@@ -905,121 +1001,138 @@ export default function WeddingPage() {
               />
             ))}
           </div>
-        ) : activeTab === "guests" ? (
-          <>
-            {/* Search + guest type dropdown filter */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-6">
-              <input
-                type="text"
-                placeholder="Search guest name..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full sm:w-56 rounded-full py-1.5 px-4 text-sm bg-white text-[#3d3d6b] border border-[#6b7db3] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#fbb1c3]"
-              />
+        ) : (
+          <div>
+            {/* Guest List is the default tab, so it's always mounted.
+                Simple hidden toggle is safe here since it was already
+                visible (and its embeds already processed) before any
+                hiding ever happens. */}
+            <div className={activeTab === "guests" ? "" : "hidden"}>
+              {/* Search + guest type dropdown filter */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-6">
+                <input
+                  type="text"
+                  placeholder="Search guest name..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full sm:w-56 rounded-full py-1.5 px-4 text-sm bg-white text-[#3d3d6b] border border-[#6b7db3] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#fbb1c3]"
+                />
 
-              <div className="relative" ref={dropdownRef}>
-                <button
-                  onClick={() => setShowTypeDropdown((s) => !s)}
-                  className="flex items-center justify-between gap-2 bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-1.5 text-sm min-w-[220px]"
-                >
-                  <span>
-                    {activeGuestTypes.length > 0
-                      ? `${activeGuestTypes.length} type${
-                          activeGuestTypes.length > 1 ? "s" : ""
-                        } selected`
-                      : `Filter by guest type (${guestRecords.length})`}
-                  </span>
-                  <span className="ml-2">▼</span>
-                </button>
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setShowTypeDropdown((s) => !s)}
+                    className="flex items-center justify-between gap-2 bg-white text-[#6b7db3] border border-[#6b7db3] rounded-full px-4 py-1.5 text-sm min-w-[220px]"
+                  >
+                    <span>
+                      {activeGuestTypes.length > 0
+                        ? `${activeGuestTypes.length} type${
+                            activeGuestTypes.length > 1 ? "s" : ""
+                          } selected`
+                        : `Filter by guest type (${guestRecords.length})`}
+                    </span>
+                    <span className="ml-2">▼</span>
+                  </button>
 
-                {showTypeDropdown && (
-                  <div className="absolute left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 top-full mt-1 w-[90vw] sm:w-72 max-w-[90vw] bg-white border border-[#6b7db3] rounded-lg shadow-lg z-50 max-h-[60vh] overflow-y-auto">
-                    <div className="p-2">
-                      <button
-                        className="w-full text-left px-3 py-2 text-sm hover:bg-[#e6edf7] rounded mb-1 font-medium text-[#3d3d6b]"
-                        onClick={() => setActiveGuestTypes([])}
-                      >
-                        All Guests ({guestRecords.length})
-                      </button>
+                  {showTypeDropdown && (
+                    <div className="absolute left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 top-full mt-1 w-[90vw] sm:w-72 max-w-[90vw] bg-white border border-[#6b7db3] rounded-lg shadow-lg z-50 max-h-[60vh] overflow-y-auto">
+                      <div className="p-2">
+                        <button
+                          className="w-full text-left px-3 py-2 text-sm hover:bg-[#e6edf7] rounded mb-1 font-medium text-[#3d3d6b]"
+                          onClick={() => setActiveGuestTypes([])}
+                        >
+                          All Guests ({guestRecords.length})
+                        </button>
 
-                      <div className="max-h-[50vh] overflow-y-auto">
-                        {GUEST_TYPES.filter((t) => guestTypeCounts[t]).map(
-                          (type) => (
-                            <div
-                              key={type}
-                              className="flex items-center px-3 py-2"
-                            >
-                              <input
-                                type="checkbox"
-                                id={`guest-type-${type}`}
-                                checked={activeGuestTypes.includes(type)}
-                                onChange={() => toggleGuestType(type)}
-                                className="mr-2"
-                              />
-                              <label
-                                htmlFor={`guest-type-${type}`}
-                                className="text-sm cursor-pointer flex-1"
+                        <div className="max-h-[50vh] overflow-y-auto">
+                          {GUEST_TYPES.filter((t) => guestTypeCounts[t]).map(
+                            (type) => (
+                              <div
+                                key={type}
+                                className="flex items-center px-3 py-2"
                               >
-                                {type}
-                              </label>
-                              <span className="text-xs text-gray-400">
-                                {guestTypeCounts[type]}
-                              </span>
-                            </div>
-                          )
-                        )}
+                                <input
+                                  type="checkbox"
+                                  id={`guest-type-${type}`}
+                                  checked={activeGuestTypes.includes(type)}
+                                  onChange={() => toggleGuestType(type)}
+                                  className="mr-2"
+                                />
+                                <label
+                                  htmlFor={`guest-type-${type}`}
+                                  className="text-sm cursor-pointer flex-1"
+                                >
+                                  {type}
+                                </label>
+                                <span className="text-xs text-gray-400">
+                                  {guestTypeCounts[type]}
+                                </span>
+                              </div>
+                            )
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
+                </div>
+
+                {hasActiveFilters && (
+                  <button
+                    onClick={clearFilters}
+                    className="text-xs font-medium px-3 py-1.5 rounded-full bg-[#8e3e3e] text-white hover:bg-[#7a3434] transition-colors whitespace-nowrap"
+                  >
+                    Clear Filters ✕
+                  </button>
                 )}
               </div>
 
-              {hasActiveFilters && (
-                <button
-                  onClick={clearFilters}
-                  className="text-xs font-medium px-3 py-1.5 rounded-full bg-[#8e3e3e] text-white hover:bg-[#7a3434] transition-colors whitespace-nowrap"
-                >
-                  Clear Filters ✕
-                </button>
+              {/* Result count */}
+              <p className="text-center text-xs text-[#6b7db3] mb-4">
+                Showing {filteredGuests.length} of {guestRecords.length} guests
+              </p>
+
+              {/* Guest list — Card view (grid) or Compact view (stacked rows) */}
+              {filteredGuests.length > 0 ? (
+                viewMode === "card" ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                    {filteredGuests.map((r) => (
+                      <GuestCard key={r.id} record={r} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {filteredGuests.map((r) => (
+                      <GuestRow key={r.id} record={r} />
+                    ))}
+                  </div>
+                )
+              ) : (
+                <p className="text-center text-[#6b7280] italic py-6">
+                  No guests match that search/filter yet.
+                </p>
               )}
             </div>
 
-            {/* Result count */}
-            <p className="text-center text-xs text-[#6b7db3] mb-4">
-              Showing {filteredGuests.length} of {guestRecords.length} guests
-            </p>
-
-            {/* Guest list — Card view (grid) or Compact view (stacked rows) */}
-            {filteredGuests.length > 0 ? (
-              viewMode === "card" ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-                  {filteredGuests.map((r) => (
-                    <GuestCard key={r.id} record={r} />
-                  ))}
+            {/* Wedding Details only mounts the first time you actually
+                open the tab — its first visit has a brief real loading
+                moment (unavoidable network fetch), but it's only ever
+                hidden AFTER that succeeds, so embeds never get skipped. */}
+            {visitedTabs.details && (
+              <div className={activeTab === "details" ? "" : "hidden"}>
+                <div className="flex flex-col gap-10">
+                  <WeddingDetailsSection
+                    title="Wedding Details"
+                    records={generalDetailRecords}
+                    emptyMessage="No wedding details added yet."
+                    showTitle={false}
+                  />
+                  <WeddingDetailsSection
+                    title="Guests Who Couldn't Attend"
+                    records={uninvitedRecords}
+                    emptyMessage="Nothing added yet."
+                    titleClassName="text-2xl md:text-3xl font-serif text-[#8e3e3e] mb-6 text-center"
+                  />
                 </div>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  {filteredGuests.map((r) => (
-                    <GuestRow key={r.id} record={r} />
-                  ))}
-                </div>
-              )
-            ) : (
-              <p className="text-center text-[#6b7280] italic py-6">
-                No guests match that search/filter yet.
-              </p>
-            )}
-          </>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-            {coverageRecords.length > 0 ? (
-              coverageRecords.map((r) => (
-                <CoverageCard key={r.id} record={r} />
-              ))
-            ) : (
-              <p className="col-span-2 text-center text-[#6b7280] italic">
-                No articles or videos added yet.
-              </p>
+              </div>
             )}
           </div>
         )}
