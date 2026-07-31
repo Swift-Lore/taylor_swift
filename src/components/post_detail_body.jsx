@@ -19,7 +19,7 @@ import {
   TwitterEmbed,
   YouTubeEmbed,
   TikTokEmbed,
-} from "./shared/LinkEmbeds";
+} from "./LinkEmbeds";
 
 // Format DATE field as "Nov-07-2025" (force UTC so it doesn't shift by timezone)
 const formatEventDate = (isoDate) => {
