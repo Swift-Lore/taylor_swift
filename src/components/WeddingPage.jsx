@@ -663,7 +663,13 @@ const GuestRow = ({ record }) => {
 /*  event pages' SOURCES section) instead of a nested card-in-card.    */
 /*  Combines every row's links from this section into one flowing grid.*/
 /* ------------------------------------------------------------------ */
-const WeddingDetailsSection = ({ title, records, emptyMessage }) => {
+const WeddingDetailsSection = ({
+  title,
+  records,
+  emptyMessage,
+  showTitle = true,
+  titleClassName = "text-lg font-serif text-[#3d3d6b] mb-4 text-center",
+}) => {
   const allUrls = records.flatMap((r) => splitUrls(r.fields?.["URLS"]));
   const notes = records.map((r) => r.fields?.["NOTES"]).filter(Boolean);
 
@@ -677,9 +683,7 @@ const WeddingDetailsSection = ({ title, records, emptyMessage }) => {
 
   return (
     <div>
-      <h2 className="text-lg font-serif text-[#3d3d6b] mb-4 text-center">
-        {title}
-      </h2>
+      {showTitle && <h2 className={titleClassName}>{title}</h2>}
 
       {notes.length > 0 && (
         <div className="max-w-2xl mx-auto mb-6">
@@ -922,7 +926,7 @@ export default function WeddingPage() {
 
   return (
     <div className="bg-[#e6edf7] py-8 md:py-12 min-h-screen">
-      <div className="max-w-5xl mx-auto px-4">
+      <div className="max-w-6xl mx-auto px-4">
         <h1 className="text-2xl md:text-3xl font-serif text-[#8e3e3e] text-center mb-6">
           T&amp;T&apos;s Wedding
         </h1>
@@ -1097,11 +1101,13 @@ export default function WeddingPage() {
               title="Wedding Details"
               records={generalDetailRecords}
               emptyMessage="No wedding details added yet."
+              showTitle={false}
             />
             <WeddingDetailsSection
               title="Guests Who Couldn't Attend"
               records={uninvitedRecords}
               emptyMessage="Nothing added yet."
+              titleClassName="text-2xl md:text-3xl font-serif text-[#8e3e3e] mb-6 text-center"
             />
           </div>
         )}
