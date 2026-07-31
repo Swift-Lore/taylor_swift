@@ -1129,7 +1129,7 @@ const twitterUrls = event?.TWITTER
           {hasSources && (
             <div className="space-y-6">
               {sourceImages.length > 0 && (
-                <div className="image-only-grid flex flex-wrap gap-6 justify-start mb-8">
+                <div className="image-only-grid flex flex-wrap gap-6 justify-center mb-8">
                   {sourceImages.map((url, index) => {
                     const isPinterest = isPinterestUrl(url);
                     const pinId = getPinterestPinId(url);
