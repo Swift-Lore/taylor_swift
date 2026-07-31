@@ -956,16 +956,24 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
         <div className="container mx-auto flex flex-col lg:flex-row lg:gap-6 min-h-0 flex-1">
           <div className="flex-1 min-w-0">
 
-          {/* Ad block */}
-{import.meta.env.PROD && !isLoading && !isInitialLoad && records.length > 0 && (
-  <div className="w-full flex justify-center mb-2 min-h-[90px]"> 
-    <AdSlot
-      variant="leaderboard"
-      maxWidthClass="max-w-6xl"
-      className="relative z-10" 
-    />
-  </div>
-)}
+          {/* Ad block — wrapper always stays mounted (keeps the reserved
+              90px height stable), only the actual AdSlot inside toggles.
+              This is what stops the page jump on Next/Previous: before,
+              the whole block (including its min-height) unmounted during
+              every date-change fetch, collapsing the space and shifting
+              everything below it up, then back down when the ad returned. */}
+          <div className="w-full flex justify-center mb-2 min-h-[90px]">
+            {import.meta.env.PROD &&
+              !isLoading &&
+              !isInitialLoad &&
+              records.length > 0 && (
+                <AdSlot
+                  variant="leaderboard"
+                  maxWidthClass="max-w-6xl"
+                  className="relative z-10"
+                />
+              )}
+          </div>
 
           {/* Mobile view toggle */}
 <div className="lg:hidden flex justify-center gap-2 pt-2 pb-2">
