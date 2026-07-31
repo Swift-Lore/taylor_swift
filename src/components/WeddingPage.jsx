@@ -317,7 +317,7 @@ const ArticlePreviewCard = ({ url }) => {
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        className="microlink-card flex items-center gap-3 w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-white p-3 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-0.5 group"
+        className="microlink-card flex items-center gap-3 w-full max-w-md mb-2 rounded-xl border border-gray-200 bg-[#fff8f8] p-4 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-1 group"
       >
         <img
           src={getFaviconUrl(previewData.domain)}
@@ -432,35 +432,32 @@ const LinkPreview = ({ url }) => {
 
   if (platform === "instagram") {
     return (
-      <div style={{ zoom: 0.65, width: "300px" }}>
-        <blockquote
-          className="instagram-media"
-          data-instgrm-captioned
-          data-instgrm-permalink={url}
-          data-instgrm-version="14"
-          style={{
-            background: "#FFF",
-            borderRadius: "8px",
-            border: "1px solid #dbdbdb",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-            margin: "0",
-            width: "300px",
-            minHeight: "500px",
-            padding: "0",
-          }}
-        >
-          <div style={{ padding: "16px" }}>
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-500 text-sm font-medium"
-            >
-              View Instagram post
-            </a>
-          </div>
-        </blockquote>
-      </div>
+      <blockquote
+        className="instagram-media"
+        data-instgrm-captioned
+        data-instgrm-permalink={url}
+        data-instgrm-version="14"
+        style={{
+          background: "#FFF",
+          borderRadius: "8px",
+          border: "1px solid #dbdbdb",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          margin: "0",
+          width: "326px",
+          padding: "0",
+        }}
+      >
+        <div style={{ padding: "16px" }}>
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 text-sm font-medium"
+          >
+            View Instagram post
+          </a>
+        </div>
+      </blockquote>
     );
   }
 
@@ -693,18 +690,22 @@ const WeddingDetailsSection = ({ title, records, emptyMessage }) => {
       )}
 
       {embedUrls.length > 0 && (
-        <div className="flex flex-wrap gap-6 justify-center items-start mb-8">
-          {embedUrls.map((url, i) => (
-            <LinkPreview key={`embed-${i}`} url={url} />
-          ))}
+        <div className="max-w-[1400px] mx-auto mb-8">
+          <div className="flex flex-wrap gap-6 justify-start items-start">
+            {embedUrls.map((url, i) => (
+              <LinkPreview key={`embed-${i}`} url={url} />
+            ))}
+          </div>
         </div>
       )}
 
       {articleUrls.length > 0 && (
-        <div className="flex flex-wrap gap-6 justify-center items-start">
-          {articleUrls.map((url, i) => (
-            <LinkPreview key={`article-${i}`} url={url} />
-          ))}
+        <div className="max-w-[1400px] mx-auto">
+          <div className="flex flex-wrap gap-6 justify-start items-start">
+            {articleUrls.map((url, i) => (
+              <LinkPreview key={`article-${i}`} url={url} />
+            ))}
+          </div>
         </div>
       )}
 
