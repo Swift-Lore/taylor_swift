@@ -549,7 +549,7 @@ export const ArticlePreviewCard = ({ url }) => {
         <img
           src={previewData.image}
           alt={previewData.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500"
           onError={(e) => {
             e.target.style.display = "none";
           }}
