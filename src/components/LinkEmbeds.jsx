@@ -213,7 +213,6 @@ export const KNOWN_BROKEN_INSTAGRAM_SHORTCODES = [
   "DaYUukgRlJS",
   "DaYGExuqtf_",
   "DaalpkslSDf7ZmfMs7Adl3nSIZBgh8zZ_HoXGI0",
-  // Formerly the hardcoded "isTravisPost" list in post_detail_body.jsx
   "DMgXbQ0yWqW",
   "DP5R6pwEXdY",
   "DPwLCrtjfR3",
@@ -234,6 +233,7 @@ export const KNOWN_BROKEN_INSTAGRAM_SHORTCODES = [
   "DYWHUV9tlLU",
   "DaWQrV3vBRT",
   "DaWSQikvFoW",
+  "Cum8XOUuve8",
 ];
 
 // X/Twitter accounts currently suspended. Add a handle here (lowercase,
