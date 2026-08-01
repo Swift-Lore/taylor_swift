@@ -120,6 +120,35 @@ const blockedDomains = ['justjared.com', 'justjaredjr.com', 'people.com', 'thesu
       domain,
     });
   }
+
+  // Reddit — comment/share permalinks are pure IDs with no readable
+  // words anywhere in the URL (subreddit name, post ID, "comment",
+  // comment ID — nothing guessable). Fetch Reddit's own public JSON
+  // API to get the real post title instead of guessing from the slug.
+  if (domain.includes('reddit.com')) {
+    try {
+      const cleanRedditUrl = url.split('?')[0].replace(/\/$/, '');
+      const jsonRes = await fetch(`${cleanRedditUrl}.json`, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; SwiftLoreBot/1.0)' },
+        signal: AbortSignal.timeout(5000),
+      });
+      const jsonData = await jsonRes.json();
+      const postData = jsonData?.[0]?.data?.children?.[0]?.data;
+      if (postData?.title) {
+        const rawThumb = postData.thumbnail;
+        const hasRealThumb = rawThumb && rawThumb.startsWith('http');
+        return res.status(200).json({
+          title: postData.title,
+          description: postData.subreddit_name_prefixed || '',
+          image: hasRealThumb ? rawThumb : (postData.url_overridden_by_dest?.match(/\.(jpg|jpeg|png|gif)$/i) ? postData.url_overridden_by_dest : null),
+          domain: 'reddit.com',
+        });
+      }
+    } catch (e) {}
+  }
+
+  // Tumblr — try oEmbed for better thumbnails
+  if (domain.includes('tumblr.com')) {
   // Tumblr — try oEmbed for better thumbnails
   if (domain.includes('tumblr.com')) {
     try {
