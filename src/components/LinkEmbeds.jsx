@@ -860,10 +860,26 @@ export const InstagramEmbed = ({ url }) => {
     if (!isVisible) return;
     setTimedOut(false);
 
-    let attempts = 0;
+        let attempts = 0;
     const maxAttempts = 20; // 20 * 300ms ≈ 6s
     const interval = setInterval(() => {
       attempts += 1;
+
+      // Instagram's own embed.js sometimes fails partway through and
+      // leaves behind a stray "View this post on Instagram" link whose
+      // href has utm_campaign=invalid, instead of ever inserting a real
+      // iframe. Treat that as a failure signal immediately instead of
+      // waiting out the full 6s timeout for something that will never
+      // finish loading.
+      const brokenLink = elRef.current?.querySelector(
+        'a[href*="utm_campaign=invalid"]'
+      );
+      if (brokenLink) {
+        clearInterval(interval);
+        setTimedOut(true);
+        return;
+      }
+
       const hasIframe = elRef.current?.querySelector("iframe");
       if (hasIframe) {
         clearInterval(interval);
