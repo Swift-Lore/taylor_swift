@@ -149,8 +149,6 @@ const blockedDomains = ['justjared.com', 'justjaredjr.com', 'people.com', 'thesu
 
   // Tumblr — try oEmbed for better thumbnails
   if (domain.includes('tumblr.com')) {
-  // Tumblr — try oEmbed for better thumbnails
-  if (domain.includes('tumblr.com')) {
     try {
       const oembedRes = await fetch(
         `https://www.tumblr.com/oembed/1.0?url=${encodeURIComponent(url)}`,
