@@ -640,8 +640,10 @@ export const TikTokEmbed = ({ url }) => {
   const cleanUrl = url.trim().split("?")[0];
   const videoIdMatch = cleanUrl.match(/\/video\/(\d+)/);
   const videoId = videoIdMatch ? videoIdMatch[1] : null;
+  const isKnownBroken = videoId && KNOWN_BROKEN_TIKTOK_VIDEO_IDS.includes(videoId);
 
   useEffect(() => {
+    if (isKnownBroken) return;
     setTimedOut(false);
     let attempts = 0;
     const maxAttempts = 20; // ~6s
