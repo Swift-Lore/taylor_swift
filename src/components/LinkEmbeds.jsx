@@ -240,6 +240,7 @@ export const KNOWN_BROKEN_INSTAGRAM_SHORTCODES = [
 // no @) once confirmed, and the fallback card will show a note instead
 // of silently failing like any other broken link.
 export const SUSPENDED_X_ACCOUNTS = ["thetsupdates", "swifferupdates"];
+export const KNOWN_BROKEN_TIKTOK_VIDEO_IDS = ["7392653242783517958"];
 
 export const getSuspendedAccountNote = (url) => {
   const match = url.match(/(?:twitter|x)\.com\/([^/]+)\/status\//i);
@@ -639,8 +640,10 @@ export const TikTokEmbed = ({ url }) => {
   const cleanUrl = url.trim().split("?")[0];
   const videoIdMatch = cleanUrl.match(/\/video\/(\d+)/);
   const videoId = videoIdMatch ? videoIdMatch[1] : null;
+  const isKnownBroken = videoId && KNOWN_BROKEN_TIKTOK_VIDEO_IDS.includes(videoId);
 
   useEffect(() => {
+    if (isKnownBroken) return;
     setTimedOut(false);
     let attempts = 0;
     const maxAttempts = 20; // ~6s
@@ -661,10 +664,10 @@ export const TikTokEmbed = ({ url }) => {
         setTimedOut(true);
       }
     }, 300);
-    return () => clearInterval(interval);
-  }, [url]);
+        return () => clearInterval(interval);
+  }, [url, isKnownBroken]);
 
-  if (timedOut) {
+  if (isKnownBroken || timedOut) {
     return <TikTokFallbackLink url={cleanUrl} />;
   }
 
