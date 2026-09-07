@@ -611,22 +611,76 @@ export const PinterestEmbed = ({ url, width = 300, height = 450 }) => {
 /*  passed as one.                                                     */
 /* ------------------------------------------------------------------ */
 
+export const TikTokFallbackLink = ({ url }) => (
+  
+    href={url}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-3 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-0.5 group"
+    style={{ width: "300px" }}
+  >
+    <div className="w-10 h-10 rounded-lg bg-black flex items-center justify-center text-white flex-shrink-0">
+      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-.88-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/>
+      </svg>
+    </div>
+    <div className="min-w-0">
+      <p className="text-sm font-semibold text-[#3d3d6b] group-hover:text-[#b66b6b] transition-colors">
+        View on TikTok
+      </p>
+      <p className="text-xs text-gray-500 truncate">tiktok.com</p>
+    </div>
+  </a>
+);
+
 export const TikTokEmbed = ({ url }) => {
+  const [timedOut, setTimedOut] = useState(false);
+  const containerRef = useRef(null);
   const cleanUrl = url.trim().split("?")[0];
   const videoIdMatch = cleanUrl.match(/\/video\/(\d+)/);
   const videoId = videoIdMatch ? videoIdMatch[1] : null;
 
+  useEffect(() => {
+    setTimedOut(false);
+    let attempts = 0;
+    const maxAttempts = 20; // ~6s
+    const interval = setInterval(() => {
+      attempts += 1;
+      // Just check whether embed.js ever produced an iframe at all.
+      // TikTok's script can create more than one (a metadata/preview
+      // request alongside the real player), and we can't tell them
+      // apart from outside — so "at least one exists" is the only
+      // safe success signal, not whether a specific one loaded cleanly.
+      const hasIframe = containerRef.current?.querySelector("iframe");
+      if (hasIframe) {
+        clearInterval(interval);
+        return;
+      }
+      if (attempts >= maxAttempts) {
+        clearInterval(interval);
+        setTimedOut(true);
+      }
+    }, 300);
+    return () => clearInterval(interval);
+  }, [url]);
+
+  if (timedOut) {
+    return <TikTokFallbackLink url={cleanUrl} />;
+  }
+
   return (
-    <blockquote
-      className="tiktok-embed"
-      cite={cleanUrl}
-      data-video-id={videoId || undefined}
-      style={{ maxWidth: "300px", minWidth: "300px" }}
-    >
-      <a href={cleanUrl} target="_blank" rel="noopener noreferrer">
-        View on TikTok
-      </a>
-    </blockquote>
+    <div ref={containerRef}>
+      <blockquote
+        className="tiktok-embed"
+        cite={cleanUrl}
+        data-video-id={videoId || undefined}
+        style={{ maxWidth: "300px", minWidth: "300px" }}
+      >
+        <a href={cleanUrl} target="_blank" rel="noopener noreferrer">
+          View on TikTok
+        </a>
+      </blockquote>
+    </div>
   );
 };
 
