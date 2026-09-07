@@ -670,8 +670,15 @@ const twitterUrls = event?.TWITTER
             {event.TIKTOK.split(" || ").map((raw, index) => {
               const cleanUrl = raw.trim();
               if (!cleanUrl) return null;
+              const videoIdMatch = cleanUrl.match(/\/video\/(\d+)/);
+              const videoId = videoIdMatch ? videoIdMatch[1] : null;
+              const isKnownBroken =
+                videoId && KNOWN_BROKEN_TIKTOK_VIDEO_IDS.includes(videoId);
               return (
-                <div key={index} className="tiktok-wrapper">
+                <div
+                  key={index}
+                  className={isKnownBroken ? "" : "tiktok-wrapper"}
+                >
                   <TikTokEmbed url={cleanUrl} />
                 </div>
               );
