@@ -664,10 +664,10 @@ export const TikTokEmbed = ({ url }) => {
         setTimedOut(true);
       }
     }, 300);
-    return () => clearInterval(interval);
-  }, [url]);
+        return () => clearInterval(interval);
+  }, [url, isKnownBroken]);
 
-  if (timedOut) {
+  if (isKnownBroken || timedOut) {
     return <TikTokFallbackLink url={cleanUrl} />;
   }
 
