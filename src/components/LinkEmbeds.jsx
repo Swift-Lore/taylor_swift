@@ -234,7 +234,6 @@ export const KNOWN_BROKEN_INSTAGRAM_SHORTCODES = [
   "DaWQrV3vBRT",
   "DaWSQikvFoW",
   "Cum8XOUuve8",
-  "Cum8XOUuve8",
 ];
 
 // X/Twitter accounts currently suspended. Add a handle here (lowercase,
