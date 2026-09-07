@@ -817,6 +817,15 @@ const TimelineCard = ({ record, index }) => {
 onMouseDown={(e) => {
   if (e.button === 2) e.preventDefault()
 }}
+onContextMenu={() => {
+  // Chrome/Edge auto-select text right before showing the context menu.
+  // Clear it on the next tick so "Open in new tab" still works normally,
+  // but the highlight doesn't stick around.
+  setTimeout(() => {
+    const sel = window.getSelection()
+    if (sel) sel.removeAllRanges()
+  }, 0)
+}}
     >
       <div className="relative">
         <div className="bg-gradient-to-br from-[#fce0e0] to-[#f8d7da] rounded-[13px] shadow-lg border border-[#e8c5c8] p-1">
