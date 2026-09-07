@@ -612,7 +612,7 @@ export const PinterestEmbed = ({ url, width = 300, height = 450 }) => {
 /* ------------------------------------------------------------------ */
 
 export const TikTokFallbackLink = ({ url }) => (
-  
+  <a
     href={url}
     target="_blank"
     rel="noopener noreferrer"
