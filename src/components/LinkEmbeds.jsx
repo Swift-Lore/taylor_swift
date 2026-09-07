@@ -240,6 +240,7 @@ export const KNOWN_BROKEN_INSTAGRAM_SHORTCODES = [
 // no @) once confirmed, and the fallback card will show a note instead
 // of silently failing like any other broken link.
 export const SUSPENDED_X_ACCOUNTS = ["thetsupdates", "swifferupdates"];
+export const KNOWN_BROKEN_TIKTOK_VIDEO_IDS = ["7392653242783517958"];
 
 export const getSuspendedAccountNote = (url) => {
   const match = url.match(/(?:twitter|x)\.com\/([^/]+)\/status\//i);
