@@ -213,7 +213,6 @@ export const KNOWN_BROKEN_INSTAGRAM_SHORTCODES = [
   "DaYUukgRlJS",
   "DaYGExuqtf_",
   "DaalpkslSDf7ZmfMs7Adl3nSIZBgh8zZ_HoXGI0",
-  "DMgXbQ0yWqW",
   "DP5R6pwEXdY",
   "DPwLCrtjfR3",
   "npJnb4ujGj",
@@ -234,12 +233,13 @@ export const KNOWN_BROKEN_INSTAGRAM_SHORTCODES = [
   "DaWQrV3vBRT",
   "DaWSQikvFoW",
   "Cum8XOUuve8",
+  "NW847ptRRI",
 ];
 
 // X/Twitter accounts currently suspended. Add a handle here (lowercase,
 // no @) once confirmed, and the fallback card will show a note instead
 // of silently failing like any other broken link.
-export const SUSPENDED_X_ACCOUNTS = ["thetsupdates", "swifferupdates", "onthistay"];
+export const SUSPENDED_X_ACCOUNTS = ["thetsupdates", "swifferupdates", "onthistay", "kaiamal13"];
 export const KNOWN_BROKEN_TIKTOK_VIDEO_IDS = ["7392653242783517958"];
 
 export const getSuspendedAccountNote = (url) => {
