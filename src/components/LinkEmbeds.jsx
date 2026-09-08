@@ -213,7 +213,6 @@ export const KNOWN_BROKEN_INSTAGRAM_SHORTCODES = [
   "DaYUukgRlJS",
   "DaYGExuqtf_",
   "DaalpkslSDf7ZmfMs7Adl3nSIZBgh8zZ_HoXGI0",
-  "DMgXbQ0yWqW",
   "DP5R6pwEXdY",
   "DPwLCrtjfR3",
   "npJnb4ujGj",
