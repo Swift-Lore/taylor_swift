@@ -1053,6 +1053,7 @@ export const LinkPreview = ({ url }) => {
   }
 
   if (platform === "tiktok") return <TikTokEmbed url={url} />;
+  if (platform === "bluesky") return <BlueskyEmbed url={url} />;
 
   return <SourceLinkPreview url={url} />;
 };
