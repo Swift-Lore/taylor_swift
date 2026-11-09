@@ -1127,7 +1127,14 @@ export const BlueskyEmbed = ({ url }) => {
         );
         if (!p.ok) throw new Error("post lookup failed");
         const data = await p.json();
-        if (!data.posts?.length) throw new Error("post not found");
+                if (!data.posts?.length) throw new Error("post not found");
+
+        // Author has opted out of showing posts on external sites —
+        // show our own link card instead of Bluesky's notice.
+        const labels = data.posts[0].author?.labels || [];
+        if (labels.some((l) => l.val === "!no-unauthenticated")) {
+          throw new Error("author blocks external display");
+        }
 
         if (!cancelled) {
           setEmbedSrc(
