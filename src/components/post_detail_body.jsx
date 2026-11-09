@@ -557,7 +557,7 @@ const twitterUrls = event?.TWITTER
               )}
 
               {nonImageLinks.length > 0 && (
-                <div className="microlink-grid" style={{ justifyContent: "center" }}>
+                <div className="microlink-grid" style={{ justifyContent: "start" }}>
                   {nonImageLinks.map((url, index) => (
                     <SourceLinkPreview key={`link-${index}`} url={url} />
                   ))}
