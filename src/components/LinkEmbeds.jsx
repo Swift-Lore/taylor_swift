@@ -638,55 +638,32 @@ export const TikTokFallbackLink = ({ url }) => (
 );
 
 export const TikTokEmbed = ({ url }) => {
-  const [timedOut, setTimedOut] = useState(false);
-  const containerRef = useRef(null);
   const cleanUrl = url.trim().split("?")[0];
   const videoIdMatch = cleanUrl.match(/\/video\/(\d+)/);
   const videoId = videoIdMatch ? videoIdMatch[1] : null;
-  const isKnownBroken = videoId && KNOWN_BROKEN_TIKTOK_VIDEO_IDS.includes(videoId);
+  const isKnownBroken =
+    videoId && KNOWN_BROKEN_TIKTOK_VIDEO_IDS.includes(videoId);
 
-  useEffect(() => {
-    if (isKnownBroken) return;
-    setTimedOut(false);
-    let attempts = 0;
-    const maxAttempts = 20; // ~6s
-    const interval = setInterval(() => {
-      attempts += 1;
-      // Just check whether embed.js ever produced an iframe at all.
-      // TikTok's script can create more than one (a metadata/preview
-      // request alongside the real player), and we can't tell them
-      // apart from outside — so "at least one exists" is the only
-      // safe success signal, not whether a specific one loaded cleanly.
-      const hasIframe = containerRef.current?.querySelector("iframe");
-      if (hasIframe) {
-        clearInterval(interval);
-        return;
-      }
-      if (attempts >= maxAttempts) {
-        clearInterval(interval);
-        setTimedOut(true);
-      }
-    }, 300);
-        return () => clearInterval(interval);
-  }, [url, isKnownBroken]);
-
-  if (isKnownBroken || timedOut) {
+  // No numeric ID (short links like vm.tiktok.com) can't be embedded
+  // directly, so those go straight to the link card.
+  if (!videoId || isKnownBroken) {
     return <TikTokFallbackLink url={cleanUrl} />;
   }
 
+  // Direct iframe to TikTok's player instead of relying on embed.js
+  // to find and replace a blockquote. Same reasoning as PinterestEmbed:
+  // it always renders where it's placed, with no script timing issues.
   return (
-    <div ref={containerRef}>
-      <blockquote
-        className="tiktok-embed"
-        cite={cleanUrl}
-        data-video-id={videoId || undefined}
-        style={{ maxWidth: "300px", minWidth: "300px" }}
-      >
-        <a href={cleanUrl} target="_blank" rel="noopener noreferrer">
-          View on TikTok
-        </a>
-      </blockquote>
-    </div>
+    <iframe
+      src={`https://www.tiktok.com/embed/v2/${videoId}`}
+      width="325"
+      height="740"
+      frameBorder="0"
+      allow="encrypted-media; fullscreen; picture-in-picture"
+      allowFullScreen
+      style={{ border: "0", maxWidth: "100%" }}
+      title="TikTok video"
+    />
   );
 };
 
