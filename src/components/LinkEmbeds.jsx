@@ -996,6 +996,7 @@ export const InstagramEmbed = ({ url }) => {
 export const SourceLinkPreview = ({ url }) => {
   if (isGettyUrl(url)) return <GettyCard url={url} />;
   if (isFacebookUrl(url)) return <FacebookCard url={url} />;
+  if (isBlueskyUrl(url)) return <BlueskyEmbed url={url} />;
   return <ArticlePreviewCard url={url} />;
 };
 
