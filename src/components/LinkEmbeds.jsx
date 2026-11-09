@@ -237,6 +237,7 @@ export const KNOWN_BROKEN_INSTAGRAM_SHORTCODES = [
   "DMgXbQ0yWqW",
   "CvgvejFOvgU",
   "C-VyDVMhrNH",
+  "DPVTqeXDlzL",
 ];
 
 // X/Twitter accounts currently suspended. Add a handle here (lowercase,
@@ -951,7 +952,7 @@ export const InstagramEmbed = ({ url }) => {
     <div
       ref={elRef}
       className="instagram-container flex flex-col items-center"
-      style={{ width: "326px" }}
+            style={{ width: "326px", overflow: "hidden" }}
     >
       <blockquote
         className="instagram-media"
