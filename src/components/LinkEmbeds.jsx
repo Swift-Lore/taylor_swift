@@ -177,6 +177,7 @@ export const getPlatform = (url) => {
   if (lower.includes("youtube.com") || lower.includes("youtu.be"))
     return "youtube";
   if (lower.includes("tiktok.com")) return "tiktok";
+  if (lower.includes("bsky.app")) return "bluesky";
   return "link";
 };
 
@@ -238,6 +239,8 @@ export const KNOWN_BROKEN_INSTAGRAM_SHORTCODES = [
   "CvgvejFOvgU",
   "C-VyDVMhrNH",
   "DPVTqeXDlzL",
+  "DfNs0pdjxwq",
+  "DfNs0pdjxwq",
 ];
 
 // X/Twitter accounts currently suspended. Add a handle here (lowercase,
@@ -993,6 +996,7 @@ export const InstagramEmbed = ({ url }) => {
 export const SourceLinkPreview = ({ url }) => {
   if (isGettyUrl(url)) return <GettyCard url={url} />;
   if (isFacebookUrl(url)) return <FacebookCard url={url} />;
+  if (isBlueskyUrl(url)) return <BlueskyEmbed url={url} />;
   return <ArticlePreviewCard url={url} />;
 };
 
@@ -1050,6 +1054,139 @@ export const LinkPreview = ({ url }) => {
   }
 
   if (platform === "tiktok") return <TikTokEmbed url={url} />;
+  if (platform === "bluesky") return <BlueskyEmbed url={url} />;
 
   return <SourceLinkPreview url={url} />;
+};
+/* ------------------------------------------------------------------ */
+/*  Bluesky — bsky.app/profile/{handle}/post/{id} links. Bluesky's     */
+/*  embed player needs the account's permanent DID, not the handle,    */
+/*  so this looks it up via the public API first, then checks the post */
+/*  still exists (unlike Instagram, Bluesky's API lets us confirm that */
+/*  before embedding). Loads the official embed iframe directly — no   */
+/*  script — and resizes it when Bluesky reports the post's height.    */
+/* ------------------------------------------------------------------ */
+
+export const isBlueskyUrl = (url) =>
+  !!url && /bsky\.app\/profile\/[^/]+\/post\/[^/?#]+/i.test(url);
+
+const parseBlueskyUrl = (url) => {
+  const m = url?.match(/bsky\.app\/profile\/([^/]+)\/post\/([^/?#]+)/i);
+  return m ? { actor: m[1], rkey: m[2] } : null;
+};
+
+export const BlueskyFallbackLink = ({ url }) => (
+  <a
+    href={url}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-3 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-[#b66b6b] hover:-translate-y-0.5 group"
+    style={{ width: "326px" }}
+  >
+    <img
+      src={getFaviconUrl("bsky.app")}
+      alt="Bluesky"
+      className="w-10 h-10 rounded-lg border border-gray-200 shadow-sm flex-shrink-0"
+    />
+    <div className="min-w-0">
+      <p className="text-sm font-semibold text-[#3d3d6b] group-hover:text-[#b66b6b] transition-colors">
+        View on Bluesky
+      </p>
+      <p className="text-xs text-gray-500 truncate">bsky.app</p>
+    </div>
+  </a>
+);
+
+export const BlueskyEmbed = ({ url }) => {
+  const [status, setStatus] = useState("loading"); // loading | ok | failed
+  const [embedSrc, setEmbedSrc] = useState(null);
+  const [height, setHeight] = useState(400);
+  const frameId = useRef(`bsky-${Math.random().toString(36).slice(2)}`);
+
+  useEffect(() => {
+    let cancelled = false;
+    setStatus("loading");
+
+    const run = async () => {
+      try {
+        const parsed = parseBlueskyUrl(url);
+        if (!parsed) throw new Error("bad url");
+
+        let did = parsed.actor;
+        if (!did.startsWith("did:")) {
+          const r = await fetch(
+            `https://public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle?handle=${encodeURIComponent(did)}`
+          );
+          if (!r.ok) throw new Error("handle lookup failed");
+          did = (await r.json()).did;
+        }
+
+        const atUri = `at://${did}/app.bsky.feed.post/${parsed.rkey}`;
+        const p = await fetch(
+          `https://public.api.bsky.app/xrpc/app.bsky.feed.getPosts?uris=${encodeURIComponent(atUri)}`
+        );
+        if (!p.ok) throw new Error("post lookup failed");
+        const data = await p.json();
+                if (!data.posts?.length) throw new Error("post not found");
+
+        // Author has opted out of showing posts on external sites —
+        // show our own link card instead of Bluesky's notice.
+        const labels = data.posts[0].author?.labels || [];
+        if (labels.some((l) => l.val === "!no-unauthenticated")) {
+          throw new Error("author blocks external display");
+        }
+
+        if (!cancelled) {
+          setEmbedSrc(
+            `https://embed.bsky.app/embed/${did}/app.bsky.feed.post/${parsed.rkey}?id=${frameId.current}`
+          );
+          setStatus("ok");
+        }
+      } catch {
+        if (!cancelled) setStatus("failed");
+      }
+    };
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [url]);
+
+  // Bluesky's iframe reports its rendered height via postMessage.
+  useEffect(() => {
+    const onMessage = (e) => {
+      if (e.origin !== "https://embed.bsky.app") return;
+      if (e.data?.id !== frameId.current) return;
+      if (typeof e.data.height === "number") setHeight(e.data.height);
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, []);
+
+  if (status === "failed") return <BlueskyFallbackLink url={url} />;
+
+  if (status === "loading") {
+    return (
+      <div
+        className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm animate-pulse"
+        style={{ width: "326px" }}
+      >
+        <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+      </div>
+    );
+  }
+
+  return (
+    <iframe
+      src={embedSrc}
+      width="326"
+      height={height}
+      frameBorder="0"
+      scrolling="no"
+      style={{ border: "0", maxWidth: "100%", overflow: "hidden" }}
+      title="Bluesky post"
+    />
+  );
 };
