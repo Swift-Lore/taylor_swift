@@ -49,11 +49,9 @@ useEffect(() => {
   const fetchEventsForMonth = async (month, year) => {
     try {
       const response = await axios.get(
-        "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+        "/api/airtable?table=events",
         {
-          headers: {
-            Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-          },
+
           params: {
             filterByFormula: `AND(MONTH({DATE}) = ${month}, YEAR({DATE}) = ${year})`,
             fields: ["DATE"],
@@ -336,7 +334,7 @@ const swapDates = () => {
 
 const addRes = calculatorTab === "add" ? calcAddSubtract() : null;
 const betweenRes = calculatorTab === "between" ? calcBetween() : null;
-  
+
   return (
     <>
       <div

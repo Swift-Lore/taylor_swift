@@ -89,9 +89,9 @@ export default function RecentEvents({ mobileTab }) {
       try {
         const trackerFetches = TRACKER_KEYS.map((key) =>
           axios.get(
-            "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+            "/api/airtable?table=events",
             {
-              headers: { Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}` },
+
               params: {
                 filterByFormula: `AND(FIND('${key}', ARRAYJOIN({TRACKER}, ',')), IS_BEFORE({DATE}, DATEADD('${today}', 1, 'days')))`,
                 sort: [{ field: "DATE", direction: "desc" }],
@@ -104,9 +104,9 @@ export default function RecentEvents({ mobileTab }) {
 
         const [recentRes, upcomingRes, ...trackerResults] = await Promise.all([
           axios.get(
-            "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+            "/api/airtable?table=events",
             {
-              headers: { Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}` },
+
               params: {
                 filterByFormula: `IS_BEFORE({DATE}, DATEADD('${today}', 1, 'days'))`,
 sort: [{ field: "DATE", direction: "desc" }],
@@ -116,9 +116,9 @@ pageSize: 4,
             }
           ),
           axios.get(
-            "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+            "/api/airtable?table=events",
             {
-              headers: { Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}` },
+
               params: {
                 filterByFormula: `IS_AFTER({DATE}, '${today}')`,
                 sort: [{ field: "DATE", direction: "asc" }],

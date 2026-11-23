@@ -7,8 +7,6 @@ import { LinkPreview, getPlatform } from "./LinkEmbeds";
 /* ------------------------------------------------------------------ */
 /*  CONFIG — update these two if your base/table ever changes          */
 /* ------------------------------------------------------------------ */
-const BASE_ID = "appVhtDyx0VKlGbhy";
-const TABLE_NAME = "Wedding"; // matches the tab name shown in Airtable
 
 const GUEST_TYPES = [
   "Actor",
@@ -293,13 +291,9 @@ export default function WeddingPage() {
       try {
         do {
           const res = await axios.get(
-            `https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(
-              TABLE_NAME
-            )}`,
+            "/api/airtable?table=wedding",
             {
-              headers: {
-                Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-              },
+
               params: offset ? { offset } : {},
             }
           );

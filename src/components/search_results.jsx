@@ -70,11 +70,9 @@ export default function SearchResults() {
           : searchConditions[0]
 
         const response = await axios.get(
-          "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+          "/api/airtable?table=events",
           {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-            },
+
             params: {
               maxRecords: 100,
               filterByFormula: filterFormula,

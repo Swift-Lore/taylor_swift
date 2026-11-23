@@ -4,13 +4,13 @@ import AdSlot from "./adslot";
 
 const SERVER_EVENTS_ENDPOINT = import.meta.env.VITE_EVENTS_ENDPOINT || "";
 
-// Direct Airtable fallback (same base/table as Timeline)
+// Server endpoint for the same public events as Timeline
 const AIRTABLE_URL =
-  "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker";
+  "/api/airtable?table=events";
 
 // Outfits table URL
 const AIRTABLE_OUTFITS_URL =
-  "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/ERAS%20TOUR%20OUTFITS";
+  "/api/airtable?table=outfits";
 
 // Normalize any record shape into a flat "show" object
 function normalizeShow(raw) {
@@ -151,17 +151,13 @@ export default function ErasTourShows() {
           do {
             const filterFormula = encodeURIComponent(`NOT({Eras Show #} = '')`);
 
-            let url = `${AIRTABLE_URL}?filterByFormula=${filterFormula}&sort[0][field]=DATE&sort[0][direction]=asc&pageSize=100`;
+            let url = `${AIRTABLE_URL}&filterByFormula=${filterFormula}&sort[0][field]=DATE&sort[0][direction]=asc&pageSize=100`;
 
             if (offset) {
               url += `&offset=${offset}`;
             }
 
-            const res = await fetch(url, {
-              headers: {
-                Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-              },
-            });
+            const res = await fetch(url);
 
             if (!res.ok) {
               throw new Error(
@@ -227,14 +223,10 @@ export default function ErasTourShows() {
 
         do {
   // Use a specific view so Airtable returns outfits in that view's order
-  let url = `${AIRTABLE_OUTFITS_URL}?view=Grid%20view&pageSize=100`;
+  let url = `${AIRTABLE_OUTFITS_URL}&view=Grid%20view&pageSize=100`;
   if (offset) url += `&offset=${offset}`;
 
-  const res = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-    },
-  });
+  const res = await fetch(url);
 
   if (!res.ok) {
     throw new Error(`Failed to fetch outfits: ${res.status}`);
