@@ -229,8 +229,8 @@ onDecline={() => {
         }}
         expires={365}
       >
-        🍪 We use cookies to improve your experience on our site. By continuing
-        to browse, you agree to our use of cookies.
+        🍪 We use optional cookies for analytics and advertising.
+You can accept or reject these cookies.
         <span style={{ fontSize: "12px", display: "block", marginTop: "8px" }}>
           <a
   href="/privacy_policy"
