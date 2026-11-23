@@ -19,7 +19,7 @@ export default async function handler(req, res) {
   try {
     const response = await fetch(
       `https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker/${id}`,
-      { headers: { Authorization: `Bearer ${process.env.VITE_AIRTABLE_API_KEY}` } }
+      { headers: { Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}` } }
     );
     const data = await response.json();
     const event = data.fields;

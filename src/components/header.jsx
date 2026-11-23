@@ -36,12 +36,7 @@ export default function Header() {
         const fetchEventData = async () => {
           try {
             const response = await fetch(
-              `https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker/${postId}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-                },
-              }
+              `/api/airtable?table=events&id=${encodeURIComponent(postId)}`
             );
 
             if (response.ok) {

@@ -61,7 +61,7 @@ const userInteractedRef = useRef(false)
       "Browse the full Swift-Lore Taylor Swift timeline: thousands of dated events with filters for albums, tours, Taylor sightings, and other characters within the Taylor Swift Cinematic Universe :)."
 
   }, [])
-  
+
   // Helper: Update URL params when filters change
   const updateURLParams = () => {
   const params = new URLSearchParams()
@@ -178,7 +178,7 @@ const [debouncedEnd, setDebouncedEnd] = useState("")
       const selectedDay = day
       const monthStr = selectedMonth.toString().padStart(2, '0')
       const dayStr = selectedDay.toString().padStart(2, '0')
-      
+
       // Set the monthDay input with MM/DD format
       setMonthDay(`${monthStr}/${dayStr}`)
       setShowCalendar(false)
@@ -208,13 +208,13 @@ const [debouncedEnd, setDebouncedEnd] = useState("")
   const today = new Date()
   const monthStr = (today.getMonth() + 1).toString().padStart(2, '0')
   const dayStr = today.getDate().toString().padStart(2, '0')
-  
+
   // Batch state updates
   setMonthDay(`${monthStr}/${dayStr}`)
   setCalendarMonth(today.getMonth())
   setCalendarYear(today.getFullYear())
   setShowCalendar(false)
-  
+
   // Small delay to prevent double render
   setTimeout(() => {
     resetPagination()
@@ -334,7 +334,7 @@ resetPagination()
   // Check cache first
   const cached = localStorage.getItem('swiftlore_keywords');
   const cacheTime = localStorage.getItem('swiftlore_keywords_time');
-  
+
   // Use cache if it's less than 1 hour old
   if (cached && cacheTime && (Date.now() - parseInt(cacheTime)) < 60 * 60 * 1000) {
     setAllKeywords(JSON.parse(cached));
@@ -351,11 +351,9 @@ resetPagination()
 
     do {
       const response = await axios.get(
-        "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Keywords",
+        "/api/airtable?table=keywords",
         {
-          headers: {
-            Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-          },
+
           params: {
             fields: ["Keywords"],
             pageSize: 100,
@@ -373,11 +371,11 @@ resetPagination()
       .sort((a, b) => a.localeCompare(b));
     setAllKeywords(keywords);
     setKeywordsLoaded(true);
-    
+
     // Save to cache
     localStorage.setItem('swiftlore_keywords', JSON.stringify(keywords));
     localStorage.setItem('swiftlore_keywords_time', Date.now().toString());
-    
+
   } catch (error) {
     console.error("Error fetching all keywords:", error);
   } finally {
@@ -398,7 +396,7 @@ useEffect(() => {
       await loadKeywordsIfNeeded();
     }
   };
-  
+
   // Check for updates 30 seconds after page load (non-blocking)
   const timer = setTimeout(checkForUpdates, 30000);
   return () => clearTimeout(timer);
@@ -408,18 +406,16 @@ useEffect(() => {
   const fetchEventsForMonth = async (month, year) => {
     try {
       const response = await axios.get(
-        "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+        "/api/airtable?table=events",
         {
-          headers: {
-            Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-          },
+
           params: {
   filterByFormula: `AND(MONTH({DATE}) = ${month}, YEAR({DATE}) = ${year})`,
   fields: ["DATE"],
 },
         }
       )
-      
+
       // Create a map of dates that have events (no timezone conversion)
 const eventsMap = {}
 response.data.records?.forEach(record => {
@@ -449,7 +445,7 @@ useEffect(() => {
     const timer = setTimeout(() => {
       resetPagination()
     }, 10)
-    
+
     return () => clearTimeout(timer)
   }
 }, [monthDay])
@@ -463,7 +459,7 @@ useEffect(() => {
   const timer = setTimeout(() => setDebouncedEnd(endDateInput), 600)
   return () => clearTimeout(timer)
 }, [endDateInput])
-  
+
 // filter keywords list (using dynamic list from Airtable)
 const getFilteredKeywords = () => {
   const source = allKeywords.length ? allKeywords : []
@@ -566,11 +562,9 @@ if (isCompleteMonthDay(monthDay)) {
         const currentOffset = offsetHistory[currentOffsetIndex]
 
 const response = await axios.get(
-  "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+  "/api/airtable?table=events",
   {
-    headers: {
-      Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-    },
+
     params: {
   pageSize: clauses.length > 0 ? filterRecordsPerPage : recordsPerPage,
   offset: currentOffset || undefined,
@@ -721,11 +715,9 @@ if (reset) {
         const currentSearchOffset = searchOffsetHistory[searchOffsetIndex]
 
 const response = await axios.get(
-  "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+  "/api/airtable?table=events",
   {
-    headers: {
-      Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-    },
+
     params: {
       pageSize: searchRecordsPerPage,
       offset: currentSearchOffset || undefined,
@@ -1221,7 +1213,7 @@ const CalendarModal = () => {
     </div>
   )
 }
-  
+
   return (
        <div className="bg-[#e6edf7] py-8 overflow-x-hidden">
                {/* SEO helper for crawlers, hidden visually */}
@@ -1233,7 +1225,7 @@ const CalendarModal = () => {
           easter eggs.
         </p>
       </div>
-         
+
       {/* ADD INTRODUCTORY TEXT HERE - New Section */}
       <div className="max-w-6xl mx-auto px-4 mb-6">
         <div className="text-center mb-8">
@@ -1445,7 +1437,7 @@ const CalendarModal = () => {
     <span>Date Calc</span>
   </button>
 </div>
-          
+
           {/* Search */}
           <div className="relative flex-grow min-w-[200px]">
             <form onSubmit={handleSearch} className="relative ml-2">
@@ -1522,7 +1514,7 @@ const CalendarModal = () => {
           )}
         </div>
       </div>
-         
+
                   {/* Ad block */}
 {import.meta.env.PROD && !loading && (posts.length > 0 || searchResults.length > 0) && (
   <AdSlot
@@ -1712,7 +1704,7 @@ const CalendarModal = () => {
           View On This Day
         </button>
       </div>
-      
+
       {/* Calendar Modal */}
 <CalendarModal />
 
@@ -1720,7 +1712,7 @@ const CalendarModal = () => {
 {showDateCalc && (
   <DateCalculatorModal onClose={() => setShowDateCalc(false)} />
 )}
-      
+
       <br />
     </div>
   )

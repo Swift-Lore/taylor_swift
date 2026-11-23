@@ -65,7 +65,7 @@ const FIXED_HOLIDAYS = new Set(
     "Mean Girls Day",
     "Last Kiss Day",
     "High Infidelity Day",
-    
+
   ].map((s) => s.toLowerCase())
 )
 
@@ -203,12 +203,12 @@ const [showDateCalc, setShowDateCalc] = useState(false)
 const [showDateTools, setShowDateTools] = useState(false)
 const [isInitialLoad, setIsInitialLoad] = useState(true)
 const [mobileView, setMobileView] = useState("today")
-  
+
   // ===== SEO META TAGS UPDATE =====
   useEffect(() => {
     // Update page title
     document.title = `Swift-Lore - Taylor Swift Timeline | On This Day`
-    
+
     // Update or create meta description
     let metaDescription = document.querySelector('meta[name="description"]')
     if (!metaDescription) {
@@ -217,14 +217,14 @@ const [mobileView, setMobileView] = useState("today")
       document.head.appendChild(metaDescription)
     }
     metaDescription.content = `Explore Taylor Swift events on this day across all eras. Interactive timeline with ${SITE_UPDATES.totalEvents}+ verified events, updated ${SITE_UPDATES.lastUpdated}.`
-    
+
     // Add structured data for Google
     const scriptId = "structured-data-script"
     let existingScript = document.getElementById(scriptId)
     if (existingScript) {
       existingScript.remove()
     }
-    
+
     const script = document.createElement('script')
     script.id = scriptId
     script.type = "application/ld+json"
@@ -240,7 +240,7 @@ const [mobileView, setMobileView] = useState("today")
       "dateModified": new Date().toISOString().split('T')[0]
     })
     document.head.appendChild(script)
-    
+
     // Cleanup on component unmount
     return () => {
       if (script.parentNode) {
@@ -248,7 +248,7 @@ const [mobileView, setMobileView] = useState("today")
       }
     }
   }, [])
-  
+
   // This updates the URL whenever the date changes so "Back" works
   useEffect(() => {
     const formattedDate = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(currentDay).padStart(2, '0')}`;
@@ -641,7 +641,7 @@ const handlePreviousDay = () => {
     const fetchRecordsByDate = async (month, day, year) => {
       const fetchByDate = async () => {
         let filterFormula
-      
+
         if (isTorontoMode) {
   // In TN mode, show the exact matching TN year first,
   // plus all other matching month/day events underneath
@@ -650,13 +650,11 @@ const handlePreviousDay = () => {
   // Normal mode: show this day across all years
   filterFormula = `AND(MONTH({DATE}) = ${month}, DAY({DATE}) = ${day})`
 }
-      
+
         const response = await axios.get(
-          "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+          "/api/airtable?table=events",
           {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-            },
+
             params: {
               filterByFormula: filterFormula,
               sort: [{ field: "DATE", direction: "desc" }],
@@ -710,18 +708,16 @@ const handlePreviousDay = () => {
     const fetchEventsForMonth = async (month, year) => {
       try {
         const response = await axios.get(
-          "https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker",
+          "/api/airtable?table=events",
           {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-            },
+
             params: {
   filterByFormula: `AND(MONTH({DATE}) = ${month}, YEAR({DATE}) = ${year})`,
   fields: ["DATE"],
 },
           }
         )
-        
+
         // Create a map of dates that have events
 const eventsMap = {}
 response.data.records?.forEach((record) => {
@@ -740,7 +736,7 @@ response.data.records?.forEach((record) => {
   const dateKey = `${year}-${month}-${day}`
   eventsMap[dateKey] = true
 })
-        
+
         setDateEventsMap(prev => ({ ...prev, ...eventsMap }))
       } catch (error) {
         console.error("Error fetching calendar events:", error)
@@ -959,7 +955,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
         <p>Current date: {displayDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
         <p>Archive last updated: {SITE_UPDATES.lastUpdated}</p>
       </div>
-      
+
       {/* Your existing visible timeline JSX */}
       <section className="w-full bg-[#e8ecf7] py-1 px-2 md:px-6 flex flex-col min-h-0">
         <div className="container mx-auto flex flex-col lg:flex-row lg:gap-6 min-h-0 flex-1">
@@ -1165,7 +1161,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
 )}
   </div>
 </div>
-            
+
                     {/* Mobile Timeline – only show when there are events */}
           {records.length > 0 && (
             <div className="md:hidden mt-1 px-3">
@@ -1292,7 +1288,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
   Swift-Lore is a fan-created research project and may contain occasional inaccuracies.
   If you spot an error, please contact us.
 </div>
-          
+
           {/* View Full Timeline Button */}
           <div className="flex justify-center mt-1 mb-1 flex-shrink-0">
             <Button
@@ -1306,7 +1302,7 @@ const hasGlobalHoliday = globalHolidayTagsForDay.length > 0
               View Full Timeline
             </Button>
           </div>
-          
+
           {/* Modals */}
 <CalendarModal />
 <TNInfoModal />

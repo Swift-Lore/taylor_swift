@@ -62,8 +62,7 @@ function AroundThisTime({ eventDate, currentPostId }) {
       after.setUTCDate(after.getUTCDate() + 3)
       const fmt = (d) => d.toISOString().split("T")[0]
       const res = await fetch(
-        `https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker?filterByFormula=AND(IS_AFTER({DATE},'${fmt(before)}'),IS_BEFORE({DATE},'${fmt(after)}'))&sort[0][field]=DATE&sort[0][direction]=asc&fields[]=DATE&fields[]=EVENT&fields[]=KEYWORDS`,
-        { headers: { Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}` } }
+        `/api/airtable?table=events&filterByFormula=AND(IS_AFTER({DATE},'${fmt(before)}'),IS_BEFORE({DATE},'${fmt(after)}'))&sort[0][field]=DATE&sort[0][direction]=asc&fields[]=DATE&fields[]=EVENT&fields[]=KEYWORDS`
       )
       const data = await res.json()
       const all = (data.records || []).filter(r => r.id !== currentPostId)
@@ -209,12 +208,7 @@ export default function PostDetailBody() {
         }
 
         const response = await fetch(
-          `https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker/${postId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-            },
-          }
+          `/api/airtable?table=events&id=${encodeURIComponent(postId)}`
         );
 
         if (!response.ok) {
@@ -250,7 +244,7 @@ export default function PostDetailBody() {
   setSourceImages(imageLinks);
   setNonImageLinks(otherLinks);
 }, [event]);
-  
+
   // Modal helpers
   const closeModal = () => setIsModalOpen(false);
 
@@ -318,7 +312,7 @@ export default function PostDetailBody() {
       document.body.appendChild(script);
     }
   }, [event]);
-  
+
   // Getty embed: inject HTML and execute its scripts
 useEffect(() => {
   const embedHtml = event?.["GETTY EMBED"];
@@ -333,7 +327,7 @@ useEffect(() => {
   // Create a temporary div to parse the HTML
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = embedHtml;
-  
+
   // Append all elements to the container
   while (tempDiv.firstChild) {
     container.appendChild(tempDiv.firstChild);
@@ -345,20 +339,20 @@ useEffect(() => {
 
   scriptsArray.forEach((oldScript) => {
     const newScript = document.createElement('script');
-    
+
     // Copy all attributes
     Array.from(oldScript.attributes).forEach(attr => {
       newScript.setAttribute(attr.name, attr.value);
     });
-    
+
     // Copy inner content for inline scripts
     if (oldScript.innerHTML) {
       newScript.innerHTML = oldScript.innerHTML;
     }
-    
+
     // Remove the old script
     oldScript.parentNode.removeChild(oldScript);
-    
+
     // Append the new script to body to execute it
     document.body.appendChild(newScript);
   });
@@ -379,7 +373,7 @@ useEffect(() => {
 
   container.innerHTML = embedHtml;
 }, [event?.["FACEBOOK EMBED"]]);
-  
+
   // Pinterest embed script
 useEffect(() => {
   if (!document.getElementById("pinterest-script")) {
@@ -390,7 +384,7 @@ useEffect(() => {
     document.body.appendChild(script);
   }
 }, []);
- 
+
   // TikTok embed script loading — needed globally since the shared
   // TikTokEmbed component drops blockquotes but doesn't load the
   // script itself (same reasoning as the Wedding page: TikTok's
@@ -572,7 +566,7 @@ const twitterUrls = event?.TWITTER
       {event?.DATE && (
         <AroundThisTime eventDate={event.DATE} currentPostId={postId} />
       )}
-      
+
       {/* AdSense: Post Detail (inline) */}
       {import.meta.env.PROD && !!event && (
         <div className="max-w-4xl mx-auto px-4 mb-8">
@@ -582,7 +576,7 @@ const twitterUrls = event?.TWITTER
           />
         </div>
       )}
-      
+
       {/* Main image */}
       {event.IMAGE && event.IMAGE.length > 0 && (
         <section className="max-w-4xl mx-auto px-4 mb-10">
