@@ -138,7 +138,7 @@ function App() {
     const hasConsent = document.cookie.includes("websiteCookieConsent=true");
     if (!hasConsent) return;
 
-    loadAdSenseScript();
+    loadConsentedScripts();
   }, []);
   return (
     <>
@@ -182,7 +182,7 @@ function App() {
           sameSite="Lax"
         onAccept={() => {
           if (!import.meta.env.PROD) return;
-          loadAdSenseScript();
+          loadConsentedScripts();
         }}
 onDecline={() => {
 }}
