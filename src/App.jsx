@@ -135,7 +135,9 @@ function App() {
     // We only load ads in the real live site, not the Bolt preview
     if (!import.meta.env.PROD) return;
 
-    const hasConsent = document.cookie.includes("websiteCookieConsent=true");
+    const hasConsent = document.cookie
+  .split(";")
+  .some((cookie) => cookie.trim() === "websiteCookieConsent=true");
     if (!hasConsent) return;
 
     loadConsentedScripts();
