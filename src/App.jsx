@@ -12,6 +12,7 @@ import ErasTourShows from "./components/ErasTourShows";
 import AboutContact from "./components/AboutContact";
 import { useEffect } from 'react';
 import WeddingPage from "./components/WeddingPage";
+import { usePageMetadata } from "./lib/pageMetadata";
 
 /* ------------ Shared layout ------------ */
 
@@ -131,6 +132,7 @@ function loadConsentedScripts() {
 }
 
 function App() {
+  usePageMetadata();
   useEffect(() => {
     // We only load ads in the real live site, not the Bolt preview
     if (!import.meta.env.PROD) return;
