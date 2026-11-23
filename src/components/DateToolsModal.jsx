@@ -46,43 +46,53 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
+  const controller = new AbortController();
+
   const fetchEventsForMonth = async (month, year) => {
     try {
-      const response = await axios.get(
-        "/api/airtable?table=events",
-        {
+      const eventsMap = {};
+      let offset;
 
+      do {
+        const response = await axios.get("/api/airtable?table=events", {
+          signal: controller.signal,
           params: {
             filterByFormula: `AND(MONTH({DATE}) = ${month}, YEAR({DATE}) = ${year})`,
             fields: ["DATE"],
+            pageSize: 100,
+            offset,
           },
+        });
+
+        if (controller.signal.aborted) return;
+
+        for (const record of response.data.records || []) {
+          const raw = record.fields?.DATE;
+          if (typeof raw !== "string") continue;
+
+          const [datePart] = raw.split("T");
+          const [y, m, d] = datePart.split("-").map(Number);
+          if (!y || !m || !d) continue;
+
+          eventsMap[`${y}-${m}-${d}`] = true;
         }
-      );
 
-      const eventsMap = {};
-      response.data.records?.forEach((record) => {
-        const raw = record.fields.DATE;
-        if (!raw) return;
+        offset = response.data.offset;
+      } while (offset && !controller.signal.aborted);
 
-        const [datePart] = raw.split("T");
-        const [yearStr, monthStr, dayStr] = datePart.split("-");
-        if (!yearStr || !monthStr || !dayStr) return;
-
-        const y = Number(yearStr);
-        const m = Number(monthStr);
-        const d = Number(dayStr);
-
-        const dateKey = `${y}-${m}-${d}`;
-        eventsMap[dateKey] = true;
-      });
-
-      setDateEventsMap((prev) => ({ ...prev, ...eventsMap }));
+      if (!controller.signal.aborted) {
+        setDateEventsMap((prev) => ({ ...prev, ...eventsMap }));
+      }
     } catch (error) {
-      console.error("Error fetching calendar events:", error);
+      if (!controller.signal.aborted) {
+        console.error("Error fetching calendar events:", error);
+      }
     }
   };
 
   fetchEventsForMonth(calendarMonth + 1, calendarYear);
+
+  return () => controller.abort();
 }, [calendarMonth, calendarYear]);
 
 const getDaysInMonth = (month, year) => {
