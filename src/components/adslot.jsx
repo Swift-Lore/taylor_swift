@@ -36,20 +36,52 @@ export default function AdSlot({
       : { slot: SLOTS.leaderboard, maxWidth: 728, minHeight: 90 };
 
   useEffect(() => {
-    if (!import.meta.env.PROD) return;
+  if (!import.meta.env.PROD) return;
 
-    const ins = insRef.current;
-    if (!ins) return;
+  const ins = insRef.current;
+  if (!ins) return;
 
-    ins.removeAttribute("data-adsbygoogle-status");
-    ins.innerHTML = "";
+  let frameId;
 
-    requestAnimationFrame(() => {
-      try {
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-      } catch {}
-    });
-  }, [config.slot, pathname]);
+  const requestAd = () => {
+    if (!ins.isConnected) return;
+    if (ins.hasAttribute("data-adsbygoogle-status")) return;
+    if (ins.dataset.swiftLoreAdRequested === "true") return;
+    if (ins.getBoundingClientRect().width <= 0) return;
+
+    const script = document.querySelector(
+      'script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]'
+    );
+    if (!script) return;
+
+    ins.dataset.swiftLoreAdRequested = "true";
+
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (error) {
+      console.error("AdSense initialization failed:", error);
+    }
+  };
+
+  const scheduleAd = () => {
+    cancelAnimationFrame(frameId);
+    frameId = requestAnimationFrame(requestAd);
+  };
+
+  const resizeObserver = new ResizeObserver(scheduleAd);
+  resizeObserver.observe(ins);
+
+  const scriptObserver = new MutationObserver(scheduleAd);
+  scriptObserver.observe(document.head, { childList: true });
+
+  scheduleAd();
+
+  return () => {
+    cancelAnimationFrame(frameId);
+    resizeObserver.disconnect();
+    scriptObserver.disconnect();
+  };
+}, [config.slot, pathname]);
 
   return (
     <div
