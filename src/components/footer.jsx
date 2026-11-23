@@ -71,8 +71,19 @@ export default function Footer() {
       <div className="bg-[#8a9ad4] py-2 px-4 text-center text-white">
         <div className="max-w-5xl mx-auto flex flex-wrap justify-center items-center gap-2 md:gap-3 text-[11px] md:text-sm">
           <a href="/cookie-policy" className="text-white hover:text-gray-200 underline">
-            Cookie Policy
-          </a>
+  Cookie Policy
+</a>
+<span className="mx-1">•</span>
+<button
+  type="button"
+  className="text-white hover:text-gray-200 underline"
+  onClick={() => {
+    resetCookieConsentValue("websiteCookieConsent");
+    window.location.reload();
+  }}
+>
+  Cookie Settings
+</button>
           <span className="mx-1">•</span>
           <a href="/about" className="text-white hover:text-gray-200 underline">
             About / Contact
