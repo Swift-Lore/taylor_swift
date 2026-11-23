@@ -1,5 +1,6 @@
 import { Button } from "./ui/Button";
 import AdSlot from "./adslot";
+import { resetCookieConsentValue } from "react-cookie-consent";
 
 export default function Footer() {
   return (
