@@ -705,48 +705,56 @@ const handlePreviousDay = () => {
 
   // ===== Pre-fetch events for calendar indicators =====
   useEffect(() => {
-    const fetchEventsForMonth = async (month, year) => {
-      try {
-        const response = await axios.get(
-          "/api/airtable?table=events",
-          {
+  if (!showCalendar) return;
 
-            params: {
-  filterByFormula: `AND(MONTH({DATE}) = ${month}, YEAR({DATE}) = ${year})`,
-  fields: ["DATE"],
-},
-          }
-        )
+  const controller = new AbortController();
 
-        // Create a map of dates that have events
-const eventsMap = {}
-response.data.records?.forEach((record) => {
-  const raw = record.fields.DATE
-  if (!raw) return
+  const fetchEventsForMonth = async (month, year) => {
+    try {
+      const eventsMap = {};
+      let offset;
 
-  // Handle "YYYY-MM-DD" or "YYYY-MM-DDTHH:MM:SS..."
-  const [datePart] = raw.split("T")
-  const [yearStr, monthStr, dayStr] = datePart.split("-")
-  if (!yearStr || !monthStr || !dayStr) return
+      do {
+        const response = await axios.get("/api/airtable?table=events", {
+          signal: controller.signal,
+          params: {
+            filterByFormula: `AND(MONTH({DATE}) = ${month}, YEAR({DATE}) = ${year})`,
+            fields: ["DATE"],
+            pageSize: 100,
+            offset,
+          },
+        });
 
-  const year = Number(yearStr)
-  const month = Number(monthStr) // 1–12
-  const day = Number(dayStr)
+        if (controller.signal.aborted) return;
 
-  const dateKey = `${year}-${month}-${day}`
-  eventsMap[dateKey] = true
-})
+        for (const record of response.data.records || []) {
+          const raw = record.fields?.DATE;
+          if (typeof raw !== "string") continue;
 
-        setDateEventsMap(prev => ({ ...prev, ...eventsMap }))
-      } catch (error) {
-        console.error("Error fetching calendar events:", error)
+          const [datePart] = raw.split("T");
+          const [y, m, d] = datePart.split("-").map(Number);
+          if (!y || !m || !d) continue;
+
+          eventsMap[`${y}-${m}-${d}`] = true;
+        }
+
+        offset = response.data.offset;
+      } while (offset && !controller.signal.aborted);
+
+      if (!controller.signal.aborted) {
+        setDateEventsMap((prev) => ({ ...prev, ...eventsMap }));
+      }
+    } catch (error) {
+      if (!controller.signal.aborted) {
+        console.error("Error fetching calendar events:", error);
       }
     }
+  };
 
-    if (showCalendar) {
-      fetchEventsForMonth(calendarMonth + 1, calendarYear)
-    }
-  }, [calendarMonth, calendarYear, showCalendar])
+  fetchEventsForMonth(calendarMonth + 1, calendarYear);
+
+  return () => controller.abort();
+}, [calendarMonth, calendarYear, showCalendar]);
 
 // ===== Card component =====
 const TimelineCard = ({ record, index }) => {
