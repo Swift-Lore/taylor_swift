@@ -33,7 +33,7 @@ export default async function handler(req, res) {
   if (!process.env.AIRTABLE_API_KEY) {
     return errorPage(503, 'Event temporarily unavailable');
   }
-
+ 
   try {
     const response = await fetch(
       `https://api.airtable.com/v0/appVhtDyx0VKlGbhy/Taylor%20Swift%20Master%20Tracker/${id}`,
