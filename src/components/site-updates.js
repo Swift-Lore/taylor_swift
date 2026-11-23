@@ -1,7 +1,7 @@
 // src/config/site-updates.js
 export const SITE_UPDATES = {
-  lastUpdated: 'April 2026',
-  totalEvents: 5746,
+  lastUpdated: 'November 2026',
+  totalEvents: 5909,
   firstYear: 2003
 };
 
