@@ -85,25 +85,49 @@ function ErasTourShowsPage() {
 
 /* ------------ App root ------------ */
 
-// Loads the AdSense script exactly once. Pulled out to its own function
-// so it can be called both on mount (covers returning visitors who
-// already have the consent cookie set before the app even loads) AND
-// from the cookie banner's onAccept handler (covers first-time visitors,
-// who by definition can only click "Accept" AFTER the page has already
-// mounted — the old mount-only useEffect never re-checked, so ads never
-// loaded for anyone accepting the banner live).
-function loadAdSenseScript() {
-  const existingScript = document.querySelector(
-    'script[src*="googlesyndication.com"]'
-  );
-  if (existingScript) return;
+// Load Google scripts after acceptance, on the live domains only.
+function loadConsentedScripts() {
+  if (!import.meta.env.PROD) return;
 
-  const script = document.createElement("script");
-  script.src =
-    "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4534610257929133";
-  script.async = true;
-  script.crossOrigin = "anonymous";
-  document.head.appendChild(script);
+  if (
+    !["swift-lore.com", "www.swift-lore.com"].includes(
+      window.location.hostname
+    )
+  ) return;
+
+  if (
+    !document.querySelector(
+      'script[src*="googletagmanager.com/gtag/js"]'
+    )
+  ) {
+    window.dataLayer = window.dataLayer || [];
+
+    window.gtag = window.gtag || function () {
+      window.dataLayer.push(arguments);
+    };
+
+    window.gtag("js", new Date());
+    window.gtag("config", "G-XY6VFJX95H");
+
+    const analytics = document.createElement("script");
+    analytics.async = true;
+    analytics.src =
+      "https://www.googletagmanager.com/gtag/js?id=G-XY6VFJX95H";
+    document.head.appendChild(analytics);
+  }
+
+  if (
+    !document.querySelector(
+      'script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]'
+    )
+  ) {
+    const ads = document.createElement("script");
+    ads.async = true;
+    ads.crossOrigin = "anonymous";
+    ads.src =
+      "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4534610257929133";
+    document.head.appendChild(ads);
+  }
 }
 
 function App() {
