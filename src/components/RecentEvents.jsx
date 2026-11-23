@@ -2,6 +2,37 @@ import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import axios from "axios"
 
+// Share requests between desktop and mobile.
+// Reuse successful responses for 60 seconds.
+const recentEventRequests = new Map()
+
+function getSharedRecentEvent(url, config = {}) {
+  const key = axios.getUri({ url, ...config })
+  const cached = recentEventRequests.get(key)
+
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.promise
+  }
+
+  const entry = {
+    expiresAt: Infinity,
+    promise: null,
+  }
+
+  entry.promise = axios.get(url, config)
+    .then((response) => {
+      entry.expiresAt = Date.now() + 60_000
+      return response
+    })
+    .catch((error) => {
+      recentEventRequests.delete(key)
+      throw error
+    })
+
+  recentEventRequests.set(key, entry)
+  return entry.promise
+}
+
 const formatDate = (dateString) => {
   if (!dateString) return ""
   const date = new Date(dateString)
@@ -88,7 +119,7 @@ export default function RecentEvents({ mobileTab }) {
       const today = new Date().toISOString().split("T")[0]
       try {
         const trackerFetches = TRACKER_KEYS.map((key) =>
-          axios.get(
+          getSharedRecentEvent(
             "/api/airtable?table=events",
             {
 
@@ -103,7 +134,7 @@ export default function RecentEvents({ mobileTab }) {
         )
 
         const [recentRes, upcomingRes, ...trackerResults] = await Promise.all([
-          axios.get(
+          getSharedRecentEvent(
             "/api/airtable?table=events",
             {
 
@@ -115,7 +146,7 @@ pageSize: 4,
               },
             }
           ),
-          axios.get(
+          getSharedRecentEvent(
             "/api/airtable?table=events",
             {
 
