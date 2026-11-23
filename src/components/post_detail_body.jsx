@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import "./post_detail_body.css";
 import AdSlot from "./adslot";
+import { setEventMetadata } from "../lib/pageMetadata";
 import {
   isLikelyImage,
   isPinterestUrl,
@@ -197,35 +198,43 @@ export default function PostDetailBody() {
   }, [postId]);
 
   // Fetch post data using the postId
-  useEffect(() => {
-    const fetchPostDetails = async () => {
-      setLoading(true);
-      try {
-        if (!postId) {
-          console.error("No post ID provided");
-          setLoading(false);
-          return;
-        }
+ useEffect(() => {
+  const controller = new AbortController();
 
-        const response = await fetch(
-          `/api/airtable?table=events&id=${encodeURIComponent(postId)}`
-        );
+  const fetchPostDetails = async () => {
+    setLoading(true);
+    setEvent(null);
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch post details");
-        }
+    try {
+      if (!postId) return;
 
-        const data = await response.json();
-        setEvent(data.fields);
-      } catch (error) {
-        console.error("Error fetching post details:", error);
-      } finally {
-        setLoading(false);
+      const response = await fetch(
+        `/api/airtable?table=events&id=${encodeURIComponent(postId)}`,
+        { signal: controller.signal }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch post details");
       }
-    };
 
-    fetchPostDetails();
-  }, [postId]);
+      const data = await response.json();
+      if (controller.signal.aborted) return;
+
+      setEvent(data.fields);
+      setEventMetadata(data.fields, postId);
+    } catch (error) {
+      if (!controller.signal.aborted) {
+        console.error("Error fetching post details:", error);
+      }
+    } finally {
+      if (!controller.signal.aborted) setLoading(false);
+    }
+  };
+
+  fetchPostDetails();
+
+  return () => controller.abort();
+}, [postId]);
 
   // Populate sourceImages / nonImageLinks from event.SOURCES
   useEffect(() => {
