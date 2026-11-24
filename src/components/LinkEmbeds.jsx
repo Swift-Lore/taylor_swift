@@ -33,6 +33,13 @@ function formatPreviewTitle(value, domain) {
   const title = decodePreviewText(value).trim();
 
   if (
+    /(^|\.)zillow\.com$/i.test(domain || "") &&
+    /access.*denied|request.*blocked|captcha|verify.*human/i.test(title)
+  ) {
+    return "Property listing on Zillow";
+  }
+
+  if (
     /^\d+$/.test(title) &&
     /\.tumblr\.com$/i.test(domain || "")
   ) {
