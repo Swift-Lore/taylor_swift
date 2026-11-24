@@ -9,6 +9,22 @@
  * ==================================================================== */
 
 import { useState, useEffect, useRef } from "react";
+function decodePreviewText(value) {
+  let text = String(value ?? "");
+
+  for (let pass = 0; pass < 2; pass++) {
+    text = text.replace(
+      /&(?:#\d+|#x[0-9a-f]+|amp|quot|apos|lt|gt|nbsp);/gi,
+      (entity) => {
+        const decoder = document.createElement("textarea");
+        decoder.innerHTML = entity;
+        return decoder.value;
+      }
+    );
+  }
+
+  return text;
+}
 
 /* ------------------------------------------------------------------ */
 /*  URL / domain helpers                                               */
