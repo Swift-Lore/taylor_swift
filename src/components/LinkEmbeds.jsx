@@ -9,6 +9,22 @@
  * ==================================================================== */
 
 import { useState, useEffect, useRef } from "react";
+function decodePreviewText(value) {
+  let text = String(value ?? "");
+
+  for (let pass = 0; pass < 2; pass++) {
+    text = text.replace(
+      /&(?:#\d+|#x[0-9a-f]+|amp|quot|apos|lt|gt|nbsp);/gi,
+      (entity) => {
+        const decoder = document.createElement("textarea");
+        decoder.innerHTML = entity;
+        return decoder.value;
+      }
+    );
+  }
+
+  return text;
+}
 
 /* ------------------------------------------------------------------ */
 /*  URL / domain helpers                                               */
@@ -534,7 +550,7 @@ export const ArticlePreviewCard = ({ url }) => {
           />
           <div className="flex-1 min-w-0">
             <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-[#8e3e3e] transition-colors">
-              {previewData.title}
+              {decodePreviewText(previewData.title)}
             </h3>
             <div className="flex items-center justify-between mt-1">
               <span className="text-xs text-gray-500 truncate">{previewData.domain}</span>
@@ -556,7 +572,7 @@ export const ArticlePreviewCard = ({ url }) => {
       <div className="h-40 overflow-hidden bg-gray-100">
         <img
           src={previewData.image}
-          alt={previewData.title}
+          alt={decodePreviewText(previewData.title)}
           className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500"
           onError={(e) => {
             e.target.style.display = "none";
@@ -565,11 +581,11 @@ export const ArticlePreviewCard = ({ url }) => {
       </div>
       <div className="p-4">
         <h3 className="text-sm font-semibold text-gray-900 mb-1 line-clamp-2 group-hover:text-[#8e3e3e] transition-colors">
-          {previewData.title}
+          {decodePreviewText(previewData.title)}
         </h3>
         {previewData.description && (
           <p className="text-xs text-gray-500 mb-2 line-clamp-2 leading-relaxed">
-            {previewData.description}
+            {decodePreviewText(previewData.description)}
           </p>
         )}
         <div className="flex items-center justify-between pt-2 border-t">
