@@ -659,15 +659,22 @@ export const TikTokEmbed = ({ url }) => {
   // it always renders where it's placed, with no script timing issues.
   return (
     <iframe
-      src={`https://www.tiktok.com/embed/v2/${videoId}`}
-      width="325"
-      height="740"
-      frameBorder="0"
-      allow="encrypted-media; fullscreen; picture-in-picture"
-      allowFullScreen
-      style={{ border: "0", maxWidth: "100%" }}
-      title="TikTok video"
-    />
+  src={`https://www.tiktok.com/player/v1/${videoId}?embed_from=oembed&autoplay=1&muted=1&loop=1&description=1&music_info=1`}
+  width="325"
+  height="578"
+  allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+  allowFullScreen
+  loading="lazy"
+  style={{
+    display: "block",
+    width: "100%",
+    maxWidth: "325px",
+    height: "auto",
+    aspectRatio: "9 / 16",
+    border: 0,
+  }}
+  title="TikTok video"
+/>
   );
 };
 
