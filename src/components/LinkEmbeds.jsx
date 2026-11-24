@@ -585,7 +585,7 @@ export const ArticlePreviewCard = ({ url }) => {
         </h3>
         {previewData.description && (
           <p className="text-xs text-gray-500 mb-2 line-clamp-2 leading-relaxed">
-            {previewData.description}
+            {decodePreviewText(previewData.description)}
           </p>
         )}
         <div className="flex items-center justify-between pt-2 border-t">
