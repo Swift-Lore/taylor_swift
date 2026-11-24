@@ -29,6 +29,19 @@ function decodePreviewText(value) {
 /* ------------------------------------------------------------------ */
 /*  URL / domain helpers                                               */
 /* ------------------------------------------------------------------ */
+function formatPreviewTitle(value, domain) {
+  const title = decodePreviewText(value).trim();
+
+  if (
+    /^\d+$/.test(title) &&
+    /\.tumblr\.com$/i.test(domain || "")
+  ) {
+    const username = domain.split(".")[0];
+    return `Tumblr post by @${username}`;
+  }
+
+  return title;
+}
 
 export const getDomainFromUrl = (url) => {
   try {
