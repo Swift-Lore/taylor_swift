@@ -228,13 +228,10 @@
 .tiktok-wrapper {
   width: 100%;
   max-width: 325px;
-  height: 740px;
+  height: auto;
   overflow: hidden;
   border-radius: 16px;
-  background: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  background: #000;
 }
 
 .tiktok-embed {
